@@ -1,0 +1,84 @@
+function data = CheckFMTComputation(optsPhys,optsNum,optsPlot)
+%************************************************************************* 
+% define
+%   mu_s_i := kBT*log(rho_i) + sum( int(rho_j(r')*Phi2D(r-r'),dr') , 
+%               j = 1..N) +mu_HS(rho_i) + V_ext_i - mu_i
+% Equilibrium, (solve for each species i)
+%  (EQ i,1) mu_s_i     = 0
+%  (EQ i,2) int(rho_i) = NoParticles_i
+% Dynamics: 
+%*************************************************************************   
+    global PersonalUserOutput
+    if(nargin == 0)        
+        %Numerical Parameters    
+        Phys_Area = struct('N',[3;80],'L1',2,'L2',1.5,'y2wall',0.,...
+                           'N2bound',20,'h',1,'L2_AD',1.);
+
+        Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
+                           'y2Min',0.5,'y2Max',6,'N2',100);
+
+        Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
+                           'Ncircle',1,'N1disc',30,'N2disc',30);
+
+        %Sub_Area  = Phys_Area;
+        optsNum = struct('PhysArea',Phys_Area,...
+                         'PlotArea',Plot_Area,...
+                         'FexNum',Fex_Num,...
+                         'DDFTCode','CheckFMTComputation',...
+                         'Tmax',7,'TN',50,...  
+                         'name','default',...
+                         'Accuracy_Averaging',1e-6);
+
+        V1       = struct('V1DV1','zeroPotential');              
+        V2       = struct('V2DV2','zeroPotential');
+
+        optsPhys = struct('V1',V1,'V2',V2,...                                            
+                          'kBT',1,'eta',0.4257,...%0.4783,...%0.4257,...
+                          'nParticlesS',10,'sigmaS',1); 
+
+        lineColourDDFT={{'r','b','g'}};            
+        optsPlot = struct('lineColourDDFT',lineColourDDFT);
+        optsPlot.doDDFTPlots=true;
+        
+        AddPaths();
+    end
+    saveFigs = false;
+
+    close all;  
+    disp(['** ',optsNum.DDFTCode,' **']);
+
+    %************************************************
+    %***************  Initialization ****************
+    %************************************************    
+    PhysArea  = optsNum.PhysArea;           
+    Rs        = diag(optsPhys.sigmaS)/2;    
+    HS        = HalfSpace_FMT(PhysArea,Rs,optsNum.Accuracy_Averaging);
+    
+    %************************************************
+    %****************  Preprocess  ******************
+    %************************************************
+    
+    tic
+    fprintf(1,'Computing Fex matrices ...\n');   
+    
+    params         = optsPhys;
+    params         = rmfield(params,'V1');
+    params.FexNum  = optsNum.FexNum;
+    params.PhysArea = optsNum.PhysArea;
+    
+    params.Pts     = HS.Pts;     
+    params.Polar   = 'cart';      
+    func           = str2func(['FexMatrices_',optsNum.FexNum.Fex]);            
+    params         = rmfield(params,'eta');
+    
+    IntMatrFex_2D  = DataStorage(['HalfSpace_FMT' filesep func2str(func)],func,params,HS); %true 
+    
+    %HS.CheckAverageDensities_Rosenfeld_3D(IntMatrFex_2D);
+    if(PersonalUserOutput)
+        CheckAverageDensities_Rosenfeld_3D(HS,IntMatrFex_2D);
+    end
+    
+    optsPhys.rho_iguess = 0.1;
+    FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum);        
+
+end

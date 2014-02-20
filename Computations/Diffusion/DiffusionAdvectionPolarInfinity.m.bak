@@ -1,0 +1,162 @@
+function data = DiffusionAdvectionPolarInfinity(N1,N2,doplotsBool)
+%************************************************
+%data = DiffusionAdvectionPolarInfinity(N1,N2,doplotsBool)
+%
+% Diffusion Equation: 
+%  drhodt = Lap(rho) - u'*grad(rho);
+% Analytical Solution
+% xt = x - ux*t;   y = y - (3 + uy*t);  t0 = -1;
+%  y  = exp(-(x^2 + y^2)/(4*(t-t0)))./(t-t0);
+%************************************************
+
+    disp('** DiffusionAdvectionPolarInfinity **');
+	if(length(dbstack) == 1)
+        AddPaths();
+    end    
+    close all;
+    
+    %************************************************
+    %****************  Preprocess  ****************
+    %************************************************
+    if(nargin == 0)
+        N1 = 22;    N2 = 22; doplotsBool = true;
+    end
+    L = 3;
+    
+    %External velocity field:
+    ux  = 0; uy = -1;
+    
+    %Check Polar Spectral/Fourier map in 2D:
+    Maps = struct('PhysSpace1',@PhysSpace_R_mInf_pInf,...
+                  'PhysSpace2',@Comp_to_Phys_T_Polar,...
+                  'CompSpace1',@CompSpace_R_mInf_pInf,...
+                  'CompSpace2',@Phys_to_Comp_T_Polar);
+              
+    x1plotMax = Maps.CompSpace1(10);              
+    rPlot = Maps.PhysSpace1((0.:0.03:x1plotMax)');
+    tPlot = Maps.PhysSpace2((0:0.02:1)');
+              
+    [Pts,Diff,~,Ind,Interp] = Polar_SpectralFourier(Maps,N1,N2,rPlot,tPlot);              
+              
+    uxV = ux*ones(N1*N2,1);     uyV = uy*ones(N1*N2,1);
+    [ur,ut] = GetPolarFromCartesian(uxV,uyV,Pts.y2_kv);
+
+    rho_ic = AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,0);
+    rho_IP = AnalyticalSolution(Interp.pts1,Interp.pts2,0);
+    
+    
+    y1     = Interp.pts1.*cos(Interp.pts2);
+    y2     = Interp.pts1.*sin(Interp.pts2);     
+ 
+    doPlots_IP(Interp,real(Interp.InterPol*dofft(rho_ic,N1,N2)),rho_IP);
+
+    %****************************************************************
+    %****************  Compute time-dependent solution   ************
+    %****************************************************************
+    
+    %opts = odeset('MvPattern',speye(optsNum.N),'OutputFcn',@NoPlot,'RelTol',tol,'AbsTol',tol,'NonNegative',NNMask);
+    mM  = ones(size(Pts.y1_kv));
+    mM(Ind.outR) = 0;
+    %opts = odeset('OutputFcn',@PlotFcn,'RelTol',10^-8,'AbsTol',10^-8,'MvPattern',diag(mM));
+    opts = odeset('RelTol',10^-10,'AbsTol',10^-10,'MvPattern',diag(mM));
+    [outTimes,Rho_t] = ode15s(@Lap,[0:0.1:20],rho_ic,opts);
+    
+    %****************************************************************
+    %***********************  Postprocess   *************************
+    %****************************************************************
+    Rho_t = Rho_t';            
+    for i=1:length(outTimes)
+        rho      = Rho_t(:,i);
+        error(i,1) = max(abs( rho -  AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,outTimes(i))));
+    end    
+    name = ['(N1,N2) = (',num2str(N1),',', num2str(N2),')'];
+    data = v2struct(Rho_t,error,outTimes,N1,N2,name);
+    
+    if(~doplotsBool)
+        return;
+    end
+    
+    y1M     = reshape(y1,Interp.Nplot2,Interp.Nplot1);
+    y2M     = reshape(y2,Interp.Nplot2,Interp.Nplot1);
+
+    figure
+    for i=1:length(outTimes)
+        rho = Rho_t(:,i);
+           
+        z = real(Interp.InterPol*dofft(rho,N1,N2));
+        
+        subplot(2,1,1)
+        mesh(y1M,y2M,reshape(z,Interp.Nplot2,Interp.Nplot1));        
+        title(['Interpolation of Solution at t = ', num2str(outTimes(i))]);
+        zlim([0 max(rho_ic)]);
+        
+        subplot(2,1,2)
+        hold on;        
+        plot(outTimes(i),error(i),'o');
+        
+        pause(0.05);
+        
+    end        
+    
+    function dydt = Lap(t,rho)
+        dydt           = Diff.Lap*rho - ([diag(ur);diag(ut)])'*(Diff.grad*rho);
+        dydt(Ind.outR) = 0;
+    end
+                   
+    function y = f(rho)
+        y = DdoubleWellFE(rho) - Vext7(Pts.y1_kv,Pts.y2_kv);
+        y = y(Ind.outR == 0);
+    end
+
+    function dy = DdoubleWellFE(x)
+        dy = 2*x;
+    end
+
+
+    function y = AnalyticalSolution(r_o,theta_o,t)
+        
+        x0 = 0 + ux*t;
+        y0 = 3 + uy*t;
+        
+        [x,y]   = pol2cart(theta_o,r_o);
+        y((theta_o == 0) & (r_o == inf)) = 0;
+        [theta,r]   = cart2pol(x-x0,y-y0);
+        
+        t0 = -1;
+        y  = exp(-r.^2./(4*(t-t0)))./(t-t0);
+    end
+
+    function stat = PlotFcn(t,rho,flag)
+        if(~ isscalar(t))
+            t = 0;
+        end        
+        
+        stat = 0;
+ 
+        if isempty(flag)            
+            doPlots_IP(Interp,dofft(rho,N1,N2));      
+            zlim([0 max(rho_ic)]);
+            drawnow;
+        end
+    end
+
+     %***************************************************************
+     %***************************************************************
+     %Mapping functions:
+    function [z,dz,dx,ddx,dddx,ddddx] = Comp_to_Phys_T_Polar(xT)    
+        [z,dz,dx,ddx,dddx,ddddx] = LinearMap01(xT,0,2*pi);
+    end
+    function xf = Phys_to_Comp_T_Polar(z)           
+        xf = z/(2*pi);
+    end
+    function [z,dz,dx,ddx,dddx,ddddx] = PhysSpace_R_mInf_pInf(xf)
+        %[z,dz,dx,ddx,dddx,ddddx] = QuadMap(xf,L); 
+        [z,dz,dx,ddx,dddx,ddddx] = SqrtMap(xf,L,inf); 
+    end
+    function xf = CompSpace_R_mInf_pInf(z)
+        %xf = InvQuadMap(z,L);
+        xf = InvSqrtMap(z,L,inf);
+    end
+
+
+end

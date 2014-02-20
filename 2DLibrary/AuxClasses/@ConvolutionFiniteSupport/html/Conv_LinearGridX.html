@@ -1,0 +1,365 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Conv_LinearGridX</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-02-13"><meta name="DC.source" content="Conv_LinearGridX.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Input</a></li><li><a href="#3">Output</a></li><li><a href="#4">Initialization</a></li><li><a href="#5">Demonstration</a></li><li><a href="#7">Iteration through y_2 - levels of ptsC</a></li><li><a href="#9">Interpolation in y1 and combination of y1/y2 interpolations</a></li><li><a href="#10">Computation of convolution</a></li></ul></div><pre class="codeinput"> <span class="keyword">function</span> X = Conv_LinearGridX(this,ptsC,dataAD,weights)
+</pre><h2>Input<a name="2"></a></h2><div><ul><li>ptsC     - structure with the following members:              ('y1_kv','y2_kv','y1','y2')              where y1_kv = kron(y1,ones(N2,1))              is not in cartesian coordinate system. The cartesian              coordinates can be obtained by the use of the method              GetCartPts(ptsC.y1_kv,ptsC.y2_kv) = ptsC_Cart</li><li>dataAD   - the points ptsC are organized in a grid. In cartesian              coordinates, let the y-coordinate layers be 'Y2_Cart'. In order to              compute the convolution around the points defined through ptsC_Cart,              it is needed to integrate over an area, which is defined through dataAD.               In particular, if ptsC_Cart.y2_kv == Y2_Cart(j), then the               are to be integrated over is (in cartesian coordinates)               (dataAD(j).pts.y1_kv + ptsC_Cart.y1_kv,               dataAD(j).pts.y2_kv)               The relative distance               (dataAD(j).pts.y1_kv,dataAD(j).pts.y2_kv-ptsC_Cart.y2_kv)               is given as the structure 'ptsPolLoc' in polar coordinates.</li><li>weights - a cell with a list of functions which get a structure with         two arrays [y1_kv,y2_kv] as input and returns one         array of same size. [y1_kv,y2_kv] represents a point in polar         coordinates, representing the radial and angular         component, respectively.</li></ul></div><h2>Output<a name="3"></a></h2><p><img src="Conv_LinearGridX_eq81109.png" alt="$$X_{i,:,k}\cdot \rho = \int_{A(y_i)}  \rho({\bf r}_i+{\bf r}')w_k({\bf r}') d{\bf r}'$$"></p><p>for <img src="Conv_LinearGridX_eq47176.png" alt="${\bf r}_i = (x_i,y_i) \in GetCartPts(ptsC.y1_kv,ptsC.y2_kv)$"> and</p><p><img src="Conv_LinearGridX_eq01416.png" alt="$$A(y_i) = dataAD(j)$$"></p><p>where j is such that GetCartPts(0,ptsC.y2(j)) == y_i.</p><h2>Initialization<a name="4"></a></h2><p>We compute of the coordinates of the points in dataAD in the skewed grid, centered around the point (0,y2) in skewed coordinates.</p><p>This is done such that not the absolute value data.ptsOr.y1_kv is added to ptsC.y1(i1Pts);, but the relative y1-distance with respect to the respective center of the shape!</p><p><img vspace="5" hspace="5" src="SketchCoordinateSystem.png" alt=""> </p><pre class="codeinput">    m        = length(ptsC.y1_kv);
+    m1       = length(ptsC.y1);
+    m2       = m/m1;
+    noW      = numel(weights);
+
+    X         = zeros(m,this.M,noW+1);<span class="comment">%always include unity weight</span>
+    checkSum  = zeros(m,1);
+    ptsC_Cart = GetCartPts(this,zeros(m2,1),ptsC.y2);  <span class="comment">%Cartesian coordinates of the y2-computational axis</span>
+    Interp2   = zeros(length(dataAD(1).pts.y1_kv),length(this.Pts.x2));
+
+	<span class="keyword">for</span> i2Pts = 1:m2
+        <span class="comment">%Points which are to be integrated over are stored in dataAD(i2Pts)</span>
+        <span class="comment">%  -&gt; dataAD(i2Pts).pts are given in cartesian coordinates</span>
+        <span class="comment">%  -&gt; they are for y1Cart = 0 and y2Cart = ptsC_Cart(i2Pts).</span>
+        <span class="comment">%  -&gt; in computational variables, these points correspond with</span>
+        dataAD(i2Pts).ptsOr = GetInvCartPts(this,dataAD(i2Pts).pts.y1_kv,dataAD(i2Pts).pts.y2_kv);
+        <span class="comment">%  -&gt; They are centered around</span>
+        data_h     = GetInvCartPts(this,0,ptsC_Cart.y2_kv(i2Pts));
+        <span class="comment">%  -&gt; for any other y1Cart', the points have to be translated</span>
+        <span class="comment">%           accordingly</span>
+        <span class="comment">%  -&gt; so for point y1Cart', consider points:</span>
+        <span class="comment">%                           dataAD(i2Pts).pts.y1_kv + y1Cart'</span>
+        <span class="comment">%  -&gt; in computational variables, this translation is given by</span>
+        <span class="comment">%       ptsC.y1_kv + data.ptsOr.y1_kv, where</span>
+        dataAD(i2Pts).ptsOr.y1_kv = dataAD(i2Pts).ptsOr.y1_kv - data_h.y1_kv;
+	<span class="keyword">end</span>
+</pre><h2>Demonstration<a name="5"></a></h2><p>(with Config_2014_2_12_10_1)     [~,idx1] = min(abs(ptsC.y1));     figure('color','white');     subplot(3,1,1);     plotDemonstration(4,60,idx1);     xlim([(-1+ptsCC.y1_kv) (ptsCC.y1_kv+1)]); ylim([0 1]); pbaspect([2 1 1]);</p><pre>   subplot(3,1,2);
+   plotDemonstration(ceil(length(dataAD)/2),60,idx1);
+   xlim([(-1+ptsCC.y1_kv) (ptsCC.y1_kv+1)]); ylim([0 1]); pbaspect([2 1 1]);</pre><pre>   subplot(3,1,3);
+   plotDemonstration(length(dataAD),60,idx1);
+   xlim([(-2+ptsCC.y1_kv) (ptsCC.y1_kv+2)]); ylim([0 2]); pbaspect([2 1 1]);</pre><p><img vspace="5" hspace="5" src="DraftX.png" alt=""> </p><div><ul><li>blue lines represent gird lines of the class 'this'</li><li>black filled points : point of ptsC around which is integrated</li><li>black hollow points are points [dataAD(i).pts.y1_kv,dataAD(i).pts.y2_kv], shifted in the direction parallel to the wall so they are centered at ptsC, for three exemplaric values of i</li><li>magenta points are at one height, such that the same interpolation matrix in y_2-direction can be used</li></ul></div><h2>Iteration through y_2 - levels of ptsC<a name="7"></a></h2><p>First, we computate the interpolation in y2-direction for each point in data.</p><p>Second, we iterate through y1-levels of ptsC</p><pre class="codeinput">    <span class="keyword">for</span> i2Pts = 1:m2
+        data       = dataAD(i2Pts);
+
+        <span class="keyword">for</span> i = 1:length(data.pts.y1_kv)
+            interp2      = CompSpace2(this,data.ptsOr.y2_kv(i));
+            Interp2(i,:) = barychebevalMatrix(this.Pts.x2,interp2);
+        <span class="keyword">end</span>
+
+        <span class="comment">% Iterate through y_1 - levels of ptsC (in y_2 - loop)</span>
+        <span class="keyword">for</span> i1Pts = 1:m1
+</pre><pre class="codeinput">            <span class="keyword">if</span>(data.area == 0)
+                <span class="keyword">continue</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% Shift points of data in y1-direction to match ptsC</span>
+            <span class="keyword">if</span>(ptsC.y1(i1Pts)==Inf)
+                pts.y1_kv = Inf(size(data.ptsOr.y1_kv));
+            <span class="keyword">elseif</span>(ptsC.y1(i1Pts)==-Inf)
+                pts.y1_kv = -Inf(size(data.ptsOr.y1_kv));
+            <span class="keyword">else</span>
+                pts.y1_kv = data.ptsOr.y1_kv + ptsC.y1(i1Pts);
+            <span class="keyword">end</span>
+</pre><h2>Interpolation in y1 and combination of y1/y2 interpolations<a name="9"></a></h2><p>Go through all (shifted) points of data, compute interpolation matrix in y1-direction, and combine with interpolation in y2-direction computed previously, to get full interpolation matrix</p><pre class="codeinput">            IP = zeros(length(pts.y1_kv),this.N1*this.N2);
+            <span class="keyword">for</span> i =1:length(pts.y1_kv)
+                interp1 = CompSpace1(this,pts.y1_kv(i));
+                Interp1 = barychebevalMatrix(this.Pts.x1,interp1);
+                <span class="comment">% kron form of the two interpolations</span>
+                IP(i,:) = kronecker(Interp1,Interp2(i,:));
+            <span class="keyword">end</span>
+</pre><h2>Computation of convolution<a name="10"></a></h2><pre class="codeinput">            iPts = (ptsC.y1_kv == ptsC.y1(i1Pts)) &amp; (ptsC.y2_kv == ptsC.y2(i2Pts));
+            X(iPts,:,1)       = ones(sum(iPts),1)*(data.int*IP);
+            <span class="keyword">for</span> k = 1:noW
+                f             = str2func(weights{k});
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((data.int.*f(data.ptsPolLoc)')*IP);
+            <span class="keyword">end</span>
+            checkSum(iPts)  = data.area;
+</pre><pre class="codeinput">        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+
+    <span class="comment">%**********************************************************</span>
+    <span class="comment">%**********************************************************</span>
+    <span class="comment">%Test:</span>
+    [errAD,ierrAD] = max(abs(checkSum - sum(X(:,:,1),2)));
+    y1err = ptsC.y1_kv(ierrAD);
+    y2err = ptsC.y2_kv(ierrAD);
+
+    PrintErrorPos(errAD,<span class="string">'Max. Error in Conv_LinearGridX'</span>,y1err,y2err);
+    <span class="comment">%**********************************************************</span>
+
+
+    <span class="keyword">function</span> plotDemonstration(idx,idx2,idx1)
+        ptsCC    = GetCartPts(this,ptsC.y1(idx1),ptsC.y2(idx));
+        plot(ptsCC.y1_kv+dataAD(idx).pts.y1_kv,dataAD(idx).pts.y2_kv,<span class="string">'ok'</span>); hold <span class="string">on</span>;
+        plot(ptsCC.y1_kv,ptsCC.y2_kv,<span class="string">'ok'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'k'</span>);
+
+        markCAll = (ptsC.y2_kv == ptsC.y2(idx));
+        ptsCCAll = GetCartPts(this,ptsC.y1_kv(markCAll)+dataAD(idx).ptsOr.y1_kv(idx2),<span class="keyword">...</span>
+                            dataAD(idx).ptsOr.y2_kv(idx2));
+        plot(ptsCCAll.y1_kv,ptsCCAll.y2_kv,<span class="string">'om'</span>);
+
+        markCAll = ((ptsC.y2_kv == ptsC.y2(idx)) &amp; ((ptsC.y1_kv == ptsC.y1(idx1))));
+        ptsCCAll = GetCartPts(this,ptsC.y1_kv(markCAll)+dataAD(idx).ptsOr.y1_kv(idx2),<span class="keyword">...</span>
+                            dataAD(idx).ptsOr.y2_kv(idx2));
+        plot(ptsCCAll.y1_kv,ptsCCAll.y2_kv,<span class="string">'om'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'m'</span>);
+
+        PlotGridLines(this);
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput">The class ConvolutionFiniteSupport has no property or method named 'Conv_LinearGridX'.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+ function X = Conv_LinearGridX(this,ptsC,dataAD,weights)
+%% Input
+%
+% * ptsC     - structure with the following members:
+%              ('y1_kv','y2_kv','y1','y2')
+%              where y1_kv = kron(y1,ones(N2,1))
+%              is not in cartesian coordinate system. The cartesian
+%              coordinates can be obtained by the use of the method
+%              GetCartPts(ptsC.y1_kv,ptsC.y2_kv) = ptsC_Cart
+% * dataAD   - the points ptsC are organized in a grid. In cartesian
+%              coordinates, let the y-coordinate layers be 'Y2_Cart'. In order to
+%              compute the convolution around the points defined through ptsC_Cart, 
+%              it is needed to integrate over an area, which is defined through dataAD. 
+%               In particular, if ptsC_Cart.y2_kv == Y2_Cart(j), then the
+%               are to be integrated over is (in cartesian coordinates)
+%               (dataAD(j).pts.y1_kv + ptsC_Cart.y1_kv,
+%               dataAD(j).pts.y2_kv)
+%               The relative distance
+%               (dataAD(j).pts.y1_kv,dataAD(j).pts.y2_kv-ptsC_Cart.y2_kv)
+%               is given as the structure 'ptsPolLoc' in polar coordinates.
+% * weights - a cell with a list of functions which get a structure with 
+%         two arrays [y1_kv,y2_kv] as input and returns one
+%         array of same size. [y1_kv,y2_kv] represents a point in polar
+%         coordinates, representing the radial and angular
+%         component, respectively.
+%
+%% Output
+%
+%
+% $$X_{i,:,k}\cdot \rho = \int_{A(y_i)}  \rho({\bf r}_i+{\bf r}')w_k({\bf r}') d{\bf r}'$$
+%
+% for ${\bf r}_i = (x_i,y_i) \in GetCartPts(ptsC.y1_kv,ptsC.y2_kv)$ and
+%
+% $$A(y_i) = dataAD(j)$$
+%
+% where j is such that GetCartPts(0,ptsC.y2(j)) == y_i.
+%
+
+    %% Initialization
+    %
+    % We compute of the coordinates of the points in dataAD in the skewed 
+    % grid, centered around the point (0,y2) in skewed coordinates.
+    % 
+    % This is done such that not the absolute value data.ptsOr.y1_kv is
+    % added to ptsC.y1(i1Pts);, but the relative y1-distance 
+    % with respect to the respective center of the shape!
+    %
+    % <<SketchCoordinateSystem.png>>
+    %
+
+    m        = length(ptsC.y1_kv);
+    m1       = length(ptsC.y1);
+    m2       = m/m1;    
+    noW      = numel(weights);
+
+    X         = zeros(m,this.M,noW+1);%always include unity weight
+    checkSum  = zeros(m,1);        
+    ptsC_Cart = GetCartPts(this,zeros(m2,1),ptsC.y2);  %Cartesian coordinates of the y2-computational axis 
+    Interp2   = zeros(length(dataAD(1).pts.y1_kv),length(this.Pts.x2));    
+          
+	for i2Pts = 1:m2
+        %Points which are to be integrated over are stored in dataAD(i2Pts)        
+        %  -> dataAD(i2Pts).pts are given in cartesian coordinates
+        %  -> they are for y1Cart = 0 and y2Cart = ptsC_Cart(i2Pts).
+        %  -> in computational variables, these points correspond with 
+        dataAD(i2Pts).ptsOr = GetInvCartPts(this,dataAD(i2Pts).pts.y1_kv,dataAD(i2Pts).pts.y2_kv); 
+        %  -> They are centered around 
+        data_h     = GetInvCartPts(this,0,ptsC_Cart.y2_kv(i2Pts));
+        %  -> for any other y1Cart', the points have to be translated
+        %           accordingly        
+        %  -> so for point y1Cart', consider points:
+        %                           dataAD(i2Pts).pts.y1_kv + y1Cart'        
+        %  -> in computational variables, this translation is given by
+        %       ptsC.y1_kv + data.ptsOr.y1_kv, where
+        dataAD(i2Pts).ptsOr.y1_kv = dataAD(i2Pts).ptsOr.y1_kv - data_h.y1_kv;   
+	end
+  
+    %% Demonstration 
+    % (with Config_2014_2_12_10_1)
+%     [~,idx1] = min(abs(ptsC.y1));
+%     figure('color','white');
+%     subplot(3,1,1);
+%     plotDemonstration(4,60,idx1);
+%     xlim([(-1+ptsCC.y1_kv) (ptsCC.y1_kv+1)]); ylim([0 1]); pbaspect([2 1 1]);
+%     
+%     subplot(3,1,2);
+%     plotDemonstration(ceil(length(dataAD)/2),60,idx1);
+%     xlim([(-1+ptsCC.y1_kv) (ptsCC.y1_kv+1)]); ylim([0 1]); pbaspect([2 1 1]);
+%     
+%     subplot(3,1,3);
+%     plotDemonstration(length(dataAD),60,idx1);
+%     xlim([(-2+ptsCC.y1_kv) (ptsCC.y1_kv+2)]); ylim([0 2]); pbaspect([2 1 1]);       
+    %%
+    % 
+    % <<DraftX.png>>
+    % 
+    % * blue lines represent gird lines of the class 'this'
+    % * black filled points : point of ptsC around which is integrated
+    % * black hollow points are points
+    % [dataAD(i).pts.y1_kv,dataAD(i).pts.y2_kv], shifted in the direction
+    % parallel to the wall so they are centered at ptsC, for three exemplaric values of i    
+    % * magenta points are at one height, such that the same interpolation
+    % matrix in y_2-direction can be used
+    %
+    
+    %% Iteration through y_2 - levels of ptsC
+    %   
+    % First, we computate the interpolation in y2-direction for each point
+    % in data.
+    %
+    % Second, we iterate through y1-levels of ptsC
+    %
+   
+    
+    for i2Pts = 1:m2       
+        data       = dataAD(i2Pts);     
+        
+        for i = 1:length(data.pts.y1_kv)                        
+            interp2      = CompSpace2(this,data.ptsOr.y2_kv(i));                                                        
+            Interp2(i,:) = barychebevalMatrix(this.Pts.x2,interp2);
+        end  
+
+        % Iterate through y_1 - levels of ptsC (in y_2 - loop)
+        for i1Pts = 1:m1
+            
+            if(data.area == 0)                       
+                continue
+            end            
+
+            % Shift points of data in y1-direction to match ptsC
+            if(ptsC.y1(i1Pts)==Inf)
+                pts.y1_kv = Inf(size(data.ptsOr.y1_kv));
+            elseif(ptsC.y1(i1Pts)==-Inf)
+                pts.y1_kv = -Inf(size(data.ptsOr.y1_kv));                    
+            else
+                pts.y1_kv = data.ptsOr.y1_kv + ptsC.y1(i1Pts);
+            end                                                
+
+            %% Interpolation in y1 and combination of y1/y2 interpolations
+            % Go through all (shifted) points of data, compute interpolation matrix in y1-direction,
+            % and combine with interpolation in y2-direction computed
+            % previously, to get full interpolation matrix
+            IP = zeros(length(pts.y1_kv),this.N1*this.N2);            
+            for i =1:length(pts.y1_kv)                            
+                interp1 = CompSpace1(this,pts.y1_kv(i));
+                Interp1 = barychebevalMatrix(this.Pts.x1,interp1);                              
+                % kron form of the two interpolations                                                            
+                IP(i,:) = kronecker(Interp1,Interp2(i,:));
+            end  
+
+            %% Computation of convolution            
+            iPts = (ptsC.y1_kv == ptsC.y1(i1Pts)) & (ptsC.y2_kv == ptsC.y2(i2Pts));
+            X(iPts,:,1)       = ones(sum(iPts),1)*(data.int*IP);            
+            for k = 1:noW
+                f             = str2func(weights{k});
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((data.int.*f(data.ptsPolLoc)')*IP);
+            end
+            checkSum(iPts)  = data.area;                                
+           
+        end
+    end
+    
+    
+    %**********************************************************
+    %**********************************************************            
+    %Test:
+    [errAD,ierrAD] = max(abs(checkSum - sum(X(:,:,1),2)));
+    y1err = ptsC.y1_kv(ierrAD);
+    y2err = ptsC.y2_kv(ierrAD);            
+
+    PrintErrorPos(errAD,'Max. Error in Conv_LinearGridX',y1err,y2err);
+    %********************************************************** 
+    
+    
+    function plotDemonstration(idx,idx2,idx1)        
+        ptsCC    = GetCartPts(this,ptsC.y1(idx1),ptsC.y2(idx));    
+        plot(ptsCC.y1_kv+dataAD(idx).pts.y1_kv,dataAD(idx).pts.y2_kv,'ok'); hold on;        
+        plot(ptsCC.y1_kv,ptsCC.y2_kv,'ok','MarkerFaceColor','k');        
+
+        markCAll = (ptsC.y2_kv == ptsC.y2(idx));    
+        ptsCCAll = GetCartPts(this,ptsC.y1_kv(markCAll)+dataAD(idx).ptsOr.y1_kv(idx2),...
+                            dataAD(idx).ptsOr.y2_kv(idx2));
+        plot(ptsCCAll.y1_kv,ptsCCAll.y2_kv,'om');   
+
+        markCAll = ((ptsC.y2_kv == ptsC.y2(idx)) & ((ptsC.y1_kv == ptsC.y1(idx1))));
+        ptsCCAll = GetCartPts(this,ptsC.y1_kv(markCAll)+dataAD(idx).ptsOr.y1_kv(idx2),...
+                            dataAD(idx).ptsOr.y2_kv(idx2));
+        plot(ptsCCAll.y1_kv,ptsCCAll.y2_kv,'om','MarkerFaceColor','m');   
+
+        PlotGridLines(this); 
+    end
+    
+end
+##### SOURCE END #####
+--></body></html>

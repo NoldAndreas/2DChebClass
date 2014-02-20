@@ -1,0 +1,80 @@
+ classdef StripMinusDisk < Polar_M1SpectralSpectral
+    properties 
+        R
+        Origin = [0,0]
+        y2Wall
+        L1        
+    end
+    
+    methods
+        function this = StripMinusDisk(Geometry)
+            %Parameters:
+            %L1,R,Origin,y2Wall
+            this@Polar_M1SpectralSpectral(Geometry.N(1),Geometry.N(2));
+            
+            this.L1         = Geometry.L1;
+            this.R          = Geometry.R;
+            this.Origin = Geometry.Origin;
+            this.y2Wall     = Geometry.y2Wall;
+            
+            InitializationPts(this);                        
+            this.polar = 'polar';
+        end        
+        %***************************************************************
+        %   Mapping functions:
+        %***************************************************************             
+        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
+            
+            if(nargin == 1)
+                pts_y1 = this.Pts.y1_kv;
+                pts_y2 = this.Pts.y2_kv;
+            end
+            
+            if(strcmp(this.polar,'polar'))
+                [ptsCart.y1_kv,ptsCart.y2_kv] = pol2cart(pts_y2,pts_y1);
+                ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
+                ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
+            else
+                exc = MException('Shape:GetCartPts','select {polar,sphSurf,cart}');
+                throw(exc);                
+            end
+            
+        end
+        function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
+            
+            O = ones(size(x1));
+            
+            [y2_kv,dy2] = LinearMap(x2,pi,2*pi);
+            
+            rd          = abs((this.Origin(2)-this.y2Wall)./sin(y2_kv));
+            L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);
+            L1_r(rd==inf) = this.L1;
+            [y1_kv,dy1] = QuotientMap(x1,L1_r,O*this.R,rd);                        
+            
+             n = this.N1*this.N2;
+             if(nargout >= 3)
+                 J        = zeros(n,2,2);
+                 J(:,1,1) = dy1;
+                 %J(:,2,1) = ((1+x2)/2).*dgdx1;
+                 J(:,2,2) = dy2;
+             end
+ 
+             if(nargout >= 4)
+                 dH1        = zeros(n,2,2);                 
+             end
+ 
+             if(nargout >= 4)
+                 dH2        = zeros(n,2,2);            
+             end
+        end
+        function [x1,x2] = CompSpace(this,y1,y2)
+            exc = MException('Segment:CompSpace','not yet implemented');
+            throw(exc);
+        end
+        
+        function [int] = ComputeIntegrationVector(this)
+            int = ComputeIntegrationVector@Polar_M1SpectralSpectral(this);
+        end
+            
+    end
+end

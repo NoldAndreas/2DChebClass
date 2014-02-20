@@ -1,0 +1,111 @@
+function DiffusionDisk()
+
+    disp('** DiffusionPolarDisk **');
+
+	if(length(dbstack) == 1)
+        AddPaths();
+    end    
+    close all;
+    
+    %************************************************
+    %****************  Preprocess  ****************
+    %************************************************
+    L = 3;
+    N1 = 20;
+    N2 = 20;
+        
+    %Check Polar Spectral/Fourier map in 2D:
+    Maps = struct('PhysSpace1',@Comp_to_Phys_R,...
+                  'PhysSpace2',@Comp_to_Phys_T,...
+                  'CompSpace1',@Phys_to_Comp_R,...
+                  'CompSpace2',@Phys_to_Comp_T);
+              
+    x1plotMax = Maps.CompSpace1(L);              
+    rPlot = Maps.PhysSpace1((0.:0.03:x1plotMax)');
+    tPlot = Maps.PhysSpace2((0:0.02:1)');
+              
+    [Pts,Diff,Int,Ind,Interp] = Polar_SpectralFourier(Maps,N1,N2,rPlot,tPlot);              
+              
+    rho_ic = AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,0);
+    rhi_IP = AnalyticalSolution(Interp.pts1,Interp.pts2,0);
+       
+    y1     = Interp.pts1.*cos(Interp.pts2);
+    y2     = Interp.pts1.*sin(Interp.pts2);     
+ 
+    doPlots_IP_Polar(Interp,dofft(rho_ic,N1,N2),rhi_IP);
+
+    %****************************************************************
+    %****************  Compute time-dependent solution   ************
+    %****************************************************************
+        
+    mM           = ones(size(Pts.y1_kv));
+    mM(Ind.outR) = 0;    
+    opts = odeset('RelTol',10^-9,'AbsTol',10^-9,'Mass',diag(mM));
+    [outTimes,Rho_t] = ode15s(@Lap,[0:0.1:5],rho_ic,opts);
+    
+    %****************************************************************
+    %***********************  Postprocess   *************************
+    %****************************************************************
+   
+    figure
+    for i=1:length(outTimes)
+           
+        doPlots_IP_Polar(Interp,dofft(Rho_t(i,:)',N1,N2));
+        
+        title(['Interpolation of Solution at t = ', num2str(outTimes(i))]);       
+        zlim([0 max(rho_ic)]);        
+        
+        pause(0.05);
+        
+    end   
+    
+    function dydt = Lap(t,rho)
+        dydt            = Diff.Lap*rho;
+        dydt(Ind.outR)  = Ind.normalOutR*(Diff.grad*rho);        
+    end
+                   
+    function y = f(rho)
+        y = DdoubleWellFE(rho) - Vext7(Pts.y1_kv,Pts.y2_kv);
+        y = y(Ind.outR == 0);
+    end
+
+    function dy = DdoubleWellFE(x)
+        dy = 2*x;
+    end
+
+    function y = AnalyticalSolution(r_o,theta_o,t)
+        y = (L^2-r_o.^2).^2;
+    end
+
+    function stat = PlotFcn(t,rho,flag)
+        if(~ isscalar(t))
+            t = 0;
+        end        
+        
+        stat = 0;
+ 
+        if isempty(flag)            
+            doPlots_IP_Polar(Interp,dofft(rho,N1,N2));      
+            zlim([0 max(rho_ic)]);
+            drawnow;
+        end
+    end
+
+    %***************************************************************
+    %   Mapping functions:
+    %***************************************************************             
+    function [z,dz,dx,ddx,dddx,ddddx] = Comp_to_Phys_R(xR)
+        [z,dz,dx,ddx,dddx,ddddx] = LinearMap(xR,-L,L);
+    end
+    function [z,dz,dx,ddx,dddx,ddddx] = Comp_to_Phys_T(xT)    
+        [z,dz,dx,ddx,dddx,ddddx] = LinearMap01(xT,0,2*pi);
+    end
+    function xf = Phys_to_Comp_R(z)
+         xf  = z/L;                     
+    end
+    function xf = Phys_to_Comp_T(z)           
+        xf = z/(2*pi);
+    end
+
+
+end

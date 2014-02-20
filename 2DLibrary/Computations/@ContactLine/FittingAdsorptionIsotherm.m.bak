@@ -1,0 +1,39 @@
+function FittingAdsorptionIsotherm(this,FT_Int,n)
+    
+    mark = ((this.AdsorptionIsotherm_FT <= FT_Int(2)) & (this.AdsorptionIsotherm_FT >= FT_Int(1))); %choose range
+    
+    ft = this.AdsorptionIsotherm_FT(mark);
+    mu = this.AdsorptionIsotherm_Mu(mark)- this.optsPhys.mu_sat;    
+            
+    X = zeros(length(ft),n);
+    
+    for i = 1:n
+        X(:,i) = ft.^(-(i+2));
+    end
+        
+    a = (X'*X)\(X'*mu);
+    this.AdsorptionIsotherm_Coeff = a;
+    a
+    
+    
+    fft = FT_Int(1) + (0:0.01:1)'*(FT_Int(2)-FT_Int(1));
+    fftX = zeros(length(fft),n);
+    for i=1:n
+        fftX(:,i) = fft.^(-(i+2));
+    end
+    
+    mufft  = fftX*a;
+    
+    %Plot result
+    figure('Color','white','Position',[0 0 1300 800]);
+    subplot(1,2,1);
+    plot(this.AdsorptionIsotherm_FT,...
+        this.AdsorptionIsotherm_Mu- this.optsPhys.mu_sat,'o'); hold on;
+    plot(fft,mufft);
+    
+    subplot(1,2,2);
+    loglog(this.AdsorptionIsotherm_FT,...
+        abs(this.AdsorptionIsotherm_Mu- this.optsPhys.mu_sat),'o'); hold on;
+    loglog(fft,abs(mufft),'k','linewidth',1.5);
+    
+end

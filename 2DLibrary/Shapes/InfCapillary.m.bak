@@ -1,0 +1,192 @@
+classdef InfCapillary < SpectralSpectral
+
+    properties        
+        L1       
+        y2Min,y2Max        
+    end
+    
+    methods        
+        function this = InfCapillary(Geometry)
+
+            this@SpectralSpectral(Geometry.N(1),Geometry.N(2));
+
+            this.L1      = Geometry.L1; 
+            this.y2Min   = Geometry.y2Min; 
+            this.y2Max   = Geometry.y2Max; 
+
+            InitializationPts(this);            
+        end
+    end
+    
+    methods (Access = public)
+        function [y1,dy1,dx,ddx,dddx,ddddx] = PhysSpace1(this,x1)
+            [y1,dy1,dx,ddx,dddx,ddddx] = QuadMap(x1,this.L1,inf);            
+        end
+        function xf = CompSpace1(this,y1)            
+            xf  = InvQuadMap(y1,this.L1,inf);
+        end
+        function [th,dth,dx,ddx,dddx,ddddx] = PhysSpace2(this,x2)                
+            [th,dth,dx,ddx,dddx,ddddx] = LinearMap(x2,this.y2Min,this.y2Max);
+        end
+        function x2 = CompSpace2(this,y2)                        
+            x2  = InvLinearMap(y2,this.y2Min,this.y2Max);
+        end                        
+        
+        function [dataDisk] = AverageDiskPt(this,y20,r,N,sphere)
+            shape.N  = N;
+            shape.R  = r;     
+            
+            if((nargin == 5) && strcmp(sphere,'sphere'))
+                shape.sphere = true;
+            end
+            
+            if(y20 >= this.y2Max + r)
+                dataDisk.pts        = 0;
+                dataDisk.ptsPolLoc  = 0;
+                dataDisk.int        = 0;
+                dataDisk.area       = -1;                                
+                return;
+            end
+                        
+            if((y20 > this.y2Max) && (y20 < this.y2Max + r)) 
+                %Segment
+                shape.h            = y20 - this.y2Max;
+                shape.S            = -1;
+                                
+                area               = Segment(shape);                
+                dataDisk.pts       = area.Pts;                
+                
+            elseif(y20 == this.y2Max)                
+                %Semicircle
+                shape.th1       = pi;
+                shape.th2       = 2*pi;        
+                
+                area            = Wedge(shape);                
+                dataDisk.pts    = Pol2CartPts(area.Pts);                            
+            else
+                exc = MException('InfCapillary:AverageDiskPt','case not implemented');
+                throw(exc);
+            end                                    
+                        
+            %Shift in y2-direction
+            dataDisk.ptsPolLoc   = Cart2PolPts(area.Pts);            
+            dataDisk.pts.y2_kv   = dataDisk.pts.y2_kv + y20;
+            
+            [dataDisk.int,dataDisk.area]     = area.ComputeIntegrationVector();
+                        
+            scatter(dataDisk.pts.y1_kv,dataDisk.pts.y2_kv,'.');            
+        end                
+        function [dataCircle] = AverageCirclePt(this,y20,r,Ncircle)
+            
+            shapeLine.N = Ncircle;
+            shapeLine.R = r;
+            
+            if(y20 >= this.y2Max + r)                
+                dataCircle.pts        = 0;
+                dataCircle.ptsPolLoc  = 0;
+                dataCircle.int        = 0;
+                dataCircle.area       = -1;
+                return;
+            end                          
+            
+            if((y20 >= this.y2Max) && (y20 < this.y2Max + r)) 
+                th                 = acos((y20 - this.y2Max)/r);
+                shapeLine.th1      = 3/2*pi - th;
+                shapeLine.th2      = 3/2*pi + th;
+                
+                line               = Arc(shapeLine);
+                dataCircle.pts     = Pol2CartPts(line.Pts);
+            else
+                exc = MException('InfCapillary:AverageDiskPt','case not implemented');
+                throw(exc);
+            end
+                        
+            dataCircle.pts       = Pol2CartPts(line.Pts);            
+            dataCircle.pts.y2_kv = dataCircle.pts.y2_kv + y20;
+            dataCircle.ptsPolLoc = line.Pts;            
+                        
+            [dataCircle.int,dataCircle.area] = line.ComputeIntegrationVector();                                                   
+            
+            %Plot data            
+            scatter(dataCircle.pts.y1_kv,dataCircle.pts.y2_kv,'.');            
+        end        
+        function dataBall = AverageBallPt(this,y20,r,N)
+            shape.N  = N;
+            shape.R  = r;     
+            
+            if(y20 >= this.y2Max + r)                
+                dataBall.pts        = 0;
+                dataBall.ptsPolLoc  = 0;
+                dataBall.int        = 0;
+                dataBall.area       = -1;
+                return;
+            end    
+                    
+            if((y20 >= this.y2Max) && (y20 < this.y2Max + r)) 
+                %1b. if part of disk is in HalfSpace  (>= half)
+                %1b1. Integrate over segment in HalfSpace
+                %shape.Origin    = [0,y20];
+                th                = acos((y20 - this.y2Max)/r);
+                shape.theta1      = pi-th;
+                shape.theta2      = pi;                
+                                
+            %1c. if part of disk is in HalfSpace  (< half)    
+            else
+                exc = MException('HalfSpace_FMT:AverageDisk','case not implemented');
+                throw(exc);                
+            end            
+            
+            area               = Ball(shape); 
+            dataBall.pts       = area.PtsCart;
+            
+            %Shift in y2-direction
+            dataBall.ptsPolLoc = Cart2PolPts(area.Pts);            
+            dataBall.pts.y2_kv = dataBall.pts.y2_kv + y20;
+                        
+            [dataBall.int,dataBall.area]     = area.ComputeIntegrationVector();
+                                   
+            scatter(dataBall.pts.y1_kv,dataBall.pts.y2_kv,'.');            
+        end        
+        
+        function [X,checkSum] = InterpolateAndIntegratePtsOrigin(this,ptsOr,data,weights)
+            
+            m        = length(ptsOr.y1_kv);
+            mThis    = length(this.Pts.y1_kv);
+            noW      = size(weights,1);
+            
+            X        = zeros(m,mThis,noW+1);
+            checkSum = zeros(m,1);
+            
+            %Go through all points in box
+            for iPts = 1:m
+                
+                j   = mod(iPts,ptsOr.N2);
+                if(j==0) 
+                    j = ptsOr.N2; 
+                end 
+                %*******************************
+                % Origin:    in Box
+                % Integrate: in Box
+                %Get element of saved vector the distance corresponds with                
+                if(data(j).area ~= -1)
+                    pts = data(j).pts;
+
+                    %center the new points aroung Pts.yi_kv(iPts)
+                    pts.y1_kv = pts.y1_kv + ptsOr.y1_kv(iPts);
+
+                    %Interpolate onto the new set of points
+                    IP    = SubShapePts(this,pts);
+
+                    %Finally get correct integration weight
+                    X(iPts,:,1)       = data(j).int*IP;                
+                    for k = 1:noW
+                        f = str2func(weights(k,:));
+                        X(iPts,:,1+k) = (data(j).int.*f(data(j).ptsPolLoc.y2_kv)')*IP;                
+                    end                                        
+                    checkSum(iPts)  = data(j).area;
+                end
+            end
+        end
+        
+    end
+end

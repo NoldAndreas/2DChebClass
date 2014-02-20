@@ -1,0 +1,369 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Conv_LinearGridXY</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-02-13"><meta name="DC.source" content="Conv_LinearGridXY.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Input</a></li><li><a href="#4">Output</a></li><li><a href="#5">Initialization</a></li><li><a href="#6">Computation of interpolation matrices</a></li><li><a href="#7">Integration with weight functions</a></li><li><a href="#8">Test</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> X = Conv_LinearGridXY(this,ptsC,area,weights)
+</pre><h2>Input<a name="2"></a></h2><div><ul><li>ptsC     - structure with the following members:              ('y1_kv','y2_kv','y1','y2')              where y1_kv = kron(y1,ones(N2,1))              where y2_kv = kron(ones(N1,1),y2_kv)              and y1,y2 are in the grid of the class <i>this</i>.</li><li>area - structure with two methods (1) [int,A] = ComputeIntegrationVector() and                   (2) pts = GetCartPts(), with pts = struct(y1_kv,y2_kv)</li><li>weights - a cell with a list of functions which get a structure with         two arrays [y1_kv,y2_kv] as input and returns one         array of same size. [y1_kv,y2_kv] represents a point in polar         coordinates, representing the radial and angular         component, respectively.</li></ul></div><h2>Output<a name="4"></a></h2><p><img src="Conv_LinearGridXY_eq33847.png" alt="$$X_{i,:,k}\cdot \rho = \int_{A}  \rho({\bf r}_i+{\bf r}')w_k({\bf r}') d{\bf r}'$$"></p><div><ul><li>A is defined by input <i>area</i></li><li>r_i is defined through the i-th entry in the arrays of ptsC (note that       the arrays in ptsC are not given in cartesian coordinates, so they       have to be transformed using GetCartPts()).</li></ul></div><h2>Initialization<a name="5"></a></h2><p>Extract relevant data from object <i>area</i>:</p><div><ul><li>convArea.pts - collocation points for integration in cartesian CO</li><li>convArea.ptsOr - collocation points for integration in skewed CO                           used by this class</li></ul></div><pre class="codeinput">    [convArea.int,convArea.area] = area.ComputeIntegrationVector();
+    convArea.pts                 = area.GetCartPts();
+    convArea.ptsPolLoc           = Cart2PolPts(convArea.pts);
+    convArea.ptsOr               = GetInvCartPts(this,<span class="keyword">...</span>
+                                convArea.pts.y1_kv,convArea.pts.y2_kv);
+
+    m        = length(ptsC.y1_kv);
+    m1       = length(ptsC.y1);
+    m2       = length(ptsC.y2);
+
+    noW      = numel(weights);
+
+    X            = zeros(m,length(this.Pts.y1_kv),noW+1);<span class="comment">%always include unity weight</span>
+    Interp1      = zeros(length(convArea.pts.y1_kv),length(ptsC.y1),this.N1);
+    Interp2      = zeros(length(convArea.pts.y1_kv),length(ptsC.y2),this.N2);
+    interp1_mark = zeros(length(convArea.pts.y1_kv),length(ptsC.y1));
+    interp2_mark = zeros(length(convArea.pts.y1_kv),length(ptsC.y2));
+
+    <span class="comment">%*************************************</span>
+    <span class="comment">%For demonstration: (with Config_2014_2_12_10_1)</span>
+<span class="comment">%     figure('color','white','Position',[0 0 600 600]);</span>
+<span class="comment">%     iPtsData = 50;</span>
+<span class="comment">% 	y1pts                  = ptsC.y1 + convArea.ptsOr.y1_kv(iPtsData);</span>
+<span class="comment">% 	y1pts(ptsC.y1 == -Inf) = -Inf;</span>
+<span class="comment">% 	y1pts(ptsC.y1 == Inf)  = Inf;</span>
+<span class="comment">%</span>
+<span class="comment">% 	y2pts                  = ptsC.y2 + convArea.ptsOr.y2_kv(iPtsData);</span>
+<span class="comment">% 	y2pts(ptsC.y2 == -Inf) = -Inf;</span>
+<span class="comment">% 	y2pts(ptsC.y2 == Inf)  = Inf;</span>
+<span class="comment">%</span>
+<span class="comment">%     y1_kvP = kronecker(y1pts,ones(size(y2pts)));</span>
+<span class="comment">%     y2_kvP = kronecker(ones(size(y1pts)),y2pts);</span>
+<span class="comment">%</span>
+<span class="comment">%     ptsCCart = GetCartPts(this,ptsC.y1_kv,ptsC.y2_kv);</span>
+<span class="comment">%     ptsCart = GetCartPts(this,y1_kvP,y2_kvP);</span>
+<span class="comment">%     [~,idxP] = min((ptsC.y1_kv).^2+(ptsC.y2_kv).^2);</span>
+<span class="comment">%</span>
+<span class="comment">%     plot(ptsCart.y1_kv,ptsCart.y2_kv,'om');hold on;</span>
+<span class="comment">%     plot(ptsCCart.y1_kv(idxP)+convArea.pts.y1_kv,ptsCCart.y2_kv(idxP)+convArea.pts.y2_kv,'ok');</span>
+<span class="comment">%     plot(ptsCCart.y1_kv(idxP)+convArea.pts.y1_kv(iPtsData),ptsCCart.y2_kv(idxP)+convArea.pts.y2_kv(iPtsData),'om','MarkerFaceColor','m','MarkerSize',10);</span>
+<span class="comment">%     plot(ptsCCart.y1_kv(idxP),ptsCCart.y2_kv(idxP),'ok','MarkerFaceColor','k','MarkerSize',10);</span>
+<span class="comment">%</span>
+<span class="comment">%     this.PlotGridLines();</span>
+<span class="comment">%     xlim([-1 2]);</span>
+<span class="comment">%     ylim([0 3]);</span>
+<span class="comment">%     pbaspect([3 3 1]);</span>
+    <span class="comment">%*************************************</span>
+</pre><h2>Computation of interpolation matrices<a name="6"></a></h2><p><img vspace="5" hspace="5" src="Draft2.png" alt=""> </p><p><img vspace="5" hspace="5" src="Draft2_Combined.png" alt=""> </p><div><ul><li>blue lines: grid lines for coordinate system of the class 'this'</li><li>black points: points of area, shifted to be centered around black filled point</li><li>magenta points: for one iteration of iPtsData, points represented by the grid (y1pts,y2pts)</li><li>Note: the black points are organized in a grid, which we do not plot here, but which can be inferred from the shifted grid on which the magenta-coloured points are located.</li></ul></div><p>Interp1(iPtsData,:,:) interpolates data in the y1-direction to get data on the y1-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><p>Interp2(iPtsData,:,:) interpolates data in the y2-direction to get data on the y2-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><pre class="codeinput">    <span class="keyword">for</span> iPtsData = 1:length(convArea.pts.y1_kv)
+
+        <span class="comment">%Shift data</span>
+        y1pts                  = ptsC.y1 + convArea.ptsOr.y1_kv(iPtsData);
+        y1pts(ptsC.y1 == -Inf) = -Inf;
+        y1pts(ptsC.y1 == Inf)  = Inf;
+
+        y2pts                  = ptsC.y2 + convArea.ptsOr.y2_kv(iPtsData);
+        y2pts(ptsC.y2 == -Inf) = -Inf;
+        y2pts(ptsC.y2 == Inf)  = Inf;
+
+        interp1 = CompSpace1(this,y1pts);
+        interp2 = CompSpace2(this,y2pts);
+
+        <span class="keyword">if</span>(size(interp1,2) == 1)
+            interp1_mark(iPtsData,:) = 1;
+        <span class="keyword">else</span>
+            interp1_mark(iPtsData,:) = interp1(:,2);
+        <span class="keyword">end</span>
+        <span class="keyword">if</span>(size(interp2,2) == 1)
+            interp2_mark(iPtsData,:) = 1;
+        <span class="keyword">else</span>
+            interp2_mark(iPtsData,:) = interp2(:,2);
+        <span class="keyword">end</span>
+
+        [Interp1(iPtsData,:,:),Interp2(iPtsData,:,:)]  = <span class="keyword">...</span>
+                               ComputeInterpolationMatrix12(this,interp1,interp2);
+    <span class="keyword">end</span>
+
+    Interp1 = permute(Interp1,[1 3 2]);
+    Interp2 = permute(Interp2,[1 3 2]);
+
+    mark_id_1 = this.mark_id_1;
+    mark_id_2 = this.mark_id_2;
+    mark_12   = this.mark_12;
+    mark_id   = this.mark_id;
+</pre><h2>Integration with weight functions<a name="7"></a></h2><p>We go through each point ptsC (represented by the filled black point in the figure above. The data assembled in Interp1 and Interp2 is combined to obtain the interpolation of the blue grid onto the hollow black points. The data is then multiplied with the weights defined through the input weight functiones in 'weights', and integrated using the integration vector provided by the input object 'area'.</p><pre class="codeinput">    <span class="keyword">for</span> i2Pts = 1:m2
+        <span class="keyword">for</span> i1Pts = 1:m1
+            iPts      = (ptsC.y1_kv == ptsC.y1(i1Pts)) &amp; <span class="keyword">...</span>
+                        (ptsC.y2_kv == ptsC.y2(i2Pts));
+
+            IP = zeros(length(convArea.pts.y1_kv),length(this.Pts.y1_kv));
+            <span class="keyword">for</span> iPtsData = 1:length(convArea.pts.y1_kv)
+
+                i1mark = interp1_mark(iPtsData,i1Pts); <span class="comment">%Get identifying dimensional ID for first dimension for given point to interpolate</span>
+                i2mark = interp2_mark(iPtsData,i2Pts); <span class="comment">%Get identifying dimensional ID for second dimension for given point to interpolate</span>
+                IP(iPtsData,mark_id(:,mark_12(i1mark,i2mark))) = <span class="keyword">...</span>
+                    kronecker(Interp1(iPtsData,mark_id_1(:,i1mark),i1Pts),Interp2(iPtsData,mark_id_2(:,i2mark),i2Pts));
+            <span class="keyword">end</span>
+            X(iPts,:,1)       = ones(sum(iPts),1)*(convArea.int*IP);
+            <span class="keyword">for</span> k = 1:noW
+                f             = str2func(weights{k});
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((convArea.int.*f(convArea.ptsPolLoc)')*IP);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><h2>Test<a name="8"></a></h2><pre class="codeinput">    checkSum  = convArea.area;
+    [errAD,ierrAD] = max(abs(checkSum - sum(X(:,:,1),2)));
+    y1err = ptsC.y1_kv(ierrAD);
+    y2err = ptsC.y2_kv(ierrAD);
+
+    PrintErrorPos(errAD,<span class="string">'Max. Error in Conv_LinearGridXY'</span>,y1err,y2err);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput">The class ConvolutionFiniteSupport has no property or method named 'Conv_LinearGridXY'.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function X = Conv_LinearGridXY(this,ptsC,area,weights)
+%% Input
+%%
+% 
+% * ptsC     - structure with the following members:
+%              ('y1_kv','y2_kv','y1','y2')
+%              where y1_kv = kron(y1,ones(N2,1))
+%              where y2_kv = kron(ones(N1,1),y2_kv)
+%              and y1,y2 are in the grid of the class _this_.
+% * area - structure with two methods (1) [int,A] = ComputeIntegrationVector() and
+%                   (2) pts = GetCartPts(), with pts = struct(y1_kv,y2_kv)
+% * weights - a cell with a list of functions which get a structure with 
+%         two arrays [y1_kv,y2_kv] as input and returns one
+%         array of same size. [y1_kv,y2_kv] represents a point in polar
+%         coordinates, representing the radial and angular
+%         component, respectively.
+% 
+
+%% Output
+%
+% $$X_{i,:,k}\cdot \rho = \int_{A}  \rho({\bf r}_i+{\bf r}')w_k({\bf r}') d{\bf r}'$$
+%
+% * A is defined by input _area_ 
+% * r_i is defined through the i-th entry in the arrays of ptsC (note that 
+%       the arrays in ptsC are not given in cartesian coordinates, so they 
+%       have to be transformed using GetCartPts()).
+%
+    
+    %% Initialization    
+    %
+    % Extract relevant data from object _area_:
+    %
+    % * convArea.pts - collocation points for integration in cartesian CO
+    % * convArea.ptsOr - collocation points for integration in skewed CO
+    %                           used by this class 
+    [convArea.int,convArea.area] = area.ComputeIntegrationVector();
+    convArea.pts                 = area.GetCartPts();
+    convArea.ptsPolLoc           = Cart2PolPts(convArea.pts);
+    convArea.ptsOr               = GetInvCartPts(this,...
+                                convArea.pts.y1_kv,convArea.pts.y2_kv);
+            
+    m        = length(ptsC.y1_kv);
+    m1       = length(ptsC.y1);
+    m2       = length(ptsC.y2);
+
+    noW      = numel(weights); 
+
+    X            = zeros(m,length(this.Pts.y1_kv),noW+1);%always include unity weight
+    Interp1      = zeros(length(convArea.pts.y1_kv),length(ptsC.y1),this.N1);
+    Interp2      = zeros(length(convArea.pts.y1_kv),length(ptsC.y2),this.N2);    
+    interp1_mark = zeros(length(convArea.pts.y1_kv),length(ptsC.y1));
+    interp2_mark = zeros(length(convArea.pts.y1_kv),length(ptsC.y2));                 
+    
+    %*************************************
+    %For demonstration: (with Config_2014_2_12_10_1)
+%     figure('color','white','Position',[0 0 600 600]);
+%     iPtsData = 50;
+% 	y1pts                  = ptsC.y1 + convArea.ptsOr.y1_kv(iPtsData);
+% 	y1pts(ptsC.y1 == -Inf) = -Inf;
+% 	y1pts(ptsC.y1 == Inf)  = Inf;
+%         
+% 	y2pts                  = ptsC.y2 + convArea.ptsOr.y2_kv(iPtsData);
+% 	y2pts(ptsC.y2 == -Inf) = -Inf;
+% 	y2pts(ptsC.y2 == Inf)  = Inf;
+%                 
+%     y1_kvP = kronecker(y1pts,ones(size(y2pts)));
+%     y2_kvP = kronecker(ones(size(y1pts)),y2pts);
+%     
+%     ptsCCart = GetCartPts(this,ptsC.y1_kv,ptsC.y2_kv); 
+%     ptsCart = GetCartPts(this,y1_kvP,y2_kvP);
+%     [~,idxP] = min((ptsC.y1_kv).^2+(ptsC.y2_kv).^2);
+%         
+%     plot(ptsCart.y1_kv,ptsCart.y2_kv,'om');hold on;    
+%     plot(ptsCCart.y1_kv(idxP)+convArea.pts.y1_kv,ptsCCart.y2_kv(idxP)+convArea.pts.y2_kv,'ok');    
+%     plot(ptsCCart.y1_kv(idxP)+convArea.pts.y1_kv(iPtsData),ptsCCart.y2_kv(idxP)+convArea.pts.y2_kv(iPtsData),'om','MarkerFaceColor','m','MarkerSize',10);
+%     plot(ptsCCart.y1_kv(idxP),ptsCCart.y2_kv(idxP),'ok','MarkerFaceColor','k','MarkerSize',10);    
+%         
+%     this.PlotGridLines();    
+%     xlim([-1 2]);
+%     ylim([0 3]);
+%     pbaspect([3 3 1]);    
+    %*************************************
+    
+    %% Computation of interpolation matrices
+    % 
+    % <<Draft2.png>> 
+    %
+    % <<Draft2_Combined.png>>    
+    %
+    % * blue lines: grid lines for coordinate system of the class 'this'
+    % * black points: points of area, shifted to be centered around black
+    % filled point
+    % * magenta points: for one iteration of iPtsData, points represented by the grid
+    % (y1pts,y2pts)
+    % * Note: the black points are organized in a grid, which we do not
+    % plot here, but which can be inferred from the shifted grid on which
+    % the magenta-coloured points are located.
+    % 
+    % Interp1(iPtsData,:,:) interpolates data in the y1-direction to get
+    % data on the y1-gridlines of the grid on which the magenta-coloured
+    % points are located. This can only be done because the
+    % interpolation matrix does not depend on the y2-coordinate.
+    %
+    % Interp2(iPtsData,:,:) interpolates data in the y2-direction to get
+    % data on the y2-gridlines of the grid on which the magenta-coloured
+    % points are located. This can only be done because the
+    % interpolation matrix does not depend on the y2-coordinate.
+    
+    
+    for iPtsData = 1:length(convArea.pts.y1_kv)                
+        
+        %Shift data
+        y1pts                  = ptsC.y1 + convArea.ptsOr.y1_kv(iPtsData);
+        y1pts(ptsC.y1 == -Inf) = -Inf;
+        y1pts(ptsC.y1 == Inf)  = Inf;
+        
+        y2pts                  = ptsC.y2 + convArea.ptsOr.y2_kv(iPtsData);
+        y2pts(ptsC.y2 == -Inf) = -Inf;
+        y2pts(ptsC.y2 == Inf)  = Inf;               
+
+        interp1 = CompSpace1(this,y1pts);
+        interp2 = CompSpace2(this,y2pts);
+        
+        if(size(interp1,2) == 1)
+            interp1_mark(iPtsData,:) = 1;
+        else
+            interp1_mark(iPtsData,:) = interp1(:,2);
+        end
+        if(size(interp2,2) == 1)
+            interp2_mark(iPtsData,:) = 1;
+        else
+            interp2_mark(iPtsData,:) = interp2(:,2);
+        end
+        
+        [Interp1(iPtsData,:,:),Interp2(iPtsData,:,:)]  = ...
+                               ComputeInterpolationMatrix12(this,interp1,interp2);
+    end 
+
+    Interp1 = permute(Interp1,[1 3 2]);
+    Interp2 = permute(Interp2,[1 3 2]);    
+    
+    mark_id_1 = this.mark_id_1;    
+    mark_id_2 = this.mark_id_2;
+    mark_12   = this.mark_12;
+    mark_id   = this.mark_id;
+
+    %% Integration with weight functions
+    %
+    % We go through each point ptsC (represented by the filled black point in the
+    % figure above. The data assembled in Interp1 and Interp2 is combined
+    % to obtain the interpolation of the blue grid onto the hollow black
+    % points. The data is then multiplied with the weights defined through
+    % the input weight functiones in 'weights', and integrated using the integration
+    % vector provided by the input object 'area'.
+    
+    for i2Pts = 1:m2
+        for i1Pts = 1:m1
+            iPts      = (ptsC.y1_kv == ptsC.y1(i1Pts)) & ...
+                        (ptsC.y2_kv == ptsC.y2(i2Pts));
+
+            IP = zeros(length(convArea.pts.y1_kv),length(this.Pts.y1_kv));
+            for iPtsData = 1:length(convArea.pts.y1_kv)
+
+                i1mark = interp1_mark(iPtsData,i1Pts); %Get identifying dimensional ID for first dimension for given point to interpolate
+                i2mark = interp2_mark(iPtsData,i2Pts); %Get identifying dimensional ID for second dimension for given point to interpolate
+                IP(iPtsData,mark_id(:,mark_12(i1mark,i2mark))) = ...
+                    kronecker(Interp1(iPtsData,mark_id_1(:,i1mark),i1Pts),Interp2(iPtsData,mark_id_2(:,i2mark),i2Pts));
+            end
+            X(iPts,:,1)       = ones(sum(iPts),1)*(convArea.int*IP);
+            for k = 1:noW
+                f             = str2func(weights{k});
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((convArea.int.*f(convArea.ptsPolLoc)')*IP);
+            end
+        end
+    end
+   
+    
+    %% Test
+    checkSum  = convArea.area;  
+    [errAD,ierrAD] = max(abs(checkSum - sum(X(:,:,1),2)));
+    y1err = ptsC.y1_kv(ierrAD);
+    y2err = ptsC.y2_kv(ierrAD);
+    
+    PrintErrorPos(errAD,'Max. Error in Conv_LinearGridXY',y1err,y2err);   
+end
+
+##### SOURCE END #####
+--></body></html>
