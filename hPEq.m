@@ -1,3 +1,3 @@
 dth
 
-Das ist Bier
+Das sind zwei Bier
