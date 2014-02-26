@@ -3,7 +3,8 @@ function Job_ComputeExactAdsorptionIsotherm()
     global dirData
     AddPaths();    
     
-    ChangeDirData([dirData filesep 'FMT_CLEq_BH_40X40_epw'],'ORG');    
+    ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
+    %FMT_CLEq_BH_40X40_epw
 
     PhysArea = struct('N',[1,250],...
                       'L1_Skewed',5,...
@@ -37,7 +38,7 @@ function Job_ComputeExactAdsorptionIsotherm()
     %***********************************************************
     %Check convergence of surface tensions and errors of conact density
     
-    config.optsPhys.V1.epsilon_w = 1.47;%1.25;
+    config.optsPhys.V1.epsilon_w = 1.375;%47;%1.25;
     
     CL = ContactLine(config); %CL with normal high resolution
 	CL.Preprocess();     

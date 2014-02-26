@@ -1,16 +1,20 @@
- function [rho_cont,ell,par,OmEx,dmuCheck] = FMT_1DContinuation(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,parCont,output)
+ function [rho_cont,ell,par,OmEx,dmuCheck,pts] = FMT_1DContinuation(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,parCont,output)
     %parCont = {'mu'}
     
     if((nargin >= 7) && strcmp(output,'load'))
         res       = DataStorage('IterativeContinuationPostProcess',...
                         @PostProcessAdsorptionIsotherm,optsPhys,[],2);      
-                    
-        rho_cont    = [];
+                            
         par         = res.dmu;
         ell         = res.ell;
         OmEx        = res.OmEx;
         dmuCheck    = res.dmuCheck; 
-        %rho_cont  = res.rho_cont;
+        pts         = res.pts;
+        if(isfield(res,'rho_cont'))
+            rho_cont  = res.rho_cont;
+        else
+            rho_cont    = [];
+        end        
         return;
     end
 
@@ -120,7 +124,8 @@
     par         = res.dmu;
 	ell         = res.ell;
 	OmEx        = res.OmEx;
-	dmuCheck    = res.dmuCheck; 
+	dmuCheck    = res.dmuCheck;    
+    pts         = HS.Pts;
         
     %Check for adsorption isotherm:
     %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
@@ -335,6 +340,7 @@
         res.dmuCheck  = zeros(size(par_h));                    
         res.dmu       = par_h;
         res.rho_cont  = rho_cont_h;
+        res.pts       = HS.Pts;
         
         no_cont_h     = size(x_cont,1);
         

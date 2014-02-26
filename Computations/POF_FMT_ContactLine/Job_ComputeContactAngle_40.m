@@ -43,7 +43,7 @@ function Job_ComputeContactAngle_40()
     CLT.ComputeEquilibrium();  
 
     CLT.InitAnalysisGrid([-5 30],[0.5 18]);
-    CLT.ComputeAdsorptionIsotherm(); %load 2014_1_30_18_46
+    CLT.ComputeAdsorptionIsotherm('load'); %load 2014_1_30_18_46
     CLT.PostProcess_2DDisjoiningPressure();
     
 	%f1 = figure('Color','white','Position',[0 0 1000 600]);

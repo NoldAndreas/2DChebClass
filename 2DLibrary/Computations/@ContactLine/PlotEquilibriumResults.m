@@ -10,16 +10,16 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     
     global dirData    
     
-    if((nargin>2) && ~isempty(bounds1))
-        this.optsNum.PlotArea.y1Min = bounds1(1);
-        this.optsNum.PlotArea.y1Max = bounds1(2);
-        this.optsNum.PlotArea.y2Min = bounds2(1);
-        this.optsNum.PlotArea.y2Max = bounds2(2);
+    if((nargin>2) && ~isempty(bounds1))                        
+        PlotArea.y1Min = bounds1(1);
+        PlotArea.y1Max = bounds1(2);
+        PlotArea.y2Min = bounds2(1);
+        PlotArea.y2Max = bounds2(2);
         
-        this.optsNum.PlotArea.N1    = 100;
-        this.optsNum.PlotArea.N2    = 100;
+        PlotArea.N1    = 100;
+        PlotArea.N2    = 100;
         
-        InitInterpolation(this,true);
+        InitInterpolation(this,true,PlotArea);
     elseif(isempty(this.HS.Interp))
         InitInterpolation(this);
     end

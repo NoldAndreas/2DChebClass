@@ -451,10 +451,15 @@ classdef (Abstract) Shape < handle
                 I = w*f;
             end
         end        
-        function doPlotFLine(this,y1P,y2P,f,CART)
+        function doPlotFLine(this,y1P,y2P,f,CART,plain)
+                        
             
             if((nargin < 5) || isempty(CART))
                 CART = 'CART';
+            end
+                            
+            if((nargin < 6) || isempty(plain))
+                plain = false;
             end
             
             xi        = (0:0.002:1)';
@@ -511,13 +516,14 @@ classdef (Abstract) Shape < handle
                 IPG1     = SubShapePts(this,ptsG1);
                 IPG2     = SubShapePts(this,ptsG2);
             end
-            plot(dist,IP*f); hold on;
-            plot(distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
-            plot(distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
-            
-            xlabel('Distance from point y0');
-            ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
-            title(['Values on line from ',ptsStr]);                                                                                        
+            plot(dist,IP*f,'k','linewidth',1.5); hold on;
+            if(~plain)
+                plot(distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
+                plot(distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
+                xlabel('Distance from point y0');                            
+                ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
+                title(['Values on line from ',ptsStr]);                                                                                        
+            end                        
         end
         
     end    

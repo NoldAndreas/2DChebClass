@@ -27,6 +27,7 @@ classdef ContactLine < handle
        
         
         AdsorptionIsotherm_FT,AdsorptionIsotherm_Mu,AdsorptionIsotherm_rho,AdsorptionIsotherm_OmEx,AdsorptionIsotherm_dmuCheck,AdsorptionIsotherm_Coeff
+        AdsorptionIsotherm_Pts
         grandPot,grandPot2
         disjoiningPressure,disjoiningPressureCheck
         
@@ -154,7 +155,7 @@ classdef ContactLine < handle
         
         ComputeHardSphereMatrices(this)
         
-        ComputeAdsorptionIsotherm(this,n)        
+        ComputeAdsorptionIsotherm(this,n)    
         function [om,rho1D] = Compute1D(this,plotBool,WLWGLG)
             rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
             rhoGas_sat       = this.optsPhys.rhoGas_sat;
@@ -209,7 +210,7 @@ classdef ContactLine < handle
             global dirDataOrg
             ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
         end        
-        function InitInterpolation(this,Nodefault)
+        function InitInterpolation(this,Nodefault,PlotArea)
             
             if((nargin == 1) || ~Nodefault)
                 if(abs(this.optsNum.PhysArea.alpha_deg - 90) < 20)
@@ -231,7 +232,14 @@ classdef ContactLine < handle
                 this.optsNum.PlotArea = PlotArea;
                 this.HS.InterpolationPlotCart(PlotArea,true);
             else
-                this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);
+                if(nargin > 2)
+                    if(~isequal(this.optsNum.PlotArea,PlotArea))
+                        this.optsNum.PlotArea = PlotArea;
+                        this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);
+                    end
+                else
+                    this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);                    
+                end                
             end
                         
         end                
@@ -260,8 +268,12 @@ classdef ContactLine < handle
         PlotDisjoiningPressureAnalysis(this)    
         PlotInterfaceAnalysisY1(this)
         [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
+        
+        PlotDensitySlices(this);
                 
         I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
         SumRule_DisjoiningPotential(this,ST_LG)
+        
+        [rho,mu] = GetPointAdsorptionIsotherm(this,ell);
     end
 end
