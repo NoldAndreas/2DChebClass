@@ -452,7 +452,6 @@ classdef (Abstract) Shape < handle
             end
         end        
         function doPlotFLine(this,y1P,y2P,f,CART,plain)
-                        
             
             if((nargin < 5) || isempty(CART))
                 CART = 'CART';

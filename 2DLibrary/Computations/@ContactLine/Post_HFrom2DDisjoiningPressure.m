@@ -13,7 +13,7 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
     %*************************************
     
     %solves Eq. (17) from Henderson (2010)    
-    %sets ell_2DDisjoiningPressurew
+    %sets ell_2DDisjoiningPressure
     %uses disjoiningPressure,y1,Int_y1
     
     Diff = barychebdiff(y1,2);    

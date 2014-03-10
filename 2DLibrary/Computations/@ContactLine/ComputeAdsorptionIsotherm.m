@@ -1,10 +1,10 @@
  function ComputeAdsorptionIsotherm(this,n)   
- 
-        if(isempty(this.HS.Interp))
-            InitInterpolation(this);
-        end
 
-        [om,rho1Dwg] = Compute1D(this,false,'WG');
+    if(isempty(this.HS.Interp))
+        InitInterpolation(this);
+    end
+
+    [om,rho1Dwg] = Compute1D(this,false,'WG');
 
         optss              = this.optsPhys;   
         optss.rho_iguess   = rho1Dwg;
