@@ -5,8 +5,7 @@ classdef (Abstract) Spectral < Interval
     %**********************************************
     methods 
         function this = Spectral(N)
-             this@Interval(N);
-             
+             this@Interval(N);             
              this.Pts.x = ClenCurtFlip(N-1); 
         end      
     end
