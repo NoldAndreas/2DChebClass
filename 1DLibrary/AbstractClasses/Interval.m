@@ -76,8 +76,12 @@ classdef (Abstract) Interval < handle
             else
                 nCol = 2;
             end
-            
             nRows = ceil(nSpecies/nCol);
+            
+            if((nargin > 2) && strcmp(options,'plain'))
+                options = struct('plain',true,...
+                                 'linecolor','k','linewidth',1.5);
+            end
             
             for iSpecies = 1:nSpecies
                 if(nSpecies>1)
@@ -100,12 +104,18 @@ classdef (Abstract) Interval < handle
                     if(isfield(options,'linestyle'))
                         set(h,'LineStyle',options.linestyle);
                     end
+                    if(isfield(options,'linewidth'))
+                        set(h,'LineWidth',options.linewidth);
                 end
+                end                
+                if((nargin <= 2) || ~isfield(options,'plain') || ~options.plain)
                 hold on;
                 plot(this.Pts.y,V,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
+                end
                 
                 xlabel('$y$','Interpreter','Latex','fontsize',25);
                 xlim([min(this.Interp.pts) max(this.Interp.pts)]);
+                
                 if(nSpecies > 1)
                     title(['Species ' num2str(iSpecies)]);
                 end
