@@ -5,7 +5,7 @@ function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhase
     intitialGuess = [0.01;0.6;-2];
     i = 1;
     optsPhysVar     = optsPhys;
-    optsPhysVar.kBT = 0.5;
+    optsPhysVar.kBT = kBT_crit/2;
     
     while((intitialGuess(1) ~= intitialGuess(2)) && (optsPhysVar.kBT < kBT_crit))
         

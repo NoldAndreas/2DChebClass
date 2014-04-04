@@ -6,7 +6,11 @@ function [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = BulkValues(mu,optsPhys,intitialGuess,
     if((~isfield(optsPhys,'V2')) || strcmp(optsPhys.V2.V2DV2,'zeroPotential'))
         alpha = 0;
     else
-        Phi_r = str2func(optsPhys.V2.V2DV2);        
+        if(ischar(optsPhys.V2.V2DV2))
+            Phi_r = str2func(optsPhys.V2.V2DV2);        
+        else
+            Phi_r = optsPhys.V2.V2DV2;
+        end        
         [h_1,h_2,alpha] = Phi_r(0);    
     end
     
