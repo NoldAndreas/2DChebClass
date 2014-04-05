@@ -75,7 +75,7 @@ classdef (Abstract) Interval < handle
                 nCol = 1;
             else
                 nCol = 2;
-            end
+            end            
             nRows = ceil(nSpecies/nCol);
             
             if((nargin > 2) && strcmp(options,'plain'))
@@ -106,11 +106,11 @@ classdef (Abstract) Interval < handle
                     end
                     if(isfield(options,'linewidth'))
                         set(h,'LineWidth',options.linewidth);
-                end
+                    end
                 end                
                 if((nargin <= 2) || ~isfield(options,'plain') || ~options.plain)
-                hold on;
-                plot(this.Pts.y,V,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
+                    hold on;
+                    plot(this.Pts.y,V,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
                 end
                 
                 xlabel('$y$','Interpreter','Latex','fontsize',25);

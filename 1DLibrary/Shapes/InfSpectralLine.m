@@ -27,6 +27,7 @@ classdef InfSpectralLine < Spectral
         function xf = CompSpace(this,y)
             xf  = InvSqrtMap(y-this.y0,this.L,inf);
         end       
+        
         function M_conv = ComputeConvolutionMatrix(this,f,shapeParams,parent)
             %{
             Strategy:

@@ -6,7 +6,7 @@ function [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,intitialGuess
         alpha = 0;
     else
         if(ischar(optsPhys.V2.V2DV2))
-        Phi_r = str2func(optsPhys.V2.V2DV2);        
+            Phi_r = str2func(optsPhys.V2.V2DV2);        
         else
             Phi_r = optsPhys.V2.V2DV2;
         end        

@@ -25,9 +25,7 @@ classdef SpectralLine < Spectral
         end
         function xf = CompSpace(this,y)
             xf  = InvLinearMap(y,this.yMin,this.yMax);
-        end        
-        
-        
+        end                        
         function M_conv = ComputeConvolutionMatrix(this,f,shapeParams,parent)
             %{
             Strategy:
@@ -153,10 +151,7 @@ classdef SpectralLine < Spectral
 
             end % subshape loop
                 
-        end % convolution
-
-        
-        
+        end % convolution               
         function Eta = ComputeFMTMatrices(this,opts)
             y = this.Pts.y;
             
