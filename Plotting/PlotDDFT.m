@@ -82,7 +82,7 @@ function PlotDDFT(input,Bool_Record)
          set(gca,'fontsize',20);                        
          set(gca,'linewidth',1.5);      
          
-         print2eps([Bool_Record , '_Mass'],gcf);
+         print2eps([Bool_Record , '_M:3ass'],gcf);
          saveas(gcf,[Bool_Record , '_Mass.fig']);
          
         %(b2) Plot Mass in Subbox
@@ -107,7 +107,8 @@ function PlotDDFT(input,Bool_Record)
         k = 1; fileNames = [];
         dT = ceil(length(plotTimes)/20);
         T_n_Max = length(plotTimes);
-        for i=1:dT:T_n_Max
+        %for i=1:dT:T_n_Max
+        for i=1:T_n_Max
             
             t       = plotTimes(i);
 
@@ -195,7 +196,8 @@ function PlotDDFT(input,Bool_Record)
          for iSpecies=1:nSpecies
             subplot(nRows,2,2+iSpecies);
             shape.doPlots(rho(:,iSpecies),'SC');
-            view([-2,5,2]);     
+            %view([-2,5,2]);     
+            view([2,-5,2]);     
             title(['Species ' num2str(iSpecies)]);
          end
 

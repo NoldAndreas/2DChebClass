@@ -77,8 +77,12 @@ function output = DDFT_DiffusionPolar(optsPhys,optsNum)
         SaveToFile(optsNum.DDFTCode,v2struct(data,optsPhys,optsNum),getResultsPath());
     end            
         
-    PlotDDFT(v2struct(optsPhys,optsNum,data));   
+    output = v2struct(optsPhys,optsNum,data);
+    PlotDDFT(output);   
+    
+    %PlotDDFT(v2struct(optsPhys,optsNum,data));   
 
+    
     %***************************************************************
     %   Physical Auxiliary functions:
     %***************************************************************         

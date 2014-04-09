@@ -22,11 +22,11 @@
     elseif(exist('/home/bgoddard/','dir'))
         dirData    = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/Data/2DChebData';
         dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/DDFT/2DChebClass';
-        dirResults = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/Data/2DChebData';
+        dirResults = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/Data/2DChebData/';
     elseif(exist('/Users/Ben/','dir'))
         dirData    = '/Users/Ben/work/MATLAB/Fluids/NComponent2D/Data/2DChebData';
         dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/NComponent2D/DDFT/2DChebClass';
-        dirResults = '/Users/Ben/work/MATLAB/Fluids/NComponent2D/Data/2DChebData';
+        dirResults = '/Users/Ben/work/MATLAB/Fluids/NComponent2D/Data/2DChebData/';
     else
         disp('Unknown computer; using current directory for save data');
         dirData     = pwd;
