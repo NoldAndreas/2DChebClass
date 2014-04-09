@@ -178,7 +178,6 @@ classdef InfSpectralLine < Spectral
             end % subshape loop
                 
         end % convolution
-
         function Eta = ComputeFMTMatrices(this,opts)
             y = this.Pts.y;
             

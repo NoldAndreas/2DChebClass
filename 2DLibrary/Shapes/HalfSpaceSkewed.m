@@ -6,6 +6,11 @@ classdef HalfSpaceSkewed < HalfSpace
     
     methods        
         function this = HalfSpaceSkewed(Geometry)
+            
+            if(~isfield(Geometry,'alpha') && isfield(Geometry,'alpha_deg'))
+                Geometry.alpha = Geometry.alpha_deg*pi/180;
+            end            
+            
             Geometry.y2Min = Geometry.y2Min/sin(Geometry.alpha);
             this@HalfSpace(Geometry);
                         

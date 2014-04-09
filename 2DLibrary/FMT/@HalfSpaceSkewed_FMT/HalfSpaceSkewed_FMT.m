@@ -16,6 +16,10 @@ classdef HalfSpaceSkewed_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
         
         function this = HalfSpaceSkewed_FMT(Geometry,R)   
             
+            if(~isfield(Geometry,'alpha') && isfield(Geometry,'alpha_deg'))
+                Geometry.alpha = Geometry.alpha_deg*pi/180;
+            end            
+            
             alpha_rad = Geometry.alpha_deg*pi/180;
             L1        = Geometry.L1_Skewed/sin(alpha_rad);
             L2        = Geometry.L2_Skewed/sin(alpha_rad);
