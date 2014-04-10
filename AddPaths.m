@@ -18,7 +18,7 @@
     elseif(exist('/home/an2609/','dir'))
         dirData    = '/home/an2609/2DChebData';
         dirDDFT    = pwd;
-        dirResults = '/home/an2609/Results'; 
+        dirResults = '/home/an2609/Results';
     elseif(exist('/home/bgoddard/','dir'))
         dirData    = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/Data/2DChebData';
         dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/DDFT/2DChebClass';
