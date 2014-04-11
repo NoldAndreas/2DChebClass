@@ -111,13 +111,16 @@ function LubricationForcedWetting()
     plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout),'r:','linewidth',1.5); 
     plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'b','linewidth',1.5);    
     
+    Tout_overlap = (thetaAP^3+3*delta*(log(yP))).^(1/3) + delta*Cout*(thetaAP^3+3*delta*(log(yP))).^(-2/3);    
+    plot(yP,Tout_overlap,'b:','linewidth',1.5);
+    
     plot(yP,1 + delta*(log(yP/lambda)+Cin),'r:','linewidth',1.5);    
     plot(yP,(1+3*delta*(log(yP/lambda)+Cin)).^(1/3),'m--','linewidth',1.5);                    
     
-    %% ****
-    thT    = 1.7;
-    CoutT  = ComputeCout(theta,thT);    
-    plot(yP,thT + delta/thT^2*(log(yP) + CoutT),'b','linewidth',1.5);
+    
+    Tin_overlap = (1+3*delta*(log(yP/lambda))).^(1/3) + delta*Cin*((1+3*delta*(log(yP/lambda))).^2).^(-1/3);    
+    plot(yP,Tin_overlap,'m:','linewidth',1.5);
+    
     
     %copyobj(gcf,0);
     set(gca,'XScale','log');

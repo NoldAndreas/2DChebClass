@@ -18,8 +18,8 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
 %*************************************************************************   
     if(nargin == 0)
         %Numerical Parameters    
-        Phys_Area = struct('y1Min',0,'y1Max',10,'N1',22,...
-                           'y2Min',-10,'y2Max',10,'L2',4,'N2',22);
+        Phys_Area = struct('y1Min',0,'y1Max',10,'N',[22,22],...
+                           'y2Min',-10,'y2Max',10,'L2',4);
 
         Plot_Area = struct('y1Min',0,'y1Max',10,'N1',100,...
                            'y2Min',-10,'y2Max',10,'L2',3,'N2',100);
@@ -38,7 +38,7 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
                           'theta',pi/4,'Cn',0.6,...
                           'Ca',0.01,'Cak',0.6,'etaRho',1,'zetaRho',1,...
                           'kBT',0.7,...
-                          'nParticles',100);
+                          'nParticlesS',100);
     end
 
     disp(['** ',optsNum.DDFTCode,' **']);
@@ -65,7 +65,7 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
     %****************  Preprocess  ****************
     %************************************************       
     tic
-    IC                        = InfCapillary(PhysArea);
+    abox                      = Box(PhysArea);
     [Pts,Diff,Int,Ind,Interp] = abox.ComputeAll(optsNum.PlotArea);    
 
 %    [Path,InterpPath,Int_of_path,Int_SubOnFull] = SubSpace(SubArea,...
@@ -84,11 +84,11 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
     mu      = x_ic(1);
     rho_ic  = x_ic(2:end);
     
-    subplot(2,2,1); doPlots_IP(Interp,rho_ic);
+    subplot(2,2,1); abox.doPlots(rho_ic);
     [fE,dfE]    = f(rho_ic);
-    subplot(2,2,2); doPlots_IP(Interp,-(rho_ic.^2).*dfE/Cn);
-    subplot(2,2,3); doPlots_IP(Interp,rho_ic.*fE/Cn-mu*rho_ic);
-    subplot(2,2,4); doPlots_IP(Interp,Diff.Lap*GetExcessChemPotential(rho_ic,0,mu));
+    subplot(2,2,2);  abox.doPlots(-(rho_ic.^2).*dfE/Cn);
+    subplot(2,2,3);  abox.doPlots(rho_ic.*fE/Cn-mu*rho_ic);
+    subplot(2,2,4);  abox.doPlots(Diff.Lap*GetExcessChemPotential(rho_ic,0,mu));
     
     t_eqSol = toc;
     %****************************************************************
