@@ -4,7 +4,7 @@ function CahnHilliard_InfCapillary()
 %
 %  Contact angle always theta = pi/2 (meaning no pressure jump across the interface)
 %
-%            (Eq)  0 = 1/Cn * dW/drho - Cn*Lap(rho) - mu 
+%            (Eq)  0 = dW/drho - Cn*Lap(rho) - mu 
 %        with W(rho) = (1-rho^2)^2/(2*Cn)
 %
 % with   (BC Wall) 0 = Cn*normal*grad(rho_s) + cos(theta)*(rho-1)*rho
@@ -13,7 +13,13 @@ function CahnHilliard_InfCapillary()
 %
 % Dynamic equation (stationary, Reynolds number Re = 0)
 %
+%%
+% 
+% $$ 0 = \nabla \cdot ( (\rho + \rho_m){\bf u} )$$
 %
+% $$ 0 = - (\rho + \rho_m) \nabla \mu + Ca  \nabla \left\{  (\zeta + \eta)(\nabla \cdot {\bf u}){\bf I} + \eta \nabla {\bf u}  \right\} $$
+% 
+%  
 %*************************************************************************   
 
     %% Parameters
@@ -22,13 +28,17 @@ function CahnHilliard_InfCapillary()
     PhysArea  = struct('y2Min',0,'y2Max',10,'N',[20,20],'L1',1);    
     PlotArea  = struct('y2Min',0,'y2Max',10,'N1',80,...
                        'y1Min',-5,'y1Max',5,'N2',80);                                       
+    M = PhysArea.N(1)*PhysArea.N(2);   
              
     % Physical Parameters
     mu_s  = 0;   % Chemical potential (saturation = 0)
     Cn    = 1;   % Cahn number (=1,microscopic scaling)
     theta = pi/2; %Equilibrium contact angle
-    Ca    = 1;   % Capillary number
+    Ca    = 0.1;   % Capillary number
     rho_m = 0.5; % = (rhoL+rhoV)/(rhoL-rhoV)
+    
+    etaRho  = 1;
+    zetaRho = 0;
                   
     %% Initialization
     
@@ -42,15 +52,11 @@ function CahnHilliard_InfCapillary()
     
     %% Dynamics
     
-    mM             = ones(N1*N2,1);
-    mM(Ind.bound)  = 0;
-    opts           = odeset('RelTol',10^-8,'AbsTol',10^-8,...
-                            'Mass',diag(repmat(mM,3,1)));
-    x_ic           = [rho_ic ; zeros(2*N1*N2,1)];
-    [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);        
+    x_ic    = fsolve(@f_dyn,[rho_ic ; zeros(2*M,1)]);    
     
+ 
     %% Functions    
-	function y = f_eq(rho_s)                
+	function y = f_eq(rho_s)
         y            = GetExcessChemPotential(rho_s,0,mu_s); 
         
         % Boundary Conditions
@@ -63,7 +69,7 @@ function CahnHilliard_InfCapillary()
     end
 
 	function y = f_dyn(x)        
-        x        = reshape(x,N1*N2,3);
+        x        = reshape(x,M,3);
         rho      = x(:,1);
         u        = x(:,2);
         v        = x(:,3);
@@ -71,47 +77,44 @@ function CahnHilliard_InfCapillary()
         uv       = uv(:);
         rho2     = repmat(rho,2,1); 
 
-        drhodt   =  - Diff.div*(uv.*rho2);
+        %Continuity
+        cont     =  - Diff.div*(uv.*rho2);
         
         %Convective term:        
         C        = [diag(u) diag(v)]*Diff.grad;
-        CC       = blkdiag(C,C);
+        %CC       = blkdiag(C,C);        
+        %- CC*uv +...
         
+        momChemPot  = -(rho2+rho_m).*(Diff.grad*GetExcessChemPotential(rho,0,mu_s)); 
+        %+ (Diff.gradLap*rho)*Cn/Cak;                            
         
-        duvdt    =  - CC*uv +... 
-                    - (1 - 6*rho2 + 6*rho2.^2).*(Diff.grad*rho)/(Cn*Cak) + ...
-                    + etaRho*(Diff.LapVec*uv) + ...
-                    + zetaRho*(Diff.gradDiv*uv) + ...
-                    + (Diff.gradLap*rho)*Cn/Cak;                            
+        mom      =  momChemPot + ...
+                    + Ca*(etaRho*(Diff.LapVec*uv) + ...
+                    + zetaRho*(Diff.gradDiv*uv));  
         
         %Pressure Term = - grad(p)/rho 
         %              = - 1/rho*d(rho^2 *df )/drho *grad(rho)/(Cn*Cak)
-        %              = - (1 - 6rho + 6rho^2)*grad(rho)/(Cn*Cak)
-                
-        rhoL         = rho(Ind.left);
-        rhoR         = rho(Ind.right);
-        %Boundary Conditions for velocities
-        duvdt([Ind.left;Ind.left])    = uv([Ind.left;Ind.left]);
-        duvdt([Ind.right;Ind.right])  = uv([Ind.right;Ind.right]);
-        [uvBottom,uvTop] = FlowAtEntries(t);
-        duvdt([Ind.top;Ind.top])      = uvTop - uv([Ind.top;Ind.top]);
-        duvdt([Ind.bottom;Ind.bottom])= uvBottom - uv([Ind.bottom;Ind.bottom]);        
-        %duvdt([Ind.top;Ind.top])      = uv([Ind.top;Ind.top]);
-        %duvdt([Ind.bottom;Ind.bottom])= uv([Ind.bottom;Ind.bottom]);        
+        %              = - (1 - 6rho + 6rho^2)*grad(rho)/(Cn*Cak)                
+        rhoB     = rho(Ind.bottom);
+        rhoT     = rho(Ind.top);
         
-        %Boundary Conditions for density
-        drhodt(Ind.left)  = Cn*(Ind.normalLeft*(Diff.grad*rho)) + cos(theta)*(rhoL-1).*rhoL;
-        drhodt(Ind.right) = Cn*(Ind.normalRight*(Diff.grad*rho)) + cos(theta)*(rhoR-1).*rhoR;
-        drhodt(Ind.top)   = Ind.normalTop*(Diff.grad*rho);
-        drhodt(Ind.bottom)= Ind.normalBottom*(Diff.grad*rho);
+        %Boundary Conditions for velocities                
+        mom([Ind.top;Ind.top])      = uv([Ind.top;Ind.top]) - [ones(sum(Ind.top),1);zeros(sum(Ind.top),1)];
+        mom([Ind.bottom;Ind.bottom])= uv([Ind.bottom;Ind.bottom]);        
+        
+        %Boundary Conditions for density       
+        cont(Ind.bottom) = Cn*(Ind.normalBottom*(Diff.grad*rho)) + cos(theta)*(rhoB-1).*rhoB;
+        cont(Ind.top)    = Cn*(Ind.normalTop*(Diff.grad*rho)) + cos(theta)*(rhoT-1).*rhoT;        
+        
+        %drhodt(Ind.top)   = Ind.normalTop*(Diff.grad*rho);
+        %drhodt(Ind.bottom)= Ind.normalBottom*(Diff.grad*rho);
 
         %flux_dir           = Diff.grad*mu_s;
         %drhodt(Ind.bound)  = Ind.normal*flux_dir;        
 %        drhodt(Ind.top)    = rho_s(Ind.top) - rho_ic(Ind.top);%Ind.normalTop*(Diff.grad*rho_s);
 %        drhodt(Ind.bottom) = rho_s(Ind.bottom) - rho_ic(Ind.bottom);%Ind.normalBottom*(Diff.grad*rho_s);
              
-        dxdt = [drhodt ; duvdt];   
-              
+        y = [cont ; mom];                 
     end
 
 
