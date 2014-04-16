@@ -1,4 +1,4 @@
-function CahnHilliard_InfCapillary()
+ function CahnHilliard_InfCapillary()
 
 %************************************************************************* 
 %

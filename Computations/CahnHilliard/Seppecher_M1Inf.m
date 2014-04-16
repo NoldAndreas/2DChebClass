@@ -1,4 +1,4 @@
-function data = Seppecher_M1Inf(optsPhys,optsNum)
+function data = Seppecher_M1Inf()
 %************************************************************************* 
 %data = Seppecher(optsPhys,optsNum)
 %
@@ -7,34 +7,29 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
 %(BC outer Radius) 0 = normal*grad(rho_s);
 %
 %*************************************************************************   
-    if(nargin == 0)        
-        %Numerical Parameters    
-        Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N1',50,...
-                           'y2Min',0,'y2Max',20,'N2',20,'L1',12); %y1Max = 20
 
-        Plot_Area = struct('y1Min',-20,'y1Max',20,'N1',120,...
-                           'y2Min',0,'y2Max',Phys_Area.y2Max,'N2',40,...
-                           'N1Vecs',40,'N2Vecs',6,'Hy2',3);
+    % Numerical Parameters    
+    PhysArea = struct('N',[50,20],'y2Min',0,'y2Max',20,'L1',12);
 
-        Sub_Area  = struct('y1Min',-5,'y1Max',5,'N1',50,...
-                           'y2Min',0,'y2Max',Phys_Area.y2Max,'N2',30);
+    PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
+                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
+                       'N1Vecs',40,'N2Vecs',6,'Hy2',3);
 
-        optsNum   = struct('PhysArea',Phys_Area,...
-                           'PlotArea',Plot_Area,'SubArea',Sub_Area,...
-                           'DDFTCode','Seppecher_M1Inf',...
-                           'plotTimes',0:0.1:5);                            
+    Sub_Area  = struct('y1Min',-5,'y1Max',5,'N1',50,...
+                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',30);
 
-        optsPhys  = struct('theta',pi/2,'g',0,...
-                           'D_A',0.,'rho_m',2,'nu',10,'Ca',0.02,... 
-                           'nParticles',0,'UWall',-1);
-
-        set(0,'defaultaxesfontsize',20);
-        set(0,'defaultlinelinewidth',1.);
-        set(0,'defaulttextfontsize',15.);
-        %set(0,'defaultaxeswidth',1);
-    end                     
-
-    disp(['** ',optsNum.DDFTCode,' **']);
+    plotTimes   = (0:0.1:5);                                    
+	nParticles  = 0;    
+    
+    % Physical Parameters
+    g           = 0;
+    theta       = pi/2;
+    D_A         = 0.;    
+    rho_m       = 2;
+    nu          = 10;
+    Ca          = 0.02; 
+    Cn          = 4/3;    
+    UWall       = -1;        
     
     %************************************************
     %***************  Initialization ****************
@@ -42,36 +37,41 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
     
     %Maps   = struct('PhysSpace',@Comp_to_Phys,'CompSpace',@Phys_to_Comp);
     %MapsIF = struct('PhysSpace',@Comp_to_PhysIF,'CompSpace',@Phys_to_CompIF);
-    IF.y1  = zeros(optsNum.PhysArea.N2,1);    
-    
-    [nParticles,g,theta,D_A,rho_m,nu,Ca,Cn,UWall]  = LoadPhysData_Sepp();                   
-    [N1,N2,PhysArea,SubArea,PlotArea,~]            = LoadNumDataM1_Sepp();
+    %IF.y1  = zeros(optsNum.PhysArea.N2,1);    
+        
+    %[N1,N2,PhysArea,SubArea,PlotArea,~] = LoadNumDataM1_Sepp();
+    M  = PhysArea.N(1)*PhysArea.N(2);
+    FF = false(2*M,1); F = false(M,1); 
+    TT = true(2*M,1);  T = true(M,1); 
+    OO = ones(2*M,1);  O = ones(M,1);
+    ZZ = zeros(2*M,1); Z = zeros(M,1);
 
-    FF = false(2*N1*N2,1); F = false(N1*N2,1); 
-    TT = true(2*N1*N2,1);  T = true(N1*N2,1); 
-    OO = ones(2*N1*N2,1);  O = ones(N1*N2,1);
-    ZZ = zeros(2*N1*N2,1); Z = zeros(N1*N2,1);
-
-    uwall      = [UWall*O ; 0*O];   
-    InterpFunc = @M1SpectralSpectral_Interpolation;
+    uwall      = [UWall*O ; 0*O];       
         
     %************************************************
     %****************  Preprocess  ******************
-    %************************************************       
-    [PtsIFY2,DiffIF,IntIF]      = Spectral(MapsIF,N2);
-    [Pts,Diff,Int,Ind,Interp]   = M1SpectralSpectral(Maps,N1,N2,PlotArea.x1Plot,PlotArea.x2Plot);
+    %************************************************    
+    IC                        = InfCapillary(PhysArea);    
+    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);           
     
-    [Path,InterpPath,Int_of_path,Int_SubOnFull] = SubSpace(SubArea,...
-               @M1SpectralSpectral_Interpolation,Pts,Maps,'normal','cart');        
+    %[Path,InterpPath,Int_of_path,Int_SubOnFull] = SubSpace(SubArea,...
+%               @M1SpectralSpectral_Interpolation,Pts,Maps,'normal','cart');        
 
-    [InterpPathUpper,Int_of_pathUpper] = Path2DVec(InterpFunc,Pts,Maps,@f_pathUpperLimit,N1*5,'normal');    
-    [InterpPathLower,Int_of_pathLower] = Path2DVec(InterpFunc,Pts,Maps,@f_pathLowerLimit,N1*5,'normal');   
+%    [InterpPathUpper,Int_of_pathUpper] = Path2DVec(InterpFunc,Pts,Maps,@f_pathUpperLimit,N1*5,'normal');    
+%    [InterpPathLower,Int_of_pathLower] = Path2DVec(InterpFunc,Pts,Maps,@f_pathLowerLimit,N1*5,'normal');   
     
-    [InterpPlotUV,PtsPlotSepp]         = GetUVInterpPlotting();%[-15 15],[1 5],40,30);        
+%     u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
+% 	figure;
+% 	doPlots_SC_Path(InterpPathUpper,u_flow.*(repmat(rho,2,1)+rho_m));
+% 
+% 
+%     [InterpPlotUV,PtsPlotSepp]         = GetUVInterpPlotting();%[-15 15],[1 5],40,30);        
+%    
+%     
             
     IBB       = [Ind.bound;Ind.bound];
     bulkSolve = (~Ind.right & ~Ind.left);
-    [~,y2]    = Maps.PhysSpace(zeros(N2,1),Pts.x2);
+    %[~,y2]    = Maps.PhysSpace(zeros(N2,1),Pts.x2);
          
     %BC at wall and left and right boundaries (at +/- infinity)
     uvBound  = Z;
@@ -80,20 +80,20 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
     %****************************************************************
     %******** Solve for equilibrium density distribution ************
     %****************************************************************        
-    mu    = zeros(N1*N2,1);               
+    mu    = zeros(M,1);               
     rho   = - tanh(Pts.y1_kv*3/4);        
-    IF    = FindInterface(InterpFunc,Pts,Maps,rho);
+   % IF    = FindInterface(InterpFunc,Pts,Maps,rho);
     theta = pi/2; nParticles = 0; y10 = 0; D_B = 0; rhoInf = -1;
     
     
-    theta = pi/2 + atan((IF.y1(1)-IF.y1(end))/PhysArea.y2Max);
-    rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
+    %theta = pi/2 + atan((IF.y1(1)-IF.y1(end))/PhysArea.y2Max);
+ %   rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
 
-    y     = NewtonMethod([0;rho(bulkSolve)],@f_eq);                 
-    rho   = GetFullRho(y(2:end));
+  %  y     = NewtonMethod([0;rho(bulkSolve)],@f_eq);                 
+  %  rho   = GetFullRho(y(2:end));
 
-    eps = 10^(-5);
-    doPlots_SC_Path(InterpPathUpper,rho); xlim([2 100]); ylim([-1-eps,-1+eps]);
+%    eps = 10^(-5);
+%    doPlots_SC_Path(InterpPathUpper,rho); xlim([2 100]); ylim([-1-eps,-1+eps]);
     
     for k = 1:3
         %nParticles = (pi/2 - theta)*(PhysArea.y1Max)^2;        
@@ -101,9 +101,15 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
                                     
             %*** 1st Step ***
             %Solve for parameter D_B to ensure Mass Balance
-            D_B  = fsolve(@GetMassInflux,D_B);     
+         %   D_B  = fsolve(@GetMassInflux,D_B);     
+            D_B = 0;
             
             u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
+            IC.doPlotsStreamlines(u_flow,Ind.top);
+            IC.doPlotsFlux(u_flow)
+            %********************************Done until here with a lot of
+            %gaps
+            
             figure;
             doPlots_SC_Path(InterpPathUpper,u_flow.*(repmat(rho,2,1)+rho_m));
             xlim([-40 40]);            
@@ -171,7 +177,7 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
         y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
         J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];
         
-        E               = eye(N1*N2);
+        E               = eye(M);
         ETop            = E(Ind.top,:);
         topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
         y(Ind.top)      = topDirection*(Diff.grad*rho_s); %Ind.normalTop*(Diff.grad*rho_s); %TODO!!!
@@ -197,7 +203,7 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
         y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
         %J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];
         
-        E               = eye(N1*N2);
+        E               = eye(M);
         ETop            = E(Ind.top,:);
         topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
         y(Ind.top)      = topDirection*(Diff.grad*rho_s); %Ind.normalTop*(Diff.grad*rho_s); %TODO!!!
@@ -220,7 +226,7 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
     end
     function [mu,uv,A,b] = GetVelocityAndChemPot(rho)
         
-        A               = eye(3*N1*N2);  b = zeros(3*N1*N2,1);
+        A               = eye(3*M);  b = zeros(3*M,1);
         
         [Af,bf]         = ContMom_DiffuseInterfaceSingleFluid(rho,optsPhys,Diff);
         A([~Ind.bound;~IBB],:)   = Af([~Ind.bound;~IBB],:);   
@@ -279,8 +285,8 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
         
         disp(['Error: ',num2str(max(abs(A*x-b)))]);
 
-        mu              = x(1:N1*N2);
-        uv              = x(1+N1*N2:end);
+        mu              = x(1:M);
+        uv              = x(1+M:end);
                 
         [At,bt] = CahnHilliard_DivergenceOfStressTensor(rho,optsPhys,Diff);
         disp(['Error of divergence of stress tensor: ',num2str(max(abs(At*[mu;uv] + bt)))]);       
@@ -368,8 +374,8 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
         [x1New,x2New] = Phys_to_Comp(y1New,y2New);        
         
         %3rd step: Interpolate V onto new points
-        IPUpdate = zeros(N1*N2);
-        for ii=1:N1*N2
+        IPUpdate = zeros(M);
+        for ii=1:M
             hInt            = M1SpectralSpectral_Interpolation(x1New(ii),x2New(ii),Pts,Maps);
             IPUpdate(ii,:)  = hInt.InterPol;
         end        
@@ -405,20 +411,7 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
         rho_Full(Ind.right)  = rhoInf;
         rho_Full(Ind.left)   = 1; 
     end
-
-    function [nParticles,g,theta,D_A,rho_m,nu,Ca,Cn,uwall] = LoadPhysData_Sepp()
-        nParticles  = optsPhys.nParticles;
-        g           = optsPhys.g;
-        theta       = optsPhys.theta;
-                
-        D_A         = optsPhys.D_A;    
-        rho_m       = optsPhys.rho_m;
-        nu          = optsPhys.nu;    
-        Ca          = optsPhys.Ca;                 
-        Cn          = 4/3;
-        optsPhys.Cn = Cn;        
-        uwall       = optsPhys.UWall;
-    end
+    
     function [N1,N2,PhysArea,SubArea,PlotArea,plotTimes] = LoadNumDataM1_Sepp()
         N1        = optsNum.PhysArea.N1; 
         N2        = optsNum.PhysArea.N2;
@@ -458,9 +451,9 @@ function data = Seppecher_M1Inf(optsPhys,optsNum)
     end    
 
     function aT = transposeVec(a)              
-        aT                = zeros(N1*N2,2*N1*N2);
-        aT(:,1:N1*N2)     = diag(a(1:N1*N2));
-        aT(:,1+N1*N2:end) = diag(a(1+N1*N2:end));
+        aT                = zeros(M,2*M);
+        aT(:,1:M)     = diag(a(1:M));
+        aT(:,1+M:end) = diag(a(1+M:end));
     end
     function [InterpPlotUV,PtsPlotSepp] = GetUVInterpPlotting()%y1Int,y2Int,n1,n2)
         

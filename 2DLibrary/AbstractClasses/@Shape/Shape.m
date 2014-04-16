@@ -177,7 +177,32 @@ classdef (Abstract) Shape < handle
             else
                 IP = ComputeInterpolationMatrix(this,y1Plot,y2Plot,true,false);           
             end
-        end                            
+        end           
+        
+        function doPlotsStreamlines(this,flux,startMask)
+            mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
+                               (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
+                               (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
+                               (this.Pts.y2_kv >= min(this.Interp.pts2)));                                                           
+            PtsYCart  = GetCartPts(this,this.Pts.y1_kv,this.Pts.y2_kv);
+                                       
+            fl_y1  = this.Interp.InterPol*flux(1:this.N1*this.N2);
+            fl_y1  = reshape(fl_y1,this.Interp.Nplot2,this.Interp.Nplot1);
+            
+            fl_y2  = this.Interp.InterPol*flux(this.N1*this.N2+1:end);
+            fl_y2  = reshape(fl_y2,this.Interp.Nplot2,this.Interp.Nplot1);
+            
+            yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);                        
+            y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
+            y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);                               
+            
+            streamline(y1M,y2M,fl_y1,fl_y2,...
+                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
+            hold on;
+            streamline(y1M,y2M,-fl_y1,-fl_y2,...
+                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
+        end
+        
         function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c)
             global PersonalUserOutput
             if(~PersonalUserOutput)
