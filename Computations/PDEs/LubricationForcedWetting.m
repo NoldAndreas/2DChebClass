@@ -15,8 +15,7 @@ function LubricationForcedWetting()
     delta   = 0.3;
     lambda  = 1e-5;
     theta   = 1;           
-
-    N = 500;
+    N       = 1000;
     
     %% Initialization
     %     
@@ -27,6 +26,11 @@ function LubricationForcedWetting()
 
     HIS            = HalfInfSpectralLine(shape);    
     [Pts,Diff,Int] = HIS.ComputeAll(plotShape);                
+        
+    [IP_In,yInner] = HIS.InterpolationPlot(struct('yMin',0,'yMax',160*lambda,'N',2*N),false);    
+    [IP_SIn,ySInner] = HIS.InterpolationPlot(struct('yMin',0,'yMax',lambda,'N',N),false);    
+   % IP_In          = HIS.ComputeInterpolationMatrix(yInner,false);
+    
     y              = Pts.y; 
     DDy            = Diff.DDy;      
     
@@ -71,29 +75,64 @@ function LubricationForcedWetting()
     end
     plot(th,hh);
         
+    % ...in inner region variables
+    hI_0 = y;  
+    hIP_0 = ones(N,1);  
+    hI_1  = (log(y+1).*(y+1).^2-log(y).*(y.^2)-y)/2;
+    hIP_1 = (y+1).*log(y+1)-y.*log(y);     
+    
+    z1 = y;
+    help1 = (2*log(z1).*log(z1+1).*(z1.^2)+2*log(z1).*log(z1+1).*z1-log(z1).*(z1.^2)+log(z1+1).*(z1.^2)+4*dilog(-z1).*(z1.^2)+2*log(z1+1).*z1+4*dilog(-z1).*z1+log(z1+1)-z1)./((z1+1).*z1);
+    help1(1) = 0;
+    help1(end) = 0;
+    help1 = -1/2*help1;
+    hIP_2 = IntM*help1-y*pi.^2/3;
     
     % Outer Region    
+    
     thetaAP     = ComputeThetaAP();        
     Cout        = ComputeCout(theta,thetaAP);    
 %    thetaAP    = (1-3*delta*log(c*L))^(1/3);%2.32;%
     disp(['thetaAP = ',num2str(thetaAP)]);
         
     h0P         = theta-(theta-thetaAP)*exp(-y);                    
-    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f1'),struct('f',@f1),false);
+    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f1'),struct('f',@f1),true);
     h1 = st.hN; h1P = st.hNP;
-    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f2'),struct('f',@f2),false);
+    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f2'),struct('f',@f2),true);
     h2 = st.hN; h2P = st.hNP;
     %[h1,h1P]    = ComputeNextOrder(@f1);        
     %[h2,h2P]    = ComputeNextOrder(@f2);
 
     %% Plot results
+    figIn = figure('color','white','Position',[0 0 800 800]);    
+    yG1 = y(y>1);
+    plot(yInner/lambda,IP_In.InterPol*hP,'k','linewidth',1.5); hold on;
+    plot(ySInner/lambda,IP_SIn.InterPol*hP,'k','linewidth',1.5); hold on;    
+    
+    plot(y,hIP_0+delta*hIP_1,'r','linewidth',1.5);    
+    plot(yG1,1+delta*(1+log(yG1)),'r:','linewidth',1.5);
+    
+    plot(y,hIP_0+delta*hIP_1+delta^2*hIP_2,'b','linewidth',1.5);    
+    %plot(yG1,1+delta*(1+log(yG1))-delta^2*( (log(yG1)).^2 + 2*log(yG1) ),'b:','linewidth',1.5);
+    
+    plot(yG1,(1+3*delta*(log(yG1)+Cin)).^(1/3),'g','linewidth',1.5);
+    plot(yG1,(thetaAP^3+3*delta*(log(yG1*lambda)+Cout)).^(1/3),'m--','linewidth',1.5);
+    
+    xlim([0 20]);
+    xlabel('$\xi$','Interpreter','Latex','fontsize',20);
+    ylabel('$\frac{dh}{dx}$','Interpreter','Latex','fontsize',20);
+    
+    print2eps([dirData filesep 'EggersInner'],figIn);
+    saveas(figIn,[dirData filesep 'EggersInner.fig']);
+
         
     fig1 = figure('color','white','Position',[0 0 800 800]);
-	HIS.doPlots(hP);    
+	HIS.doPlots(hP);    hold on;
+    plot(yInner,IP_In.InterPol*hP,'b');
+    plot(ySInner,IP_SIn.InterPol*hP,'b');
     %yG = y(y>lambda/3);
     yP = 10.^((-5.6:0.01:1)');
-    
-   % plot(y,thetaAP*ones(size(y)),'r:','linewidth',1.5); 
+     
     
     plot(y,h0P,'k:','linewidth',1.5);
     plot(y,h0P+delta*h1P,'k--','linewidth',1.5);    
@@ -109,17 +148,23 @@ function LubricationForcedWetting()
     xlim([0 4]);             
 
     plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout),'r:','linewidth',1.5); 
-    plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'b','linewidth',1.5);    
+    plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'g','linewidth',1.5);    
     
-    Tout_overlap = (thetaAP^3+3*delta*(log(yP))).^(1/3) + delta*Cout*(thetaAP^3+3*delta*(log(yP))).^(-2/3);    
-    plot(yP,Tout_overlap,'b:','linewidth',1.5);
+   % Tout_overlap = (thetaAP^3+3*delta*(log(yP))).^(1/3) + delta*Cout*(thetaAP^3+3*delta*(log(yP))).^(-2/3);    
+%    plot(yP,Tout_overlap,'b:','linewidth',1.5);
+    
+    plot(y*lambda,hIP_0+delta*hIP_1,'b--','linewidth',1.5);    
+    mark_h = (y*lambda<1e-5);
+    plot(y(mark_h)*lambda,hIP_0(mark_h) + ...
+                           delta*hIP_1(mark_h) + ...
+                           delta^2*hIP_2(mark_h),'b-.','linewidth',1.5);    
     
     plot(yP,1 + delta*(log(yP/lambda)+Cin),'r:','linewidth',1.5);    
-    plot(yP,(1+3*delta*(log(yP/lambda)+Cin)).^(1/3),'m--','linewidth',1.5);                    
+    %plot(yP,(1+3*delta*(log(yP/lambda)+Cin)).^(1/3),'m--','linewidth',1.5);                    
     
     
-    Tin_overlap = (1+3*delta*(log(yP/lambda))).^(1/3) + delta*Cin*((1+3*delta*(log(yP/lambda))).^2).^(-1/3);    
-    plot(yP,Tin_overlap,'m:','linewidth',1.5);
+ %   Tin_overlap = (1+3*delta*(log(yP/lambda))).^(1/3) + delta*Cin*((1+3*delta*(log(yP/lambda))).^2).^(-1/3);    
+%    plot(yP,Tin_overlap,'m:','linewidth',1.5);
     
     
     %copyobj(gcf,0);
@@ -161,6 +206,13 @@ function LubricationForcedWetting()
         y     = 2*(IP*h1)./(hh0.^3);
         
         coeff0_0 = 2*(Cout-1)/thetaAP^5;
+    end
+
+    function y = ComputeInnerSolution(hIP)
+        y    = DDy*hIP - rhs;
+        y(1) = hIP(1);
+       % y(end) = hIP(end);
+        y(end) = Diff.Dy(end,:)*hIP;
     end
 
     %% Auxiliary functions
