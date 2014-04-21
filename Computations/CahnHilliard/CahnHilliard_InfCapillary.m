@@ -46,8 +46,8 @@
                   
     %% Initialization
     
-	IC                        = InfCapillary(PhysArea);
-    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);    
+	IC                 = InfCapillary(PhysArea);
+    [Pts,Diff,Int,Ind] = IC.ComputeAll(PlotArea);    
     
     %% Equilibrium
     rho_ic    = fsolve(@f_eq,InitialGuess());    
@@ -55,28 +55,28 @@
     
     
     %% Dynamics   
-    mM             = ones(M,1);
-    mM(Ind.top | Ind.bottom)  = 0;
-    opts           = odeset('RelTol',10^-8,'AbsTol',10^-8,...
-                            'Mass',diag(repmat(mM,3,1)));
-    x_ic           = [rho_ic ; zeros(2*M,1)];
-    [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);        
-
-    X_t       = X_t';
-	rho_t     = X_t(1:M,:);    
-    flux_t    = X_t(M+1:end,:);
-    %x_iguess = [rho_ic ; Uwall*(Pts.y2_kv/max(Pts.y2_kv)) ; zeros(M,1)];   
-    %x        = fsolve(@f_dyn,x_iguess);    
-    for i = 1:length(outTimes)
-        subplot(1,2,1);
-        IC.doPlots(rho_t(:,i),'contour'); hold on;
-        IC.doPlotsFlux(flux_t(:,i)); title(['t=',num2str(outTimes(i)),' , max = ',num2str(max(abs(flux_t(:,i))))]); 
-        
-        subplot(1,2,2);
-        IC.doPlots(rho_t(:,i),'SC');
-        
-        pause(0.1);
-    end
+%     mM             = ones(M,1);
+%     mM(Ind.top | Ind.bottom)  = 0;
+%     opts           = odeset('RelTol',10^-8,'AbsTol',10^-8,...
+%                             'Mass',diag(repmat(mM,3,1)));
+%     x_ic           = [rho_ic ; zeros(2*M,1)];
+%     [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);        
+% 
+%     X_t       = X_t';
+% 	rho_t     = X_t(1:M,:);    
+%     flux_t    = X_t(M+1:end,:);
+%     %x_iguess = [rho_ic ; Uwall*(Pts.y2_kv/max(Pts.y2_kv)) ; zeros(M,1)];   
+%     %x        = fsolve(@f_dyn,x_iguess);    
+%     for i = 1:length(outTimes)
+%         subplot(1,2,1);
+%         IC.doPlots(rho_t(:,i),'contour'); hold on;
+%         IC.doPlotsFlux(flux_t(:,i)); title(['t=',num2str(outTimes(i)),' , max = ',num2str(max(abs(flux_t(:,i))))]); 
+%         
+%         subplot(1,2,2);
+%         IC.doPlots(rho_t(:,i),'SC');
+%         
+%         pause(0.1);
+%     end
 
     %% Functions    
 	function y = f_eq(rho_s)

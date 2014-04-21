@@ -96,9 +96,9 @@ function LubricationForcedWetting()
     disp(['thetaAP = ',num2str(thetaAP)]);
         
     h0P         = theta-(theta-thetaAP)*exp(-y);                    
-    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f1'),struct('f',@f1),true);
+    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f1'),struct('f',@f1),false);
     h1 = st.hN; h1P = st.hNP;
-    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f2'),struct('f',@f2),true);
+    st = DataStorage('NextOrder',@ComputeNextOrder,struct('f','f2'),struct('f',@f2),false);
     h2 = st.hN; h2P = st.hNP;
     %[h1,h1P]    = ComputeNextOrder(@f1);        
     %[h2,h2P]    = ComputeNextOrder(@f2);
@@ -144,8 +144,8 @@ function LubricationForcedWetting()
     print2eps([dirData filesep 'Eggers1'],fig1);
     saveas(fig1,[dirData filesep 'Eggers1.fig']);
     
-    ylim([0 2.5]);
-    xlim([0 4]);             
+    ylim([0.9 2.5]);
+    xlim([1e-7 4]);             
 
     plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout),'r:','linewidth',1.5); 
     plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'g','linewidth',1.5);    
@@ -172,6 +172,51 @@ function LubricationForcedWetting()
 
     print2eps([dirData filesep 'Eggers2'],fig1);
     saveas(fig1,[dirData filesep 'Eggers2.fig']);
+    
+    
+    %% Plot h^3 - graph
+     fig1 = figure('color','white','Position',[0 0 800 800]);
+	HIS.doPlots(hP.^3);    hold on;
+    plot(yInner,IP_In.InterPol*(hP.^3),'b');
+    plot(ySInner,IP_SIn.InterPol*(hP.^3),'b');
+    %yG = y(y>lambda/3);
+    yP = 10.^((-5.6:0.01:1)');
+         
+    %plot(y,h0P,'k:','linewidth',1.5);
+    %plot(y,h0P+delta*h1P,'k--','linewidth',1.5);    
+    %plot(y,h0P+delta*h1P+delta^2*h2P,'k-.','linewidth',1.5);
+    
+    xlabel('$x$','Interpreter','Latex','fontsize',20);
+    ylabel('$(dh/dx)^3$','Interpreter','Latex','fontsize',20);
+    
+    ylim([0 10]);
+    xlim([1e-7 4]);  
+
+    %plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout),'r:','linewidth',1.5); 
+    plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)),'g','linewidth',1.5);    
+    
+   % Tout_overlap = (thetaAP^3+3*delta*(log(yP))).^(1/3) + delta*Cout*(thetaAP^3+3*delta*(log(yP))).^(-2/3);    
+%    plot(yP,Tout_overlap,'b:','linewidth',1.5);
+    
+    %plot(y*lambda,hIP_0+delta*hIP_1,'b--','linewidth',1.5);    
+  %  mark_h = (y*lambda<1e-5);
+    %plot(y(mark_h)*lambda,hIP_0(mark_h) + ...
+%                           delta*hIP_1(mark_h) + ...
+%                           delta^2*hIP_2(mark_h),'b-.','linewidth',1.5);    
+    
+ %   plot(yP,1 + delta*(log(yP/lambda)+Cin),'r:','linewidth',1.5);    
+    %plot(yP,(1+3*delta*(log(yP/lambda)+Cin)).^(1/3),'m--','linewidth',1.5);                    
+    
+    
+ %   Tin_overlap = (1+3*delta*(log(yP/lambda))).^(1/3) + delta*Cin*((1+3*delta*(log(yP/lambda))).^2).^(-1/3);    
+%    plot(yP,Tin_overlap,'m:','linewidth',1.5);
+    
+    
+    %copyobj(gcf,0);
+    set(gca,'XScale','log');
+
+    print2eps([dirData filesep 'Eggers3'],fig1);
+    saveas(fig1,[dirData filesep 'Eggers3.fig']);
 
     
     %% Right hand side of ODE
