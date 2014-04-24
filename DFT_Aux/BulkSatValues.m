@@ -32,7 +32,7 @@ function [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,intitialGuess
     mu_sat     = x(3);
     
     [h1,CS_L] = HS_f(rhoLiq_sat,kBT);
-    p = -(kBT*rhoLiq_sat*(log(rhoLiq_sat) - 1) + alpha*rhoLiq_sat^2 + CS_L - mu_sat*rhoLiq_sat);
+    p         = -(kBT*rhoLiq_sat*(log(rhoLiq_sat) - 1) + alpha*rhoLiq_sat^2 + CS_L - mu_sat*rhoLiq_sat);
     
     if(abs(rhoGas_sat-rhoLiq_sat)<1e-8)
         cprintf('*r','BulkSatValues: No Liquid and Gas Phas found. Only one Phase!');
@@ -49,13 +49,18 @@ function [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,intitialGuess
     end
     
     function z = fBulk(x)
-        rho1 = (x(1)); rho2 = (x(2)); mu = (x(3));
+        rho1        = x(1); 
+        rho2        = x(2); 
+        mu          = x(3);
+        
         [muCS1,CS1] = HS_f(rho1,kBT);
         [muCS2,CS2] = HS_f(rho2,kBT);
+        
         dy1 = kBT*(log(rho1)) + 2*alpha*rho1 + muCS1 - mu;
         dy2 = kBT*(log(rho2)) + 2*alpha*rho2 + muCS2 - mu;
         y1  = kBT*rho1*(log(rho1) - 1) + alpha*rho1^2 + CS1 - mu*rho1;
         y2  = kBT*rho2*(log(rho2) - 1) + alpha*rho2^2 + CS2 - mu*rho2;
+        
         y1My2 = y1 - y2;
         
         z = [dy1;dy2;y1My2];
