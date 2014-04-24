@@ -1,4 +1,5 @@
- function CahnHilliard_InfCapillary()
+
+function CahnHilliard_InfCapillary()
 
 %************************************************************************* 
 %
@@ -25,7 +26,7 @@
     %% Parameters
     
     % Numerical Parameters    
-    PhysArea  = struct('y2Min',0,'y2Max',1,'N',[40,40],'L1',1);
+    PhysArea  = struct('y2Min',0,'y2Max',1,'N',[20,20],'L1',1);
     PlotArea  = struct('y2Min',0,'y2Max',1,'N1',80,...
                        'y1Min',-1.5,'y1Max',1,'N2',80);                                       
     M = PhysArea.N(1)*PhysArea.N(2);   
@@ -46,8 +47,8 @@
                   
     %% Initialization
     
-	IC                        = InfCapillary(PhysArea);
-    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);    
+	IC                 = InfCapillary(PhysArea);
+    [Pts,Diff,Int,Ind] = IC.ComputeAll(PlotArea);    
     
     %% Equilibrium
     rho_ic    = fsolve(@f_eq,InitialGuess());    

@@ -57,10 +57,11 @@ function data = Seppecher_M1Inf()
     %[Path,InterpPath,Int_of_path,Int_SubOnFull] = SubSpace(SubArea,...
 %               @M1SpectralSpectral_Interpolation,Pts,Maps,'normal','cart');        
 
-%    [InterpPathUpper,Int_of_pathUpper] = Path2DVec(InterpFunc,Pts,Maps,@f_pathUpperLimit,N1*5,'normal');    
+    IC.SetUpBorders(100);
+%    [InterpPathUpper,Int_of_pathUpper] = Path2DVec(InterpFunc,Pts,Maps,@f_pathUpperLimit,N1*5,'normal');
 %    [InterpPathLower,Int_of_pathLower] = Path2DVec(InterpFunc,Pts,Maps,@f_pathLowerLimit,N1*5,'normal');   
     
-%     u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
+     u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
 % 	figure;
 % 	doPlots_SC_Path(InterpPathUpper,u_flow.*(repmat(rho,2,1)+rho_m));
 % 
