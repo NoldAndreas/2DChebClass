@@ -9,16 +9,11 @@ function data = Seppecher_M1Inf()
 %*************************************************************************   
 
     % Numerical Parameters    
-    PhysArea = struct('N',[50,20],'y2Min',0,'y2Max',20,'L1',12);
+    PhysArea = struct('N',[100,20],'y2Min',0,'y2Max',20,'L1',5);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
                        'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
-                       'N1Vecs',40,'N2Vecs',6,'Hy2',3);
-
-    Sub_Area  = struct('y1Min',-5,'y1Max',5,'N1',50,...
-                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',30);
-
-    plotTimes   = (0:0.1:5);                                    
+                       'N1Vecs',40,'N2Vecs',6,'Hy2',3);    
 	nParticles  = 0;    
     
     % Physical Parameters
@@ -27,6 +22,7 @@ function data = Seppecher_M1Inf()
     D_A         = 0.;    
     rho_m       = 2;
     nu          = 10;
+    zeta        = 10 + 2/3;
     Ca          = 0.02; 
     Cn          = 4/3;    
     UWall       = -1;        
@@ -35,11 +31,6 @@ function data = Seppecher_M1Inf()
     %***************  Initialization ****************
     %************************************************
     
-    %Maps   = struct('PhysSpace',@Comp_to_Phys,'CompSpace',@Phys_to_Comp);
-    %MapsIF = struct('PhysSpace',@Comp_to_PhysIF,'CompSpace',@Phys_to_CompIF);
-    %IF.y1  = zeros(optsNum.PhysArea.N2,1);    
-        
-    %[N1,N2,PhysArea,SubArea,PlotArea,~] = LoadNumDataM1_Sepp();
     M  = PhysArea.N(1)*PhysArea.N(2);
     FF = false(2*M,1); F = false(M,1); 
     TT = true(2*M,1);  T = true(M,1); 
@@ -52,27 +43,13 @@ function data = Seppecher_M1Inf()
     %****************  Preprocess  ******************
     %************************************************    
     IC                        = InfCapillary(PhysArea);    
-    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);           
+    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);   
+    PtsCart                   = IC.GetCartPts();
     
-    %[Path,InterpPath,Int_of_path,Int_SubOnFull] = SubSpace(SubArea,...
-%               @M1SpectralSpectral_Interpolation,Pts,Maps,'normal','cart');        
-
     IC.SetUpBorders(100);
-%    [InterpPathUpper,Int_of_pathUpper] = Path2DVec(InterpFunc,Pts,Maps,@f_pathUpperLimit,N1*5,'normal');
-%    [InterpPathLower,Int_of_pathLower] = Path2DVec(InterpFunc,Pts,Maps,@f_pathLowerLimit,N1*5,'normal');   
-    
-     u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
-% 	figure;
-% 	doPlots_SC_Path(InterpPathUpper,u_flow.*(repmat(rho,2,1)+rho_m));
-% 
-% 
-%     [InterpPlotUV,PtsPlotSepp]         = GetUVInterpPlotting();%[-15 15],[1 5],40,30);        
-%    
-%     
             
     IBB       = [Ind.bound;Ind.bound];
     bulkSolve = (~Ind.right & ~Ind.left);
-    %[~,y2]    = Maps.PhysSpace(zeros(N2,1),Pts.x2);
          
     %BC at wall and left and right boundaries (at +/- infinity)
     uvBound  = Z;
@@ -81,20 +58,21 @@ function data = Seppecher_M1Inf()
     %****************************************************************
     %******** Solve for equilibrium density distribution ************
     %****************************************************************        
-    mu    = zeros(M,1);               
-    rho   = - tanh(Pts.y1_kv*3/4);        
-   % IF    = FindInterface(InterpFunc,Pts,Maps,rho);
-    theta = pi/2; nParticles = 0; y10 = 0; D_B = 0; rhoInf = -1;
+    mu     = zeros(M,1);               
+    rho    = - tanh(Pts.y1_kv/Cn);
     
-    
-    %theta = pi/2 + atan((IF.y1(1)-IF.y1(end))/PhysArea.y2Max);
- %   rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
+    alpha  = FindInterfaceAngle();
+    theta  = pi/2; nParticles = 0; y10 = 0; D_B = 0; rhoInf = -1;
+        
+    theta  = pi/2 + alpha;
+    rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
 
-  %  y     = NewtonMethod([0;rho(bulkSolve)],@f_eq);                 
-  %  rho   = GetFullRho(y(2:end));
+    y     = NewtonMethod([0;rho(bulkSolve)],@f_eq);                 
+    rho   = GetFullRho(y(2:end));
 
-%    eps = 10^(-5);
-%    doPlots_SC_Path(InterpPathUpper,rho); xlim([2 100]); ylim([-1-eps,-1+eps]);
+    eps = 10^(-5);    
+    figure('Name','Check accuracy of map');
+    subplot(2,2,1); IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho,'CART'); ylim([-1-eps,-1+eps]);    
     
     for k = 1:3
         %nParticles = (pi/2 - theta)*(PhysArea.y1Max)^2;        
@@ -102,19 +80,15 @@ function data = Seppecher_M1Inf()
                                     
             %*** 1st Step ***
             %Solve for parameter D_B to ensure Mass Balance
-         %   D_B  = fsolve(@GetMassInflux,D_B);     
-            D_B = 0;
+            D_B  = fsolve(@GetMassInflux,D_B);                 
             
             u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,D_B,theta);
-            IC.doPlotsStreamlines(u_flow,Ind.top);
-            IC.doPlotsFlux(u_flow)
-            %********************************Done until here with a lot of
-            %gaps
             
-            figure;
-            doPlots_SC_Path(InterpPathUpper,u_flow.*(repmat(rho,2,1)+rho_m));
-            xlim([-40 40]);            
+            subplot(2,2,2); IC.doPlotFLine([-100,100],[PhysArea.y2Max,PhysArea.y2Max],rho.*u_flow(end/2+1:end),'CART'); 
+            title('Check accuracy of map');
 
+            IC.doPlotsStreamlines(u_flow,Ind.top); %IC.doPlotsFlux(u_flow)
+            
             %*** 2nd step ***
             %Solve continuity and momentum eq. for chem. potential and
             %velocities
@@ -164,26 +138,52 @@ function data = Seppecher_M1Inf()
     %   Physical Auxiliary functions:
     %***************************************************************                            
     function [y,dy] = f_eq_inf(rhoInf)
-        muInf       = mu(Ind.right);
-        [~,y,dy]     = DoubleWellPotential(rhoInf,Cn,muInf(1));
-        dy           = dy(2);
+        muInf       = mu(Ind.right);        
+        [~,y,dy]    = W(rhoInf);
+        y           = y - muInf(1);        
     end
+
+    function [mu_s,J] = GetExcessChemPotential(rho_s,mu_offset)    
+        [WE,dWE,ddWE]    = W(rho_s);
+        mu_s             = dWE - Cn*(Diff.Lap*rho_s) - mu_offset;                                   
+        J                = diag(ddWE) - Cn*Diff.Lap;
+        J                = [-ones(length(rho),1),J];  
+    end
+
+    function [z,dz,ddz] = W(rho)        
+        z   = (1-rho.^2).^2/(2*Cn);
+        dz  = -2*rho.*(1-rho.^2)/Cn;
+        ddz = 2*(3*rho.^2-1)/Cn;
+    end
+
     function [y,J] = f_eq(x)
         %solves for T*log*rho + Vext          
         mu_s        = x(1);        
         rho_s       = GetFullRho(x(2:end));
-        [~,y,J]     = CahnHilliardFreeEnergy(rho_s,Cn,Diff,mu+mu_s);
+                
+        [y,J] = GetExcessChemPotential(rho_s,mu+mu_s);        
         
-        %Boundary Condition for the density
+        
+        %% Boundary condition for the density at wall
+        % 
+        % $${\bf n}\cdot {\nabla \rho} = g$$
+        % 
+        
+        
         y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
         J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];
         
+        %% Boundary condition for the density at y2max
+        % 
+        % $$(\cos(\theta),\sin \theta)^T \cdot {\nabla \rho} = 0$$
+        % 
         E               = eye(M);
         ETop            = E(Ind.top,:);
         topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
         y(Ind.top)      = topDirection*(Diff.grad*rho_s); %Ind.normalTop*(Diff.grad*rho_s); %TODO!!!
         J(Ind.top,:)    = [zeros(sum(Ind.top),1),topDirection*Diff.grad];
         
+        %% Mass condition
         y           = [Int*rho_s - nParticles;y(bulkSolve)];
         J           = [0,Int(bulkSolve);J(bulkSolve,[true;bulkSolve])];
         %y           = [Int_SubOnFull*rho_s - nParticles;y(bulkSolve)];
@@ -225,11 +225,12 @@ function data = Seppecher_M1Inf()
         %J           = [Int_SubOnFull(bulkSolve);J(bulkSolve,[false;bulkSolve])];
         
     end
+
     function [mu,uv,A,b] = GetVelocityAndChemPot(rho)
         
         A               = eye(3*M);  b = zeros(3*M,1);
         
-        [Af,bf]         = ContMom_DiffuseInterfaceSingleFluid(rho,optsPhys,Diff);
+        [Af,bf]         = ContMom_DiffuseInterfaceSingleFluid(rho);
         A([~Ind.bound;~IBB],:)   = Af([~Ind.bound;~IBB],:);   
         b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
         
@@ -250,8 +251,10 @@ function data = Seppecher_M1Inf()
         
         %*****************************************************
         %*** Take divergence of momentum eq ***
+        % ******** check
         logGradRho_T   = transposeVec(Diff.grad*log(rho + rho_m));        
-        [~,ys,~]       = CahnHilliardFreeEnergy(rho,Cn,Diff);
+        [~,ys,~]       = W(rho);
+        ys             = ys - Cn*Diff.Lap*rho;
         
         Cmu            = -Diff.Lap*diag(rho + rho_m);           
         Cuv            = -Ca*(2+nu)*Diff.Lap*logGradRho_T;
@@ -264,21 +267,22 @@ function data = Seppecher_M1Inf()
                
         %2. Left boundary:
         %Set Chemical potential at -infinty to zero        
-        A([Ind.left;FF],:) = 0;        
+        A([Ind.left;FF],:)             = 0;        
         A([Ind.left;FF],[Ind.left;FF]) = eye(sum(Ind.left)); 
         b([Ind.left;FF])               = 0;
         
         %3. Right boundary:
         OR                 = ones(sum(Ind.right),1);        
-        IntPathUpLow       = (Int_of_pathUpper.Vec + Int_of_pathLower.Vec);        
-        [Tt11,Tb11]        = CahnHilliard_StressTensorIJ(rho,optsPhys,Diff,1,1);
-        [Tt12,Tb12]        = CahnHilliard_StressTensorIJ(rho,optsPhys,Diff,1,2);            
-        TtHor  = [Tt11;Tt12];        
-        TbHor = [Tb11;Tb12];        
+        IntPathUpLow       = IC.borderTop.IntNormal + IC.borderBottom.IntNormal; %?? => to check!!
+%        IntPathUpLow       = (Int_of_pathUpper.Vec + Int_of_pathLower.Vec);        
+        [Tt11,Tb11]        = CahnHilliard_StressTensorIJ(rho,1,1);
+        [Tt12,Tb12]        = CahnHilliard_StressTensorIJ(rho,1,2);            
+        TtHor              = [Tt11;Tt12];        
+        TbHor              = [Tb11;Tb12];        
                 
         A(Ind.right,:)        = (OR*IntPathUpLow)*TtHor;
         A(Ind.right,[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) - ...
-                                diag(rho(Ind.right)+rho_m)*PhysArea.y2Max;
+                                        diag(rho(Ind.right)+rho_m)*PhysArea.y2Max;
         b(Ind.right)          = -IntPathUpLow*TbHor;        
         %******************************************************
               
@@ -289,68 +293,22 @@ function data = Seppecher_M1Inf()
         mu              = x(1:M);
         uv              = x(1+M:end);
                 
-        [At,bt] = CahnHilliard_DivergenceOfStressTensor(rho,optsPhys,Diff);
+        [At,bt] = CahnHilliard_DivergenceOfStressTensor(rho);
         disp(['Error of divergence of stress tensor: ',num2str(max(abs(At*[mu;uv] + bt)))]);       
         
-        figure;
-        doPlots_SC_Path(InterpPathUpper,TtHor*[mu;uv]+TbHor);
-        xlim([-40 40]);
+      %  figure;
+      %  doPlots_SC_Path(InterpPathUpper,TtHor*[mu;uv]+TbHor);
+      %  xlim([-40 40]);
         
     end
+
     function m = GetMassInflux(dB)
         %Density at infinity : -1,
         %Density at -infinity: 1.
-        dmCL   = ((-1+rho_m)-(1+rho_m))*(PhysArea.y2Max-0);
-        
-        u_flow = GetSeppecherSolutionCart(Pts,UWall,D_A,dB,theta);
-        m      = Int_of_pathUpper.Vec*(u_flow.*(repmat(rho,2,1)+rho_m)) + dmCL*UWall;
+        massFlux   = ((-1+rho_m)-(1+rho_m))*(PhysArea.y2Max-0)*UWall;      %due to mapping to infinity
+        u_flow     = GetSeppecherSolutionCart(Pts,UWall,D_A,dB,theta);
+        m          = IC.borderTop.IntNormal*(u_flow.*(repmat(rho,2,1)+rho_m)) + massFlux;
     end
-    %***************************************************************
-    %Mapping functions:
-    %***************************************************************
-    function [y1_kv,y2_kv,J,dH1,dH2] = Comp_to_Phys(x1,x2)
-        n  = length(x1);            
-        
-        [y2_kv,dy2dx2] =  LinearMap(x2,0,PhysArea.y2Max);
-        [h2,dh2,ddh2]  =  Interface(y2_kv);
-        [y1_kv,Diffy1] =  M1QuadMap(x1,PhysArea.L1,inf);
-        y1_kv          =  y1_kv + h2;
-        
-        if(nargout >= 3)
-            J        = zeros(n,2,2);
-            J(:,1,1) = Diffy1.dydx; 
-            J(:,1,2) = dh2;
-            J(:,2,1) = zeros(n,1);
-            J(:,2,2) = dy2dx2;            
-        end
-        
-        if(nargout >= 4) %d^2(y1)/d(..)
-            dH1        = zeros(n,2,2);
-            dH1(:,1,1) = Diffy1.dyddx; 
-            dH1(:,2,2) = ddh2;
-        end
-        
-        if(nargout >= 4) %d^2(y2)/d(..)
-            dH2        = zeros(n,2,2);            
-        end
-    end
-    function [x1,x2] = Phys_to_Comp(y1,y2,phys_Area)
-        if(nargin == 3)
-            x2 = InvLinearMap(y2,0,phys_Area.y2Max);
-            x1 = InvQuadMap(y1,phys_Area.L1,inf);
-        else
-            x2 = InvLinearMap(y2,0,PhysArea.y2Max);
-            x1 = InvQuadMap(y1-Interface(y2),PhysArea.L1,inf);
-        end
-    end
-
-    function [y2,dy2,dx,ddx,dddx,ddddx] = Comp_to_PhysIF(x2)
-        [y2,dy2,dx,ddx,dddx,ddddx] =  LinearMap(x2,0,PhysArea.y2Max);        
-    end
-    function [x2] = Phys_to_CompIF(y2)
-        x2 = InvLinearMap(y2,0,PhysArea.y2Max);
-    end
-
     function [h2,dh2,ddh2] = Interface(y)
         
         InterpIF   = Spectral_Interpolation(y,PtsIFY2,MapsIF);        
@@ -362,7 +320,6 @@ function data = Seppecher_M1Inf()
             ddh2  = InterpIF.InterPol*(DiffIF.DDy*IF.y1);
         end
     end    
-
     function IPUpdate = UpdateInterfaceAndMap()
         %1st step: Compute new Interface
         IFOld = IF;
@@ -411,35 +368,7 @@ function data = Seppecher_M1Inf()
         rho_Full(bulkSolve)  = rho_s;
         rho_Full(Ind.right)  = rhoInf;
         rho_Full(Ind.left)   = 1; 
-    end
-    
-    function [N1,N2,PhysArea,SubArea,PlotArea,plotTimes] = LoadNumDataM1_Sepp()
-        N1        = optsNum.PhysArea.N1; 
-        N2        = optsNum.PhysArea.N2;
-        PhysArea  = optsNum.PhysArea;
-        SubArea   = optsNum.SubArea;   
-        PlotArea  = optsNum.PlotArea;           
-        
-        CompSpace = Maps.CompSpace;
-        
-        CheckAreaBoundaries(PhysArea,PlotArea);
-        CheckAreaBoundaries(PhysArea,SubArea);
-        
-        x1Min = min(CompSpace(PlotArea.y1Min,PlotArea.y2Min,PhysArea),...
-                    CompSpace(PlotArea.y1Min,PlotArea.y2Max,PhysArea));
-        x1Max = max(CompSpace(PlotArea.y1Max,PlotArea.y2Min,PhysArea),...
-                    CompSpace(PlotArea.y1Max,PlotArea.y2Max,PhysArea));                
-        x2Min = min(CompSpace(PlotArea.y1Min,PlotArea.y2Min,PhysArea),...
-                    CompSpace(PlotArea.y1Max,PlotArea.y2Min,PhysArea));
-        x2Max = max(CompSpace(PlotArea.y1Min,PlotArea.y2Max,PhysArea),...
-                    CompSpace(PlotArea.y1Max,PlotArea.y2Max,PhysArea));
-        
-        PlotArea.x1Plot = GetArray(x1Min,x1Max,PlotArea.N1);
-        PlotArea.x2Plot = GetArray(x2Min,x2Max,PlotArea.N2);
-                        
-        plotTimes  = optsNum.plotTimes;        
-    end
-
+    end    
     function [y1 , y2 , dy1_dt , dy2_dt ] = f_pathUpperLimit(t) 
         [y1,y2,J]   = Comp_to_Phys(-t,ones(size(t)));        
         dy1_dt      = -J(:,1,1);
@@ -484,7 +413,6 @@ function data = Seppecher_M1Inf()
         PtsPlotSepp.N1 = length(y1s);   PtsPlotSepp.N2 = length(y2s);
         
     end
-
     function PlotPtsSepp()
         uBCSepp = GetSeppecherSolutionCart([PtsPlotSepp.y1_kv-y10,PtsPlotSepp.y2_kv],UWall,D_A,D_B,theta);
         %GetSeppecherSolutionCart(PtsPlotSepp,UWall,D_A,D_B,theta);
@@ -494,6 +422,116 @@ function data = Seppecher_M1Inf()
              [IF.y2(end),IF.y2(end)+sin(theta)*PlotArea.Hy2],'linewidth',2,'color','k'); hold on;
         ylim([PhysArea.y2Min (PhysArea.y2Max+PlotArea.Hy2)]);             
     end
+    function alpha = FindInterfaceAngle()
+
+        fsolveOpts   = optimset('Display','off');                
+        
+        pt.y2_kv  =  min(PtsCart.y2_kv);
+        y1CartStart = fsolve(@rhoX1,0,fsolveOpts);
+                
+        pt.y2_kv  =  max(PtsCart.y2_kv);
+        y1CartEnd = fsolve(@rhoX1,0,fsolveOpts);                
+        
+        alpha = atan((y1CartStart-y1CartEnd)/...
+                        (max(PtsCart.y2_kv)-  min(PtsCart.y2_kv)));
+    
             
+        function z = rhoX1(y1)
+            pt.y1_kv = y1;
+            IP       = IC.SubShapePtsCart(pt);
+            z        = IP*rho;
+        end    
+    end
+
+%     function [w,dw,J] = DoubleWellPotential(rho,Cn,mu)
+%         %rho in [-1,1]
+%         %w = 1/(2*Cn^2)*(1-rho.^2).^2 + 0.5 |grad(rho)|^2 
+%         w       = 1/(2*Cn^2)*(1-rho.^2).^2;
+%         dw      = - 2/(Cn^2)*(1-rho.^2).*rho ;  
+%         J       = - 2/(Cn^2)*diag(1-3*rho.^2);    
+% 
+%         if(nargin == 3) %if mu is passed as a variable
+%             w      = w - mu.*rho;
+%             dw     = dw - mu;  
+%             J      = [-ones(length(rho),1),J];  
+%         end
+%     end
+
+    function [A,b] = ContMom_DiffuseInterfaceSingleFluid(rho)
+    %Continuitiy: div(rho*uv) = 0
+    %Momentum: - rho*grad(mu) +Ca*(Lap(uv) + (zeta + 1/3)*grad(div(uv)) ) +...
+    %          ... +grad(rho)*(W'(rho) - mu - Cn*Lap(rho) )
+    %
+    % A*[mu;uv] = b corresponds to momentum and continuity Eq. for given rho               
+
+        rho_f          = rho + rho_m;
+        rho_f2         = repmat(rho_f,2,1);
+        gradRho_T      = Diff.grad*rho_f;
+
+        aT             = zeros(M,2*M);
+        aT(:,1:M)      = diag(gradRho_T(1:M));
+        aT(:,1+M:end)  = diag(gradRho_T(1+M:end));
+
+        A_cont_mu      = zeros(M);
+        A_cont_uv      = aT + diag(rho_f)*Diff.div; 
+
+        A_mom_mu       = -diag(rho_f2)*Diff.grad - [diag(Diff.Dy1*rho);diag(Diff.Dy2*rho)];
+        A_mom_uv       = Ca*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);
+
+        %A_mom_mu       = -Diff.grad;
+        %A_mom_uv       = Diff.LapVec;
+
+        A_cont         = [A_cont_mu,A_cont_uv];
+        A_mom          = [A_mom_mu, A_mom_uv];
+        A              = [A_cont;A_mom];  
+
+        b              = zeros(3*M,1);
+        [~,ys,~]       = W(rho);
+        ys             = ys - Cn*(Diff.Lap*rho);
+                
+        b(1+M:end)     = - repmat(ys,2,1).*(Diff.grad*rho); 
+
+    end
+    function [A,b] = CahnHilliard_StressTensorIJ(rho,i,j)
+    % get matrices for
+    % T = Ca*( grad(u) + grad(u)^T + (zeta - 2/3) div(u)*I ) +...
+    %   + (W(rho) + Cn/2*|grad(rho)|^2 - mu*(rho+rho_m))*I - Cn*(grad(rho) X grad(rho))
+
+        bDiag   = W(rho) + Cn/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
+        %bDiag   = W(rho) + 1/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
+        if(i == 1 && j == 1)
+            Amu     = -diag(rho+rho_m);
+            Auv     = Ca*[2*Diff.Dy1 , zeros(M)] + Ca*(zeta - 2/3)*Diff.div;     
+            b       = bDiag - Cn*(Diff.Dy1*rho).*(Diff.Dy1*rho);
+        elseif((i==2 && j == 1)  || (i==1 && j == 2))
+            Amu     = zeros(M);
+            Auv     = Ca*[Diff.Dy2 , Diff.Dy1] ;
+            b       = - Cn*(Diff.Dy1*rho).*(Diff.Dy2*rho);            
+        elseif(i==2 && j == 2)
+            Amu     = -diag(rho+rho_m);
+            Auv     = Ca*[zeros(M) , 2*Diff.Dy2] + Ca*(zeta - 2/3)*Diff.div;
+            b       = bDiag - Cn*(Diff.Dy2*rho).*(Diff.Dy2*rho);                 
+        end
+
+        A = [Amu Auv];
+
+    end
+    function [A,b] = CahnHilliard_DivergenceOfStressTensor(rho)
+
+        [A11,b11] = CahnHilliard_StressTensorIJ(rho,1,1); 
+        [A12,b12] = CahnHilliard_StressTensorIJ(rho,1,2); 
+        [A21,b21] = CahnHilliard_StressTensorIJ(rho,2,1); 
+        [A22,b22] = CahnHilliard_StressTensorIJ(rho,2,2); 
+
+        A1        = Diff.Dy1 * A11  + Diff.Dy2*A21;
+        A2        = Diff.Dy1 * A12  + Diff.Dy2*A22;
+
+        b1        = Diff.Dy1 * b11  + Diff.Dy2*b21;
+        b2        = Diff.Dy1 * b12  + Diff.Dy2*b22;
+
+        A   = [A1;A2];
+        b   = [b1;b2];      
+
+    end
 
 end

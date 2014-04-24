@@ -35,19 +35,31 @@ classdef Border < Isoline
             this.IntTang    = this.IntTang*blkdiag(IP,IP); 
         end     
         
-        function PlotValueOnPath(this,V,ScNorTang)
+        function PlotValueOnPath(this,V,ScNorTang,var)
             
             if(isempty(this.Interp))
                ComputeInterpolationMatrix(this,(-1:0.02:1)');
             end
             
-            switch ScNorTang
-                case 'normal'
-                    IP = this.normal*...
-                      blkdiag(this.InterpOntoBorder,this.InterpOntoBorder);                    
+            if((nargin >= 3) && strcmp(ScNorTang,'normal'))
+                IP = this.normal*...
+                      blkdiag(this.InterpOntoBorder,this.InterpOntoBorder);
+            else
+                IP = this.InterpOntoBorder;
             end
-            plot(this.Pts.t,IP*V,'o'); hold on;
-            plot(this.Interp.t,this.Interp.InterPol*IP*V,'r');
+            
+            if((nargin < 4) || (nargin >= 4) && strcmp(var,'t'))
+                pt_t     = this.Pts.t;
+                interp_t = this.Interp.t;
+            elseif(strcmp(var,'y1'))
+                pt_t     = this.Pts.y1_kv;
+                interp_t = this.Interp.pts_y1;
+            elseif(strcmp(var,'y2'))
+                pt_t     = this.Pts.y2_kv;
+                interp_t = this.Interp.pts_y2;
+            end
+            plot(pt_t,IP*V,'o'); hold on;
+            plot(interp_t,this.Interp.InterPol*IP*V,'r');
         end        
         
         

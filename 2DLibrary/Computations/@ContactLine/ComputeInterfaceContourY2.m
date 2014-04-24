@@ -9,8 +9,7 @@ function y1Cart = ComputeInterfaceContourY2(this,level,y2)
     
     f            = this.rho_eq;    
     drho         = (this.optsPhys.rhoLiq_sat - this.optsPhys.rhoGas_sat);
-    
-    
+        
     rhoV         = this.optsPhys.rhoGas_sat + level*drho;
     
     fsolveOpts   = optimset('Display','off');

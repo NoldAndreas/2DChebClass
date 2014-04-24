@@ -5,7 +5,6 @@ function LubricationForcedWetting()
 % 
 % $$\frac{-\delta}{h^2+\lambda h} = h'''-h'+ \theta$$
 % 
-    
     global dirData
     AddPaths();        
     ChangeDirData([dirData filesep 'ForcedWetting'],'ORG');    
