@@ -9,8 +9,13 @@ function ShortRangeInteractions_TolmanLength()
 % $$\phi(r) = -\epsilon \frac{e^{-\lambda r}}{4\pi r}$$
 % 
 
+    global dirData
+    AddPaths();        
+    ChangeDirData([dirData filesep 'TolmanLength'],'ORG');    
+    close all;
+
     %% Parameters               
-    epw      = 0.5;
+    epw      = 0.3;
     lambda   = 1;
     lambdaW  = 1;
     R        = inf;
@@ -20,7 +25,7 @@ function ShortRangeInteractions_TolmanLength()
     optsPhys = struct('V2',V2,'HSBulk','MuCarnahanStarling','kBT',kBT);
     
     N = 200;
-    L = 20;
+    L = 40;
     
     GetCriticalPoint(optsPhys,[],true);    
     disp('Critical values from Sullivan, Wetting Transitions at Fluid-Solid Interfaces');
@@ -56,24 +61,29 @@ function ShortRangeInteractions_TolmanLength()
     
     %% Solve ODE
     %
-    figure;    
+    fig1 = figure('color','white','Position',[0 0 800 600]);
     rho = rhoGas_sat*ones(N,1);
     
-    for dmu = -0.02:0.01:0.02
+    for dmu = -(1e-4):(2e-5):(-2e-5)
         
         [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = ...
-            BulkValues(mu_sat+dmu,optsPhys,[rhoGas_sat,rhoLiq_sat,mu_sat],true);
-    
-        
+            BulkValues(mu_sat+dmu,optsPhys,[rhoGas_sat,rhoLiq_sat,mu_sat],true);            
         rho = fsolve(@ODE,rho);
     
-        hold off;
-        IS.doPlots(rho); hold on;
+        %hold off;
+        IS.doPlots(rho,'plain'); hold on;
         plot(Pts.y,rhoLiq_eq*ones(size(r)),'b');
         plot(Pts.y,rhoGas_eq*ones(size(r)),'b');
+        %title(['dmu = ',num2str(dmu)]);        
         
-        pause(0.05);
+     %   pause(0.05);
     end
+    xlabel('$z$','Interpreter','Latex','fontsize',20);
+    ylabel('$\rho$','Interpreter','Latex','fontsize',20);
+    
+    saveas(fig1,[dirData filesep 'ShortRangePlanarWall.fig']);
+   print2eps([dirData filesep 'ShortRange'],fig1);
+    
     
     %% Auxiliary functions    
     function y = ODE(rho)  
@@ -90,6 +100,10 @@ function ShortRangeInteractions_TolmanLength()
        
        y     = LapMu + rho + lapV - lambda^2*(muHS + V - (mu_sat + dmu));
        
+       %Boundary condition
+       if(R == inf)
+           y(1) = muHS(1) + 2*V(1) - (mu_sat + dmu) - dmuHS(1)*drho(1);
+       end
     end
     
 
