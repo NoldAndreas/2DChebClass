@@ -10,12 +10,11 @@ function ShortRangeInteractions_TolmanLength()
 % 
 
     %% Parameters               
-    epw      = 5;
+    epw      = 0.5;
     lambda   = 1;
     lambdaW  = 1;
-    R        = 100;
-    kBT      = 0.75;
-    dmu      = -0.1;
+    R        = inf;
+    kBT      = 0.08;    
     
     V2       = struct('V2DV2',@PhiYukawa);
     optsPhys = struct('V2',V2,'HSBulk','MuCarnahanStarling','kBT',kBT);
@@ -24,9 +23,12 @@ function ShortRangeInteractions_TolmanLength()
     L = 20;
     
     GetCriticalPoint(optsPhys,[],true);    
-    [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,[0.05;0.5;-3],true);    
+    disp('Critical values from Sullivan, Wetting Transitions at Fluid-Solid Interfaces');
+    disp(['kBT_C = ',num2str(1/11.102)]);
+    disp(['rho_C = ',num2str(0.249)]);    
     
-    [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = BulkValues(mu_sat-0.01,optsPhys,[0.05;0.5;-0.3],true);
+    [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,[0.05;0.5;-0.3],true);    
+    
     
     %% Initialization
     %     
@@ -38,7 +40,11 @@ function ShortRangeInteractions_TolmanLength()
     IS         = HalfInfSpectralLine(shape);    
     [Pts,Diff] = IS.ComputeAll(plotShape);        
         
-    r    = Pts.y + R;
+    if(R == inf)
+        r    = Pts.y;
+    else
+        r    = Pts.y + R;
+    end
     Dr   = Diff.Dy;
     DDr  = Diff.DDy;   
         
@@ -53,13 +59,18 @@ function ShortRangeInteractions_TolmanLength()
     figure;    
     rho = rhoGas_sat*ones(N,1);
     
-    for dmu = -0.001:0.0001:0.000001
+    for dmu = -0.02:0.01:0.02
+        
+        [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = ...
+            BulkValues(mu_sat+dmu,optsPhys,[rhoGas_sat,rhoLiq_sat,mu_sat],true);
+    
+        
         rho = fsolve(@ODE,rho);
     
         hold off;
         IS.doPlots(rho); hold on;
-        plot(r-R,rhoLiq_eq*ones(size(r)),'b');
-        plot(r-R,rhoGas_eq*ones(size(r)),'b');
+        plot(Pts.y,rhoLiq_eq*ones(size(r)),'b');
+        plot(Pts.y,rhoGas_eq*ones(size(r)),'b');
         
         pause(0.05);
     end
@@ -71,18 +82,27 @@ function ShortRangeInteractions_TolmanLength()
        drho   = Dr*rho;
        ddrho  = DDr*rho;
        
-       LapMu = 2*drho.*dmuHS./r + ddrho.*dmuHS + (drho.^2).*ddmuHS;
+       if(R == inf)
+           LapMu = ddrho.*dmuHS + (drho.^2).*ddmuHS;
+       else
+           LapMu = 2*drho.*dmuHS./r + ddrho.*dmuHS + (drho.^2).*ddmuHS;
+       end
        
        y     = LapMu + rho + lapV - lambda^2*(muHS + V - (mu_sat + dmu));
        
     end
     
 
-    %% Right hand side of ODE
+    %% Right hand side of ODE    
     function [V,lapV] = Vext(r)
-        V    = -epw/(2*lambdaW^2)*( (R./r - 1./(lambdaW*r)).*exp(-lambdaW*(r-R)) + ...
+        if(R == inf)
+            V    = -epw*exp(-r);
+            lapV = -epw*exp(-r);
+        else
+            V    = -epw/(2*lambdaW^2)*( (R./r - 1./(lambdaW*r)).*exp(-lambdaW*(r-R)) + ...
                                 (R./r + 1./(lambdaW*r)).*exp(-lambdaW*(r+R)));
-        lapV = (diag(2./r)*Dr + DDr)*V;
+            lapV = (diag(2./r)*Dr + DDr)*V;        
+        end
     end
 
     function [muHS,dmuHS,ddmuHS] = mu_HS(rho)  
