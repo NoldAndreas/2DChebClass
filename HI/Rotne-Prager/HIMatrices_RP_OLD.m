@@ -1,26 +1,32 @@
 function W = HIMatrices_RP(optsPhys,domain)
 
     sigmaHS = optsPhys.HI.sigmaHS;
-    sigmaS  = optsPhys.V2.sigmaS;
+    sigmaS  = optsPhys.HI.sigmaS;
+    
+    sigmaPairs = [sigmaHS(:) sigmaS(:)];
     
     nSpecies = size(sigmaHS,1);
     
-    uniqueSigmaHS = unique(sigmaHS);
+    uniquePairs = unique(sigmaPairs,'rows');
     
-    nSigmaHS = length(uniqueSigmaHS);
+    nPairs = size(uniquePairs,1);
 
     W(nSpecies,nSpecies).W1 = 0;
     
-    for iSigmaHS = 1:nSigmaHS
-        optsPhys.sigmaHij = uniqueSigmaHS(iSigmaHS);
-        optsPhys.HIShapeParams.RMin = optsPhys.sigmaHij;
+    for iPair = 1:nPairs
+         
+        optsPhys.sigmaHij = uniquePairs(iPair,1);
+        optsPhys.HIShapeParams.RMin = uniquePairs(iPair,2);
         
         W2 = RP12(optsPhys,domain);
         W1 = zeros(size(W2));
         
         for iSpecies = 1:nSpecies
             for jSpecies = 1:nSpecies;
-                if(sigmaHS(iSpecies,jSpecies)==uniqueSigmaHS(iSigmaHS))
+                
+                pairIJ = [sigmaHS(iSpecies,jSpecies) sigmaS(iSpecies,jSpecies)];
+                   
+                if(isequal(pairIJ,uniquePairs(iPair,:)))
                     W(iSpecies,jSpecies).W2 = W2;
                     W(iSpecies,jSpecies).W1 = W1;
                 end
@@ -28,16 +34,6 @@ function W = HIMatrices_RP(optsPhys,domain)
         end
         
     end
-    
-%     for iSpecies = 1:nSpecies
-%         for jSpecies = iSpecies:nSpecies
-%             optsPhys.sigmaHij = sigmaHS(iSpecies,jSpecies);
-%             optsPhys.HIShapeParams.RMin = optsPhys.HIShapeParams.RMinS(iSpecies,jSpecies);
-%             W(iSpecies,jSpecies).W2 = RP12(optsPhys,domain);
-%             W(iSpecies,jSpecies).W1 = zeros(size(W(iSpecies,jSpecies).W2));
-%             W(jSpecies,iSpecies) = W(iSpecies,jSpecies);
-%         end
-%     end
-       
+     
 end
 

@@ -128,25 +128,25 @@ function ComputeConvolutionMatrix_Test(this)
     YRange = (-0.9:0.05:0.9)';
     Interp   = this.ComputeInterpolationMatrix(XRange,YRange,true,false);
 
-    figure
-    doPlots_SC(Interp,this.Pts,[exact14 exact24 exact34]);
-    set(gcf,'Name','Exact');
-
-    figure
-    doPlots_SC(Interp,this.Pts,conv_New_S);
-    set(gcf,'Name','Pointwise Convolution Scalar');
-
-    figure
-    doPlots_SC(Interp,this.Pts,conv_New_V);
-    set(gcf,'Name','Pointwise Convolution Vector');
-
-    figure
-    doPlots_SC(Interp,this.Pts,reshape(conv_New_M,N1*N2,4));
-    set(gcf,'Name','Pointwise Convolution Matrix');
-
-    figure
-    doPlots_SC(Interp,this.Pts,reshape(conv_M,N1*N2,4));
-    set(gcf,'Name','Standard Convolution Matrix');
+%     figure
+%     doPlots_SC(Interp,this.Pts,[exact14 exact24 exact34]);
+%     set(gcf,'Name','Exact');
+% 
+%     figure
+%     doPlots_SC(Interp,this.Pts,conv_New_S);
+%     set(gcf,'Name','Pointwise Convolution Scalar');
+% 
+%     figure
+%     doPlots_SC(Interp,this.Pts,conv_New_V);
+%     set(gcf,'Name','Pointwise Convolution Vector');
+% 
+%     figure
+%     doPlots_SC(Interp,this.Pts,reshape(conv_New_M,N1*N2,4));
+%     set(gcf,'Name','Pointwise Convolution Matrix');
+% 
+%     figure
+%     doPlots_SC(Interp,this.Pts,reshape(conv_M,N1*N2,4));
+%     set(gcf,'Name','Standard Convolution Matrix');
 
     disp(['InfSpace: ComputeConvolutionMatrix_Test Scalar ''pointwise'' error: ' ...
             num2str( sum(abs(exact34-conv_New_S).^2) / sum(abs(exact34).^2) )])

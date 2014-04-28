@@ -43,6 +43,8 @@ function data = DDFT_DiffusionInfSpace_NSpecies(optsPhys,optsNum,optsPlot,name)
     close all;  
     disp(['** ',optsNum.DDFTCode,' **']);
 
+    AddPaths;
+    
     %************************************************
     %***************  Initialization ****************
     %************************************************        

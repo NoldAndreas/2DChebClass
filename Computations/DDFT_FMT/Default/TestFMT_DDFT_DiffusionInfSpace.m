@@ -1,9 +1,7 @@
-function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPlanar_NSpecies(nexec)
-
-    %This is equivalent to:
+function output = TestFMT_DDFT_DiffusionInfSpace(nexec)
 
     %Numerical Parameters    
-    Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+    Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
                        'y2Min',-inf,'y2Max',inf,'L2',4);
     
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
@@ -12,24 +10,34 @@ function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPlanar_NSpecies(nex
     Fex_Num   = struct('Fex','FMTRosenfeld',... %'Rosenfeld_3DFluid',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
     
+    HI_Num    = struct('N',[20;20],'L',2);                   
+                   
     %Sub_Area  = Phys_Area;
+    
+    tMax = 2;
+    
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
                      'FexNum',Fex_Num,...
+                     'HINum',HI_Num,...
                      'DDFTCode','DDFT_DiffusionInfSpace_NSpecies2',...
-                     'plotTimes',0:4/100:4);
-                     
-    sigmaS = [ 1   1.1 ;
-              1.1 1.2 ];        
+                     'plotTimes',0:tMax/100:tMax);
+    
+    sigmaS = 1;
         
-    V1       = struct('V1DV1','rotating2cart',...
-                      'V0',0.01,'V0r',1,'alphar',2,'tau',1,'rV',1);                                         
+    V1       = struct('V1DV1','infHIDiffusion',...
+                      'V0',0.01,'V0add',2,'tau',0.1,'sigma1Add',5,'sigma2Add',10, ...
+                      'y10',-3,'y20',0);                                         
                   
     V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);                                 
     
-    optsPhys = struct('V1',V1,'V2',V2,...                                            
+%     HI       = struct('HI11','noHI_2D','HI12','RP12_2D', ...
+%                       'HIPreprocess', 'RotnePragerPreprocess2D', ...
+%                       'sigma',sigmaS,'sigmaH',sigmaS/2);
+    
+    optsPhys = struct('V1',V1,'V2',V2,...                                         
                       'kBT',1,...
-                      'nParticlesS',[10;10]); 
+                      'nParticlesS',50); 
                  
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
@@ -39,7 +47,7 @@ function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPlanar_NSpecies(nex
     if((nargin == 0) || ~nexec)
         AddPaths();
         f = str2func(optsNum.DDFTCode);
-        f(optsPhys,optsNum,optsPlot);                 
+        output  = f(optsPhys,optsNum,optsPlot);                 
     end
 
 end                 

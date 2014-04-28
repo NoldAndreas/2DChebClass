@@ -1,4 +1,4 @@
-function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPlanar_NSpecies(nexec)
+function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionInfSpace_HI_NSpecies(nexec)
 
     %This is equivalent to:
 
@@ -12,22 +12,36 @@ function [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPlanar_NSpecies(nex
     Fex_Num   = struct('Fex','FMTRosenfeld',... %'Rosenfeld_3DFluid',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
     
+    HI_Num    = struct('N',[20;20],'L',2);                   
+                   
     %Sub_Area  = Phys_Area;
+    
+    tMax = 10;
+    
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
                      'FexNum',Fex_Num,...
-                     'DDFTCode','DDFT_DiffusionInfSpace_NSpecies2',...
-                     'plotTimes',0:4/100:4);
-                     
-    sigmaS = [ 1   1.1 ;
-              1.1 1.2 ];        
+                     'HINum',HI_Num,...
+                     'DDFTCode','DDFT_DiffusionInfSpace_HI_NSpecies',...
+                     'plotTimes',0:tMax/100:tMax);
+
+	sigma1 = 1;
+    sigma2 = 2;
+    sigma12 = (sigma1+sigma2)/2;
+                 
+    sigmaS = [ sigma1   sigma12 ;
+               sigma12  sigma2 ];        
         
     V1       = struct('V1DV1','rotating2cart',...
-                      'V0',0.01,'V0r',1,'alphar',2,'tau',1,'rV',1);                                         
+                      'V0',0.01,'V0r',1,'alphar',3,'tau',0.5,'rV',1);                                         
                   
     V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);                                 
     
-    optsPhys = struct('V1',V1,'V2',V2,...                                            
+    HI       = struct('HI11','noHI_2D','HI12','RP12_2D', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D', ...
+                      'sigma',sigmaS,'sigmaH',sigmaS/2);
+    
+    optsPhys = struct('V1',V1,'V2',V2,'HI',HI,...                                            
                       'kBT',1,...
                       'nParticlesS',[10;10]); 
                  

@@ -4,9 +4,8 @@ function w12 = RP12(optsPhys,domain)
     
     w12Temp = domain.ComputeConvolutionMatrix(@RP,optsPhys.HIShapeParams,false);
     
-     w12 = [w12Temp(:,:,1,1), w12Temp(:,:,1,2) ; ...
-            w12Temp(:,:,2,1), w12Temp(:,:,2,2) ];
-
+    w12 = [w12Temp(:,:,1,1), w12Temp(:,:,1,2) ; ...
+           w12Temp(:,:,2,1), w12Temp(:,:,2,2) ];
 
     function rr = roxr(x,y)
         % x and y are the kron products

@@ -269,7 +269,7 @@ classdef (Abstract) Shape < handle
             if(~PersonalUserOutput)
                 return;
             end            
-            V = V(:);
+            %V = V(:);
             
             nSpecies=size(V,2);
             if(nSpecies == 1)
@@ -300,7 +300,7 @@ classdef (Abstract) Shape < handle
                 if(nSpecies > 1)                    
                     subplot(nRows,nCol,iSpecies);
                 end
-                
+
                 if( (size(V,1) == length(this.Interp.pts1)) && (length(this.Interp.pts1) ~= length(this.Pts.y1_kv)) )
                     VI = V(:,iSpecies);
                 else
