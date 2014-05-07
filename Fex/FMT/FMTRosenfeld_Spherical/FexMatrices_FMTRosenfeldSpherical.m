@@ -11,8 +11,11 @@ function convStruct = FexMatrices_FMTRosenfeldSpherical(optsPhys,IDC)
     %preallocate
     convStruct(nSpecies).D0 = [];
     
+    sigmaS = diag(optsPhys.V2.sigmaS);
+    
     for iSpecies = 1:nSpecies
-        R = optsPhys.sigmaS(iSpecies)/2;
+        %R = optsPhys.sigmaS(iSpecies)/2;
+        R = sigmaS(iSpecies)/2;
         optsFMT.yMin = -R;
         optsFMT.yMax = R;
         % f2, f3, f2_r, f2r_w

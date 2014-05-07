@@ -29,7 +29,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         %set default value
         recompute = true;
     end
-    
+   
     %1st Step: Search for File and load if found
     if((nargin == 5) && (recompute == 2))        
         %(1)First Option: Select Input File
@@ -67,6 +67,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             
             [h1s,Parameters.Function] = fileparts(Parameters.Function);
             [h1s,par_i.Function]      = fileparts(par_i.Function);
+              
+%             comp_struct(Parameters,par_i)
+%             pause
             
             if(isequaln(Parameters,par_i))%index{i}.Parameters))
                 

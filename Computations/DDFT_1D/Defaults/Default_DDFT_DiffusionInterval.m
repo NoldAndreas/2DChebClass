@@ -18,10 +18,13 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionInterval()
     alpha = repmat([5,5],Phys_Area.N,1);
     beta = repmat([0.5,0.5],Phys_Area.N,1);
     y0 = repmat([4,8],Phys_Area.N,1);
+    
+    sigmaS  = [1 1;1 1];
+    
     V1       = struct('V1DV1','bump1D','alpha',alpha,'beta',beta,'y0',y0);
-      
+    V2       = struct('sigmaS',sigmaS);      
      
-    optsPhys = struct('V1',V1,'V2',[],'kBT',1,'nParticlesS',[5;5],'sigmaS',[1;1], ...
+    optsPhys = struct('V1',V1,'V2',V2,'kBT',1,'nParticlesS',[5;5], ...
         'mS',[1;1],'gammaS',[2;2]);
     
     lineColourDDFT={{'r','b','g'}};            

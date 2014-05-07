@@ -301,7 +301,9 @@ for iPlot=1:nPlots
     for iDDFT=1:nDDFT
         
         % get rho, v, r and w (for means) values
-        rho_t=ddft(iDDFT).rho_t;
+        rho_t  = ddft(iDDFT).rho_t;
+        flux_t = ddft(iDDFT).flux_t;
+        
         Interp=ddft(iDDFT).shape.Interp;
         
         % choose line style
@@ -310,16 +312,17 @@ for iPlot=1:nPlots
         optsPlot.lineColour=lineColourDDFT{iDDFT};
         
         % plot means of r and v up to current time
-        plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).vMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
-        
+        plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).fluxMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
+
         % get values at appropriate time
-        rho = rho_t(:,:,iPlot);
-        v   = zeros(size(rho));
+        rho  = rho_t(:,:,iPlot);
+        flux = flux_t(:,:,iPlot);
         
         optsPlot.plotTime=plotTime;
         
         % plot the distributions
-        plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        %plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        plotRhoFluxDDFT(rho,flux,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
         
         hold(hRa,'on');
         hold(hPa,'on');
@@ -335,22 +338,22 @@ for iPlot=1:nPlots
     % choose appropriate text for axis labels
     if(optsPlot.symbolLabels)
         meanRText='$\bar r  \;\;$';
-        meanPText='$p \;\;$';
+        meanPText='Flux';
         rhoText='$\rho \;\;$';
-        vText='$p \;\;$';     
+        vText='Flux';     
         tText='$t$';
         rText='$r$';
     else
         geom=optsPlot.geom;
         if(strcmp(geom,'spherical'))
             meanRText='Mean radial position';
-            meanPText='Mean radial velocity';
-            vText='Radial velocity';  
+            meanPText='Mean radial flux';
+            vText='Radial flux';  
             rText='Radius';
         else
             meanRText='Mean position';
-            meanPText='Mean velocity';
-            vText='Velocity';  
+            meanPText='Mean flux';
+            vText='Flux';  
             rText='Distance';
         end
         if(optsPlot.plotDensity)
@@ -464,4 +467,4 @@ if(doSwf)
     end
 end
 
-close(hRPf);
+%close(hRPf);

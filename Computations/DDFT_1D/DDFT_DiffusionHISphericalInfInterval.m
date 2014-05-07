@@ -74,7 +74,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHISphericalInfInterval
         getConv        = @Fex_Meanfield;
     end
     
-        opts.optsPhys = optsPhys;
+    opts.optsPhys = optsPhys;
     opts.optsNum = optsNum;
     HIStruct = DataStorage(['Interval' filesep 'HIMatricesSpherical'],@HIMatricesSpherical,opts,aLine,false);
           

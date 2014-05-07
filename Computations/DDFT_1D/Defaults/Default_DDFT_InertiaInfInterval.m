@@ -18,8 +18,9 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaInfInterval
     beta   = 40;
     
     V1       = struct('V1DV1','oscBump1D','alpha0',alpha0,'alphaT',alphaT,'beta',beta);
-           
-    optsPhys = struct('V1',V1,'V2',[],'kBT',1,'nParticlesS',8,'sigmaS',1, ...
+    V2       = struct('sigmaS',1);
+    
+    optsPhys = struct('V1',V1,'V2',V2,'kBT',1,'nParticlesS',8, ...
                            'mS',1,'gammaS',2);
     
     lineColourDDFT={{'r','b','g'}};            

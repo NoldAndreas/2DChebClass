@@ -1,7 +1,7 @@
 function K11 = JeffreyOnishi11Spherical(rf,rt,optsPhys)
 
-    sigma   = optsPhys.sigma;
-    sigmaH  = optsPhys.sigmaH;
+    sigma   = optsPhys.sigmaS;
+    sigmaH  = optsPhys.sigmaHS;
     lambda  = optsPhys.lambda;
     fx      = optsPhys.fx;
     fy      = optsPhys.fy;

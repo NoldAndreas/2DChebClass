@@ -1,6 +1,6 @@
 function HI = JeffreyOnishi12(r,optsPhys)
 
-    sigmaH  = optsPhys.sigmaH;
+    sigmaH  = optsPhys.sigmaHS;
     lambda  = optsPhys.lambda;
     fx      = optsPhys.fx;
     nMax    = optsPhys.nMax;

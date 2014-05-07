@@ -42,9 +42,9 @@ nSpecies=size(meanr,2);
 
 hr=zeros(nSpecies,1);
 
-if(strcmp(type,'rv'))
-    hp=hr;   %#ok
-end
+% if(strcmp(type,'rv'))
+%     hp=hr;   %#ok
+% end
 
 for iSpecies=1:nSpecies
 
@@ -61,13 +61,13 @@ for iSpecies=1:nSpecies
     hold(hRa,'on');
     
     % plot momentum mean if we calculate it
-    if(strcmp(type,'rv'))
+%    if(strcmp(type,'rv'))
         hp=plot(hPa,plotTimes(range),meanv(range,iSpecies));
         set(hp,'LineStyle',lineStyleS,'Color',lineColourS,'Marker',lineMarkerS);
         handles.hp=hp;
         hold(hPa,'on');
     
-    end
+%    end
     
 end
 

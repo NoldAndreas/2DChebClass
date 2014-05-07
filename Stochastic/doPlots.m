@@ -166,9 +166,9 @@ if(~isempty(DDFTStruct))
         DDFTStruct(iDDFT).rhoI = rhoI;
         DDFTStruct(iDDFT).rhoF = rhoF;
         
-        DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct);
-        DDFTStruct(iDDFT).rMean = DDFTAveragesStruct.rMean;
-        DDFTStruct(iDDFT).vMean = DDFTAveragesStruct.vMean;
+        DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
+        DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
+        DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
     end
     
     DDFTPlotStruct = DDFTStruct;

@@ -1,8 +1,8 @@
 function K12 = RotnePrager12Spherical(r,s,optsPhys)
 
     alpha   = optsPhys.alpha;
-    sigma   = optsPhys.sigma;
-    sigmaH  = optsPhys.sigmaH;
+    sigma   = optsPhys.sigmaS;
+    sigmaH  = optsPhys.sigmaHS;
     
     %------------------------------------------------------------------
     % set up frequently-used quantities

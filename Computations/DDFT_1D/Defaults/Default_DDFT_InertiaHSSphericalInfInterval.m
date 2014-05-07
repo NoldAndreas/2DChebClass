@@ -18,10 +18,14 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaHSSphericalInfInterva
     ZS = [0.5;0.25];
     Z = repmat(ZS',Phys_Area.N,1);
     
+    sigmaS = [1 1; 1 1];
+    
     V1       = struct('V1DV1','APSHS','Vm',Vm,'Z',Z);
-
-    optsPhys = struct('V1',V1,'V2',[],'kBT',1,'nParticlesS',[25;25], ...
-                           'mS',[1;1],'gammaS',[2;2],'sigmaS',[1;1]);
+    V2       = struct('sigmaS',sigmaS);
+    
+    
+    optsPhys = struct('V1',V1,'V2',V2,'kBT',1,'nParticlesS',[25;25], ...
+                           'mS',[1;1],'gammaS',[2;2]);
     
     lineColourDDFT={{'r','b','m','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);

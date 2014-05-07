@@ -54,7 +54,12 @@ potParams2Names={'sigma'};
 % HI parameters
 %--------------------------------------------------------------------------
 
-sigmaHS=[0.5;0.5];
+sigmaH1=0.5;
+sigmaH2=0.5;
+sigmaH12=(sigmaH1+sigmaH2)/2;
+
+sigmaHS=[sigmaH1  sigmaH12;
+        sigmaH12 sigmaH2];
 
 HIParamsNames={'sigmaH'};
 
@@ -72,19 +77,20 @@ tMax=2.5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-nSamples=50000;  
+%nSamples=50000;  
 
-%nSamples=500;  
+nSamples=10000;  
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=500;
+nRuns=50;
 
-nRuns = 1000;
+%nRuns = 1000;
 
 % number of cores to use in parallel processing
 poolsize=10;
+%poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r','rv','r','rv'};
@@ -98,8 +104,8 @@ stocHIType={[],[],'RP','RPInv'};
 stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
-%doStoc={true,false};
-doStoc={true,true,true,true};
+doStoc={true,true,false,false};
+%doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -118,40 +124,58 @@ saveStoc={true,true,true,true};
 %--------------------------------------------------------------------------
 
 
-PhysArea = {struct('N',200,'L',4),struct('N',200,'L',4)};
-PlotArea = {struct('N',200,'yMin',0,'yMax',8),struct('N',200,'yMin',0,'yMax',8)};
-FexNum   = {struct('Fex','FMT','N',100),struct('Fex','FMT','N',100)};
+PhysArea = {struct('N',200,'L',4), ...
+            struct('N',200,'L',4), ...
+            struct('N',200,'L',4), ...
+            struct('N',200,'L',4)};
+PlotArea = {struct('N',200,'yMin',0,'yMax',8), ...
+            struct('N',200,'yMin',0,'yMax',8), ...
+            struct('N',200,'yMin',0,'yMax',8), ...
+            struct('N',200,'yMin',0,'yMax',8)};
+FexNum   = {struct('Fex','FMT','N',100), ...
+            struct('Fex','FMT','N',100), ...
+            struct('Fex','FMT','N',100), ...
+            struct('Fex','FMT','N',100)};
+HINum    = {[], ...
+            [], ...
+            struct('N',100,'L',4, ...
+                       'HI11','noHISpherical',...
+                       'HI12','RotnePrager12Spherical', ...
+                       'HIPreprocess', 'RotnePragerPreprocessSpherical'), ...
+            struct('N',100,'L',4, ...
+                       'HI11','JeffreyOnishi11Spherical',...
+                       'HI12','JeffreyOnishi12Spherical', ...
+                       'HIPreprocess', 'JeffreyOnishiPreprocessSpherical')};
 
-DDFTCode = {'DDFT_DiffusionSphericalInfInterval','DDFT_InertiaSphericalInfInterval'};
+DDFTCode = {'DDFT_DiffusionSphericalInfInterval', ...
+            'DDFT_InertiaSphericalInfInterval', ...
+            'DDFT_DiffusionHISphericalInfInterval', ...
+            'DDFT_InertiaHISphericalInfInterval'};
+        
 Tmax = tMax;
 
 doPlots = true;
 
 DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'}};
+                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'},...
+                   {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'},...
+                   {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'}};
 
-
-DDFTName={'DDFT1','DDFT2'};
+HIParamsNamesDDFT={'sigmaH','sigma'};               
+               
+DDFTName={'r0','rv0','r1','rv1'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r'};
-
-% whether to include hydrodynamic interactions
-% currently this should be false
-%DDFTHI={false,false};
+DDFTType={'r','rv','r','rv'};
 
 % whether to do DDFT calculations
-
-%doDDFT={true,true};
-doDDFT={true,false};
+%doDDFT={true,true,true,true};
+doDDFT={true,true,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true};
-%loadDDFT={false,false};
-
-%saveDDFT={true,true};
+loadDDFT={true,true,true,true};
 
 
 %--------------------------------------------------------------------------

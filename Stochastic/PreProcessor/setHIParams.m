@@ -54,7 +54,7 @@ if(optsStruct.anyStoc)
         % for each species
         for iSpecies=1:nSpecies
             mask=startPosDim(iSpecies):endPosDim(iSpecies); %#ok
-            eval(['optsStruct.' vars{iVar} '( mask ) = optsStruct.' vars{iVar} 'S(iSpecies);'])
+            eval(['optsStruct.' vars{iVar} '( mask ) = optsStruct.' vars{iVar} 'S(iSpecies,iSpecies);'])
         end
     end
   
@@ -64,13 +64,12 @@ end
 % Set up stochastic HI parameters in HIParams
 %--------------------------------------------------------------------------
 
-% remove extra braces
-vars=optsStruct.HIParamsNames;
-
-nVars=length(vars);
-
 if(optsStruct.anyStoc)
     addVarText=[];
+    
+    vars=optsStruct.HIParamsNames;
+
+    nVars=length(vars);
 
     % append each variable and its value to the command
     % var is (nParticles*stocDim,1) as above, varS as in input
@@ -98,11 +97,21 @@ end
 %--------------------------------------------------------------------------
 
 if(optsStruct.anyDDFT)
-    addVarText=[];
+    %addVarText=[];
 
+    if(isfield(optsStruct,'HI11'))
+        addVarText = '''HI11'',optsStruct.HI11,''HI12'',optsStruct.HI12,''HIPreprocess'',optsStruct.HIPreprocess';
+    else
+        addVarText = [];
+    end
+    
+    vars=optsStruct.HIParamsNamesDDFT;
+
+    nVars=length(vars);
+    
     % HIParamsDDFT has var and varS with the same values as varS in input
     for iVar=1:nVars
-        if(iVar==1)
+        if(isempty(addVarText))
             comma = [];
         else
             comma = ',';

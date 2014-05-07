@@ -1,7 +1,7 @@
 function params = RotnePragerPreprocess(params)
 
     % these should be nSpecies x nSpecies
-    sigma  = params.sigma;
+    sigma  = params.sigmaHS;
     
     sigmaII = diag(sigma);
     sigmaII = sigmaII(:);

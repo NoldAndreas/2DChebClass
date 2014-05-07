@@ -45,7 +45,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInterval()
     
     if(strcmp(Fex_Num.Fex,'Percus'))
         optsFMT        = Fex_Num;
-        optsFMT.sigma  = optsPhys.sigmaS;
+        optsFMT.sigma  = optsPhys.V2.sigmaS;
         IntMatrFex     = aLine.ComputeFMTMatrices(optsFMT);
         getFex         = str2func([Fex_Num.Fex]);
         getConv        = @zeroFunction;
@@ -60,7 +60,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInterval()
         getConv        = @Fex_Meanfield;
     elseif(strcmp(Fex_Num.Fex,'Perturbation'))
         optsFMT        = Fex_Num;
-        optsFMT.sigma  = optsPhys.sigmaS;
+        optsFMT.sigma  = optsPhys.V2.sigmaS;
         IntMatrFex     = aLine.ComputeFMTMatrices(optsFMT);
         getFex         = str2func([Fex_Num.Fex]);
         opts           = optsPhys; 

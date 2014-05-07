@@ -2,9 +2,11 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaHISphericalInfInterva
 
     Phys_Area = struct('N',200,'L',4);
     Plot_Area = struct('N',200,'yMin',0,'yMax',8);
-    Fex_Num   = struct('Fex','FMT','N',100);
-    
-    HI_Num    = struct('N',100,'L',4);
+    Fex_Num   = struct('Fex','FMT','N',100);  
+    HI_Num    = struct('N',100,'L',4, ...
+                       'HI11','JeffreyOnishi11Spherical',...
+                       'HI12','JeffreyOnishi12Spherical', ...
+                       'HIPreprocess', 'JeffreyOnishiPreprocessSpherical');
     
     tMax = 2.5;
     
@@ -21,19 +23,16 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaHISphericalInfInterva
     ZS = [0.5;0.25];
     Z = repmat(ZS',Phys_Area.N,1);
     
-    V1       = struct('V1DV1','APSHS','Vm',Vm,'Z',Z);
+    sigmaS  = [1 1;1 1];
+    sigmaHS = [0.5 0.5; 0.5 0.5];
 
-    sigmaS  = [1;1];
-    sigmaHS = [0.5;0.5];
+    V1       = struct('V1DV1','APSHS','Vm',Vm,'Z',Z);
+    V2       = struct('sigmaS',sigmaS);
+        
+    HI       = struct('sigmaHS',sigmaHS,'sigmaS',sigmaS); 
     
-    HI       = struct('HI11','JeffreyOnishi11Spherical',...
-              'HI12','JeffreyOnishi12Spherical', ...
-              'HIPreprocess', 'JeffreyOnishiPreprocessSpherical', ...
-              'sigma',[1 1;1 1],'sigmaH',[0.5 0.5; 0.5 0.5]); 
-    
-    optsPhys = struct('V1',V1,'V2',[],'HI',HI,'kBT',1,'nParticlesS',[25;25], ...
-                           'mS',[1;1],'gammaS',[2;2],'sigmaS',sigmaS, ...
-                           'sigmaHS',sigmaHS);
+    optsPhys = struct('V1',V1,'V2',V2,'HI',HI,'kBT',1,'nParticlesS',[25;25], ...
+                           'mS',[1;1],'gammaS',[2;2]);
     
                       
                        

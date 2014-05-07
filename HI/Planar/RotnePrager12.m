@@ -1,7 +1,7 @@
 function HI = RotnePrager12(r,optsPhys)
 
     alpha   = optsPhys.alpha;
-    sigmaH  = optsPhys.sigmaH;
+    sigmaH  = optsPhys.sigmaHS;
     
     r = abs(r);
     

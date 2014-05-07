@@ -4,7 +4,9 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHIInfInterval
     Plot_Area = struct('N',200,'yMin',-20,'yMax',20);
     Fex_Num   = struct('Fex','Percus','N',100);
     
-    HI_Num    = struct('N',100,'L',2);
+    HI_Num    = struct('N',100,'L',2, ...
+                      'HI11','noHI','HI12','RotnePrager12', ...
+                      'HIPreprocess', 'RotnePragerPreprocess');
     
     tMax = 25;
     
@@ -22,12 +24,12 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHIInfInterval
      
     V1       = struct('V1DV1','oscBump1D','alpha0',alpha0,'alphaT',alphaT,'beta',beta);
     
-    HI       = struct('HI11','noHI','HI12','RotnePrager12', ...
-                      'HIPreprocess', 'RotnePragerPreprocess', ...
-                      'sigma',1,'sigmaH',0.5);
+    V2       = struct('sigmaS',1);
+    
+    HI       = struct('sigmaHS',0.5);
 
     
-    optsPhys = struct('V1',V1,'V2',[],'HI',HI,'kBT',1,'nParticlesS',8,'sigmaS',1, ...
+    optsPhys = struct('V1',V1,'V2',V2,'HI',HI,'kBT',1,'nParticlesS',8, ...
                            'mS',1,'gammaS',2);
     
     lineColourDDFT={{'g','r','b'}};            

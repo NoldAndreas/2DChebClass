@@ -100,8 +100,10 @@ optsPlotV=getOptsPlotV(optsStruct);
 % Construct standard plotting options
 %--------------------------------------------------------------------------
 
-plotDir = [optsStruct.potNames filesep 'Output'];
-pdfDir  = [optsStruct.potNames filesep 'Output' filesep 'pdfs'];
+global dirResults
+
+plotDir = [dirResults filesep optsStruct.potNames filesep 'Output'];
+pdfDir  = [plotDir filesep 'pdfs'];
 movieFile = [plotDir filesep 'dynamics'];
 IFFiles    = {{[plotDir filesep 'initial.pdf'], [plotDir filesep 'final.pdf']}};
 
