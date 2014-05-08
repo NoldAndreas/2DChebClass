@@ -1,11 +1,5 @@
-function [meanR,meanV]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS,saveFile)
+function [meanR,meanV]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS)
 
-if(exist(saveFile,'file'))
-
-    load(saveFile,'meanR','meanV');
-
-else    
-    
     switch geom
 
         case 'planar2D'
@@ -17,8 +11,4 @@ else
             [meanR,meanV]=getRVmeansStocPolar2D(x,p,nParticlesS,mS);
     end
     
-    save(saveFile,'meanR','meanV');
-
-end
-
 end

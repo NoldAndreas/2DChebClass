@@ -1,4 +1,4 @@
-function plotMeans1D(stoc,ddft,optsPlot,equilibria,pdfFile)
+function plotMeans1D(stoc,ddft,optsPlot,equilibria)
 % plotMeans(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
 %   plots mean position and momentum over time from given stochastic and DDFT data
 %
@@ -110,31 +110,6 @@ legTextP=optsPlot.legTextP;
 % number of plots in the movie
 nPlots=length(plotTimes);
 
-% geometry and dimension needed to calculate means
-geom=optsPlot.geom;
-dim=optsPlot.dim;
-
-% pre-calculate means for both stochastic and DDFT data
-meanrStoc=zeros(nPlots,nSpecies,nStoc);
-meanvStoc=meanrStoc;
-
-for iStoc=1:nStoc
-    % loop through each set of stochastic data
-    x=stoc(iStoc).x;
-    p=stoc(iStoc).p;
-    
-    % compute means for each time, species and stochastic calculation
-    [meanrStoc(:,:,iStoc),meanvStoc(:,:,iStoc)]=getRVmeansStoc1D(x,p,geom,dim,nParticlesS,mS);
-end
-
-meanrDDFT=zeros(nPlots,nSpecies,nDDFT);
-meanvDDFT=meanrDDFT;
-
-for iDDFT=1:nDDFT 
-    % loop through each set of DDFT data and compute / read in means
-    [meanrDDFT(:,:,iDDFT),meanvDDFT(:,:,iDDFT)]=getRVmeansDDFT(ddft(iDDFT),geom);
-end
-
 % set up figure
 fullscreen = get(0,'ScreenSize');
 if(fullscreen(3)>1300)
@@ -185,11 +160,7 @@ for iStoc=1:nStoc
     optsPlot.lineMarker=lineMarkerStoc{iStoc};
     optsPlot.lineColour=lineColourStoc{iStoc};
     
-    meanrStocS=meanrStoc(:,:,iStoc);
-    meanvStocS=meanvStoc(:,:,iStoc);
-    
-    % plot means of r and v up to current time    
-    plotRVmeans(meanrStocS,meanvStocS,plotTimes,nPlots,optsPlot,handlesM,stocType(iStoc));
+    plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).vMean,plotTimes,nPlots,optsPlot,handlesM,stocType(iStoc));
     hold(hMRa,'on');
     hold(hMPa,'on');
 end
@@ -204,11 +175,8 @@ for iDDFT=1:nDDFT
     optsPlot.lineMarker=lineMarkerDDFT{iDDFT};
     optsPlot.lineColour=lineColourDDFT{iDDFT};
 
-    meanrDDFTS=meanrDDFT(:,:,iDDFT);
-    meanvDDFTS=meanvDDFT(:,:,iDDFT);
-    
-    % plot means of r and v up to current time
-    plotRVmeans(meanrDDFTS,meanvDDFTS,plotTimes,nPlots,optsPlot,handlesM,DDFTType(iDDFT));
+    plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).fluxMean,plotTimes,nPlots,optsPlot,handlesM,DDFTType(iDDFT));
+    %plotRVmeans(meanrDDFTS,meanvDDFTS,plotTimes,nPlots,optsPlot,handlesM,DDFTType(iDDFT));
     hold(hMRa,'on');
     hold(hMPa,'on');
 
@@ -230,7 +198,8 @@ if(~isempty(legTextP))
     PMMin=optsPlot.PMMin;
     PMMax=optsPlot.PMMax;
     %modify momentum plot
-    fixPlot(hMPa,tMin,tMax,PMMin,PMMax,'$t$','$\bar p  \;\;$',[],legPos,legTextP)
+    %fixPlot(hMPa,tMin,tMax,PMMin,PMMax,'$t$','$\bar p  \;\;$',[],legPos,legTextP)
+    fixPlot(hMPa,tMin,tMax,PMMin,PMMax,'$t$','$\bar j  \;\;$',[],legPos,legTextP)
     
     % remove tick marks and label from position plot
     set(hMRa,'XTickLabel',[]);
@@ -249,6 +218,8 @@ if(nDDFT>0)
    addEqLinesDDFT([],handlesM,ddft,optsPlot,true,true);
 end
 
-save2pdf(pdfFile,hRPf);
+outputFile = optsPlot.meansFile;
+
+save2pdf(outputFile,hRPf);
 
 fprintf(1,'Finished\n');

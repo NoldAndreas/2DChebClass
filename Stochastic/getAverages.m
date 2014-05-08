@@ -1,33 +1,5 @@
 function averagesStruct=getAverages(opts,stocStruct)
 
-%function equilibria=getEquilibria(xEq,pEq,optsPlot)
-%equilibria=getEquilibria(xEq,optsPlot)
-%   calculates equilibrium distributions and means from stochastic sampling
-%
-% INPUTS: 
-%  xEq    -- nSamples x (dim*nParticles) matrix of equilibrium positions
-%  optsPlot  -- structure of size [1 1] containing
-%             plotTimes       (vector of plot times)
-%             geom            (geometry; either 'planar' or 'spherical')
-%             dim             (dimension)
-%             nBins           (number of bins for histogramming)
-%             plotDensity     (true/false whether to plot the
-%                                 density; false->distruibution)
-%
-% OUTPUTS:
-%  equilbria -- structure of size [1 1] containing
-%             REq             (vector of rho at positions xR)
-%             vEq             (vector of v at positions xR)
-%             pEq             (vector of p at positions xR)
-%             xR              (vector positions, centres of histogram bins)
-%             rMeanEq         (vector of mean positions, 
-%                               same length as plotTimes)
-%             vMeanEq         (vector of mean velocities, 
-%                               same length as plotTimes)
-%             plotTimes       (vector of plot times, same as input)
-
-    %optsPhys = opts.optsPhys;
-    %optsStoc = opts.optsStoc;
     optsPlot = opts.optsPlot;
         
     % determine the relevant parameters
@@ -42,13 +14,15 @@ function averagesStruct=getAverages(opts,stocStruct)
     nPlots   = length(plotTimes);
     
     if(dim==2)
-        rho   = zeros(nBins(1),nBins(2),2,nSpecies,nPlots);
-        v     = rho;
-        boxes = rho;
+        rho   = zeros(nBins(1),nBins(2),nSpecies,nPlots);
+        v     = zeros(nBins(1),nBins(2),1,nSpecies,nPlots);
+        flux  = v;
+        boxes = v;
     else
         rho   = zeros(nBins,nSpecies,nPlots);
         v     = rho;
-        boxes = rho;
+        flux  = v;
+        boxes = v;
     end
     
     x = stocStruct.x;
@@ -59,9 +33,11 @@ function averagesStruct=getAverages(opts,stocStruct)
     %----------------------------------------------------------------------
 
     if(dim==2)
-        [rMean,vMean]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS);
+        [rMean,vMean] = getRVmeansStoc2D(x,p,geom,nParticlesS,mS);
+        [~,fluxMean]  = getRFluxMeansStoc2D(x,p,geom,nParticlesS,mS);
     else
-        [rMean,vMean]=getRVmeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
+        [rMean,vMean] = getRVmeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
+        [~,fluxMean]  = getRFluxMeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
     end
 
     %----------------------------------------------------------------------
@@ -79,7 +55,8 @@ function averagesStruct=getAverages(opts,stocStruct)
             rho(:,:,:,:,iPlot)   = nR;
             boxes(:,:,:,:,iPlot) = xR;
             for iSpecies=1:nSpecies
-                v(:,:,:,iSpecies,iPlot)=meanP(:,:,:,iSpecies)./mS(iSpecies);
+                v(:,:,:,iSpecies,iPlot) = meanP(:,:,:,iSpecies)./mS(iSpecies);
+                flux(:,:,:,iSpecies,iPlot) = v(:,:,:,iSpecies,iPlot).*rho(:,:,:,iSpecies,iPlot);
             end
         else
             [nR,meanP,xR]= RPhist(R,P,nBins,nParticlesS);   
@@ -87,13 +64,16 @@ function averagesStruct=getAverages(opts,stocStruct)
             boxes(:,:,iPlot) = xR;
             mSrep=repmat(mS',size(meanP,1),1);                
             v(:,:,iPlot)=meanP./mSrep;
+            flux(:,:,iPlot) = v(:,:,iPlot).*rho(:,:,iPlot);
         end
     end
 
     averagesStruct.rMean     = rMean;
     averagesStruct.vMean     = vMean;
+    averagesStruct.fluxMean  = fluxMean;
     averagesStruct.rho       = rho;
     averagesStruct.v         = v;
+    averagesStruct.flux      = flux;
     averagesStruct.boxes     = boxes;
     averagesStruct.plotTimes = plotTimes;
 

@@ -1,4 +1,4 @@
-function plotMeansPlanar2D(stoc,ddft,optsPlot,equilibria,pdfFile)
+function plotMeansPlanar2D(stoc,ddft,optsPlot,equilibria)
 % plotMeans(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
 %   plots mean position and momentum over time from given stochastic and DDFT data
 %

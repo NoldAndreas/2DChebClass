@@ -68,10 +68,13 @@ if(~isempty(stocStruct))
 
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
+        
+        redoPlotData = ~loadSamples;
+%         redoPlotData = true;
 
         fprintf(1,'Calculating Initial equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial' filesep 'Equilibria'];
-        initialEq = DataStorage(eqDir,@getEquilibria,opts,xpStruct,~loadSamples);
+        initialEq = DataStorage(eqDir,@getEquilibria,opts,xpStruct,redoPlotData);
         fprintf(1,'Finished\n');
 
     else
@@ -97,9 +100,12 @@ if(~isempty(stocStruct))
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
 
+        redoPlotData = ~loadSamples;
+%         redoPlotData = true;
+        
         fprintf(1,'Calculating Final equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final' filesep 'Equilibria'];
-        finalEq = DataStorage(eqDir,@getEquilibria,opts,xpStruct,~loadSamples);
+        finalEq = DataStorage(eqDir,@getEquilibria,opts,xpStruct,redoPlotData);
         fprintf(1,'Finished\n');
 
     else
@@ -130,6 +136,7 @@ if(~isempty(stocStruct))
         optsStoc = optsStocFull(iStoc);
 
         redoPlotData = ~optsStoc.loadStoc;
+%         redoPlotData = true;
 
         optsStoc = rmfield(optsStoc,'loadSamples');
         optsStoc = rmfield(optsStoc,'sampleFinal');
@@ -197,16 +204,14 @@ if(optsPlot.doInitialFinal)
     plotInitialFinal(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
 end
 
-return
-
 %--------------------------------------------------------------------------
 % make equilibrium plots
 %--------------------------------------------------------------------------
 
-if(optsPlot.doEquilibria)
-    %pdfFile=fileStruct.plotFile;
-    plotEquilibria(stocStruct,DDFTStruct,optsPlot,equilibria);
-end
+% if(optsPlot.doEquilibria)
+%     %pdfFile=fileStruct.plotFile;
+%     plotEquilibria(stocStruct,DDFTStruct,optsPlot,equilibria);
+% end
 
 %--------------------------------------------------------------------------
 % make mean plot
@@ -214,7 +219,7 @@ end
 
 if(optsPlot.doMeans)
     %pdfFile=fileStruct.plotFile{1};
-    plotMeans(stocStruct,DDFTStruct,optsPlot,equilibria);
+    plotMeans(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
 end
 
 %--------------------------------------------------------------------------
@@ -222,47 +227,47 @@ end
 % only useful when particles are 'distinguishable'
 %--------------------------------------------------------------------------
 
-if(optsStruct.anyPlotsP)
-    meanStruct=getMeansParticles(stocStruct);
-end
-
-%--------------------------------------------------------------------------
-% make intial and final particle plots
-%--------------------------------------------------------------------------
-
-if(optsStruct.doInitialFinalP)
-    gifFile=fileStruct.plotFileP{2};
-    plotInitialFinalParticles(meanStruct,optsPlotParticles,gifFile);
-end
-
-%--------------------------------------------------------------------------
-% make particle movie
-%--------------------------------------------------------------------------
-
-if(optsStruct.doMovieGifP || optsStruct.doMovieSwfP || optsStruct.doPdfsP)
-    makeMovieParticles(meanStruct,optsPlotParticles)
-end
+% if(optsStruct.anyPlotsP)
+%     meanStruct=getMeansParticles(stocStruct);
+% end
+% 
+% %--------------------------------------------------------------------------
+% % make intial and final particle plots
+% %--------------------------------------------------------------------------
+% 
+% if(optsStruct.doInitialFinalP)
+%     gifFile=fileStruct.plotFileP{2};
+%     plotInitialFinalParticles(meanStruct,optsPlotParticles,gifFile);
+% end
+% 
+% %--------------------------------------------------------------------------
+% % make particle movie
+% %--------------------------------------------------------------------------
+% 
+% if(optsStruct.doMovieGifP || optsStruct.doMovieSwfP || optsStruct.doPdfsP)
+%     makeMovieParticles(meanStruct,optsPlotParticles)
+% end
 
 %--------------------------------------------------------------------------
 % make custom plot
 %--------------------------------------------------------------------------
 
-if(optsStruct.doCustom)
-    path('CustomPlots',path)
-    customPlot=str2func(optsStruct.custom);
-    customPlot(stocStruct,DDFTStruct,equilibria,optsPlotGIF,optsPhysGIF);
-    rmpath('CustomPlots');
-end
-
-%--------------------------------------------------------------------------
-% make custom particle plot
-%--------------------------------------------------------------------------
-
-if(optsStruct.doCustomP)
-    path('CustomPlots',path)
-    customPlot=str2func(optsStruct.custom);
-    customPlot(meanStruct,optsPlotParticles);
-    rmpath('CustomPlots');
-end
+% if(optsStruct.doCustom)
+%     path('CustomPlots',path)
+%     customPlot=str2func(optsStruct.custom);
+%     customPlot(stocStruct,DDFTStruct,equilibria,optsPlot,optsPhys);
+%     rmpath('CustomPlots');
+% end
+% 
+% %--------------------------------------------------------------------------
+% % make custom particle plot
+% %--------------------------------------------------------------------------
+% 
+% if(optsStruct.doCustomP)
+%     path('CustomPlots',path)
+%     customPlot=str2func(optsStruct.custom);
+%     customPlot(meanStruct,optsPlotParticles);
+%     rmpath('CustomPlots');
+% end
 
 end

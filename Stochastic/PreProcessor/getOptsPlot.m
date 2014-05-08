@@ -102,9 +102,10 @@ optsPlotV=getOptsPlotV(optsStruct);
 
 global dirResults
 
-plotDir = [dirResults filesep optsStruct.potNames filesep 'Output'];
-pdfDir  = [plotDir filesep 'pdfs'];
-movieFile = [plotDir filesep 'dynamics'];
+plotDir    = [dirResults filesep optsStruct.potNames filesep 'Output'];
+pdfDir     = [plotDir filesep 'pdfs'];
+movieFile  = [plotDir filesep 'dynamics'];
+meansFile  = [plotDir filesep 'means.pdf'];
 IFFiles    = {{[plotDir filesep 'initial.pdf'], [plotDir filesep 'final.pdf']}};
 
 if(optsStruct.anyPlots || optsStruct.anyDDFT)  
@@ -139,7 +140,7 @@ if(optsStruct.anyPlots || optsStruct.anyDDFT)
                     'separateSpecies',optsStruct.separateSpecies, ...
                     'separateComp',optsStruct.separateComp, ...
                     'plotDir',plotDir,'pdfDir',pdfDir, 'movieFile',movieFile, ...
-                    'IFFiles',IFFiles);
+                    'meansFile',meansFile,'IFFiles',IFFiles);
 
     % merge in the legend and line options            
     optsPlot=mergeStruct(optsPlot,optsLeg,optsPlotV,optsStruct.potParamsPlot);

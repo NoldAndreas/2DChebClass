@@ -90,15 +90,18 @@ doP=~isempty(optsPlot.legTextP);
 % choose appropriate text for axis labels
 if(optsPlot.symbolLabels)
     rhoText='$\rho \;\;$';
-    vText='$p \;\;$';     
+    %vText='$p \;\;$';     
+    vText='Flux';     
     rText='$r$';
 else
     geom=optsPlot.geom;
     if(strcmp(geom,'spherical'))
-        vText='Radial velocity';  
+        %vText='Radial velocity';  
+        vText='Radial flux';  
         rText='Radius';
     else
-        vText='Velocity';  
+        %vText='Velocity';  
+        vText='Flux';  
         rText='Distance';
     end
     rhoText='Number of particles';
@@ -203,12 +206,13 @@ for iPlot=1:2
         
         rho   = stoc(iStoc).rho(:,:,plotPos(iPlot));
         v     = stoc(iStoc).v(:,:,plotPos(iPlot));
+        flux  = stoc(iStoc).flux(:,:,plotPos(iPlot));
         boxes =  stoc(iStoc).boxes(:,:,plotPos(iPlot));
         
         optsPlot.plotTime=plotTime;
         
-        plotRhoVdistStoc(rho,v,boxes,optsPlot,handlesRP,stocType(iStoc));
-        %plotRhoVdistStoc(xt,pt,optsPlot,handlesRP,stocType(iStoc));
+        %plotRhoVdistStoc(rho,v,boxes,optsPlot,handlesRP,stocType(iStoc));
+        plotRhoVdistStoc(rho,flux,boxes,optsPlot,handlesRP,stocType(iStoc));
         
     end
     
@@ -233,19 +237,19 @@ for iPlot=1:2
         optsPlot.lineMarker=lineMarkerDDFT{iDDFT};
         optsPlot.lineColour=lineColourDDFT{iDDFT};
         
-        % get rho and v
+        % get rho and flux
         rho=ddft(iDDFT).rho_t;
- %       v=ddft(iDDFT).v_t;
+        flux=ddft(iDDFT).flux_t;
         
         % select correct time
         rho=rho(:,:,plotPos(iPlot));
-%        v=v(:,:,plotPos(iPlot));
-        v = zeros(size(rho));
+        flux=flux(:,:,plotPos(iPlot));
         
         Interp = ddft(iDDFT).shape.Interp;
         
         % plot the distributions
-        plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        %plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        plotRhoVdistDDFT(rho,flux,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
 
         hold(hRa,'on');
         hold(hPa,'on');

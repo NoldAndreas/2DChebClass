@@ -127,10 +127,6 @@ doP=~isempty(legTextP);
 % number of plots in the movie
 nPlots=length(plotTimes);
 
-% geometry and dimension needed to calculate means
-geom=optsPlot.geom;
-dim=optsPlot.dim;
-
 % determine whether we are plotting final equilibrium values
 if(~isempty(equilibria))
     doEq=true;
@@ -273,25 +269,19 @@ for iPlot=1:nPlots
         optsPlot.lineStyle=lineStyleStoc{iStoc};
         optsPlot.lineMarker=lineMarkerStoc{iStoc};
         
-        %plotRVmeans(meanrStoc(:,:,iStoc),meanvStoc(:,:,iStoc),plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
-        plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).vMean,plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
-  
+        plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).fluxMean,plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
+
+        hold(hMRa,'on');
+        hold(hMPa,'on');        
+        
         optsPlot.plotTime=plotTime;
         
         rho   = stoc(iStoc).rho(:,:,iPlot);
-        v     = stoc(iStoc).v(:,:,iPlot);
+        flux  = stoc(iStoc).flux(:,:,iPlot);
         boxes = stoc(iStoc).boxes(:,:,iPlot);
         
-        plotRhoVdistStoc(rho,v,boxes,optsPlot,handlesRP,stocType(iStoc));
-        
-     %   plotRhoVdistStoc(xt,pt,optsPlot,handlesRP,stocType(iStoc));
-            
-        hold(hRa,'on');
-        hold(hPa,'on');
-        hold(hMRa,'on');
-        hold(hMPa,'on');
-        
-        
+        plotRhoVdistStoc(rho,flux,boxes,optsPlot,handlesRP,stocType(iStoc));
+                      
     end
 
     %----------------------------------------------------------------------
@@ -314,6 +304,9 @@ for iPlot=1:nPlots
         % plot means of r and v up to current time
         plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).fluxMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
 
+        hold(hMRa,'on');
+        hold(hMPa,'on');
+        
         % get values at appropriate time
         rho  = rho_t(:,:,iPlot);
         flux = flux_t(:,:,iPlot);
@@ -323,12 +316,7 @@ for iPlot=1:nPlots
         % plot the distributions
         %plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
         plotRhoFluxDDFT(rho,flux,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
-        
-        hold(hRa,'on');
-        hold(hPa,'on');
-        hold(hMRa,'on');
-        hold(hMPa,'on');
-       
+               
     end
     
     %----------------------------------------------------------------------
@@ -366,6 +354,7 @@ for iPlot=1:nPlots
     
     fixPlot(hMRa,tMin,tMax,RMMin,RMMax,tText,meanRText,plotTime,legPos,legTextR);
     fixPlot(hRa,rMin,rMax,RMin,RMax,rText,rhoText,plotTime,legPos,legTextR);
+    
     if(doP)
         fixPlot(hMPa,tMin,tMax,PMMin,PMMax,tText,meanPText,plotTime,legPos,legTextP);
         fixPlot(hPa,pMin,pMax,PMin,PMax,rText,vText,plotTime,legPos,legTextP);

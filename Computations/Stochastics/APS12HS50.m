@@ -238,11 +238,11 @@ quiet=true;
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif=true;          % .gif movie
+doMovieGif=false;          % .gif movie
 doPdfs=false;              % .pdfs to make .swf
 doMovieSwf=false;          % .swf movie
 doInitialFinal=false;
-doMeans=false;
+doMeans=true;
 
 % particle movies/plots
 doInitialFinalP=false;
