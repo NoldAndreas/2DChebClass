@@ -67,10 +67,6 @@ for iRun=1:nRuns
     p0(:,iRun)=pInitial(sampleShift+sampleSkip*iRun,:)';
 end
 
-
-% initial velocities are all zero
-%p0=zeros(dim*nParticles,1);
-
 % get positions of times at which to plot/save data
 [plotPosMask,~]=getPlotPos(optsStoc);
 nPlots=length(find(plotPosMask));
@@ -80,6 +76,18 @@ p=x;
 
 % get pool size (number of processors)
 poolsize=ICStruct.poolsize;
+
+[~,tempName] = fileparts(tempname);
+
+tempFile = cell(1,poolsize);
+
+for iWorker=1:poolsize
+    tempFile{iWorker} = ['Stochastic' filesep 'parFor_' tempName '_' num2str(iWorker) '.txt'];
+
+    fid = fopen(tempFile{iWorker},'w');
+    fprintf(fid,'0');
+    fclose(fid);
+end
 
 % if there's already a pool open, close it and kill all jobs
 if(matlabpool('size')>0)
@@ -95,6 +103,12 @@ if(poolsize>1)
     addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
 end
 
+ndp = 3;
+printLength = 4+ndp;
+printFormat = ['%0' num2str(printLength) '.' num2str(ndp) 'f'];
+
+disp([num2str(0,printFormat) '%']);
+
 tic
 
 % note this for loop can be done in parallel
@@ -107,16 +121,51 @@ parfor iRun=1:nRuns
         % for setting times etc)
         f=zeros(dim*nParticles,tSteps);
     end
-      
+ 
+    task   = getCurrentTask();
+    worker = task.ID;
+
+    fid = fopen(tempFile{worker},'r'); %#ok
+    oldProgress = fscanf(fid,'%f');
+    fclose(fid);
+    
+    fid = fopen(tempFile{worker},'w');
+    newProgress = oldProgress + 100/nRuns;
+    fprintf(fid,num2str(newProgress));
+    fclose(fid);
+  
+    if(worker==1)
+        progress = 0;
+    
+        for iWorker = 1:poolsize
+            fid = fopen(tempFile{iWorker},'r');
+            progress = progress + fscanf(fid,'%f');
+            fclose(fid);
+        end
+
+        delString = repmat(char(8),1,printLength+3);
+        progString = num2str(progress,printFormat);
+        if(length(progString)==printLength)
+            disp(delString);
+            disp([progString '%']);
+        end
+    end
+    
     % do dynamics
     [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
 end
+
 
 toc
 
 if(poolsize>1)
     matlabpool close
     path(oldPath);
+end
+
+
+for iFile = 1:poolsize
+    delete(tempFile{iFile});
 end
 
 xpStruct.x = x;
