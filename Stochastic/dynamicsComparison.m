@@ -11,7 +11,8 @@ AddPaths();
 %--------------------------------------------------------------------------
 
 %inputFile='APS12HS50';
-inputFile='APS12G50';
+%inputFile='APS12G50';
+inputFile = 'HITest';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

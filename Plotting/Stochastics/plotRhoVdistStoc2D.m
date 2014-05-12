@@ -1,4 +1,4 @@
-function handles=plotRhoVdistStoc2D(x,p,optsPlot,plotHandles)
+function handles=plotRhoVdistStoc2D(rho,v,boxes,optsPlot,plotHandles)
 %plotRhoVdistStoc(x,p,optsPlot,plotHandles,type)
 %   plots position and velocity distributions in axes given by plotHandles
 %
@@ -64,34 +64,6 @@ else
 end
 
 
-
-
-% determine the relevant parameters
-%geom=optsPlot.geom;
-nBins=optsPlot.nBins;
-dim=optsPlot.dim;
-
-% get the R and P data
-%[R,P]=getRP(x,p,geom,dim);
-[R,P]=getRP(x,p,'planar2D',dim);
-
-% do histogramming of R and obtain v(r).  Note we can't just use hist as we want P=v
-% as a function of r, not as a histogram
-
-if(optsPlot.fixedBins)
-    histRange=[optsPlot.rMin{1} optsPlot.rMax{1} optsPlot.rMin{2} optsPlot.rMax{2}];
-    [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS,histRange);
-else
-    [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS);
-end
-
-% convert to velocities
-mS=optsPlot.mS;
-meanV=meanP;
-for iSpecies=1:length(mS)
-    meanV(:,:,:,iSpecies)=meanP(:,:,:,iSpecies)./mS(iSpecies);
-end
-
 % plotting options
 faceColour=optsPlot.faceColour;
 
@@ -102,14 +74,15 @@ hr=zeros(nSpecies,1);
 
 for iSpecies=1:nSpecies
     
-    nRS=nR(:,:,iSpecies);
-%    meanVS=meanV(:,:,:,iSpecies);
-    xRS=xR(:,:,:,iSpecies);
+    rhoS=rho(:,:,iSpecies);
+    %vS=v(:,:,:,iSpecies);
+    boxesS=boxes(:,:,:,iSpecies);
     
     switch optsPlot.plotType
         case 'surf'
             % surface plot
-            hr(iSpecies)=surf(hRa(iSpecies),xRS(:,:,1),xRS(:,:,2),nRS);
+            %hr(iSpecies)=surf(hRa(iSpecies),xRS(:,:,1),xRS(:,:,2),nRS);
+            hr(iSpecies)=surf(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
             set(hr(iSpecies),'FaceColor',faceColour{iSpecies});
 %           set(hr(iSpecies),'EdgeColor',faceColour{iSpecies});
             alpha(hr(iSpecies),0.5);
@@ -124,7 +97,7 @@ for iSpecies=1:nSpecies
 
     hold(hRa,'on')
     
-    [C,h]=contour(hCa,xRS(:,:,1),xRS(:,:,2),nRS);
+    [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
     set(h,'color',faceColour{iSpecies},'linewidth',contourWidth);
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');

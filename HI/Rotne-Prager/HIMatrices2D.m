@@ -13,16 +13,12 @@ function HIStruct = HIMatrices2D(opts,IDC)
     optsNum = optsNum.HINum;
     
     if(isfield(params,'HIPreprocess'))
-        fPreprocess = str2func(params.HIPreprocess);
+        fPreprocess = str2func(optsNum.HIPreprocess);
         params = fPreprocess(params);
-        params = rmfield(params,'HIPreprocess');
     end
     
-    f11      = str2func(params.HI11);
-    f12      = str2func(params.HI12);
-
-    params  = rmfield(params,'HI11');
-    params  = rmfield(params,'HI12');
+    f11      = str2func(optsNum.HI11);
+    f12      = str2func(optsNum.HI12);
     
     if(isfield(optsNum,'N'))
         params.N = optsNum.N;
@@ -44,7 +40,7 @@ function HIStruct = HIMatrices2D(opts,IDC)
     for iS = 1:nSpecies
         for jS = iS:nSpecies
             paramsIJ = getIJParams(iS,jS);
-            
+
             HITemp11 = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  
             HITemp12 = IDC.ComputeConvolutionMatrix(@F12,paramsIJ); 
             

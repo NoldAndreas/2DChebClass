@@ -69,8 +69,8 @@ if(~isempty(stocStruct))
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
         
-        redoPlotData = ~loadSamples;
-%         redoPlotData = true;
+%        redoPlotData = ~loadSamples;
+         redoPlotData = true;
 
         fprintf(1,'Calculating Initial equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial' filesep 'Equilibria'];
@@ -100,8 +100,8 @@ if(~isempty(stocStruct))
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
 
-        redoPlotData = ~loadSamples;
-%         redoPlotData = true;
+%        redoPlotData = ~loadSamples;
+         redoPlotData = true;
         
         fprintf(1,'Calculating Final equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final' filesep 'Equilibria'];
@@ -114,7 +114,7 @@ if(~isempty(stocStruct))
 
     equilibria(1).data=initialEq;
     equilibria(2).data=finalEq;
-
+    
     %--------------------------------------------------------------------------
     % get dynamic quantities (rho, v, means, etc)
     %--------------------------------------------------------------------------
@@ -127,6 +127,11 @@ if(~isempty(stocStruct))
     opts.optsPlot.plotTimes   = optsPlot.plotTimes;
     opts.optsPlot.nParticlesS = optsPlot.nParticlesS;
     opts.optsPlot.mS          = optsPlot.mS;
+    if(optsPhys.dim == 2)
+        opts.optsPlot.fixedBins   = optsPlot.fixedBins;
+        opts.optsPlot.rMin        = optsPlot.rMin;
+        opts.optsPlot.rMax        = optsPlot.rMax;
+    end
 
 
     nStoc = length(optsStocFull);

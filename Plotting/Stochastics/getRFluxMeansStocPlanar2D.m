@@ -1,4 +1,4 @@
-function [meanR,meanV]=getRFluxMeansStocPlanar2D(x,p,nParticlesS,mS)
+function [meanR,meanFlux]=getRFluxMeansStocPlanar2D(x,p,nParticlesS,mS)
 % [meanR,meanV]=getRVmeansStoc(x,p,geom,dim)
 %   returns mean position and velocity for stochastic results at each time
 %

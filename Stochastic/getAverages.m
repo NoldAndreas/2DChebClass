@@ -15,7 +15,7 @@ function averagesStruct=getAverages(opts,stocStruct)
     
     if(dim==2)
         rho   = zeros(nBins(1),nBins(2),nSpecies,nPlots);
-        v     = zeros(nBins(1),nBins(2),1,nSpecies,nPlots);
+        v     = zeros(nBins(1),nBins(2),2,nSpecies,nPlots);
         flux  = v;
         boxes = v;
     else
@@ -51,12 +51,20 @@ function averagesStruct=getAverages(opts,stocStruct)
         [R,P]=getRP(xt,pt,geom,dim);
 
         if(dim==2)
-            [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS);   
-            rho(:,:,:,:,iPlot)   = nR;
+            if(optsPlot.fixedBins)
+                histRange=[optsPlot.rMin(1) optsPlot.rMax(1) optsPlot.rMin(2) optsPlot.rMax(2)];
+                [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS,histRange);
+            else
+                [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS);
+            end
+            %[nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS);  
+            rho(:,:,:,iPlot)   = nR;
             boxes(:,:,:,:,iPlot) = xR;
+                        
             for iSpecies=1:nSpecies
                 v(:,:,:,iSpecies,iPlot) = meanP(:,:,:,iSpecies)./mS(iSpecies);
-                flux(:,:,:,iSpecies,iPlot) = v(:,:,:,iSpecies,iPlot).*rho(:,:,:,iSpecies,iPlot);
+                flux(:,:,1,iSpecies,iPlot) = v(:,:,1,iSpecies,iPlot).*rho(:,:,iSpecies,iPlot);
+                flux(:,:,2,iSpecies,iPlot) = v(:,:,2,iSpecies,iPlot).*rho(:,:,iSpecies,iPlot);
             end
         else
             [nR,meanP,xR]= RPhist(R,P,nBins,nParticlesS);   

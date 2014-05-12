@@ -94,7 +94,7 @@ optsLeg=makeLegLine(optsStruct);
 % Get potential plotting options
 %--------------------------------------------------------------------------
 
-optsPlotV=getOptsPlotV(optsStruct);
+%optsPlotV=getOptsPlotV(optsStruct);
 
 %--------------------------------------------------------------------------
 % Construct standard plotting options
@@ -143,7 +143,8 @@ if(optsStruct.anyPlots || optsStruct.anyDDFT)
                     'meansFile',meansFile,'IFFiles',IFFiles);
 
     % merge in the legend and line options            
-    optsPlot=mergeStruct(optsPlot,optsLeg,optsPlotV,optsStruct.potParamsPlot);
+    %optsPlot=mergeStruct(optsPlot,optsLeg,optsPlotV,optsStruct.potParamsPlot);
+    optsPlot=mergeStruct(optsPlot,optsLeg,optsStruct.potParamsPlot);
     
     if(optsStruct.anyStoc)
         optsPlotStocGIF=struct('nBins',optsStruct.nBins, ...

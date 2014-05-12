@@ -1,4 +1,4 @@
-function plotInitialFinal2D(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
+function plotInitialFinal2D(stoc,ddft,optsPlot,equilibria,pdfFile)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -58,18 +58,38 @@ nStoc=size(stoc,2);
 nDDFT=size(ddft,2);
 
 % easy way to check if any of the computations include momentum
-doP=~isempty(optsPlotGIF(1).legTextP);
+doP=~isempty(optsPlot.legTextP);
+
+if(nStoc>0)
+    doEqStoc=[true;true];
+else
+    doEqStoc=[false;false];
+end
+
+if(nDDFT>0)
+    doEqDDFT=[true;true];
+else
+    doEqDDFT=[false;false];
+end
+
+for iEq = 1:2
+    if( ~isempty( equilibria(iEq).data ))
+        doEqStoc(iEq)=true;
+    end
+    
+    if( nDDFT>0 )
+        doEqDDFT(iEq)=true;
+    end
+    
+end
 
 % set initial and final time positions
-plotPos(2)=1;
-plotPos(3)=length(optsPlotGIF(1).plotTimes);
+plotPos(1)=1;
+plotPos(2)=length(optsPlot.plotTimes);
 
-fullscreen = get(0,'ScreenSize');
+fullscreen = get(0,'screensize');
 
-for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
-
-    % choose appropriate plotting options
-    optsPlot=optsPlotGIF(iPlot);
+for iPlot=1:2  
 
     %----------------------------------------------------------------------
     % Set up figure
@@ -134,7 +154,7 @@ for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
     end
     
     % and file to save in
-    outputFile=pdfFile{iPlot};
+%    outputFile=pdfFile{iPlot};
     
     %----------------------------------------------------------------------
     % Stochastic data plots
@@ -144,21 +164,18 @@ for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
     
         optsPlot.faceColour=lineColourStoc{iStoc};
                    
-        % get x and p values from structure
-        x=stoc(iStoc).x;
-        p=stoc(iStoc).p;
-
-        % get values at appropriate time
-        % transpose as should be nParticles x nSamples
-        xt=x(:,:,plotPos(iPlot))'; 
-        pt=p(:,:,plotPos(iPlot))';
+        rho   = stoc(iStoc).rho(:,:,:,plotPos(iPlot));
+        %v     = stoc(iStoc).v(:,:,:,:plotPos(iPlot));
+        flux  = stoc(iStoc).flux(:,:,:,:,plotPos(iPlot));
+        boxes =  stoc(iStoc).boxes(:,:,:,:,plotPos(iPlot));
         
+        optsPlot.plotTime=plotTime;        
         optsPlot.type=stocType(iStoc,:);
         
-        plotRhoVdistStoc2D(xt,pt,optsPlot,handlesRP(iPlot));
+        plotRhoVdistStoc2D(rho,flux,boxes,optsPlot,handlesRP(iPlot));
         
-        hold(hRa,'on');
-        hold(hPa,'on');
+%         hold(hRa,'on');
+%         hold(hPa,'on');
         
     end
        
@@ -206,10 +223,10 @@ for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
     optsPlot.xLab='x';
     optsPlot.yLab='y';
     
-    optsPlot.xMin=optsPlot.rMin{1};
-    optsPlot.xMax=optsPlot.rMax{1};
-    optsPlot.yMin=optsPlot.rMin{2};
-    optsPlot.yMax=optsPlot.rMax{2};
+    optsPlot.xMin=optsPlot.rMin(1);
+    optsPlot.xMax=optsPlot.rMax(1);
+    optsPlot.yMin=optsPlot.rMin(2);
+    optsPlot.yMax=optsPlot.rMax(2);
 
     optsPlot.zMin=optsPlot.RMin;
     optsPlot.zMax=optsPlot.RMax;
@@ -217,7 +234,7 @@ for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
     optsPlot.zLab='Density';
 
     %optsPlot.legText=optsPlot.legTextR{iSpecies};
-    if(strcmp(optsPlotGIF(1).plotType,'surf'))
+    if(strcmp(optsPlot.plotType,'surf'))
         fixPlot2Dsurf(hRa,optsPlot);
         optsPlot.time=[];
         fixPlot2Dcontour(hPa,optsPlot);
@@ -227,22 +244,22 @@ for iPlot=2:3  % we're using optsPlotGIF(2) and optsPlotGIF(3)
         
     if(doP)  
 
-        optsPlot.xMin=optsPlot.pMin{1};
-        optsPlot.xMax=optsPlot.pMax{1};
-        optsPlot.yMin=optsPlot.pMin{2};
-        optsPlot.yMax=optsPlot.pMax{2};            
+        optsPlot.xMin=optsPlot.pMin(1);
+        optsPlot.xMax=optsPlot.pMax(1);
+        optsPlot.yMin=optsPlot.pMin(2);
+        optsPlot.yMax=optsPlot.pMax(2);            
 
         %optsPlot.legText=optsPlot.legTextP{iSpecies};
         optsPlot.zLab='Momentum';
-        optsPlot.zMin=optsPlot.PMin{1};
-        optsPlot.zMax=optsPlot.PMax{1};
+        optsPlot.zMin=optsPlot.PMin(1);
+        optsPlot.zMax=optsPlot.PMax(1);
 
         fixPlot2D(hPa,optsPlot);
     end
         
     
     % write the figure files
-    save2pdf(outputFile,hRPf,100,true);
+    %save2pdf(outputFile,hRPf,100,true);
     %close(hRPf);
 
 end % for iPlot

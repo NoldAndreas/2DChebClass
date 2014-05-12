@@ -23,7 +23,8 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     PhysArea    = optsNum.PhysArea;   
     N1 = PhysArea.N(1); N2 = PhysArea.N(2);              
     kBT          = optsPhys.kBT; 
-    nParticlesS  = optsPhys.nParticlesS;            
+    nParticlesS  = optsPhys.nParticlesS;    
+    nSpecies=length(nParticlesS);
     plotTimes    = optsNum.plotTimes;
     
     if(isfield(optsPhys,'HSBulk'))
@@ -63,30 +64,22 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     tfex = toc;
     disp(tfex);
     
-    if(isfield(optsPhys,'doHI'))
-        doHI = optsPhys.doHI;
+    if(isfield(optsNum,'HINum') && ~isempty(optsNum.HINum))
+        doHI = true;
     else
         doHI = false;
     end
+    
     if(doHI)        
         tic
         fprintf(1,'Computing HI matrices ...');   
-        paramsHI.kBT  = optsPhys.kBT;
-        paramsHI.HI   = optsPhys.HI;
-        paramsHI.HIShapeParams  = optsNum.HIShapeParams;
-        paramsHI.Pts     = IDC.Pts;     
-        paramsHI.Polar   = 'cart';
-        func           = str2func('HIMatrices_RP');    
-        IntMatrHI     = DataStorage('HIData',func,paramsHI,IDC);   
-
-        %IntMatrHI = HIMatrices_RP(optsPhys,optsNum,IDC);
-
+        optsHI.optsPhys = optsPhys;
+        optsHI.optsNum = optsNum;
+        IntMatrHI     = DataStorage(['InfSpace' filesep 'HIData'],@HIMatrices2D,optsHI,IDC);      
         fprintf(1,'done.\n');
         tHI = toc;
         disp(tHI);        
     end
-    
-    nSpecies=length(nParticlesS);
     
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);
@@ -106,9 +99,6 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     VAdd0=getVAdd(y1S,y2S,0,optsPhys.V1);
     y0 = getInitialGuess(VAdd0);
     
-    %y0=zeros(1+N1*N2,nSpecies);
-    
-%     x_ic    = fsolve(@f,zeros(1+N1*N2,nSpecies));
     fprintf(1,'Computing initial condition ...');
     fsolveOpts=optimset('Display','off');
     [x_ic,flag]    = fsolve(@f,y0,fsolveOpts); 
@@ -124,7 +114,8 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-    if(optsPlot.doDDFTPlots)
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
         figure
         rho_ic  = exp((x_ic-Vext)/kBT);
         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
@@ -171,18 +162,15 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     data     = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,...
                         t_preprocess,t_eqSol,t_dynSol);                        
     data.shape = IDC;
-    
-    %if(~isfield(optsNum,'savefileDDFT'))
-    %    SaveToFile(optsNum.DDFTCode,data,optsPhys,optsNum,getResultsPath());
-    %end                    
-                    
+                      
 	display(['Preprocessor, Computation time (sec): ', num2str(t_preprocess)]);
     display(['Equilibrium Sol., Computation time (sec): ', num2str(t_eqSol)]);
     display(['Dynamics, Computation time (sec): ', num2str(t_dynSol)]);
     
     output = v2struct(optsPhys,optsNum,optsPlot,data);
     
-    if(~exist('optsPlot','var') || optsPlot.doDDFTPlots)
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
         PlotDDFT(output);  
     end
              
@@ -254,8 +242,9 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
         mu_s(Ind.bound,:) = 0;
         
         rho_s = exp((x-Vext)/kBT);
+        rho_s = [rho_s;rho_s];
         gradMu_s = Diff.grad*mu_s;
-        HI_s = OverdampedHI(rho_s,IntMatrHI,gradMu_s);
+        HI_s = ComputeHI(rho_s,gradMu_s,IntMatrHI);
         
         h_s      = Diff.grad*x - Vext_grad;
         h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
@@ -288,11 +277,12 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     end
 
     function flux = GetFlux_HI(x,t)
-        rho_s = exp((x-Vext)/kBT);       
+        rho_s = exp((x-Vext)/kBT);  
+        rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
         gradMu_s = Diff.grad*mu_s;
-        HI_s = OverdampedHI(rho_s,IntMatrHI,gradMu_s);
-        flux  = -[rho_s;rho_s].*(gradMu_s + HI_s);                                
+        HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        flux  = -rho_s.*(gradMu_s + HI_s);                                  
     end
 
 

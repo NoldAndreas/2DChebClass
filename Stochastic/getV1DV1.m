@@ -17,7 +17,7 @@ switch optsPhys.type
         
         % get coordinates for each particle (of size nParticles x d)
         C = getCoords(x,dim,geom);
-        
+
         d = size(C,2);        % geometry dimension
         
         if (d==1)

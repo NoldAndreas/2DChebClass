@@ -4,7 +4,7 @@ function [VBack,DVBack]=getVBackDVBack(x1,x2,optsPhys)
 getV1DV1=str2func(optsPhys.V1DV1);
 
 % retrieve the parts we're interested in
-[VBack_S,h1] = getV1DV1(x1,x2,0,optsPhys);
+[VBack_S,~] = getV1DV1(x1,x2,0,optsPhys);
 
 VBack  = VBack_S.V;
-DVBack = VBack_S.DV;
+DVBack = VBack_S.grad;

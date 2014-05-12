@@ -1,6 +1,6 @@
 function HI = RP12_2D(x,y,optsPhys)
 
-    sigmaH = optsPhys.sigmaH;
+    sigmaH = optsPhys.sigmaHS;
 
     N = length(x);
     id = IoxI(N);
