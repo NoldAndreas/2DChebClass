@@ -35,18 +35,13 @@ function [optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionPlanar_NSpecies()
             alpha12 alpha2  alpha23 ;
             alpha13 alpha23 alpha3  ];
         
-    potParams2Names ={{'epsilon','alpha'}};
         
     V1       = struct('V1DV1','rotating2cart',...
                       'V0',0.05,'V0r',1,'alphar',1,'tau',1,'rV',1); 
-                  
-%     V1       = struct('V1DV1','quadBump',...
-%                       'V0',0.1,'y10',1,'y20',1,'tau',10); 
-                  
+                           
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
     
     optsPhys = struct('V1',V1,'V2',V2,...
-                      'potParams2Names',potParams2Names,...
                       'kBT',1,...
                       'nParticlesS',[10;10;10]); 
                  

@@ -50,11 +50,12 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     %************************************************           
     tic
     fprintf(1,'Computing Fex matrices ...');   
-    params.V2      = optsPhys.V2;
-    params.kBT     = optsPhys.kBT;
-    params.FexNum  = optsNum.FexNum;
-    params.Pts     = IDC.Pts;     
-    params.Polar   = 'cart';
+    params.V2          = optsPhys.V2;
+    params.kBT         = optsPhys.kBT;
+    params.FexNum      = optsNum.FexNum;
+    params.Pts         = IDC.Pts;     
+    params.Polar       = 'cart';
+    params.nParticlesS = optsPhys.nParticlesS;
        
     func           = str2func(['FexMatrices_',optsNum.FexNum.Fex]);    
 	IntMatrFex     = DataStorage('FexData',func,params,IDC);   
