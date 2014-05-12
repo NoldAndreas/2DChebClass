@@ -4,8 +4,8 @@ function [z,dzdr_r] = Gaussian(r,optsPhys)
     epsilon = optsPhys.epsilon;
     alpha   = optsPhys.alpha;
     
-	z = epsilon*exp(-(r.^2)/(alpha^2));  
+	z = epsilon.*exp(-(r.^2)./(alpha.^2));
     z(r == inf) = 0;
-    
-    dzdr_r = -2*epsilon/(alpha^2)*exp(-(r.^2)/(alpha^2));  
+        
+    dzdr_r = -2*epsilon./(alpha.^2).*exp(-(r.^2)./(alpha.^2));  
 end

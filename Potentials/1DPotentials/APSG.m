@@ -5,11 +5,11 @@ function [VBack_S,VAdd_S]=APSG(y,t,optsPhys)
     tSwitch = optsPhys.tSwitch;
 
     %--------------------------------------------------------------------------
-    VBack  = Vm*y.^2;
-    DVBack = 2*Vm*y;
+    VBack  = Vm.*y.^2;
+    DVBack = 2*Vm.*y;
     %--------------------------------------------------------------------------
 
-    if(t==0 || t>tSwitch)
+    if(t==0 || t>tSwitch(1))
     %if(t>tSwitch)
         Z=40;
         strength = 10;
@@ -18,7 +18,7 @@ function [VBack_S,VAdd_S]=APSG(y,t,optsPhys)
         strength = 10;
     end
     
-    VAdd  = -strength*exp(-y.^2/2/Z);
+    VAdd  = -strength.*exp(-y.^2/2/Z);
     DVAdd = -y/Z.*VAdd;
         
     %--------------------------------------------------------------------------

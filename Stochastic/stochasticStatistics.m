@@ -100,16 +100,23 @@ if(poolsize>1)
     % open pool for parallel computing
     matlabpool('open','local',poolsize);
     oldPath = path;
-    addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
+    %addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
 end
 
 ndp = 3;
 printLength = 4+ndp;
 printFormat = ['%0' num2str(printLength) '.' num2str(ndp) 'f'];
 
-disp([num2str(0,printFormat) '%']);
+nowLength = length(datestr(now));
+
+delString = repmat(char(8),1,printLength + nowLength + 4);
 
 tic
+
+tStart = clock;
+
+disp([num2str(0,printFormat) '%']);
+disp(datestr(now));
 
 % note this for loop can be done in parallel
 parfor iRun=1:nRuns
@@ -122,6 +129,9 @@ parfor iRun=1:nRuns
         f=zeros(dim*nParticles,tSteps);
     end
  
+    % do dynamics
+    [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
+    
     task   = getCurrentTask();
     worker = task.ID;
 
@@ -134,25 +144,29 @@ parfor iRun=1:nRuns
     fprintf(fid,num2str(newProgress));
     fclose(fid);
   
-    if(worker==1)
+    if(worker == 1)
         progress = 0;
-    
+
         for iWorker = 1:poolsize
             fid = fopen(tempFile{iWorker},'r');
             progress = progress + fscanf(fid,'%f');
             fclose(fid);
         end
-
-        delString = repmat(char(8),1,printLength+3);
+        
         progString = num2str(progress,printFormat);
         if(length(progString)==printLength)
             disp(delString);
+            
+            tTaken = etime(clock,tStart);
+            tLeft  = (100-progress)/progress*tTaken;
+            tEst   = addtodate(now,round(tLeft),'second');
+            tString    = datestr(tEst);
+            
             disp([progString '%']);
+            disp(tString);
         end
     end
-    
-    % do dynamics
-    [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
+
 end
 
 

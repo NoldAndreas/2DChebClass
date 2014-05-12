@@ -125,7 +125,7 @@ if(optsStruct.anyDDFT)
 
     optsPhysDDFTGlobal = mergeStruct(optsPhysGlobal, ...  
                                     optsPhysDDFTGlobal );
-   
+                                   
     for iDDFT=1:nDDFT
         optsPhysDDFT(iDDFT) = optsPhysDDFTGlobal;  %#ok
 

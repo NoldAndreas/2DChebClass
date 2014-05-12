@@ -10,7 +10,8 @@ stocDim=3;
 % it's one in certain places
 DDFTDim=1;
 
-nParticlesS=[25;25];
+%nParticlesS=[25;25];
+nParticlesS=[10;10];
 
 kBT=1;          % temperature
 mS=[1;1];
@@ -22,16 +23,15 @@ D0S=kBT./mS./gammaS;
 % V1 parameters
 %--------------------------------------------------------------------------
 
-V1DV1={'APSG'};
+V1DV1='APSG';
 
 % appropriate physical parameters for potentials in V1DV1   
-VmS= 0.01;  
-
-tSwitchS=12;
+VmS= [0.01;0.01];  
+tSwitchS= [12;12];
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
-potParamsNames = {{'Vm','tSwitch'}};
+potParamsNames = {'Vm','tSwitch'};
 
 %--------------------------------------------------------------------------
 % V2 parameters
@@ -47,13 +47,14 @@ alpha12=(alpha1+alpha2)/2;
 
 alphaS = [alpha1, alpha12; alpha12, alpha2];
 
-potParams2Names={{'epsilon','alpha'}};
+potParams2Names={'epsilon','alpha'};
 
 %--------------------------------------------------------------------------
 % HI parameters
 %--------------------------------------------------------------------------
-
-HIParamsNames={{}};
+% 
+% HIParamsNames={};
+% HIParamsNamesDDFT={};
 
 %--------------------------------------------------------------------------
 % Save time setup
@@ -63,71 +64,92 @@ HIParamsNames={{}};
 tMax=12;
 
 %--------------------------------------------------------------------------
+% Stochastic setup
+%--------------------------------------------------------------------------
+
+% number of samples to take of the initial and final equilibrium
+% distributions goverened by the second and third arguments of V1DV1 above
+% only relevant if fixedInitial=false or sampleFinal=true
+%nSamples=50000;  
+
+nSamples=50000;  
+
+initialGuess='makeGrid';
+
+% number of runs of stochastic dynamics to do, and average over
+nRuns=1000;
+
+%nRuns = 1000;
+
+% number of cores to use in parallel processing
+poolsize=12;
+%poolsize=1;
+
+% type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
+stocType={'r','rv'};
+
+% whether to include hydrodynamic interactions
+stocHI={false,false};
+% HI interaction matrices
+stocHIType={[],[]};
+
+% names for stochastic calculations -- used as legend text
+stocName={'r0','rv0'};
+
+% whether to do Langevin and Brownian dynamics
+doStoc={true,true};
+%doStoc={true,false,false,false};
+%doStoc={false,false,false,false};
+
+% whether to load saved data for Langevin and Brownian dynamics
+loadStoc={true,true};
+
+% number of time steps
+tSteps={10^3,10^3};
+
+% whether to save output data (you probably should)
+saveStoc={true,true};
+
+
+%--------------------------------------------------------------------------
 % DDFT setup
 %--------------------------------------------------------------------------
 
-% length of grid
-L=4;
-% number of points
-N=201;
+PhysArea = {struct('N',200,'L',4), ...
+            struct('N',200,'L',4)};
+PlotArea = {struct('N',200,'yMin',0,'yMax',10), ...
+            struct('N',200,'yMin',0,'yMax',10)};
+FexNum   = {struct('Fex','Meanfield','N',100,'L',2), ...
+            struct('Fex','Meanfield','N',100,'L',2)};
 
-% plotting range of the form (rPlotMin:rPlotStep:rPlotMax);
-rPlotMin =0;
-rPlotMax=10;
-rPlotStep=0.01;
+DDFTCode = {'DDFT_DiffusionSphericalInfInterval', ...
+            'DDFT_InertiaSphericalInfInterval'};
+        
+Tmax = tMax;
 
-intLimMin=0;
-intLimMax=20;
+doPlots = true;
 
-NInt=N;
-
-% integration region
-uBound=2;
-lBound=0;
-
-
-FexMatrices='getRPAMatricesFull';
-Fex='RPA';
-
-% file names for the DDFT integration matrices
-DDFTHIType={'noHI','noHI','JeffreyOnishi11','RotnePrager'};
-
-DDFTParamsNames={{'L','N','rPlotMin','rPlotMax','rPlotStep', ...
-                   'intLimMin','intLimMax','NInt','uBound','lBound', ...
-                   'FexMatrices','Fex','DDFTHIType'}};
-
-DDFTParamsSaveNames={{'N'}};
-
-DDFTName={'DDFT 1','DDFT 2','DDFT 3','DDFT 4'};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'}};
+                           
+DDFTName={'r0','rv0'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'rv','r','rv','r'};
-
-% whether to include hydrodynamic interactions
-% currently this should be false
-DDFTHI={false,false,true,true};
-
-% locations for DDFT code
-DDFTDir=['DDFT1D' filesep 'Spherical'];
-DDFTCode='DDFTSpherical';
+DDFTType={'r','rv'};
 
 % whether to do DDFT calculations
-%doDDFT={true,true,true,true};
-doDDFT={true,false,false,false};
-%doDDFT={false,false,false,false};
+doDDFT={true,true};
 
 % do we load and save the DDFT data
-%loadDDFT={true,true,true,true};
-loadDDFT={false,false,false,false};
-
-saveDDFT=true;
+loadDDFT={true,true};
 
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
+
 
 % whether to plot the distribution (false) or the density (true) in
 % spherical coordinates.
@@ -136,27 +158,17 @@ plotDensity=false;
 plotCurrent=false;
 
 % x axis for position and velocity plots
-% in form {General (movie), Initial, Final}
-rMin={0,0,0};
-rMax={10,10,10};
+rMin=0;
+rMax=12;
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
-% in form {General (movie), Initial, Final}
-RMin={0,0,0};
+RMin=0;
+RMax=15;
 
-if(plotDensity)
-    RMax={1.5,1.5,1.5};        % density
-else
-    %RMax={100,100,100};    % distribution
-    RMax={15,15,15};    % distribution
-end
-
-PMin={-0.6,-0.6,-0.6};  % velocity
-PMax={0.4,0.4,0.4};
-% PMin={-20,-20,-20};  % current
-% PMax={10,10,10};
+PMin=-0.5;
+PMax=0.4;
 
 
 % y axis for mean position and velocity plots

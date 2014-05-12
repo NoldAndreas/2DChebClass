@@ -77,13 +77,13 @@ if(optsStruct.anyStoc)
     % append each variable and its value to the command
     % var is (nParticles,nParticles) as above, varS as in input
     
-    if(iVar==1)
-        comma = [];
-    else
-        comma = ',';
-    end
-    
     for iVar=1:nVars
+        if(iVar==1)
+            comma = [];
+        else
+            comma = ',';
+        end
+        
         % add var with value var
         addVarText=cat(2,addVarText, [comma '''' vars{iVar} ''',optsStruct.'  vars{iVar}]);
         % add varS with value varS
@@ -102,7 +102,15 @@ end
 
 if(optsStruct.anyDDFT)
     
-    addVarText=['''V2DV2'', ''' optsStruct.V2DV2 '''' ];
+    if(strcmp(optsStruct.geom,'spherical'))
+        V2Name = [optsStruct.V2DV2 'Spherical'];
+    else
+        V2Name = optsStruct.V2DV2;
+    end
+
+    
+    %addVarText=['''V2DV2'', ''' optsStruct.V2DV2 '''' ];
+    addVarText=['''V2DV2'', ''' V2Name '''' ];
 
     % potParams2DDFT has var and varS with the same values as varS in input
     for iVar=1:nVars

@@ -10,7 +10,8 @@ stocDim=3;
 % it's one in certain places
 DDFTDim=1;
 
-nParticlesS=[25;25];
+%nParticlesS=[25;25];
+nParticlesS=[10;10];
 
 kBT=1;          % temperature
 mS=[1;1];
@@ -79,17 +80,17 @@ tMax=2.5;
 % only relevant if fixedInitial=false or sampleFinal=true
 %nSamples=50000;  
 
-nSamples=10000;  
+nSamples=500000;  
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=50;
+nRuns=2000;
 
 %nRuns = 1000;
 
 % number of cores to use in parallel processing
-poolsize=10;
+poolsize=12;
 %poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
@@ -104,13 +105,12 @@ stocHIType={[],[],'RP','RPInv'};
 stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true,false,false};
+doStoc={true,true,true,true};
+%doStoc={true,false,false,false};
 %doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
-%loadStoc={false,false};
-
 
 % number of time steps
 tSteps={2*10^4,2*10^4,2*10^4,2*10^4};
@@ -171,11 +171,13 @@ DDFTName={'r0','rv0','r1','rv1'};
 DDFTType={'r','rv','r','rv'};
 
 % whether to do DDFT calculations
-%doDDFT={true,true,true,true};
-doDDFT={true,true,false,false};
+doDDFT={true,true,true,true};
+%doDDFT={true,false,false,false};
+%doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
+%loadDDFT={false,true,true,true};
 
 
 %--------------------------------------------------------------------------

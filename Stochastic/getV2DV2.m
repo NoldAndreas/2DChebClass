@@ -38,7 +38,7 @@ switch optsPhys.type
         % calculations (although this doesn't actually change anything as
         % it's equivalent to shifting the external potential by a constant)
         V2 = V2-diag(diag(V2));       
-        V2 = 1/2*sum(sum(V2,2),1);  
+        V2 = 1/2*sum(sum(V2,2),1);
 
         %------------------------------------------------------------------
         % Calculate DV2                                                        

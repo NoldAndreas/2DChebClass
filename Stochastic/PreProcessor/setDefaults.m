@@ -57,6 +57,8 @@ if(S.anyStoc)
     D.poolSize=1;
     D.loadSamples=true;
     
+    D.HIParamsNames={};
+    
     nStoc=length(S.stocName);
     D.doStoc=cell(1,nStoc);
     D.loadStoc=cell(1,nStoc);
@@ -88,6 +90,8 @@ if(S.anyDDFT)
     D.doDDFT=cell(1,nDDFT);
     D.loadDDFT=cell(1,nDDFT);
     D.saveDDFT=cell(1,nDDFT);
+    
+    D.HIParamsNamesDDFT={};
     
     D.doDDFTPlots=false;
     

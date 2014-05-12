@@ -138,7 +138,6 @@ if(optsStruct.anyDDFT)
             addVarText=cat(2,addVarText, [',''' vars{iVar} 'S'',optsStruct.'  vars{iVar} 'S']);
         end
 
-
         potParamsCmd=['optsStruct.potParamsDDFT{iDDFT} = struct(' addVarText ');'];
         
         eval(potParamsCmd)

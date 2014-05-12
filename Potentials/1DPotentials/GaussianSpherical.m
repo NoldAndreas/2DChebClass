@@ -1,4 +1,4 @@
-function z = GaussianPolar(x,y,optsPhys)
+function z = GaussianSpherical(x,y,optsPhys)
 
     epsilon = optsPhys.epsilon;
     alpha   = optsPhys.alpha;
