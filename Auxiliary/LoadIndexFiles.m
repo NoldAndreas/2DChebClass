@@ -3,6 +3,9 @@ function index = LoadIndexFiles(dirIndexFiles)
     index         = {};
     TxtFiles      = dir(fullfile(dirIndexFiles,'*.txt'));
     
+    [~,dateOrder]  = sort([TxtFiles.datenum],'descend');
+    TxtFiles       = TxtFiles(dateOrder);
+    
     count = 1;
     
     for i = 1:length(TxtFiles)

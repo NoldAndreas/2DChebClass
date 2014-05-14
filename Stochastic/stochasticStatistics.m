@@ -77,7 +77,7 @@ p=x;
 % get pool size (number of processors)
 poolsize=ICStruct.poolsize;
 
-tempDir = ['parForLog'];
+tempDir = 'parForLog';
 
 if(~exist(tempDir,'dir'))
     mkdir(tempDir);
@@ -183,10 +183,7 @@ if(poolsize>1)
     path(oldPath);
 end
 
-
-for iFile = 1:poolsize
-    delete(tempFile{iFile});
-end
+delete([tempDir filesep '*'])
 rmdir(tempDir);
 
 xpStruct.x = x;

@@ -9,10 +9,6 @@ function c = mycombnk(v,k)
 
 [m, n] = size(v);
 
-if min(m,n) ~= 1
-   error(message('stats:combnk:VectorRequired'));
-end
-
 if n == 1
    n = m;
    flag = 1;
@@ -45,7 +41,7 @@ elseif n < 17 && (k > 3 || n-k < 4)
 
    idx = x(sum(x,2) == k,:);
    nrows = size(idx,1);
-   [rows,ignore] = find(idx');
+   [rows,~] = find(idx');
    c = reshape(v(rows),k,nrows).';
 else 
    P = [];

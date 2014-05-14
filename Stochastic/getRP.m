@@ -91,35 +91,3 @@ switch geom
 end
 
 end %function
-
-
-%         %check by plotting     
-%         sample=1;
-%         pr=pr(:,:,sample)';
-%         ptheta=ptheta(:,:,sample)';
-%         thetar=thetar(:,:,sample)';
-%         r1=r(1,:,sample)';
-%         r2=r(2,:,sample)';
-%         p1=p(1,:,sample)';
-%         p2=p(2,:,sample)';
-%         
-%         rhat=[cos(thetar) sin(thetar)];
-%         
-%         prPlot=[pr pr].*rhat + [r1 r2];
-%         
-%         thetahat = [-sin(thetar) cos(thetar)];
-%         
-%         pthetaPlot= [ptheta ptheta].*thetahat + prPlot;
-%         
-%         for iParticle=1:nParticles
-%             plot([0 r1(iParticle)],[0 r2(iParticle)],'k');
-% 
-%             hold on;
-%             plot([r1(iParticle) r1(iParticle)+p1(iParticle)],[r2(iParticle) r2(iParticle)+p2(iParticle)],'r');
-%             
-%             plot([r1(iParticle) prPlot(iParticle,1)],[r2(iParticle) prPlot(iParticle,2)],'--b');
-%             
-%             plot([prPlot(iParticle,1) pthetaPlot(iParticle,1)],[prPlot(iParticle,2) pthetaPlot(iParticle,2)],'--g');
-%             
-%         end
-%         axis 'equal';

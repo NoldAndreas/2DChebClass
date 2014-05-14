@@ -75,49 +75,7 @@ function [rnd, neval] = myslicesample(initial,nsamples,logpdf,thin,burnin)
  
 % Copyright 2005-2011 The MathWorks, Inc.
 
-%narginchk(4,Inf);  % initial, nsamples and pdf or logpdf are required.
-
-% if isempty(initial)  % initial value is required to run the slice sampling.
-%     error(message('stats:slicesample:EmptyIni'));
-% end;
-% if ~isvector(initial)  % initial value is required to be a vector or scalar
-%     error(message('stats:slicesample:NonvectorIni'));
-% end;
-
 initial = initial(:)';
-% parse the information in the name/value pairs 
-%pnames = {'pdf' ,'logpdf', 'width','burnin','thin'};
-%dflts =  {[] [] 10 0 1};
-%[pdf,logpdf,width,burnin,thin] = ...
-%       internal.stats.parseArgs(pnames, dflts, varargin{:});
- 
-% pdf or logpdf for target distribution has to be provided.
-% if isempty(pdf)&& isempty(logpdf)
-%     error(message('stats:slicesample:EmptyTarget'));
-% end;
- 
-% log density is used for numerical stability
-% if  isempty(logpdf)
-%     checkFunErrs('pdf',pdf,initial); % error check for pdf function
-%     logpdf =@(x) mylog(pdf(x)); % log density
-% else
-%     checkFunErrs('logpdf',logpdf,initial); % error check for logpdf function
-% end;
-% 
-% if (logpdf(initial)==-Inf)
-%     error(message('stats:slicesample:BadInitial'))
-% end
-% %error checks for burnin and thin
-% if (burnin<0) || burnin~=round(burnin)
-%     error(message('stats:slicesample:BadBurnin'));
-% end
-% if (thin<=0)|| thin~=round(thin)
-%     error(message('stats:slicesample:BadThin'));
-% end
-% if (~isscalar(width) && ~isscalar(initial) && ~isequal(size(width),size(initial))) ...
-%     || any(width<eps(initial))
-%     error(message('stats:slicesample:BadWidth'));
-% end
 
 width = 10;
 
@@ -212,38 +170,38 @@ delete(wb);
 
 neval = neval/(nsamples*thin+burnin); % averaged number of evaluations
 
-%-------------------------------------------------
-function  y = mylog(x)
-% MYLOG function is defined to avoid Log of Zero warnings. 
-y = -Inf(size(x));
-y(x>0) = log(x(x>0));
- 
-%----------------------------------------------------
-function checkFunErrs(type,fun,param)
-%CHECKFUNERRS Check for errors in evaluation of user-supplied function
-if isempty(fun), return; end
-try 
-    out=fun(param);
-catch ME
-    m = message('stats:slicesample:FunEvalError',type,func2str(fun));
-    throwAsCaller(addCause(MException(m.Identifier,'%s',getString(m)),ME));
-end
- 
-% check finite values
-switch type
-case 'logpdf'
-    if any(isnan(out))||any(isinf(out) & out>0 )
-        error(message('stats:slicesample:NonfiniteLogpdf'));
-    end;
-case 'pdf'
-    if any(~isfinite(out))
-        error(message('stats:slicesample:NonfinitePdf', func2str( fun )));
-    end;    
-   if any(out<0)
-        error(message('stats:slicesample:NegativePdf', func2str( fun )));
-    end;    
-end;
- 
+% %-------------------------------------------------
+% function  y = mylog(x)
+% % MYLOG function is defined to avoid Log of Zero warnings. 
+% y = -Inf(size(x));
+% y(x>0) = log(x(x>0));
+%  
+% %----------------------------------------------------
+% function checkFunErrs(type,fun,param)
+% %CHECKFUNERRS Check for errors in evaluation of user-supplied function
+% if isempty(fun), return; end
+% try 
+%     out=fun(param);
+% catch ME
+%     m = message('stats:slicesample:FunEvalError',type,func2str(fun));
+%     throwAsCaller(addCause(MException(m.Identifier,'%s',getString(m)),ME));
+% end
+%  
+% % check finite values
+% switch type
+% case 'logpdf'
+%     if any(isnan(out))||any(isinf(out) & out>0 )
+%         error(message('stats:slicesample:NonfiniteLogpdf'));
+%     end;
+% case 'pdf'
+%     if any(~isfinite(out))
+%         error(message('stats:slicesample:NonfinitePdf', func2str( fun )));
+%     end;    
+%    if any(out<0)
+%         error(message('stats:slicesample:NegativePdf', func2str( fun )));
+%     end;    
+% end;
+%  
  
 
 
