@@ -1,4 +1,4 @@
-function plotInitialFinal2D(stoc,ddft,optsPlot,equilibria,pdfFile)
+function outputFile = plotInitialFinal2D(stoc,ddft,optsPlot,equilibria,pdfFile)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -259,7 +259,7 @@ for iPlot=1:2
         
     
     % write the figure files
-    %save2pdf(outputFile,hRPf,100,true);
+    save2pdf(outputFile,hRPf,100,true);
     %close(hRPf);
 
 end % for iPlot

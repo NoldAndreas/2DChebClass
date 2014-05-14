@@ -99,15 +99,22 @@ if(exist('doPlots','var'))
 end
 
 if(optsStruct.anyPlots || optsStruct.anyPlotsP)
-   doPlots(stocStruct,DDFTStruct,optsStoc,optsNumDDFT,optsPlot,optsPlotParticles,optsPhys);
+   plotFiles = doPlots(stocStruct,DDFTStruct,optsStoc,optsNumDDFT,optsPlot,optsPlotParticles,optsPhys);
 end
 
-%doPlots(stocStruct,DDFTStruct,optsPlot,optsPlotParticles,fileStruct,optsStruct,optsPhys);
-
-%path(oldPath);
-
 %--------------------------------------------------------------------------
-% Restore path
+% Send Email
 %--------------------------------------------------------------------------
 
-%rmPaths();
+if(doEmail)
+    setupEmail();
+    if(~isempty(plotFiles))
+        subject = ['Code complete: ' inputFile];
+        body    = 'Files attached.';
+        sendmail(optsStruct.emailAddress, subject, body, plotFiles);
+    else
+        subject = ['Code complete: ' inputFile];
+        body    = 'No plot files produced.';
+        sendmail(optsStruct.emailAddress, subject, body);
+    end
+end

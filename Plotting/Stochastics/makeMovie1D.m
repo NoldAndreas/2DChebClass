@@ -1,4 +1,4 @@
-function makeMovie1D(stoc,ddft,optsPlot,equilibria)
+function outputFile = makeMovie1D(stoc,ddft,optsPlot,equilibria)
 % makeMovie(stoc,ddft,optsPlotGIF,equilibria)
 %   makes movie from given stochastic and DDFT data
 %
@@ -432,6 +432,7 @@ if(doGif)
     delayTime=1/fps;
     imwrite(im,map,gifFile,'DelayTime',delayTime,'LoopCount',inf)
     fprintf(1,'Finished\n');
+    outputFile = gifFile;
 end
 
 %--------------------------------------------------------------------------
@@ -448,9 +449,11 @@ if(doSwf)
         system(swfCmd);
         fprintf(1,'Finished\n');
     else
-    
         makeSwf(swfFile,pdfFileNames,optsPlot)
     end
+    
+    outputFile = swfFile;
+    
 end
 
 %close(hRPf);

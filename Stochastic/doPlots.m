@@ -1,4 +1,4 @@
-function doPlots(stocStruct,DDFTStruct,optsStocFull,optsDDFTFull,optsPlot,optsPlotParticles,optsPhys)
+function plotFiles = doPlots(stocStruct,DDFTStruct,optsStocFull,optsDDFTFull,optsPlot,optsPlotParticles,optsPhys)
 
 %function doPlots(stocStruct,DDFTStruct,optsPlotGIF,optsPlotParticles,fileStruct,optsStruct,optsPhysGIF)
 %doPlots(stocStruct,DDFTStruct,optsPlotGIF,optsPlotParticles,fileStruct,optsStruct)
@@ -20,6 +20,12 @@ function doPlots(stocStruct,DDFTStruct,optsStocFull,optsDDFTFull,optsPlot,optsPl
 
 % use this if matlab crashes on 3D plotting:
 % opengl software
+
+%--------------------------------------------------------------------------
+% Set up output file list
+%--------------------------------------------------------------------------
+
+plotFiles = {};
 
 %--------------------------------------------------------------------------
 % Set text size and line width
@@ -202,7 +208,8 @@ end
 %--------------------------------------------------------------------------
 
 if(optsPlot.doMovieGif || optsPlot.doMovieSwf || optsPlot.doPdfs)
-    makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2))
+    movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
+    plotFiles = cat(2,plotFiles,movieFile);
 end
 
 %--------------------------------------------------------------------------
@@ -210,8 +217,8 @@ end
 %--------------------------------------------------------------------------
 
 if(optsPlot.doInitialFinal)
-    %pdfFile=fileStruct.plotFile;
-    plotInitialFinal(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+    IFFile = plotInitialFinal(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+    plotFiles = cat(2,plotFiles,IFFile);
 end
 
 %--------------------------------------------------------------------------
@@ -229,7 +236,8 @@ end
 
 if(optsPlot.doMeans)
     %pdfFile=fileStruct.plotFile{1};
-    plotMeans(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+    meanFile = plotMeans(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+    plotFiles = cat(2,plotFiles,meanFile);
 end
 
 %--------------------------------------------------------------------------

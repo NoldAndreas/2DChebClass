@@ -1,4 +1,4 @@
-function makeMoviePlanar2D(stoc,ddft,optsPlot,optsPhys,equilibria)
+function outputFile = makeMoviePlanar2D(stoc,ddft,optsPlot,optsPhys,equilibria)
 % makeMovie(stoc,ddft,optsPlot,equilibria)
 %   makes movie from given stochastic and DDFT data
 %
@@ -389,6 +389,9 @@ for iPlot=1:nPlots
             [im,map] = rgb2ind(f.cdata,256,'nodither');  
             imwrite(im,map,gifFile,'gif','WriteMode','append','DelayTime',delayTime);
         end
+        
+        outputFile = gifFile;
+        
     end
     
     %----------------------------------------------------------------------
@@ -429,6 +432,9 @@ if(doSwf)
     
         makeSwf(swfFile,pdfFileNames,optsPlot)
     end
+    
+    outputFile = swfFile;
+    
 end
 
 close(hRPf);

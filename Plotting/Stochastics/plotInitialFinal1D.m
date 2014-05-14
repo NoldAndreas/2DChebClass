@@ -1,4 +1,4 @@
-function plotInitialFinal1D(stoc,ddft,optsPlot,equilibria)
+function outputFile = plotInitialFinal1D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
