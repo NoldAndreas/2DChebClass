@@ -170,7 +170,7 @@ for iPlot=1:2
         boxes =  stoc(iStoc).boxes(:,:,:,:,plotPos(iPlot));
         
         optsPlot.plotTime=plotTime;        
-        optsPlot.type=stocType(iStoc,:);
+        optsPlot.type=stocType{iStoc};
         
         plotRhoVdistStoc2D(rho,flux,boxes,optsPlot,handlesRP(iPlot));
         

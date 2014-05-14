@@ -53,15 +53,21 @@ function [VBack_S,VAdd_S]=infHIDiffusion3(y1S,y2S,t,optsPhys)
 
     t = t/tau;
 
-    V0add = V0add*exp(-t^2);
+    V0add = V0add.*exp(-t^2);
     
-    VAdd        = -V0add.*exp((-(y1S-y10).^2./sigma1Add - (y2S-y20).^2./sigma2Add)) ...
-                  -V0add.*exp((-(y1S-y11).^2./sigma1Add - (y2S-y21).^2./sigma2Add)) ...
-                  -V0add.*exp((-(y1S-y12).^2./sigma1Add - (y2S-y22).^2./sigma2Add));
+    VAdd0 = -V0add.*exp((-(y1S-y10).^2./sigma1Add - (y2S-y20).^2./sigma2Add));
+    VAdd1 = -V0add.*exp((-(y1S-y11).^2./sigma1Add - (y2S-y21).^2./sigma2Add));
+    VAdd2 = -V0add.*exp((-(y1S-y12).^2./sigma1Add - (y2S-y22).^2./sigma2Add));
+    
+    VAdd0(abs(y1S)==inf |  abs(y2S)==inf) = 0;
+    VAdd1(abs(y1S)==inf |  abs(y2S)==inf) = 0;
+    VAdd2(abs(y1S)==inf |  abs(y2S)==inf) = 0;
+    
+    VAdd        = VAdd0 + VAdd1 + VAdd2;
     VAdd(abs(y1S)==inf |  abs(y2S)==inf) = 0;
     
-    DVAddDy1   = -2*(y1S-y10).*VAdd./sigma1Add - 2*(y1S-y11).*VAdd./sigma1Add - 2*(y1S-y12).*VAdd./sigma1Add;
-    DVAddDy2   = -2*(y2S-y20).*VAdd./sigma2Add - 2*(y2S-y21).*VAdd./sigma2Add - 2*(y2S-y22).*VAdd./sigma2Add;
+    DVAddDy1   = -2*(y1S-y10).*VAdd0./sigma1Add - 2*(y1S-y11).*VAdd1./sigma1Add - 2*(y1S-y12).*VAdd2./sigma1Add;
+    DVAddDy2   = -2*(y2S-y20).*VAdd0./sigma2Add - 2*(y2S-y21).*VAdd1./sigma2Add - 2*(y2S-y22).*VAdd2./sigma2Add;
     
     DVAddDy1(abs(y1S)==inf | abs(y2S)==inf)=0;
     DVAddDy2(abs(y1S)==inf | abs(y2S)==inf)=0;

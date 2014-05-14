@@ -71,9 +71,6 @@ fprintf(1,'Making movie plots ... ');
 nStoc=size(stoc,2);
 nDDFT=size(ddft,2);
 
-% species masses
-mS=optsPlot.mS;
-
 % get times
 plotTimes=optsPlot.plotTimes;
 

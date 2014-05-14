@@ -48,18 +48,18 @@ potParamsNames = {'V0','V0add','tau','sigma1Add','sigma2Add',...
 % V2 parameters
 %--------------------------------------------------------------------------
 
-V2DV2='hardSphere';
-
-sigmaS = 1;
-
-potParams2Names={'sigma'};
-
-% V2DV2='Gaussian';
+% V2DV2='hardSphere';
 % 
-% epsilonS = 0;
-% alphaS   = 1;
+% sigmaS = 1;
 % 
-% potParams2Names={'epsilon','alpha'};
+% potParams2Names={'sigma'};
+
+V2DV2='Gaussian';
+
+epsilonS = 1;
+alphaS   = 1;
+
+potParams2Names={'epsilon','alpha'};
 
 
 
@@ -92,9 +92,7 @@ nSamples=50000;
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=20000;
-
-nRuns=200;
+nRuns=15000;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -113,11 +111,11 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
+%doStoc={false,false,false,false};
 doStoc={true,false,false,false};
-%doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={false,true,true,true};
+loadStoc={true,true,true,true};
 
 % number of time steps
 tSteps={10^3,10^3,2*10^4,10^3};
@@ -141,22 +139,22 @@ PlotArea = {struct('y1Min',-y0,'y1Max',y0,'N1',100,...
                        'y2Min',-y0,'y2Max',y0,'N2',100), ...
             struct('y1Min',-y0,'y1Max',y0,'N1',100,...
                        'y2Min',-y0,'y2Max',y0,'N2',100)};
-FexNum   = {struct('Fex','FMTRosenfeld',...
-                       'Ncircle',10,'N1disc',10,'N2disc',10), ...
-            struct('Fex','FMTRosenfeld',...
-                       'Ncircle',10,'N1disc',10,'N2disc',10)};
+% FexNum   = {struct('Fex','FMTRosenfeld',...
+%                        'Ncircle',10,'N1disc',10,'N2disc',10), ...
+%             struct('Fex','FMTRosenfeld',...
+%                        'Ncircle',10,'N1disc',10,'N2disc',10)};
 
-% FexNum  = {struct('Fex','Meanfield','N',[20;20],'L',2), ...
-%             struct('Fex','Meanfield','N',[20;20],'L',2)};
+FexNum  = {struct('Fex','Meanfield','N',[20;20],'L',2), ...
+            struct('Fex','Meanfield','N',[20;20],'L',2)};
 
-
-HINum    = {[], ...
-            struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
-                      'HIPreprocess', 'RotnePragerPreprocess2D', ...
-                      'sigma',sigmaS,'sigmaH',sigmaS/2)};
+ 
+% HINum    = {[], ...
+%             struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
+%                       'HIPreprocess', 'RotnePragerPreprocess2D', ...
+%                       'sigma',sigmaS,'sigmaH',sigmaS/2)};
                   
-% 
-% HINum = {[],[]};
+
+HINum = {[],[]};
 
 DDFTCode = {'DDFT_DiffusionInfSpace_NSpecies2', ...
             'DDFT_DiffusionInfSpace_NSpecies2'};
@@ -168,8 +166,8 @@ doPlots = true;
 DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
                    {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'}};
 
-HIParamsNamesDDFT={'sigmaH','sigma'};               
-%HIParamsNamesDDFT={};
+% HIParamsNamesDDFT={'sigmaH','sigma'};               
+HIParamsNamesDDFT={};
                
 DDFTName={'r0','r1'};
 
@@ -207,7 +205,7 @@ pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.5;
+RMax=0.2;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -231,7 +229,7 @@ oneLeg='top';
 perRow=4;
 
 % number of bins for histograming of stochastic data
-nBins=[30;30];
+nBins=[20;20];
 %nBins=100;
 
 % don't plot v for regions where rho<vCutoff*max(rho) as these are just

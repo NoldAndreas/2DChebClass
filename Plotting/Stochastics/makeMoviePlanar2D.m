@@ -71,9 +71,6 @@ fprintf(1,'Making movie plots ... ');
 nStoc=size(stoc,2);
 nDDFT=size(ddft,2);
 
-% species masses
-%mS=optsPlot.mS;
-
 % get times
 plotTimes=optsPlot.plotTimes;
 
@@ -240,19 +237,15 @@ for iPlot=1:nPlots
     for iStoc=1:nStoc
            
         optsPlot.faceColour=lineColourStoc{iStoc};   
-
-        % get x and p values from structure
-        x=stoc(iStoc).x;
-        p=stoc(iStoc).p;
        
-        % get values at appropriate time
-        % transpose as should be nParticles x nSamples
-        xt=x(:,:,iPlot)'; 
-        pt=p(:,:,iPlot)';
+        rho   = stoc(iStoc).rho(:,:,:,iPlot);
+        flux  = stoc(iStoc).flux(:,:,:,:,iPlot);
+        boxes =  stoc(iStoc).boxes(:,:,:,:,iPlot);
         
-        optsPlot.type=stocType(iStoc);
+        optsPlot.plotTime=plotTime;        
+        optsPlot.type=stocType{iStoc};
         
-        plotRhoVdistStoc2D(xt,pt,optsPlot,handlesRP(iStoc));
+        plotRhoVdistStoc2D(rho,flux,boxes,optsPlot,handlesRP(iStoc));
             
 %         hold(hMRa,'on');
 %         hold(hMPa,'on');
@@ -311,10 +304,10 @@ for iPlot=1:nPlots
     optsPlot.xLab='x';
     optsPlot.yLab='y';
     
-    optsPlot.xMin=optsPlot.rMin{1};
-    optsPlot.xMax=optsPlot.rMax{1};
-    optsPlot.yMin=optsPlot.rMin{2};
-    optsPlot.yMax=optsPlot.rMax{2};
+    optsPlot.xMin=optsPlot.rMin(1);
+    optsPlot.xMax=optsPlot.rMax(1);
+    optsPlot.yMin=optsPlot.rMin(2);
+    optsPlot.yMax=optsPlot.rMax(2);
 
     optsPlot.zMin=optsPlot.RMin;
     optsPlot.zMax=optsPlot.RMax;
@@ -342,7 +335,8 @@ for iPlot=1:nPlots
                     optsPlot.lineColour=lineColourStoc{1};
                 end
                 if(iPlot==1)
-                    optsPlot.quiverNorm=getQuiverNorm(optsPlot);
+                   % optsPlot.quiverNorm=getQuiverNorm(optsPlot);
+                   otpsPlot.quiverNorm = 1;
                 end
 
 %                addPotential(hRa(iAxis),optsPlot);
@@ -356,15 +350,15 @@ for iPlot=1:nPlots
 
     if(doP)  
 
-        optsPlot.xMin=optsPlot.pMin{1};
-        optsPlot.xMax=optsPlot.pMax{1};
-        optsPlot.yMin=optsPlot.pMin{2};
-        optsPlot.yMax=optsPlot.pMax{2};            
+        optsPlot.xMin=optsPlot.pMin(1);
+        optsPlot.xMax=optsPlot.pMax(1);
+        optsPlot.yMin=optsPlot.pMin(2);
+        optsPlot.yMax=optsPlot.pMax(2);            
 
         %optsPlot.legText=optsPlot.legTextP{iSpecies};
         optsPlot.zLab='Momentum';
-        optsPlot.zMin=optsPlot.PMin{1};
-        optsPlot.zMax=optsPlot.PMax{1}; 
+        optsPlot.zMin=optsPlot.PMin(1);
+        optsPlot.zMax=optsPlot.PMax(1); 
         
         fixPlot2D(hPa,optsPlot);
 

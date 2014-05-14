@@ -77,21 +77,6 @@ sampleFinal = optsStoc.sampleFinal;
 loadSamples = optsStoc.loadSamples;
 MBp         = optsStoc.MBp;
 
-
-% optsStoc = rmfield(optsStoc,'loadSamples');
-% optsStoc = rmfield(optsStoc,'fixedInitial');
-% optsStoc = rmfield(optsStoc,'sampleFinal');
-% optsStoc = rmfield(optsStoc,'poolsize');
-% optsStoc = rmfield(optsStoc,'doStoc');
-% optsStoc = rmfield(optsStoc,'loadStoc');
-% optsStoc = rmfield(optsStoc,'saveStoc');
-% optsStoc = rmfield(optsStoc,'HI');
-% optsStoc = rmfield(optsStoc,'HIType');
-% optsStoc = rmfield(optsStoc,'stocName');
-% optsStoc = rmfield(optsStoc,'noise');
-% optsStoc = rmfield(optsStoc,'nRuns');
-% optsStoc = rmfield(optsStoc,'nRuns');
-
 optsStocI.initialGuess = optsStoc.initialGuess;
 optsStocI.nSamples     = optsStoc.nSamples;
 optsStocI.thin         = optsStoc.thin;
@@ -105,6 +90,7 @@ fprintf(1,'Starting initial sampling ... ');
 
 optsPhys.t=0;
 opts.optsPhys = optsPhys;
+opts.optsPhys.tMax = [];  % initial sampling independent of final time
 opts.optsStoc = optsStocI;
 
 ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];

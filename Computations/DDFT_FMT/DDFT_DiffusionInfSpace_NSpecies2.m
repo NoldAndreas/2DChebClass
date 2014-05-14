@@ -1,4 +1,4 @@
-function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -25,6 +25,13 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     kBT          = optsPhys.kBT; 
     nParticlesS  = optsPhys.nParticlesS;    
     nSpecies=length(nParticlesS);
+    
+    mS = optsPhys.mS;
+    gammaS = optsPhys.gammaS;
+    gamma  = bsxfun(@times,gammaS',ones(N1*N2,nSpecies));
+    m  = bsxfun(@times,mS',ones(N1*N2,nSpecies));
+    D0 = 1./(gamma.*m);
+    
     plotTimes    = optsNum.plotTimes;
     
     if(isfield(optsPhys,'HSBulk'))
@@ -56,9 +63,10 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     params.FexNum  = optsNum.FexNum;
     params.Pts     = IDC.Pts;     
     params.Polar   = 'cart';
-       
+    params.nSpecies = nSpecies;   
+    
     func           = str2func(['FexMatrices_',optsNum.FexNum.Fex]);    
-	IntMatrFex     = DataStorage('FexData',func,params,IDC);   
+	IntMatrFex     = DataStorage('FexData/InfSpace',func,params,IDC);   
         
     fprintf(1,'done.\n');
     tfex = toc;
@@ -73,9 +81,10 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     if(doHI)        
         tic
         fprintf(1,'Computing HI matrices ...');   
-        optsHI.optsPhys = optsPhys;
-        optsHI.optsNum = optsNum;
-        IntMatrHI     = DataStorage(['InfSpace' filesep 'HIData'],@HIMatrices2D,optsHI,IDC);      
+        optsHI.optsPhys.HI       = optsPhys.HI;
+        optsHI.optsPhys.nSpecies = nSpecies;
+        optsHI.optsNum.HINum     = optsNum.HINum;
+        IntMatrHI     = DataStorage('HIData/InfSpace',@HIMatrices2D,optsHI,IDC);      
         fprintf(1,'done.\n');
         tHI = toc;
         disp(tHI);        
@@ -150,28 +159,26 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
     X_t       = reshape(X_t,N1*N2,nSpecies,length(outTimes));
     rho_t     = reshape(rho_t,N1*N2,nSpecies,length(outTimes));
     flux_t    = zeros(2*N1*N2,nSpecies,length(plotTimes));
-    
+    V_t       = zeros(N1*N2,nSpecies,length(plotTimes));
     for i = 1:length(plotTimes)
         if(doHI)
             flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
         else
             flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
         end
+        V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
     end
-    
-    data     = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,...
-                        t_preprocess,t_eqSol,t_dynSol);                        
+                           
+    data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
     data.shape = IDC;
-                      
+    
 	display(['Preprocessor, Computation time (sec): ', num2str(t_preprocess)]);
     display(['Equilibrium Sol., Computation time (sec): ', num2str(t_eqSol)]);
     display(['Dynamics, Computation time (sec): ', num2str(t_dynSol)]);
     
-    output = v2struct(optsPhys,optsNum,optsPlot,data);
-    
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-        PlotDDFT(output);  
+        PlotDDFT(v2struct(optsPhys,optsNum,data));  
     end
              
     %***************************************************************
@@ -232,6 +239,8 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
 %            dxdt(Ind.outR,:)  = Ind.normalOutR*flux_dir;             
 %        end
         
+        dxdt = D0.*dxdt;
+
         dxdt = dxdt(:);
     end
 
@@ -253,6 +262,7 @@ function output = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
           
         dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
 
+        dxdt = D0.*dxdt;
         
         dxdt = dxdt(:);
     end

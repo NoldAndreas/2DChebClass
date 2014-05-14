@@ -73,11 +73,11 @@ else
 end
 
 
-y1Min=optsPlot.rMin{1};
-y2Min=optsPlot.rMin{2};
+y1Min=optsPlot.rMin(1);
+y2Min=optsPlot.rMin(2);
 
-y1Max=optsPlot.rMax{1};
-y2Max=optsPlot.rMax{2};
+y1Max=optsPlot.rMax(1);
+y2Max=optsPlot.rMax(2);
 
 faceColour=optsPlot.faceColour;
 
@@ -117,8 +117,8 @@ N2=Interp.N2;
 hr=zeros(nSpecies,1);
 hp=hr;
 
-y1pad=optsPlot.rMin{1}-1;
-y2pad=optsPlot.rMin{2}-1;
+y1pad=optsPlot.rMin(1)-1;
+y2pad=optsPlot.rMin(2)-1;
 
 fluxNorm=optsPlot.fluxNorm;
 

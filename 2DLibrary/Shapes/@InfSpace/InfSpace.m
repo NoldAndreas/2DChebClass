@@ -94,7 +94,7 @@ classdef InfSpace < SpectralSpectral
             invSubShapePts = invertPts(subShapeCartPts,'cart');
             
             if(useDistance)
-                fP       = f(GetDistance(invSubShapePts.y1_kv,invSubShapePts.y2_kv));
+                fP       = f(this.GetDistance(invSubShapePts.y1_kv,invSubShapePts.y2_kv));
             else
                 fP       = f(invSubShapePts.y1_kv,invSubShapePts.y2_kv);
             end

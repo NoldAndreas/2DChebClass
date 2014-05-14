@@ -77,12 +77,18 @@ p=x;
 % get pool size (number of processors)
 poolsize=ICStruct.poolsize;
 
+tempDir = ['parForLog'];
+
+if(~exist(tempDir,'dir'))
+    mkdir(tempDir);
+end
+
 [~,tempName] = fileparts(tempname);
 
 tempFile = cell(1,poolsize);
 
 for iWorker=1:poolsize
-    tempFile{iWorker} = ['Stochastic' filesep 'parFor_' tempName '_' num2str(iWorker) '.txt'];
+    tempFile{iWorker} = [tempDir filesep 'parFor_' tempName '_' num2str(iWorker) '.txt'];
 
     fid = fopen(tempFile{iWorker},'w');
     fprintf(fid,'0');
@@ -181,6 +187,7 @@ end
 for iFile = 1:poolsize
     delete(tempFile{iFile});
 end
+rmdir(tempDir);
 
 xpStruct.x = x;
 xpStruct.p = p;

@@ -69,8 +69,8 @@ if(~isempty(stocStruct))
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
         
-%        redoPlotData = ~loadSamples;
-         redoPlotData = true;
+        redoPlotData = ~loadSamples;
+%         redoPlotData = true;
 
         fprintf(1,'Calculating Initial equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial' filesep 'Equilibria'];
@@ -100,8 +100,8 @@ if(~isempty(stocStruct))
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
 
-%        redoPlotData = ~loadSamples;
-         redoPlotData = true;
+        redoPlotData = ~loadSamples;
+%         redoPlotData = true;
         
         fprintf(1,'Calculating Final equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final' filesep 'Equilibria'];
@@ -162,7 +162,8 @@ if(~isempty(stocStruct))
 else
     
     stocPlotStruct = [];
-    equilibria     = zeros(1,2);
+    equilibria(1).data = [];
+    equilibria(2).data = [];
     
 end
 
