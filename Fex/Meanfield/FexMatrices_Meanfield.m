@@ -19,7 +19,7 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
     if(isfield(optsPhys,'nParticlesS'))
         nSpecies=length(optsPhys.nParticlesS);
     else
-        nSpecies=length(optsPhys.nSpecies);
+        nSpecies=optsPhys.nSpecies;
     end
 
     %paramNames = optsPhys.potParams2Names;

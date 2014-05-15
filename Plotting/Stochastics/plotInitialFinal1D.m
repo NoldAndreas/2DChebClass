@@ -1,4 +1,4 @@
-function outputFile = plotInitialFinal1D(stoc,ddft,optsPlot,equilibria)
+function outputFiles = plotInitialFinal1D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -106,6 +106,8 @@ else
     end
     rhoText='Number of particles';
 end
+
+outputFiles = {};
 
 
 % set initial and final time positions
@@ -283,6 +285,8 @@ for iPlot=1:2
     % write the figure files
     save2pdf(outputFile,hRPf);
     %close(hRPf);
+    
+    outputFiles = cat(2,outputFiles,outputFile);
 
 end % for iPlot
 

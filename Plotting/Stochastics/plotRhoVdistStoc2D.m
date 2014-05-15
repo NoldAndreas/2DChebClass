@@ -95,7 +95,7 @@ for iSpecies=1:nSpecies
     end
 
 
-    hold(hRa,'on')
+    hold(hRa(iSpecies),'on')
     
     [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
     set(h,'color',faceColour{iSpecies},'linewidth',contourWidth);

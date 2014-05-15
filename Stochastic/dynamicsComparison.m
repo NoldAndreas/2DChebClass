@@ -12,8 +12,10 @@ AddPaths();
 
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
-inputFile = 'HITest';
+
+%inputFile = 'HITest';
 %inputFile = 'GaussianTest';
+inputFile = 'GaussianTest_2Species';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file
@@ -106,7 +108,7 @@ end
 % Send Email
 %--------------------------------------------------------------------------
 
-if(doEmail)
+if(optsStruct.sendEmail)
     setupEmail();
     if(~isempty(plotFiles))
         subject = ['Code complete: ' inputFile];

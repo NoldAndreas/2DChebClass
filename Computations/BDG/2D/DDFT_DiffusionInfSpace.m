@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace_NSpecies2(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -108,8 +108,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace_NSpecies2(opt
     VAdd0=getVAdd(y1S,y2S,0,optsPhys.V1);
     x_ic0 = getInitialGuess(VAdd0);
     
-    paramsIC.optsPhys = optsPhys;
-    paramsIC.optsPhys = rmfield(paramsIC.optsPhys,{'tMax','D0S','gammaS','HI'});
+    paramsIC.optsPhys.V1  = optsPhys.V1;
+    paramsIC.optsPhys.V2  = optsPhys.V2;
+    paramsIC.optsPhys.mS  = optsPhys.mS;
+    paramsIC.optsPhys.kBT = optsPhys.kBT;
 
     paramsIC.optsNum.FexNum   = optsNum.FexNum;
     paramsIC.optsNum.PhysArea = optsNum.PhysArea;

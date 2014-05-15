@@ -22,7 +22,7 @@ D0S=kBT./mS./gammaS;
 % V1 parameters
 %--------------------------------------------------------------------------
 
-V1DV1='infHIDiffusion3';
+V1DV1='triangleDiffusion';
 
 % appropriate physical parameters for potentials in V1DV1
 V0S = 0.01;
@@ -37,8 +37,6 @@ y21S = -1;
 y12S = 0;
 y22S = 0.5;
 
-
-
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
 potParamsNames = {'V0','V0add','tau','sigma1Add','sigma2Add',...
@@ -48,20 +46,11 @@ potParamsNames = {'V0','V0add','tau','sigma1Add','sigma2Add',...
 % V2 parameters
 %--------------------------------------------------------------------------
 
-% V2DV2='hardSphere';
-% 
-% sigmaS = 1;
-% 
-% potParams2Names={'sigma'};
+V2DV2='hardSphere';
 
-V2DV2='Gaussian';
+sigmaS = 1;
 
-epsilonS = 1;
-alphaS   = 1;
-
-potParams2Names={'epsilon','alpha'};
-
-
+potParams2Names={'sigma'};
 
 %--------------------------------------------------------------------------
 % HI parameters
@@ -77,6 +66,7 @@ HIParamsNames={'sigmaH'};
 
 % end time of calculation
 tMax=0.25;
+%tMax=0.5;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -85,14 +75,17 @@ tMax=0.25;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=50000;  
 
-nSamples=50000;  
+%nSamples=100000;  
+
+nSamples=5000;  
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=15000;
+%nRuns=10000;
+
+nRuns=50;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -111,14 +104,14 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-%doStoc={false,false,false,false};
-doStoc={true,false,false,false};
+%doStoc={true,false,true,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={10^3,10^3,2*10^4,10^3};
+tSteps={10^4,10^3,10^4,10^3};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
@@ -131,43 +124,34 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-PhysArea = {struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
-                       'y2Min',-inf,'y2Max',inf,'L2',4), ...
-            struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
-                       'y2Min',-inf,'y2Max',inf,'L2',4)};
-PlotArea = {struct('y1Min',-y0,'y1Max',y0,'N1',100,...
-                       'y2Min',-y0,'y2Max',y0,'N2',100), ...
-            struct('y1Min',-y0,'y1Max',y0,'N1',100,...
-                       'y2Min',-y0,'y2Max',y0,'N2',100)};
-% FexNum   = {struct('Fex','FMTRosenfeld',...
-%                        'Ncircle',10,'N1disc',10,'N2disc',10), ...
-%             struct('Fex','FMTRosenfeld',...
-%                        'Ncircle',10,'N1disc',10,'N2disc',10)};
+Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+                       'y2Min',-inf,'y2Max',inf,'L2',4);
 
-FexNum  = {struct('Fex','Meanfield','N',[20;20],'L',2), ...
-            struct('Fex','Meanfield','N',[20;20],'L',2)};
+Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
+                       'y2Min',-y0,'y2Max',y0,'N2',100);
 
- 
-% HINum    = {[], ...
-%             struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
-%                       'HIPreprocess', 'RotnePragerPreprocess2D', ...
-%                       'sigma',sigmaS,'sigmaH',sigmaS/2)};
-                  
+Fex_Num = struct('Fex','FMTRosenfeld',...
+                       'Ncircle',10,'N1disc',10,'N2disc',10);
+                   
+PhysArea = {Phys_Area, Phys_Area};
 
-HINum = {[],[]};
+PlotArea = {Plot_Area, Plot_Area};
 
-DDFTCode = {'DDFT_DiffusionInfSpace_NSpecies2', ...
-            'DDFT_DiffusionInfSpace_NSpecies2'};
+FexNum   = {Fex_Num, Fex_Num};
+
+HINum    = {[], ...
+            struct('N',[10;10],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D')};
+
+DDFTCode = {'DDFT_DiffusionInfSpace', ...
+            'DDFT_DiffusionInfSpace'};
         
-Tmax = tMax;
-
 doPlots = true;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'}};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','HINum','doPlots'}};
 
-% HIParamsNamesDDFT={'sigmaH','sigma'};               
-HIParamsNamesDDFT={};
+HIParamsNamesDDFT={'sigmaH','sigma'};               
                
 DDFTName={'r0','r1'};
 
@@ -177,23 +161,18 @@ DDFTName={'r0','r1'};
 DDFTType={'r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,false};
+doDDFT={true,true};
 %doDDFT={false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true};
+%loadDDFT={true,true};
+loadDDFT={false,false};
 
 DDFTColour = {{'g'},{'m'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
-
-% whether to plot the distribution (false) or the density (true) in
-% spherical coordinates.
-plotDensity=false;
-
-plotCurrent=false;
 
 plotType = 'surf';
 
@@ -210,60 +189,19 @@ RMax=0.2;
 PMin=[-1;-1];
 PMax=[1;1];
 
-
 % y axis for mean position and velocity plots
 RMMin=[-y0;-y0];
 RMMax=[y0;y0];
 PMMin=[-1;-1];
 PMMax=[1;1];
 
-viewPoint = [-30,45];
-
-% position of the legend -- set to 'off' to turn off individual legends
-%legPos='SouthEast';
-%legPos='NorthWest';
-legPos='off';
-% to create a single legend for all plots
-oneLeg='top';
-%oneLeg='off';
-perRow=4;
-
 % number of bins for histograming of stochastic data
-nBins=[20;20];
-%nBins=100;
-
-% don't plot v for regions where rho<vCutoff*max(rho) as these are just
-% noise either due to DDFT calculation or very small number of particles
-%vCutoff=5*10^(-2);
-vCutoff=5*10^(-2);
-
-% animation options:
-% resolution
-dpi=300;
-% framerate
-fps=5;
-% whether to flatten pdfs in swf
-bitmap=false;
-% whether to suppress output of pdf2swf
-quiet=true;
+nBins=[30;30];
 
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif=false;          % .gif movie
-doPdfs=false;              % .pdfs to make .swf
-doMovieSwf=false;          % .swf movie
 doInitialFinal=true;
 doMeans=false;
 
-% particle movies/plots
-doInitialFinalP=false;
-doMovieGifP=false;
-doPdfsP=false;
-doMovieSwfP=false;
-
-% strip out any where the time step was too large
-doStrip=false;
-
-doCustom=false;
-%custom='makeMovieWithSnapshotsV';
-custom='MSHISnapshots';
+%sendEmail = true;

@@ -59,6 +59,8 @@ if(S.anyStoc)
     
     D.HIParamsNames={};
     
+    D.doStrip = false;
+    
     nStoc=length(S.stocName);
     D.doStoc=cell(1,nStoc);
     D.loadStoc=cell(1,nStoc);
@@ -135,11 +137,11 @@ D.legPos='off';
 D.oneLeg='top';
 D.perRow=4;
 
-D.viewPoint=[45 14];
+D.viewPoint=[-30,45];
 
 D.symbolLabels=false;
 
-D.dpi=150;
+D.dpi=300;
 D.fps=5;
 D.bitmap=true;
 D.quiet=true;
@@ -201,7 +203,7 @@ end
 % Default email
 %--------------------------------------------------------------------------
 
-D.doEmail = false;
+D.sendEmail = false;
 D.emailAddress = 'b.goddard@ed.ac.uk';
 
 %--------------------------------------------------------------------------

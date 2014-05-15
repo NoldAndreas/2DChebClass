@@ -52,6 +52,12 @@ for iDDFT=1:nDDFT
     optsDDFT=optsNumFull(iDDFT);
     optsPhys=optsPhysFull(iDDFT);
     
+    potNames = optsPhys.potNames;
+    optsPhys = rmfield(optsPhys,'dim');
+    optsPhys = rmfield(optsPhys,'type');
+    optsPhys = rmfield(optsPhys,'geom');
+    optsPhys = rmfield(optsPhys,'potNames');
+    
     optsPlot.lineStyleDDFT=lineStyles{iDDFT};
     optsPlot.lineMarkerDDFT=lineMarkers{iDDFT};
     optsPlot.lineColourDDFT=lineColours{iDDFT};
@@ -64,33 +70,19 @@ for iDDFT=1:nDDFT
     optsDDFT = rmfield(optsDDFT,'saveDDFT');
 	optsDDFT = rmfield(optsDDFT,'doDDFT');
     optsDDFT = rmfield(optsDDFT,'DDFTName');
+    optsDDFT = rmfield(optsDDFT,'type');
     
     opts.optsPhys = optsPhys;
+    
     opts.optsNum  = optsDDFT;
             
-    DDFTdir = [optsPhys.potNames filesep 'DDFT' filesep optsDDFT.DDFTCode];            
+    DDFTdir = [potNames filesep 'DDFT' filesep optsDDFT.DDFTCode];            
     
     DDFTStruct = DataStorage(DDFTdir,@DDFTwrapper,opts,optsPlot,~loadDDFT);
                 
     % save to full structure
     DDFTStructFull(iDDFT)=orderfields(DDFTStruct);  %#ok
     
-%     % add in species coordinate for 1-species 2D DDFTs
-%     if(optsPhysGIFFull(1).dim==2)
-%         rho_t=DDFTStructFull(iDDFT).rho_t;
-%         flux_t=DDFTStructFull(iDDFT).flux_t;
-%         if(ndims(rho_t)==2)
-%             temp=zeros(size(rho_t,1),1,size(rho_t,2));
-%             temp(:,1,:)=rho_t;
-%             DDFTStructFull(iDDFT).rho_t=temp;  %#ok
-% 
-%             temp=zeros(size(flux_t,1),1,size(flux_t,2));
-%             temp(:,1,:)=flux_t;
-%             DDFTStructFull(iDDFT).flux_t=temp; %#ok
-%         end
-%     end
-
-
     fprintf(1,'Finished\n');
 end
 

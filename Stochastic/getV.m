@@ -17,7 +17,7 @@ function V=getV(x,t,optsPhys)
 
 x=x(:);
 
-[V1,~]=getV1DV1(x,[],t,optsPhys);
+[V1,~]=getV1DV1(x,t,optsPhys);
 
 [V2,~]=getV2DV2(x,optsPhys);
 

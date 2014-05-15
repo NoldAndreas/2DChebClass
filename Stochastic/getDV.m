@@ -21,7 +21,7 @@ function DV=getDV(x,t,optsPhys)
 x=x(:);
 
 % evaluate it for DV1, note the first output is V1
-[~,DV1]=getV1DV1(x,[],t,optsPhys);
+[~,DV1]=getV1DV1(x,t,optsPhys);
 
 % evaluate DV2
 [~,DV2]=getV2DV2(x,optsPhys);

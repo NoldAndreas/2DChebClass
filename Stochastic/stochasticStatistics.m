@@ -105,7 +105,7 @@ if(poolsize>1)
     fprintf(1,'\n');
     % open pool for parallel computing
     matlabpool('open','local',poolsize);
-    oldPath = path;
+    %oldPath = path;
     %addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
 end
 
@@ -180,7 +180,7 @@ toc
 
 if(poolsize>1)
     matlabpool close
-    path(oldPath);
+    %path(oldPath);
 end
 
 delete([tempDir filesep '*'])

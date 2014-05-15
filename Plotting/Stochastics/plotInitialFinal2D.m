@@ -1,4 +1,4 @@
-function outputFile = plotInitialFinal2D(stoc,ddft,optsPlot,equilibria,pdfFile)
+function outputFiles = plotInitialFinal2D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -83,6 +83,8 @@ for iEq = 1:2
     
 end
 
+outputFiles = {};
+
 % set initial and final time positions
 plotPos(1)=1;
 plotPos(2)=length(optsPlot.plotTimes);
@@ -154,7 +156,7 @@ for iPlot=1:2
     end
     
     % and file to save in
-%    outputFile=pdfFile{iPlot};
+    outputFile=optsPlot.IFFiles{iPlot};
     
     %----------------------------------------------------------------------
     % Stochastic data plots
@@ -261,6 +263,8 @@ for iPlot=1:2
     % write the figure files
     save2pdf(outputFile,hRPf,100,true);
     %close(hRPf);
+    
+    outputFiles = cat(2,outputFiles,outputFile);
 
 end % for iPlot
 
