@@ -108,7 +108,6 @@ for iSpecies=1:nSpecies
     % normalize to nParticlesS(iSpecies)
     nR(:,:,iSpecies)=nR(:,:,iSpecies)/nSamples/RS1h/RS2h;
     
-    
     [xR1,xR2]=meshgrid(RS1mids,RS2mids);
     
     xR(:,:,1,iSpecies)=xR1;

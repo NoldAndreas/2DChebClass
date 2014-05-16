@@ -71,13 +71,13 @@ function equilibria=getEquilibria(opts,xpStruct)
     % getRP takes matrices of size (dim*nParticles) x nSamples
     xEq=xEq';
     pEq=pEq';
-    % at equilibrium the momenta are all zero
-   
+
     % get the R and P data
     [R,P]=getRP(xEq,pEq,geom,dim);
-
+    
     if(optsPlot.dim==2)
-        [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS);   
+        histRange=[optsPlot.rMin(1) optsPlot.rMax(1) optsPlot.rMin(2) optsPlot.rMax(2)];
+        [nR,meanP,xR]= RPhist2D(R,P,nBins,nParticlesS,histRange);
         meanV=meanP;
         for iSpecies=1:length(mS)
             meanV(:,:,:,iSpecies)=meanP(:,:,:,iSpecies)./mS(iSpecies);
@@ -87,7 +87,8 @@ function equilibria=getEquilibria(opts,xpStruct)
         mS=repmat(mS',size(meanP,1),1);
         meanV=meanP./mS;
     end    
-        
+
+
     % form output structure
     equilibria.REq=nR;
     equilibria.vEq=meanV;

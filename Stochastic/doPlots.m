@@ -71,12 +71,14 @@ if(~isempty(stocStruct))
         opts.optsPlot.plotTimes   = optsPlot.plotTimes;
         opts.optsPlot.nParticlesS = optsPlot.nParticlesS;
         opts.optsPlot.mS          = optsPlot.mS;
+        opts.optsPlot.rMin        = optsPlot.rMin;
+        opts.optsPlot.rMax        = optsPlot.rMax;
 
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
         
-        redoPlotData = ~loadSamples;
-%         redoPlotData = true;
+%        redoPlotData = ~loadSamples;
+          redoPlotData = true;
 
         fprintf(1,'Calculating Initial equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial' filesep 'Equilibria'];
@@ -102,12 +104,14 @@ if(~isempty(stocStruct))
         opts.optsPlot.plotTimes   = optsPlot.plotTimes;
         opts.optsPlot.nParticlesS = optsPlot.nParticlesS;
         opts.optsPlot.mS          = optsPlot.mS;
+        opts.optsPlot.rMin        = optsPlot.rMin;
+        opts.optsPlot.rMax        = optsPlot.rMax;
 
         opts.optsStoc = optsStoc;
         opts.optsPhys = optsPhys;
 
-        redoPlotData = ~loadSamples;
-%         redoPlotData = true;
+%        redoPlotData = ~loadSamples;
+         redoPlotData = true;
         
         fprintf(1,'Calculating Final equilibria values ... ');
         eqDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final' filesep 'Equilibria'];
@@ -225,10 +229,10 @@ end
 % make equilibrium plots
 %--------------------------------------------------------------------------
 
-% if(optsPlot.doEquilibria)
-%     %pdfFile=fileStruct.plotFile;
-%     plotEquilibria(stocStruct,DDFTStruct,optsPlot,equilibria);
-% end
+if(optsPlot.doEquilibria)
+    eqFile = plotEquilibria(stocStruct,DDFTStruct,optsPlot,equilibria);
+    plotFiles = cat(2,plotFiles,eqFile);
+end
 
 %--------------------------------------------------------------------------
 % make mean plot

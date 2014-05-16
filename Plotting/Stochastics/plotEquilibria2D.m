@@ -1,4 +1,4 @@
-function plotEquilibria2D(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
+function outputFile = plotEquilibria2D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -58,201 +58,162 @@ nStoc=size(stoc,2);
 nDDFT=size(ddft,2);
 
 % easy way to check if any of the computations include momentum
-doP=~isempty(optsPlotGIF(1).legTextP);
-
-% set initial and final time positions
-plotPos(2)=1;
-plotPos(3)=length(optsPlotGIF(1).plotTimes);
+doP=~isempty(optsPlot(1).legTextP);
 
 fullscreen = get(0,'ScreenSize');
+%----------------------------------------------------------------------
+% Set up figure
+%----------------------------------------------------------------------
 
-for iPlot=2:2  % we're using optsPlotGIF(2) and optsPlotGIF(3)
+hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+% set background colour to white
+set(hRPf,'Color','w');
 
-    % choose appropriate plotting options
-    optsPlot=optsPlotGIF(iPlot);
+switch optsPlot.plotType
+    case 'surf'  
+        handles=tightsubplot(1,2,0.075,0.075,0.075);
+        hRa=handles(1);
+        hPa=handles(2);
+    case 'contour'
+        hRa=axes;
+        % invisible axes off the figure
+        hPa= axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
+end
 
-    %----------------------------------------------------------------------
-    % Set up figure
-    %----------------------------------------------------------------------
-    
-    hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
-    % set background colour to white
-    set(hRPf,'Color','w');
+% figure and axes handles to be passed to plotting functions
+handlesRP = struct('hRPf',hRPf,'hRa',hRa,'hPa',hPa);
 
-    switch optsPlot.plotType
-        case 'surf'  
-            handles=tightsubplot(1,2,0.075,0.075,0.075);
-            hRa=handles(1);
-            hPa=handles(2);
-        case 'contour'
-            hRa=axes;
-            % invisible axes off the figure
-            hPa= axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
-    end
-
-    % figure and axes handles to be passed to plotting functions
-    handlesRP(iPlot)=struct('hRPf',hRPf,'hRa',hRa,'hPa',hPa); %#ok
-
-    %----------------------------------------------------------------------
-    % Set up legend
-    %----------------------------------------------------------------------
+%----------------------------------------------------------------------
+% Set up legend
+%----------------------------------------------------------------------
 
 %     if(~strcmp(optsPlot.oneLeg,'off'))
 %         % create the legend
 %         addOneLeg(optsPlot,hRPf);
 %     end
-  
-    %----------------------------------------------------------------------
-    % Get time, colours and types
-    %----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+% Get time, colours and types
+%----------------------------------------------------------------------
+
+% get time to add to plot
+plotTimes=optsPlot.plotTimes;
+plotTime=plotTimes(1);
+
+% surface colours and types
+if(nStoc>0)
+     optsPlot.faceColour=optsPlot.eqColour{1};
+     % get type info -- used to decide whether to plot the velocity
+     stocType=optsPlot.stocType;
+end
+
+if(nDDFT>0)
+    optsPlot.faceColour=optsPlot.eqColour{1};
+    % get type info -- used to decide whether to plot the velocity
+    DDFTType=optsPlot.DDFTType;
+end
+
+% and file to save in
+outputFile = optsPlot.eqFile;
+
+%----------------------------------------------------------------------
+% Stochastic equilibrium plots
+%----------------------------------------------------------------------
+
+if(nStoc>0)
+
+    rho   = equilibria(1).data.REq;
+    v     = equilibria(1).data.vEq;
+    boxes = equilibria(1).data.xEq;
     
-    % get time to add to plot
-    plotTimes=optsPlot.plotTimes;
-    plotTime=plotTimes(plotPos(iPlot));
+    optsPlot.type=stocType(1,:);
 
-    % surface colours and types
-    if(nStoc>0)
-         optsPlot.faceColour=optsPlot.eqColour{1};
-         % get type info -- used to decide whether to plot the velocity
-         stocType=optsPlot.stocType;
-    end
-   
-    if(nDDFT>0)
-        optsPlot.faceColour=optsPlot.eqColour{1};
-        % get type info -- used to decide whether to plot the velocity
-        DDFTType=optsPlot.DDFTType;
-    end
+    optsPlot.faceColour = optsPlot.lineColourStoc{1};
+
+    plotRhoVdistStoc2D(rho,v,boxes,optsPlot,handlesRP);
+
+    hold(hRa,'on');
+    hold(hPa,'on');
+
+end
+
+
+%----------------------------------------------------------------------
+% DDFT data plots
+%----------------------------------------------------------------------
+
+if(nDDFT>0)
+
+    % get rho, v and r values
+    rho = ddft(1).rho_t;
+    flux = ddft(1).flux_t;
     
-    % and file to save in
-    outputFile=pdfFile{iPlot};
-    outputFile=[outputFile(1:end-5) 'Eq.pdf'];
+
+    optsPlot.type=DDFTType(1,:);
+
+    % get values at appropriate time
+    rhot  = rho(:,:,:,1);
+    fluxt = flux(:,:,:,:,1);
+
+    optsPlot.faceColour=optsPlot.lineColourDDFT{1};
+    optsPlot.fluxNorm = 1;
     
-    %----------------------------------------------------------------------
-    % Stochastic equilibrium plots
-    %----------------------------------------------------------------------
-     
-    if(nStoc>0)
-                   
-        % get x and p values from structure
-        if(iPlot==2)
-            x=stoc(1).xInitial;
-        else
-            x=stoc(1).xFinal;
-        end
-        p=stoc(1).pIF;
-            
-        x=x';
-        p=p';
-        
-        optsPlot.type=stocType(1,:);
-        
-        optsPlot.faceColour = optsPlot.lineColourStoc{1};
-        
-        if(~isempty(x))
-            plotRhoVdistStoc2D(x,p,optsPlot,handlesRP(iPlot));
-        end
-        
-        hold(hRa,'on');
-        hold(hPa,'on');
-        
-    end
-       
-        
-    %----------------------------------------------------------------------
-    % DDFT data plots
-    %----------------------------------------------------------------------
-      
-    if(nDDFT>0)
-        
-        % NEED TO OUTPUT FINAL EQUILIBRIUM
-        
-        if(iPlot==2)
-            
-            for iDDFT=1:nDDFT
-            
-                % get rho, v and r values
-                rho=ddft(iDDFT).rho_t;
+    % plot the distributions
+    plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).shape.Interp,ddft(1).shape.Pts,optsPlot,handlesRP);
 
-                optsPlot.type=DDFTType(1,:);
+    hold(hRa,'on');
+    hold(hPa,'on');
 
-                % get values at appropriate time
-                rhot=rho(:,:,1);
 
-                if(strcmp(optsPlot.type,'rv'))
-                    v=ddft(1).v_IP;
-                    vt=v(:,:,plotPos(iPlot));
-                else
-                    v=ddft(1).flux_t;
-                    fluxNorm = 0.1*max(max(max(v)));
-                    optsPlot.fluxNorm=fluxNorm;
+end
 
-                    vt=v(:,:,plotPos(iPlot));
-                end
-                
-                optsPlot.faceColour=optsPlot.lineColourDDFT{iDDFT};
-                
-                %ddft(iDDFT).shape
-                
-                % plot the distributions
-                plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
+%----------------------------------------------------------------------
+% Set axes, legend, add time
+%----------------------------------------------------------------------
 
-                hold(hRa,'on');
-                hold(hPa,'on');
-        
-            end
-                
-        end
-        
-    end
-            
-    %----------------------------------------------------------------------
-    % Set axes, legend, add time
-    %----------------------------------------------------------------------
-    
-    optsPlot.time=plotTime;
-    
-    optsPlot.xLab='x';
-    optsPlot.yLab='y';
-    
-    optsPlot.xMin=optsPlot.rMin{1};
-    optsPlot.xMax=optsPlot.rMax{1};
-    optsPlot.yMin=optsPlot.rMin{2};
-    optsPlot.yMax=optsPlot.rMax{2};
+optsPlot.time=plotTime;
 
-    optsPlot.zMin=optsPlot.RMin;
-    optsPlot.zMax=optsPlot.RMax;
+optsPlot.xLab='x';
+optsPlot.yLab='y';
 
-    optsPlot.zLab='Density';
+optsPlot.xMin=optsPlot.rMin(1);
+optsPlot.xMax=optsPlot.rMax(1);
+optsPlot.yMin=optsPlot.rMin(2);
+optsPlot.yMax=optsPlot.rMax(2);
 
-    %optsPlot.legText=optsPlot.legTextR{iSpecies};
-    if(strcmp(optsPlotGIF(1).plotType,'surf'))
-        fixPlot2Dsurf(hRa,optsPlot);
-        optsPlot.time=[];
-        fixPlot2Dcontour(hPa,optsPlot);
-    else
-        fixPlot2Dcontour(hRa,optsPlot);
-    end
-        
-    if(doP)  
+optsPlot.zMin=optsPlot.RMin;
+optsPlot.zMax=optsPlot.RMax;
 
-        optsPlot.xMin=optsPlot.pMin{1};
-        optsPlot.xMax=optsPlot.pMax{1};
-        optsPlot.yMin=optsPlot.pMin{2};
-        optsPlot.yMax=optsPlot.pMax{2};            
+optsPlot.zLab='Density';
 
-        %optsPlot.legText=optsPlot.legTextP{iSpecies};
-        optsPlot.zLab='Momentum';
-        optsPlot.zMin=optsPlot.PMin{1};
-        optsPlot.zMax=optsPlot.PMax{1};
+%optsPlot.legText=optsPlot.legTextR{iSpecies};
+if(strcmp(optsPlot(1).plotType,'surf'))
+    fixPlot2Dsurf(hRa,optsPlot);
+    optsPlot.time=[];
+    fixPlot2Dcontour(hPa,optsPlot);
+else
+    fixPlot2Dcontour(hRa,optsPlot);
+end
 
-        fixPlot2D(hPa,optsPlot);
-    end
-        
-    
-    % write the figure files
-    save2pdf(outputFile,hRPf,100,true);
-    %close(hRPf);
+if(doP)  
 
-end % for iPlot
+    optsPlot.xMin=optsPlot.pMin(1);
+    optsPlot.xMax=optsPlot.pMax(1);
+    optsPlot.yMin=optsPlot.pMin(2);
+    optsPlot.yMax=optsPlot.pMax(2);            
+
+    %optsPlot.legText=optsPlot.legTextP{iSpecies};
+    optsPlot.zLab='Momentum';
+    optsPlot.zMin=optsPlot.PMin(1);
+    optsPlot.zMax=optsPlot.PMax(1);
+
+    fixPlot2D(hPa,optsPlot);
+end
+
+
+% write the figure files
+save2pdf(outputFile,hRPf,100,true);
+%close(hRPf);
+
 
 fprintf(1,'Finished\n');

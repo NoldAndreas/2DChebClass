@@ -10,7 +10,7 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=10;
+nParticlesS=20;
 
 kBT=1;          % temperature
 mS=1;
@@ -76,16 +76,14 @@ tMax=0.25;
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
 
-%nSamples=100000;  
-
-nSamples=5000;  
+nSamples=100000;  
+ 
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=10000;
 
-nRuns=50;
+nRuns=10000;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -104,8 +102,8 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-%doStoc={true,false,true,false};
-doStoc={false,false,false,false};
+doStoc={true,false,false,false};
+%doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -124,7 +122,7 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                        'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
@@ -161,12 +159,12 @@ DDFTName={'r0','r1'};
 DDFTType={'r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true};
+doDDFT={true,false};
 %doDDFT={false,false};
 
 % do we load and save the DDFT data
-%loadDDFT={true,true};
-loadDDFT={false,false};
+loadDDFT={true,true};
+%loadDDFT={false,false};
 
 DDFTColour = {{'g'},{'m'}};
 
@@ -200,8 +198,9 @@ nBins=[30;30];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif=false;          % .gif movie
-doInitialFinal=true;
-doMeans=false;
+doMovieGif     = true;          % .gif movie
+doInitialFinal = false;
+doMeans        = false;
+doEquilibria   = false;
 
 %sendEmail = true;

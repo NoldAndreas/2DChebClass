@@ -13,9 +13,9 @@ AddPaths();
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
 
-%inputFile = 'HITest';
+inputFile = 'HITest';
 %inputFile = 'GaussianTest';
-inputFile = 'GaussianTest_2Species';
+%inputFile = 'GaussianTest_2Species';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file
@@ -86,14 +86,6 @@ end
 %--------------------------------------------------------------------------
 % Plotting
 %--------------------------------------------------------------------------
-
-%oldPath = path;
-% if(~isempty(optsNumDDFT))
-%     DDFTDir= ['DDFT' filesep optsNumDDFT(1).DDFTDir];
-%     % add DDFTDir and all subfolders to path
-%     addpath(genpath(DDFTDir))
-%     rmpath(['DDFT' filesep optsNumDDFT(1).DDFTDir filesep 'Potentials']);
-% end
 
 % in case doPlots is a variable from anything
 if(exist('doPlots','var'))    

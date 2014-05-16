@@ -23,7 +23,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
     PhysArea    = optsNum.PhysArea;   
     N1 = PhysArea.N(1); N2 = PhysArea.N(2);              
     kBT          = optsPhys.kBT; 
-    nParticlesS  = optsPhys.nParticlesS;    
+    nParticlesS  = optsPhys.nParticlesS;
     nSpecies=length(nParticlesS);
     
     mS = optsPhys.mS;
@@ -108,10 +108,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
     VAdd0=getVAdd(y1S,y2S,0,optsPhys.V1);
     x_ic0 = getInitialGuess(VAdd0);
     
-    paramsIC.optsPhys.V1  = optsPhys.V1;
-    paramsIC.optsPhys.V2  = optsPhys.V2;
-    paramsIC.optsPhys.mS  = optsPhys.mS;
-    paramsIC.optsPhys.kBT = optsPhys.kBT;
+    paramsIC.optsPhys.V1          = optsPhys.V1;
+    paramsIC.optsPhys.V2          = optsPhys.V2;
+    paramsIC.optsPhys.mS          = optsPhys.mS;
+    paramsIC.optsPhys.kBT         = optsPhys.kBT;
+    paramsIC.optsPhys.nParticlesS = optsPhys.nParticlesS;
 
     paramsIC.optsNum.FexNum   = optsNum.FexNum;
     paramsIC.optsNum.PhysArea = optsNum.PhysArea;

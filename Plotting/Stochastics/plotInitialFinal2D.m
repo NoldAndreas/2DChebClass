@@ -97,9 +97,9 @@ for iPlot=1:2
     % Set up figure
     %----------------------------------------------------------------------
     
-    if(fullscreen(3)>1500)
-        fullscreen(3)=fullscreen(3)/2;
-    end
+%     if(fullscreen(3)>1500)
+%         fullscreen(3)=fullscreen(3)/2;
+%     end
     hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
     % set background colour to white
     set(hRPf,'Color','w');

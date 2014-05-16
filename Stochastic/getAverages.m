@@ -47,7 +47,7 @@ function averagesStruct=getAverages(opts,stocStruct)
     for iPlot = 1: nPlots
         xt=x(:,:,iPlot)'; 
         pt=p(:,:,iPlot)';
-
+        
         [R,P]=getRP(xt,pt,geom,dim);
 
         if(dim==2)
