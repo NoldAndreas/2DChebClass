@@ -10,8 +10,8 @@ stocDim=3;
 % it's one in certain places
 DDFTDim=1;
 
-%nParticlesS=[25;25];
-nParticlesS=[10;10];
+nParticlesS=[25;25];
+%nParticlesS=[10;10];
 
 kBT=1;          % temperature
 mS=[1;1];
@@ -26,9 +26,9 @@ D0S=kBT./mS./gammaS;
 V1DV1='APSHS';
 
 % appropriate physical parameters for potentials in V1DV1
-VmS= [0.1;0.1];    
+VmS= 0.1;    
 
-tSwitchS=[1;1];
+tSwitchS=1;
 
 ZS=[0.5;0.25];
 
@@ -105,9 +105,9 @@ stocHIType={[],[],'RP','RPInv'};
 stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true,true,true};
+%doStoc={true,true,true,true};
 %doStoc={true,false,false,false};
-%doStoc={false,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -124,18 +124,13 @@ saveStoc={true,true,true,true};
 %--------------------------------------------------------------------------
 
 
-PhysArea = {struct('N',200,'L',4), ...
-            struct('N',200,'L',4), ...
-            struct('N',200,'L',4), ...
-            struct('N',200,'L',4)};
-PlotArea = {struct('N',200,'yMin',0,'yMax',8), ...
-            struct('N',200,'yMin',0,'yMax',8), ...
-            struct('N',200,'yMin',0,'yMax',8), ...
-            struct('N',200,'yMin',0,'yMax',8)};
-FexNum   = {struct('Fex','FMT','N',100), ...
-            struct('Fex','FMT','N',100), ...
-            struct('Fex','FMT','N',100), ...
-            struct('Fex','FMT','N',100)};
+Phys_Area = struct('N',200,'L',4);
+Plot_Area = struct('N',200,'yMin',0,'yMax',8);
+Fex_Num   = struct('Fex','FMT','N',100);
+
+PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
+FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num};
 HINum    = {[], ...
             [], ...
             struct('N',100,'L',4, ...
@@ -149,8 +144,8 @@ HINum    = {[], ...
 
 DDFTCode = {'DDFT_DiffusionSphericalInfInterval', ...
             'DDFT_InertiaSphericalInfInterval', ...
-            'DDFT_DiffusionHISphericalInfInterval', ...
-            'DDFT_InertiaHISphericalInfInterval'};
+            'DDFT_DiffusionSphericalInfInterval', ...
+            'DDFT_InertiaSphericalInfInterval'};
         
 Tmax = tMax;
 
@@ -172,13 +167,14 @@ DDFTType={'r','rv','r','rv'};
 
 % whether to do DDFT calculations
 doDDFT={true,true,true,true};
-%doDDFT={true,false,false,false};
+%doDDFT={true,false,true,false};
+%doDDFT={false,false,true,true};
 %doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
 %loadDDFT={false,true,true,true};
-
+%loadDDFT={false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup

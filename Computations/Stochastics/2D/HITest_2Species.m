@@ -10,7 +10,7 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=[10;10];
+nParticlesS=[20;20];
 
 kBT=1;          % temperature
 mS=[1;1];
@@ -34,10 +34,8 @@ y10S = -1;
 y20S = -1;
 y11S = 1;
 y21S = -1;
-y12S = 0;
-y22S = [0.5;-0.5];
-
-
+y12S = [-0.5;0.5];
+y22S = 0.5;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -48,19 +46,27 @@ potParamsNames = {'V0','V0add','tau','sigma1Add','sigma2Add',...
 % V2 parameters
 %--------------------------------------------------------------------------
 
-V2DV2='Gaussian';
+V2DV2='hardSphere';
 
-epsilonS = [1 1; 1 1];
-alphaS   = [1 1; 1 1];
+sigmaS = [1 1; 1 1];
 
-potParams2Names={'epsilon','alpha'};
+potParams2Names={'sigma'};
+
+%--------------------------------------------------------------------------
+% HI parameters
+%--------------------------------------------------------------------------
+
+sigmaHS = 0.5*sigmaS;
+
+HIParamsNames={'sigmaH'};
 
 %--------------------------------------------------------------------------
 % Save time setup
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.25;
+%tMax=0.25;
+tMax=0.5;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -69,14 +75,14 @@ tMax=0.25;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=50000;  
 
-nSamples=200000;  
-
+nSamples=500000;  
+ 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=20000;
+
+nRuns=1000;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -95,19 +101,19 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-%doStoc={false,false,false,false};
-doStoc={true,false,false,false};
+%doStoc={true,false,true,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={10^3,10^3,2*10^4,10^3};
+tSteps={10^4,10^3,10^4,10^3};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
-stocColour = {{'r','b'},{'g'},{'b'},{'m'}};
+stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -115,30 +121,34 @@ stocColour = {{'r','b'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
-                   'y2Min',-inf,'y2Max',inf,'L2',4);
+Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+                       'y2Min',-inf,'y2Max',inf,'L2',4);
+
 Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
                        'y2Min',-y0,'y2Max',y0,'N2',100);
-Fex_Num   = struct('Fex','Meanfield','N',[20;20],'L',2);
-               
 
+Fex_Num = struct('Fex','FMTRosenfeld',...
+                       'Ncircle',10,'N1disc',10,'N2disc',10);
+                   
 PhysArea = {Phys_Area, Phys_Area};
+
 PlotArea = {Plot_Area, Plot_Area};
 
-FexNum  = {Fex_Num, Fex_Num};
+FexNum   = {Fex_Num, Fex_Num};
+
+HINum    = {[], ...
+            struct('N',[10;10],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D')};
 
 DDFTCode = {'DDFT_DiffusionInfSpace', ...
             'DDFT_DiffusionInfSpace'};
         
-Tmax = tMax;
-
 doPlots = true;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'}};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','HINum','doPlots'}};
 
-% HIParamsNamesDDFT={'sigmaH','sigma'};               
-HIParamsNamesDDFT={};
+HIParamsNamesDDFT={'sigmaH','sigma'};               
                
 DDFTName={'r0','r1'};
 
@@ -148,13 +158,14 @@ DDFTName={'r0','r1'};
 DDFTType={'r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,false};
+doDDFT={true,true};
 %doDDFT={false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true};
+%loadDDFT={false,false};
 
-DDFTColour = {{'g','m'},{'r','b'}};
+DDFTColour = {{'m','g'},{'r','b'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -170,7 +181,7 @@ pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.2;
+RMax=0.5;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -182,13 +193,13 @@ PMMin=[-1;-1];
 PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=[50;50];
+nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif=false;          % .gif movie
-doInitialFinal=false;
-doMeans=false;
-doEquilibria = true;
+doMovieGif     = false;          % .gif movie
+doInitialFinal = true;
+doMeans        = false;
+doEquilibria   = false;
 
 %sendEmail = true;

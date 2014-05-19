@@ -3,7 +3,7 @@ function convStruct = FexMatrices_FMTRosenfeldSpherical(optsPhys,IDC)
     if(isfield(optsPhys,'nParticlesS'))
         nSpecies=length(optsPhys.nParticlesS);
     else
-        nSpecies=length(optsPhys.nSpecies);
+        nSpecies=optsPhys.nSpecies;
     end
     
     optsFMT.N = 100;

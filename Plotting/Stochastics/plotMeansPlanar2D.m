@@ -1,4 +1,4 @@
-function plotMeansPlanar2D(stoc,ddft,optsPlot,equilibria)
+function outputFile = plotMeansPlanar2D(stoc,ddft,optsPlot,equilibria)
 % plotMeans(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
 %   plots mean position and momentum over time from given stochastic and DDFT data
 %
@@ -280,6 +280,7 @@ end
 if(nDDFT>0)
 %   addEqLinesDDFT([],handlesM,ddft,optsPlot,true,true);
 end
+% NEED TO FIX OUTPUTFILE
 
 save2pdf(pdfFile,hRPf);
 

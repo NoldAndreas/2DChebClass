@@ -1,4 +1,4 @@
-function plotMeans1D(stoc,ddft,optsPlot,equilibria)
+function outputFile = plotMeans1D(stoc,ddft,optsPlot,equilibria)
 % plotMeans(stoc,ddft,optsPlotGIF,equilibria,pdfFile)
 %   plots mean position and momentum over time from given stochastic and DDFT data
 %

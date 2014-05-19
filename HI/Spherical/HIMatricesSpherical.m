@@ -6,7 +6,7 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
     if(isfield(optsPhys,'nParticlesS'))
         nSpecies=length(optsPhys.nParticlesS);
     else
-        nSpecies=length(optsPhys.nSpecies);
+        nSpecies=optsPhys.nSpecies;
     end
 
     params = optsPhys.HI;

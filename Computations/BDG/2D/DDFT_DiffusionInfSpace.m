@@ -52,7 +52,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
     L1   = PhysArea.L1; L2   = PhysArea.L2; N = [N1,N2];
     IDC = InfSpace_FMT(v2struct(L1,L2,N));
     
-    [Pts,Diff,Int,Ind,Interp] = IDC.ComputeAll(optsNum.PlotArea);
+    [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
     %************************************************
     %****************  Preprocess  ******************
@@ -83,8 +83,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
         tic
         fprintf(1,'Computing HI matrices ...');   
         paramsHI.optsPhys.HI       = optsPhys.HI;
-        paramsHI.optsPhys.nSpecies = nSpecies;
         paramsHI.optsNum.HINum     = optsNum.HINum;
+        paramsHI.optsNum.Pts       = IDC.Pts;    
+        paramsHI.optsNum.Polar     = 'cart';
+        paramsHI.optsPhys.nSpecies = nSpecies;
         IntMatrHI     = DataStorage(['HIData' filesep class(IDC)],@HIMatrices2D,paramsHI,IDC);      
         fprintf(1,'done.\n');
         t_HI = toc;
