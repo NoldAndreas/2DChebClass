@@ -1,7 +1,7 @@
-function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaHISphericalInfInterval(doHI)
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_InertiaSphericalInfInterval(doHI)
 
     if(nargin==0)
-        doHI = false;
+        doHI = true;
     end
 
     Phys_Area = struct('N',200,'L',4);
@@ -40,11 +40,13 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_InertiaHISphericalInfInterva
     if(doHI)
         optsPhys.HI = HI;
         optsNum.HINum = HI_Num;
-    end           
+    end                       
                        
     lineColourDDFT={{'m','g','r','b'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
     
-    
+    AddPaths();
+    f = str2func(optsNum.DDFTCode);
+    output = f(optsPhys,optsNum,optsPlot);  
 end

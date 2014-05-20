@@ -62,7 +62,7 @@ end
 stop(tt) ;
 delete(tt) ; 
 % ... and figure
-%if ishandle(fh)
-%    close(fh);
-%   delete(fh) ;
-%end
+if ishandle(fh)
+   %close(fh);
+  delete(fh) ;
+end

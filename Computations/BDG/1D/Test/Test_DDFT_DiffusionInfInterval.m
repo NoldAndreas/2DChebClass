@@ -1,4 +1,8 @@
-function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHIInfInterval
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfInterval(doHI)
+
+    if(nargin==0)
+        doHI = true;
+    end
 
     Phys_Area = struct('N',200,'L',30);
     Plot_Area = struct('N',200,'yMin',-20,'yMax',20);
@@ -13,7 +17,6 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHIInfInterval
     optsNum   = struct('PhysArea',Phys_Area,...
                          'PlotArea',Plot_Area,...
                          'FexNum',Fex_Num,...
-                         'HINum',HI_Num,...
                          'DDFTCode','DDFT_DiffusionInfInterval',...
                          'Tmax',tMax,'plotTimes',0:tMax/100:tMax, ...
                          'doPlots',true);
@@ -28,11 +31,20 @@ function [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHIInfInterval
     
     HI       = struct('sigmaHS',0.5);
 
-    
-    optsPhys = struct('V1',V1,'V2',V2,'HI',HI,'kBT',1,'nParticlesS',8, ...
+    optsPhys = struct('V1',V1,'V2',V2,'kBT',1,'nParticlesS',8, ...
                            'mS',1,'gammaS',2);
     
+    if(doHI)
+        optsPhys.HI = HI;
+        optsNum.HINum = HI_Num;
+    end
+        
     lineColourDDFT={{'g','r','b'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
+    
+    AddPaths();
+    f = str2func(optsNum.DDFTCode);
+    output = f(optsPhys,optsNum,optsPlot);  
+    
 end

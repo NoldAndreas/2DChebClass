@@ -1,7 +1,8 @@
 function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionSphericalInfInterval(optsPhys,optsNum,optsPlot)
 
     if(nargin == 0)
-        [optsNum,optsPhys,optsPlot] = Default_DDFT_DiffusionHISphericalInfInterval();
+        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionSphericalInfInterval();
+        return;
     end
     
     AddPaths();

@@ -1,4 +1,4 @@
-function dFdRho=Percus(rho,Eta,kBT)
+function dFdRho=Fex_Percus(rho,Eta,kBT)
 
     nSpecies = size(rho,2);    
     rhoTotal = sum(rho,2);
