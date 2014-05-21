@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfDisc(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -12,8 +12,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
 %   (DYN i) rho_i/dt = div(rho_i*grad(mu_s_i))
 %*************************************************************************   
     if(nargin == 0)
-        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT();
-        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_MF();
+        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfDisc_MF();
         return;
     end
     
@@ -51,8 +50,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
         optsPlot.doDDFTPlots=true;
     end
     
-    L1   = PhysArea.L1; L2   = PhysArea.L2; N = [N1,N2];
-    IDC = InfSpace_FMT(v2struct(L1,L2,N));
+    L   = PhysArea.L1; N = [N1,N2];
+    IDC = InfDisc_FMT(v2struct(L,N));
     
     [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
@@ -253,7 +252,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace(optsPhys,opts
         %Boundary Conditions at infinity     
         dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
 
-        
         dxdt = D0.*dxdt;
 
         dxdt = dxdt(:);

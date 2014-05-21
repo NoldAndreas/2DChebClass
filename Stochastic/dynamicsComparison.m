@@ -10,10 +10,10 @@ AddPaths();
 % Choose input file
 %--------------------------------------------------------------------------
 
-inputFile='APS12HS50';
+%inputFile='APS12HS50';
 %inputFile='APS12G50';
 
-%inputFile = 'HITest';
+inputFile = 'HITest';
 %inputFile = 'HITest_2Species';
 
 %inputFile = 'GaussianTest';

@@ -83,7 +83,7 @@ initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
 
-nRuns=1000;
+nRuns=10000;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -122,7 +122,7 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                        'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
@@ -198,7 +198,7 @@ nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = false;          % .gif movie
+doMovieGif     = true;          % .gif movie
 doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;
