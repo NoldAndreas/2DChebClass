@@ -21,7 +21,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInterval()
     
     sigmaS  = [1 1;1 1];
     
-    V1       = struct('V1DV1','bump1D','alpha',alpha,'beta',beta,'y0',y0);
+    V1       = struct('V1DV1','V1_Test_Finite','alpha',alpha,'beta',beta,'y0',y0);
     V2       = struct('sigmaS',sigmaS);      
      
     optsPhys = struct('V1',V1,'V2',V2,'kBT',1,'nParticlesS',[5;5], ...

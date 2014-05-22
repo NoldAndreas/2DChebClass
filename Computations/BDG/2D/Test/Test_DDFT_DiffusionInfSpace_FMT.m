@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace(doHI)
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = true;
@@ -29,7 +29,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace(doHI)
     sigmaS  = 1;
     sigmaHS = 0.5;
 
-    V1       = struct('V1DV1','triangleDiffusion',...
+    V1       = struct('V1DV1','V1_Triangle',...
                       'V0',0.01,'V0add',3,'tau',0.1,'sigma1Add',0.5,'sigma2Add',0.5, ...
                       'y10',-1,'y20',-1,'y11',1,'y21',-1,'y12',0,'y22',0.5); 
                   

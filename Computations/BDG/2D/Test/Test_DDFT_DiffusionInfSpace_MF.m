@@ -1,4 +1,4 @@
-function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace2()
+function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace_MF()
 
     Phys_Area = struct('N',[20;20], ...
                        'y1Min',-inf,'y1Max',inf,'L1',4,...
@@ -32,7 +32,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace2()
             alpha13 alpha23 alpha3  ];
         
         
-    V1       = struct('V1DV1','rotating2cart',...
+    V1       = struct('V1DV1','V1_Rotating_Cart',...
                       'V0',0.05,'V0r',1,'alphar',1,'tau',1,'rV',1); 
                            
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);

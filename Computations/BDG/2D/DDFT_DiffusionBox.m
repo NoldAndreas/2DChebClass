@@ -1,4 +1,4 @@
-function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -11,10 +11,16 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 % Dynamics:
 %   (DYN i) rho_i/dt = div(rho_i*grad(mu_s_i))
 %*************************************************************************   
-    if(nargin == 0)
-        [optsNum,optsPhys,optsPlot] = TestFMT_DDFT_DiffusionPolar_NSpecies(false);
-    end
+    
 
+% !! ONLY WORKING FOR MEAN FIELD -- NEED TO IMPLEMENT BOX_FMT
+
+    if(nargin == 0)
+        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionBox_FMT();
+        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionBox_MF();
+        return;
+    end
+    
     disp(['** ',optsNum.DDFTCode,' **']);
 
     %************************************************
@@ -23,7 +29,15 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     PhysArea    = optsNum.PhysArea;   
     N1 = PhysArea.N(1); N2 = PhysArea.N(2);              
     kBT          = optsPhys.kBT; 
-    nParticlesS  = optsPhys.nParticlesS;            
+    nParticlesS  = optsPhys.nParticlesS;
+    nSpecies=length(nParticlesS);
+    
+    mS = optsPhys.mS;
+    gammaS = optsPhys.gammaS;
+    gamma  = bsxfun(@times,gammaS',ones(N1*N2,nSpecies));
+    m  = bsxfun(@times,mS',ones(N1*N2,nSpecies));
+    D0 = 1./(gamma.*m);
+    
     plotTimes    = optsNum.plotTimes;
     
     if(isfield(optsPhys,'HSBulk'))
@@ -32,7 +46,8 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
         HS_f       = str2func(optsNum.HSBulk); 
     else
         HS_f       = @ZeroMap;
-    end                     
+    end   
+    
     getFex = str2func(['Fex_',optsNum.FexNum.Fex]);
     
     if(nargin<3)
@@ -40,54 +55,48 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
         optsPlot.doDDFTPlots=true;
     end
     
-    L1   = PhysArea.L1; L2   = PhysArea.L2; N = [N1,N2];
-    IDC = InfSpace(v2struct(L1,L2,N));
+    IDC = Box(PhysArea);
     
-    [Pts,Diff,Int,Ind,Interp] = IDC.ComputeAll(optsNum.PlotArea);
+    [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
     %************************************************
     %****************  Preprocess  ******************
     %************************************************           
     tic
     fprintf(1,'Computing Fex matrices ...');   
-    params.V2          = optsPhys.V2;
-    params.kBT         = optsPhys.kBT;
-    params.FexNum      = optsNum.FexNum;
-    params.Pts         = IDC.Pts;     
-    params.Polar       = 'cart';
-    params.nParticlesS = optsPhys.nParticlesS;
-       
+    paramsFex.V2      = optsPhys.V2;
+    paramsFex.kBT     = optsPhys.kBT;
+    paramsFex.FexNum  = optsNum.FexNum;
+    paramsFex.Pts     = IDC.Pts;     
+    paramsFex.Polar   = 'cart';
+    paramsFex.nSpecies = nSpecies;   
+    
     func           = str2func(['FexMatrices_',optsNum.FexNum.Fex]);    
-	IntMatrFex     = DataStorage('FexData',func,params,IDC);   
+	IntMatrFex     = DataStorage(['FexData' filesep class(IDC)],func,paramsFex,IDC);   
         
     fprintf(1,'done.\n');
-    tfex = toc;
-    disp(tfex);
+    t_fex = toc;
+    disp(['Fex computation time (sec): ', num2str(t_fex)]);
     
-    if(isfield(optsPhys,'doHI'))
-        doHI = optsPhys.doHI;
+    if(isfield(optsNum,'HINum') && ~isempty(optsNum.HINum))
+        doHI = true;
     else
         doHI = false;
     end
+    
     if(doHI)        
         tic
         fprintf(1,'Computing HI matrices ...');   
-        paramsHI.kBT  = optsPhys.kBT;
-        paramsHI.HI   = optsPhys.HI;
-        paramsHI.HIShapeParams  = optsNum.HIShapeParams;
-        paramsHI.Pts     = IDC.Pts;     
-        paramsHI.Polar   = 'cart';
-        func           = str2func('HIMatrices_RP');    
-        IntMatrHI     = DataStorage('HIData',func,paramsHI,IDC);   
-
-        %IntMatrHI = HIMatrices_RP(optsPhys,optsNum,IDC);
-
+        paramsHI.optsPhys.HI       = optsPhys.HI;
+        paramsHI.optsNum.HINum     = optsNum.HINum;
+        paramsHI.optsNum.Pts       = IDC.Pts;    
+        paramsHI.optsNum.Polar     = 'cart';
+        paramsHI.optsPhys.nSpecies = nSpecies;
+        IntMatrHI     = DataStorage(['HIData' filesep class(IDC)],@HIMatrices2D,paramsHI,IDC);      
         fprintf(1,'done.\n');
-        tHI = toc;
-        disp(tHI);        
+        t_HI = toc;
+        display(['HI computation time (sec): ', num2str(t_HI)]); 
     end
-    
-    nSpecies=length(nParticlesS);
     
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);
@@ -96,7 +105,6 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     I  = eye(N1*N2);
     eyes=repmat(I,1,2);
     
-    t_preprocess = toc;
   
     %****************************************************************
     %**************** Solve for equilibrium condition   ************
@@ -105,14 +113,22 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     tic
     
     VAdd0=getVAdd(y1S,y2S,0,optsPhys.V1);
-    y0 = getInitialGuess(VAdd0);
+    x_ic0 = getInitialGuess(VAdd0);
     
-    %y0=zeros(1+N1*N2,nSpecies);
+    paramsIC.optsPhys.V1          = optsPhys.V1;
+    paramsIC.optsPhys.V2          = optsPhys.V2;
+    paramsIC.optsPhys.mS          = optsPhys.mS;
+    paramsIC.optsPhys.kBT         = optsPhys.kBT;
+    paramsIC.optsPhys.nParticlesS = optsPhys.nParticlesS;
+
+    paramsIC.optsNum.FexNum   = optsNum.FexNum;
+    paramsIC.optsNum.PhysArea = optsNum.PhysArea;
     
-%     x_ic    = fsolve(@f,zeros(1+N1*N2,nSpecies));
-    fprintf(1,'Computing initial condition ...');
     fsolveOpts=optimset('Display','off');
-    [x_ic,flag]    = fsolve(@f,y0,fsolveOpts); 
+    paramsIC.fsolveOpts = fsolveOpts;
+    
+    fprintf(1,'Computing initial condition ...');        
+    [x_ic,flag]     = DataStorage(['EquilibriumData' filesep class(IDC)],@ComputeEquilibrium,paramsIC,x_ic0);
     fprintf(1,'done.\n');
     
     if(flag<0)
@@ -125,13 +141,15 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-    if(optsPlot.doDDFTPlots)
-        figure
-        rho_ic  = exp((x_ic-Vext)/kBT);
-        IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
-    end
+%     if(~isfield(optsNum,'doPlots') ...
+%             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+%         figure
+%         rho_ic  = exp((x_ic-Vext)/kBT);
+%         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+%     end
 
     t_eqSol = toc;
+    disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
     
     %****************************************************************
     %****************  Compute time-dependent solution   ************
@@ -143,12 +161,17 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     mM=repmat(mM,nSpecies,1);
     opts = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag(mM));
     
+    fprintf(1,'Computing dynamics ...'); 
     if(doHI)
         [outTimes,X_t] =  ode15s(@dx_dt_HI,plotTimes,x_ic,opts);        
     else
         [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);
     end
+    fprintf(1,'done.\n');
+    
     t_dynSol = toc;
+    
+    disp(['Dynamics computation time (sec): ', num2str(t_dynSol)]);
     
     %************************************************
     %****************  Postprocess  ****************
@@ -160,35 +183,29 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     X_t       = reshape(X_t,N1*N2,nSpecies,length(outTimes));
     rho_t     = reshape(rho_t,N1*N2,nSpecies,length(outTimes));
     flux_t    = zeros(2*N1*N2,nSpecies,length(plotTimes));
-    
+    V_t       = zeros(N1*N2,nSpecies,length(plotTimes));
     for i = 1:length(plotTimes)
         if(doHI)
             flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
         else
             flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
         end
+        V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
     end
-    
-    data     = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,...
-                        t_preprocess,t_eqSol,t_dynSol);                        
+                           
+    data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
     data.shape = IDC;
     
-    %if(~isfield(optsNum,'savefileDDFT'))
-    %    SaveToFile(optsNum.DDFTCode,data,optsPhys,optsNum,getResultsPath());
-    %end                    
-                    
-	display(['Preprocessor, Computation time (sec): ', num2str(t_preprocess)]);
-    display(['Equilibrium Sol., Computation time (sec): ', num2str(t_eqSol)]);
-    display(['Dynamics, Computation time (sec): ', num2str(t_dynSol)]);
-    
-    
-    if(~exist('optsPlot','var') || optsPlot.doDDFTPlots)
-        PlotDDFT(v2struct(optsPhys,optsNum,optsPlot,data));  
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        figure
+        PlotDDFT(v2struct(optsPhys,optsNum,data));  
     end
              
     %***************************************************************
     %   Physical Auxiliary functions:
     %***************************************************************         
+    
     function y = f(x)
         %solves for T*log*rho + Vext                
         mu_s         = x(1,:);
@@ -230,20 +247,16 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
         x       = reshape(x,N1*N2,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
-        mu_s(Ind.bound,:) = 0;
         h_s      = Diff.grad*x - Vext_grad;
-        h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
                 
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         
-        %Boundary Conditions at infinity
- %       if(PhysArea.y1Max == Inf)        
-            dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
-        %else
-%            flux_dir        = Diff.grad*mu_s;
-%            dxdt(Ind.outR,:)  = Ind.normalOutR*flux_dir;             
-%        end
+        %Boundary Conditions: no flux at the walls        
+        flux_dir          = Diff.grad*mu_s;
+        dxdt(Ind.bound,:) = Ind.normal*flux_dir;   
         
+        dxdt = D0.*dxdt;
+
         dxdt = dxdt(:);
     end
 
@@ -251,19 +264,21 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
         x       = reshape(x,N1*N2,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
-        mu_s(Ind.bound,:) = 0;
         
         rho_s = exp((x-Vext)/kBT);
+        rho_s = [rho_s;rho_s];
         gradMu_s = Diff.grad*mu_s;
-        HI_s = OverdampedHI(rho_s,IntMatrHI,gradMu_s);
+        HI_s = ComputeHI(rho_s,gradMu_s,IntMatrHI);
         
         h_s      = Diff.grad*x - Vext_grad;
-        h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
                 
         dxdt     = kBT*(Diff.Lap*mu_s + Diff.div*HI_s) + eyes*( h_s.*(gradMu_s + HI_s) );  
-          
+
+        % NEED TO FIX BOUNDARY CONDITIONS IN TERMS OF FLUX
+        
         dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
 
+        dxdt = D0.*dxdt;
         
         dxdt = dxdt(:);
     end
@@ -288,11 +303,12 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     end
 
     function flux = GetFlux_HI(x,t)
-        rho_s = exp((x-Vext)/kBT);       
+        rho_s = exp((x-Vext)/kBT);  
+        rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
         gradMu_s = Diff.grad*mu_s;
-        HI_s = OverdampedHI(rho_s,IntMatrHI,gradMu_s);
-        flux  = -[rho_s;rho_s].*(gradMu_s + HI_s);                                
+        HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        flux  = -rho_s.*(gradMu_s + HI_s);                                  
     end
 
 
@@ -300,7 +316,11 @@ function data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
     %Auxiliary functions:
     %***************************************************************
 
-    function [muSC,fnCS] = ZeroMap(h1s,h2s)
+    function [y,flag] = ComputeEquilibrium(params,y0)      
+        [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
+    end
+    
+    function [muSC,fnCS] = ZeroMap(~,~)
         muSC = 0;
         fnCS = 0;
     end

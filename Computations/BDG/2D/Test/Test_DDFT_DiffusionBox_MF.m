@@ -1,21 +1,20 @@
-function [optsNum,optsPhys] = Test_DDFT_DiffusionBox_NSpecies()
+function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionBox_MF()
 
-    %Numerical Parameters    
-    Phys_Area = struct('y1Min',0,'y1Max',10,'N',[20,20],...
+    Phys_Area = struct('N',[20;20], ...
+                       'y1Min',0,'y1Max',10,...
                        'y2Min',0,'y2Max',10);
     
     Plot_Area = struct('y1Min',0,'y1Max',10,'N1',100,...
                        'y2Min',0,'y2Max',10,'N2',100);
-    
-    FexNum = struct('Fex','Meanfield','N',[20,20],'L',1);
                    
-    %Sub_Area  = Phys_Area;
+    FexNum = struct('Fex','Meanfield','N',[20,20],'L',1);
+    
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'DDFTCode','DDFT_DiffusionBox_NSpecies',...
-                     'plotTimes',0:7/50:7,...
-                     'FexNum',FexNum);    
-                                  
+                     'FexNum',FexNum,...
+                     'DDFTCode','DDFT_DiffusionBox',...
+                     'plotTimes',0:7/100:7);
+
     epsilonS=2*[ 1 1 1 ;
                  1 1 1 ;
                  1 1 1 ] ;
@@ -31,24 +30,24 @@ function [optsNum,optsPhys] = Test_DDFT_DiffusionBox_NSpecies()
     alphaS=[alpha1  alpha12 alpha13 ; 
             alpha12 alpha2  alpha23 ;
             alpha13 alpha23 alpha3  ];
-    
-    V1       = struct('V1DV1','quadSwitch',...
-                      'V0',2,'y10',7,'y20',6,'tau',10);                                         
-                  
-    V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);        
         
+        
+    V1       = struct('V1DV1','V1_Test_Box',...
+                      'V0',2,'y10',7,'y20',6,'tau',10); 
+                           
+    V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
+    
     optsPhys = struct('V1',V1,'V2',V2,...
-                      'kBT',0.7,...
+                      'kBT',1,'mS',1,'gammaS',1, ...
                       'nParticlesS',[20;20;20]); 
                  
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    %Run File
     AddPaths();
     f = str2func(optsNum.DDFTCode);
-    f(optsPhys,optsNum,optsPlot);                 
+    output = f(optsPhys,optsNum,optsPlot);                 
 
 end                 
 

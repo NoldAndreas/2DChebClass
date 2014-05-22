@@ -29,7 +29,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_InertiaSphericalInfInter
     sigmaS  = [1 1;1 1];
     sigmaHS = [0.5 0.5; 0.5 0.5];
 
-    V1       = struct('V1DV1','APSHS','Vm',Vm,'Z',Z);
+    V1       = struct('V1DV1','V1_Test_Spherical','Vm',Vm,'Z',Z);
     V2       = struct('sigmaS',sigmaS);
         
     HI       = struct('sigmaHS',sigmaHS,'sigmaS',sigmaS); 

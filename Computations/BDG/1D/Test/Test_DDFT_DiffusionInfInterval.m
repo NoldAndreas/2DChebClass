@@ -25,7 +25,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfInterval(doH
     alphaT = 15;
     beta   = 40;
      
-    V1       = struct('V1DV1','oscBump1D','alpha0',alpha0,'alphaT',alphaT,'beta',beta);
+    V1       = struct('V1DV1','V1_Test_Infinite','alpha0',alpha0,'alphaT',alphaT,'beta',beta);
     
     V2       = struct('sigmaS',1);
     
