@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -11,13 +11,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
 % Dynamics:
 %   (DYN i) rho_i/dt = div(rho_i*grad(mu_s_i))
 %*************************************************************************   
-    
-
-% !! ONLY WORKING FOR MEAN FIELD -- NEED TO IMPLEMENT BOX_FMT
-
     if(nargin == 0)
-        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionBox_FMT();
-        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionBox_MF();
+        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT();
+        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_MF();
         return;
     end
     
@@ -31,6 +27,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
     kBT          = optsPhys.kBT; 
     nParticlesS  = optsPhys.nParticlesS;
     nSpecies=length(nParticlesS);
+    
+    R         = diag(optsPhys.V2.sigmaS)/2;
     
     mS = optsPhys.mS;
     gammaS = optsPhys.gammaS;
@@ -55,7 +53,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
         optsPlot.doDDFTPlots=true;
     end
     
-    IDC = Box(PhysArea);
+    if(~isfield(optsNum,'Accuracy_Averaging'))
+        optsNum.Accuracy_Averaging = 1e-6;
+    end
+    
+    IDC = HalfSpace_FMT(PhysArea,R,optsNum.Accuracy_Averaging);
     
     [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
@@ -100,8 +102,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
     
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);
-    [Vext,Vext_grad]  = getVBackDVBack(y1S,y2S,optsPhys.V1);   
-    
+    [Vext,Vext_grad]  = getVBackDVBack(y1S,y2S,optsPhys.V1);       
+
     I  = eye(N1*N2);
     eyes=repmat(I,1,2);
     
@@ -145,9 +147,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
 %             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
 %         figure
 %         rho_ic  = exp((x_ic-Vext)/kBT);
-%         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+%         IDC.doPlots(rho_ic,'','r');        
 %     end
-
+    
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
     
@@ -179,8 +181,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
 
     X_t       = X_t';
     rho_t     = exp((X_t-Vext(:)*ones(1,length(outTimes)))/kBT);
-    
+        
     X_t       = reshape(X_t,N1*N2,nSpecies,length(outTimes));
+    
     rho_t     = reshape(rho_t,N1*N2,nSpecies,length(outTimes));
     flux_t    = zeros(2*N1*N2,nSpecies,length(plotTimes));
     V_t       = zeros(N1*N2,nSpecies,length(plotTimes));
@@ -247,13 +250,23 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
         x       = reshape(x,N1*N2,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
-        h_s      = Diff.grad*x - Vext_grad;
-                
-        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        mu_s(Ind.top,:)   = 0;
+        mu_s(Ind.right,:) = 0;
+        mu_s(Ind.left,:)  = 0;
         
+        h_s      = Diff.grad*x - Vext_grad;
+        h_s(Ind.top,:)   = 0;
+        h_s(Ind.right,:) = 0;
+        h_s(Ind.left,:)  = 0;
+        
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+  
         %Boundary Conditions: no flux at the walls        
-        flux_dir          = Diff.grad*mu_s;
-        dxdt(Ind.bound,:) = Ind.normal*flux_dir;   
+        flux_dir           = Diff.grad*mu_s;
+        dxdt(Ind.bottom,:) = Ind.normalBottom*flux_dir;           
+        dxdt(Ind.top,:)    = x(Ind.top,:) - x_ic(Ind.top,:);        
+        dxdt(Ind.right,:)  = x(Ind.right,:) - x_ic(Ind.right,:);
+        dxdt(Ind.left,:)   = x(Ind.left,:) - x_ic(Ind.left,:);  
         
         dxdt = D0.*dxdt;
 
@@ -264,6 +277,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
         x       = reshape(x,N1*N2,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
+        mu_s(Ind.bound,:) = 0;
         
         rho_s = exp((x-Vext)/kBT);
         rho_s = [rho_s;rho_s];
@@ -271,11 +285,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
         HI_s = ComputeHI(rho_s,gradMu_s,IntMatrHI);
         
         h_s      = Diff.grad*x - Vext_grad;
+        h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
                 
         dxdt     = kBT*(Diff.Lap*mu_s + Diff.div*HI_s) + eyes*( h_s.*(gradMu_s + HI_s) );  
-
-        % NEED TO FIX BOUNDARY CONDITIONS IN TERMS OF FLUX
-        
+          
         dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
 
         dxdt = D0.*dxdt;
@@ -286,7 +299,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
     function mu_s = GetExcessChemPotential(x,t,mu_offset)
         rho_s = exp((x-Vext)/kBT);
         
-        mu_s = getFex(rho_s,IntMatrFex,kBT);
+        mu_s = getFex(rho_s,IntMatrFex,kBT,R);
                        
         for iSpecies=1:nSpecies
            mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
