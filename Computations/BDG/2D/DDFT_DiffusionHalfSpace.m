@@ -143,12 +143,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-%     if(~isfield(optsNum,'doPlots') ...
-%             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-%         figure
-%         rho_ic  = exp((x_ic-Vext)/kBT);
-%         IDC.doPlots(rho_ic,'','r');        
-%     end
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        figure
+        rho_ic  = exp((x_ic-Vext)/kBT);
+        IDC.doPlots(rho_ic,'','r');    
+        
+        pause
+    end
     
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);

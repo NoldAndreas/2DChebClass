@@ -1,4 +1,4 @@
-function [V1,DV1,VBack,DVBack,VAdd]=getV1DV1(x1,t,optsPhys)
+function [V1,DV1] = getV1DV1(x1,t,optsPhys)
 
 %--------------------------------------------------------------------------
 % Set up coordinates
@@ -30,13 +30,26 @@ end
 
 V1DV1=str2func(optsPhys.V1DV1);
 
-if(d==1)      % 1D potential
-    [VBackStruct,VAddStruct]=V1DV1(x1,t,optsPhys);
-else                  % 2D potential
-    [VBackStruct,VAddStruct]=V1DV1(x1,x2,t,optsPhys);
+if(nargout(V1DV1) == 3)
+    confined = true;
+else
+    confined = false;
 end
-    
-    
+
+if(d==1)      % 1D potential
+    if(confined)
+        [VBackStruct,VAddStruct,VGeomStruct] = V1DV1(x1,t,optsPhys);
+    else
+        [VBackStruct,VAddStruct] = V1DV1(x1,t,optsPhys);
+    end
+else                  % 2D potential
+    if(confined)
+        [VBackStruct,VAddStruct,VGeomStruct] = V1DV1(x1,x2,t,optsPhys);
+    else
+        [VBackStruct,VAddStruct] = V1DV1(x1,x2,t,optsPhys);
+    end
+end
+
 %--------------------------------------------------------------------------
 % Extract potential
 %--------------------------------------------------------------------------
@@ -46,6 +59,11 @@ VAdd  = VAddStruct.V;
 
 % add to give total potential
 V1= VBack + VAdd;
+
+if(confined)
+    VG = VGeomStruct.V;
+    V1 = V1 + VG;
+end
 
 %--------------------------------------------------------------------------
 % Construct gradient depending on calculation type, geometry and dimension
@@ -74,45 +92,45 @@ if (d==1)
             % get gradients as row vectors (1,nParticles)
             DVBack = (VBackStruct.DV)';  
             DVAdd  = (VAddStruct.DV)';
-
+            DV1 = DVBack + DVAdd;
+            
+            if(confined)
+                DV1 = DV1 + (VGeomStruct.DV)';
+            end
+            
             % multiply by 1/R
             R = x1';
-            DVBack = DVBack./R;
-            DVAdd  = DVAdd./R;
-            DVBack(R==0) = 0;
-            DVAdd(R==0) = 0;
+            DV1 = DV1./R;
+            DV1(R==0) = 0;
 
             % replicate the rows dim times (dim,nParticles)
-            DVBack = DVBack(ones(1,dim),:);
-            DVAdd  = DVAdd(ones(1,dim),:);
+            DV1 = DV1(ones(1,dim),:);
 
         case 'planar'  % dim 1,2,3,  d = 1
             % gradient should act in potDir direction
 
             nParticles=optsPhys.nParticles;
 
-            DVBack = zeros(dim,nParticles);
-            DVAdd  = zeros(dim,nParticles);
-
-            DVBack(end,:) = (VBackStruct.DV)';
-            DVAdd(end,:)  = (VAddStruct.DV)';
-
+            DV1 = zeros(dim,nParticles);
+            DV1(end,:) = (VBackStruct.DV)' + (VAddStruct.DV)';
+            
+            if(confined)
+                DV1(end,:) = DV1(end,:) + (VGeomStruct.DV)';
+            end
+            
         otherwise
 
-            nParticles=optsPhys.nParticles;
+            nParticles = optsPhys.nParticles;
 
-            DVBack=zeros(dim,nParticles);
-            DVAdd=zeros(dim,nParticles);
+            DV1 = zeros(dim,nParticles);
 
     end   % geometries
 
     % convert back to column vectors of size (nParticles x dim,1)
-    DVBack = DVBack(:);
-    DVAdd  = DVAdd(:);
+    DV1 = DV1(:);
 
     if(strcmp(geom,'spherical'))
-        DVBack = DVBack.*x;
-        DVAdd  = DVAdd.*x;
+        DV1 = DV1.*x;
     end
 
 
@@ -129,12 +147,14 @@ else % d=2
         %----------------------------------------------------------
 
         case 'planar2D'  % dim = d = 2
-            DVBack1 = VBackStruct.dy1;
-            DVBack2 = VBackStruct.dy2;
-
-            DVAdd1  = VAddStruct.dy1;
-            DVAdd2  = VAddStruct.dy2;
-
+            DV11 = VBackStruct.dy1 + VAddStruct.dy1;
+            DV12 = VBackStruct.dy2 + VAddStruct.dy2;
+            
+            if(confined)
+                DV11 = DV11 + VGeomStruct.dy1;
+                DV12 = DV12 + VGeomStruct.dy2;
+            end
+            
         %----------------------------------------------------------
         % Polar 2D
         %----------------------------------------------------------    
@@ -152,22 +172,21 @@ else % d=2
 
             % Coordinates are in the order r, theta
 
-            DVBackR   = VBackStruct.dy1;
-            DVBackT_r = VBackStruct.dy2;
-
-            DVAddR    = VAddStruct.dy1;
-            DVAddT_r  = VAddStruct.dy2;
-
+            DV1R   = VBackStruct.dy1 + VAddStruct.dy1;
+            DV1T_r = VBackStruct.dy2 + VAddStruct.dy2;
+            
+            if(confined)
+                DV1R   = DV1R + VGeomStruct.dy1;
+                DV1T_r = DV1T_r + VGeomStruct.dy2;
+            end
+            
             T = C(:,2);
             cosT = cos(T);
             sinT = sin(T);
 
-            DVBack1 = DVBackR .* cosT - DVBackT_r .* sinT;
-            DVBack2 = DVBackR .* sinT + DVBackT_r .* cosT;
-
-            DVAdd1  = DVAddR .* cosT  - DVAddT_r .* sinT;
-            DVAdd2  = DVAddR .* sinT  + DVAddT_r .* cosT;
-
+            DV11 = DV1R .* cosT - DV1T_r .* sinT;
+            DV12 = DV1R .* sinT + DV1T_r .* cosT;
+            
     end    % geometry switch
 
     %--------------------------------------------------------------
@@ -175,18 +194,11 @@ else % d=2
     %--------------------------------------------------------------
 
     % put each derivative into a row (2,nParticles)
-    DVBack = [DVBack1' ; DVBack2'];
+    DV1 = [DV11' ; DV12'];
     % convert to (nParticles,1) with correct x1, x2
     % ordering
-    DVBack = DVBack(:);
-
-    % do same for DVAdd
-    DVAdd  = [DVAdd1' ; DVAdd2'];
-    DVAdd  = DVAdd(:);
+    DV1 = DV1(:);
 
 end    % dimension switch
-   
-% add to give total gradient
-DV1=DVBack + DVAdd;
-   
+      
 end

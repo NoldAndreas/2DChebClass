@@ -141,13 +141,13 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionBox(optsPhys,optsNum,o
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-%     if(~isfield(optsNum,'doPlots') ...
-%             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-%         figure
-%         rho_ic  = exp((x_ic-Vext)/kBT);
-%         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
-%     end
-
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        figure
+        rho_ic  = exp((x_ic-Vext)/kBT);
+        IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+    end
+    
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
     

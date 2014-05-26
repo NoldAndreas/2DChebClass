@@ -8,18 +8,21 @@ function [VBack_S,VAdd_S]=V1_HalfSpace(y1,y2,t,optsPhys)
     sigma1       = optsPhys.sigma1;
     sigma2       = optsPhys.sigma2;
     tau          = optsPhys.tau;
-    y10=optsPhys.y10;
-    y20=optsPhys.y20;
+    y10          = optsPhys.y10;
+    y20          = optsPhys.y20;
 
-%     VBack        = V0.*exp(-(y1.^2+y2.^2)./10);
-% 
-%     DVBackDy1    = -2*y1.*VBack;
-%     DVBackDy2    = -2*y2.*VBack;
+%     VBack        = V0.*(y1.^2+y2.^2);
+%     DVBackDy1    = 2*V0.*y1;
+%     DVBackDy2    = 2*V0.*y2;
 
-    VBack        = zeros(size(y1));
+    VBack        = -V0.*exp(-(y1.^2+y2.^2));
+    DVBackDy1    = -2*VBack.*y1;
+    DVBackDy2    = -2*VBack.*y2;
 
-    DVBackDy1    = zeros(size(y1));
-    DVBackDy2    = zeros(size(y1));
+    
+%     VBack        = zeros(size(y1));
+%     DVBackDy1    = zeros(size(y1));
+%     DVBackDy2    = zeros(size(y1));
 
     VBack_S = struct('V',VBack,...
                     'dy1',DVBackDy1,'dy2',DVBackDy2,...

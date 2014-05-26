@@ -22,7 +22,7 @@ x=-gridSize/2:1:gridSize/2;
 x=repmat(x,1,dim);
 
 % all possible combinations of points formed from x
-r=combnk(x,dim);
+r=mycombnk(x,dim);
 % narrow down to all unique triples
 r=unique(r,'rows');
 
