@@ -28,6 +28,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     nParticlesS  = optsPhys.nParticlesS;
     nSpecies=length(nParticlesS);
     
+    R         = diag(optsPhys.V2.sigmaS)/2;
+    
     mS = optsPhys.mS;
     gammaS = optsPhys.gammaS;
     gamma  = bsxfun(@times,gammaS',ones(N1*N2,nSpecies));
@@ -51,8 +53,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         optsPlot.doDDFTPlots=true;
     end
     
+    if(~isfield(optsNum,'Accuracy_Averaging'))
+        optsNum.Accuracy_Averaging = 1e-6;
+    end
     
-    IDC = HalfSpace(PhysArea);
+    IDC = HalfSpace_FMT(PhysArea,R,optsNum.Accuracy_Averaging);
     
     [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
@@ -74,6 +79,26 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     fprintf(1,'done.\n');
     t_fex = toc;
     disp(['Fex computation time (sec): ', num2str(t_fex)]);
+    
+    if(isfield(optsNum,'HINum') && ~isempty(optsNum.HINum))
+        doHI = true;
+    else
+        doHI = false;
+    end
+    
+    if(doHI)        
+        tic
+        fprintf(1,'Computing HI matrices ...');   
+        paramsHI.optsPhys.HI       = optsPhys.HI;
+        paramsHI.optsNum.HINum     = optsNum.HINum;
+        paramsHI.optsNum.Pts       = IDC.Pts;    
+        paramsHI.optsNum.Polar     = 'cart';
+        paramsHI.optsPhys.nSpecies = nSpecies;
+        IntMatrHI     = DataStorage(['HIData' filesep class(IDC)],@HIMatrices2D,paramsHI,IDC);      
+        fprintf(1,'done.\n');
+        t_HI = toc;
+        display(['HI computation time (sec): ', num2str(t_HI)]); 
+    end
     
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);
@@ -141,7 +166,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     opts = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag(mM));
     
     fprintf(1,'Computing dynamics ...'); 
-    [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);
+    if(doHI)
+        [outTimes,X_t] =  ode15s(@dx_dt_HI,plotTimes,x_ic,opts);        
+    else
+        [outTimes,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);
+    end
     fprintf(1,'done.\n');
     
     t_dynSol = toc;
@@ -161,7 +190,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     flux_t    = zeros(2*N1*N2,nSpecies,length(plotTimes));
     V_t       = zeros(N1*N2,nSpecies,length(plotTimes));
     for i = 1:length(plotTimes)
-        flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
+        if(doHI)
+            flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
+        else
+            flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
+        end
         V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
     end
                            
@@ -242,6 +275,29 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         dxdt = dxdt(:);
     end
 
+    function dxdt = dx_dt_HI(t,x)
+        x       = reshape(x,N1*N2,nSpecies);
+        
+        mu_s     = GetExcessChemPotential(x,t,mu);
+        mu_s(Ind.bound,:) = 0;
+        
+        rho_s = exp((x-Vext)/kBT);
+        rho_s = [rho_s;rho_s];
+        gradMu_s = Diff.grad*mu_s;
+        HI_s = ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        
+        h_s      = Diff.grad*x - Vext_grad;
+        h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
+                
+        dxdt     = kBT*(Diff.Lap*mu_s + Diff.div*HI_s) + eyes*( h_s.*(gradMu_s + HI_s) );  
+          
+        dxdt(Ind.bound,:)  = x(Ind.bound,:) - x_ic(Ind.bound,:);   
+
+        dxdt = D0.*dxdt;
+        
+        dxdt = dxdt(:);
+    end
+
     function mu_s = GetExcessChemPotential(x,t,mu_offset)
         rho_s = exp((x-Vext)/kBT);
         
@@ -259,6 +315,15 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         rho_s = exp((x-Vext)/kBT);       
         mu_s  = GetExcessChemPotential(x,t,mu); 
         flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
+    end
+
+    function flux = GetFlux_HI(x,t)
+        rho_s = exp((x-Vext)/kBT);  
+        rho_s = [rho_s;rho_s];
+        mu_s  = GetExcessChemPotential(x,t,mu); 
+        gradMu_s = Diff.grad*mu_s;
+        HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        flux  = -rho_s.*(gradMu_s + HI_s);                                  
     end
 
 

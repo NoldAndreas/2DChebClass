@@ -94,8 +94,16 @@ function ThreePhaseContactLine_FMT_HalfSpaceSkewed(CompCase,Case90)
     end
     
     y2MaxCompPlot = 6;
-        
+
+    if(~exist(dirData,'dir'))
+        mkdir(dirData);
+    end
+    
     diaryFile = [dirData filesep 'LogFile.txt'];
+    if(~exist(diaryFile,'file'))
+        fid = fopen(diaryFile,'w');
+        fclose(fid);
+    end
     diary(diaryFile); diary on;
        
     N1           = 40;
