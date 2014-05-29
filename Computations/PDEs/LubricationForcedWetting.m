@@ -216,7 +216,38 @@ function LubricationForcedWetting()
 
     print2eps([dirData filesep 'Eggers3'],fig1);
     saveas(fig1,[dirData filesep 'Eggers3.fig']);
+    
+    
+    %**** Print for Paper **********
+    fig1 = figure('color','white','Position',[0 0 800 800]);
+	HIS.doPlots(hP,'plain');    hold on;
+    plot(yInner,IP_In.InterPol*hP,'k','linewidth',1.5);
+    plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',1.5);
 
+    set(gca,'XScale','log');    
+    yP = 10.^((-5.6:0.01:1)');     
+    
+    plot(y,h0P,'b:','linewidth',1.5);
+    plot(y,h0P+delta*h1P,'r:','linewidth',1.5);    
+    plot(y,h0P+delta*h1P+delta^2*h2P,'m:','linewidth',1.5);
+            
+    mark_h = (y*lambda<1e-5);
+    plot(y(mark_h)*lambda,hIP_0(mark_h)+delta*hIP_1(mark_h),'b-.','linewidth',1.5);        
+    plot(y(mark_h)*lambda,hIP_0(mark_h) + ...
+                           delta*hIP_1(mark_h) + ...
+                           delta^2*hIP_2(mark_h),'r-.','linewidth',1.5);        
+
+    %Intermediate Region result
+    plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'k--','linewidth',1.5);    
+    
+    ylim([0.9 2.5]);
+    xlim([1e-7 4]);            
+    
+    xlabel('$x$','Interpreter','Latex','fontsize',25);
+    ylabel('$dh/dx$','Interpreter','Latex','fontsize',25);    
+        
+    print2eps([dirData filesep 'Eggers4'],fig1);
+    saveas(fig1,[dirData filesep 'Eggers4.fig']);
     
     %% Right hand side of ODE
     function y = ODE(hP)
