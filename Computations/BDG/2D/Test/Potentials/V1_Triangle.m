@@ -36,11 +36,11 @@ function [VBack_S,VAdd_S]=V1_Triangle(y1S,y2S,t,optsPhys)
     DVBackDy1    = 2*V0.*y1S;
     DVBackDy2    = 2*V0.*y2S;
 
-    VBack = VBack.*w;
-
     DVBackDy1    = DVBackDy1.*w + VBack.*DwDy1;
     DVBackDy2    = DVBackDy2.*w + VBack.*DwDy2;
 
+    VBack = VBack.*w;
+    
 
     DVBackDy1(abs(y1S)==inf | abs(y2S)==inf) = 0;
     DVBackDy2(abs(y1S)==inf | abs(y2S)==inf) = 0;

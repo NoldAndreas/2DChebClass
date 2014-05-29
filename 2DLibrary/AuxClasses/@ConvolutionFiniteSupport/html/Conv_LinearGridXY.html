@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Conv_LinearGridXY</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-02-13"><meta name="DC.source" content="Conv_LinearGridXY.m"><style type="text/css">
+      --><title>Conv_LinearGridXY</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-05-28"><meta name="DC.source" content="Conv_LinearGridXY.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -113,7 +113,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="comment">%     ylim([0 3]);</span>
 <span class="comment">%     pbaspect([3 3 1]);</span>
     <span class="comment">%*************************************</span>
-</pre><h2>Computation of interpolation matrices<a name="6"></a></h2><p><img vspace="5" hspace="5" src="Draft2.png" alt=""> </p><p><img vspace="5" hspace="5" src="Draft2_Combined.png" alt=""> </p><div><ul><li>blue lines: grid lines for coordinate system of the class 'this'</li><li>black points: points of area, shifted to be centered around black filled point</li><li>magenta points: for one iteration of iPtsData, points represented by the grid (y1pts,y2pts)</li><li>Note: the black points are organized in a grid, which we do not plot here, but which can be inferred from the shifted grid on which the magenta-coloured points are located.</li></ul></div><p>Interp1(iPtsData,:,:) interpolates data in the y1-direction to get data on the y1-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><p>Interp2(iPtsData,:,:) interpolates data in the y2-direction to get data on the y2-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><pre class="codeinput">    <span class="keyword">for</span> iPtsData = 1:length(convArea.pts.y1_kv)
+</pre><h2>Computation of interpolation matrices<a name="6"></a></h2><p><img vspace="5" hspace="5" src="Draft2.png" alt=""> </p><p><img vspace="5" hspace="5" src="Draft2_Combined.png" alt=""> </p><div><ul><li>blue lines: grid lines for coordinate system of the class 'this'</li><li>hollow black points: points of area, shifted to be centered around black filled point</li><li>black filled point: one point from input <i>ptsC</i></li><li>magenta points: for one iteration of iPtsData through convArea, points represented by the grid (y1pts,y2pts)</li><li>Note: the filled black points are organized in a grid, which we do not plot here, but which can be inferred from the shifted grid on which the magenta-coloured points are located.</li></ul></div><p>Interp1(iPtsData,:,:) interpolates data in the y1-direction to get data on the y1-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><p>Interp2(iPtsData,:,:) interpolates data in the y2-direction to get data on the y2-gridlines of the grid on which the magenta-coloured points are located. This can only be done because the interpolation matrix does not depend on the y2-coordinate.</p><pre class="codeinput">    <span class="keyword">for</span> iPtsData = 1:length(convArea.pts.y1_kv)
 
         <span class="comment">%Shift data</span>
         y1pts                  = ptsC.y1 + convArea.ptsOr.y1_kv(iPtsData);
@@ -269,11 +269,12 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights)
     % <<Draft2_Combined.png>>    
     %
     % * blue lines: grid lines for coordinate system of the class 'this'
-    % * black points: points of area, shifted to be centered around black
-    % filled point
-    % * magenta points: for one iteration of iPtsData, points represented by the grid
+    % * hollow black points: points of area, shifted to be centered around black
+    % filled point 
+    % * black filled point: one point from input _ptsC_
+    % * magenta points: for one iteration of iPtsData through convArea, points represented by the grid
     % (y1pts,y2pts)
-    % * Note: the black points are organized in a grid, which we do not
+    % * Note: the filled black points are organized in a grid, which we do not
     % plot here, but which can be inferred from the shifted grid on which
     % the magenta-coloured points are located.
     % 

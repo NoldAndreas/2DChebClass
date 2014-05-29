@@ -245,7 +245,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfDisc(optsPhys,optsN
         mu_s     = GetExcessChemPotential(x,t,mu);
         mu_s(Ind.bound,:) = 0;
         h_s      = Diff.grad*x - Vext_grad;
-        h_s(Ind.bound,:) = 0; %here, we have assumed that grad(mu) converges fast enough
+        h_s([Ind.bound;Ind.bound],:) = 0; %here, we have assumed that grad(mu) converges fast enough
                 
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         

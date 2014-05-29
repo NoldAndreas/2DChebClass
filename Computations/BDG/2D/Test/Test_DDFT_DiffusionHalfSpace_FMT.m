@@ -11,37 +11,27 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT(d
                    
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
-
-%     Fex_Num = struct('Fex','Meanfield','N',[20,20],'L',1);                   
-                   
                    
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
-    %Sub_Area  = Phys_Area;
-    
-    tMax = 20;
+    tMax = 10;
 
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
                      'FexNum',Fex_Num,...
-                     'DDFTCode','DDFT_DiffusionHalfSpace',...
+                     'DDFTCode','DDFT_DiffusionHalfSpace_FMT',...
                      'plotTimes',0:tMax/100:tMax, ...
                      'Accuracy_Averaging',1e-6);
 
     sigmaS  = 1;
     sigmaHS = 0.5;
 
-    V1       = struct('V1DV1','V1_HalfSpace','V0',0.01,'V0Add',0.1,'sigma1',2,'sigma2',2,...
-                        'tau',1,'y10',2,'y20',1);
+    V1       = struct('V1DV1','V1_HalfSpace_FMT','V0',0.1,'V0Add',1,'sigma1',1,'sigma2',1,...
+                        'tau',1,'y10',2,'y20',2);
 
     V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);   
 
-%     V1       = struct('V1DV1','V1_HalfSpace','V0',0,'V0Add',0,'sigma1',2,'sigma2',2,...
-%                         'tau',1,'y10',2,'y20',0);
-% 
-%     V2       = struct('V2DV2','Gaussian','alpha',1,'epsilon',0);
-% 
     HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
     
     optsPhys = struct('V1',V1,'V2',V2, ...                                            

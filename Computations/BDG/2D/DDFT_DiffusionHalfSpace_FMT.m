@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace_FMT(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
 % data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
 %
@@ -13,7 +13,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
 %*************************************************************************   
     if(nargin == 0)
         [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT();
-        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_MF();
         return;
     end
     
@@ -143,14 +142,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-    if(~isfield(optsNum,'doPlots') ...
-            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-        figure
-        rho_ic  = exp((x_ic-Vext)/kBT);
-        IDC.doPlots(rho_ic,'','r');    
-        
-        pause
-    end
+%     if(~isfield(optsNum,'doPlots') ...
+%             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+%         figure
+%         rho_ic  = exp((x_ic-Vext)/kBT);
+%         IDC.doPlots(rho_ic,'','r');    
+%         
+%         pause
+%     end
     
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
@@ -257,11 +256,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         mu_s(Ind.left,:)  = 0;
         
         h_s      = Diff.grad*x - Vext_grad;
-        h_s(Ind.top,:)   = 0;
-        h_s(Ind.right,:) = 0;
-        h_s(Ind.left,:)  = 0;
+        h_s([Ind.top;Ind.top],:)   = 0;
+        h_s([Ind.right;Ind.right],:) = 0;
+        h_s([Ind.left;Ind.left],:)  = 0;
         
-        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));
   
         %Boundary Conditions: no flux at the walls        
         flux_dir           = Diff.grad*mu_s;

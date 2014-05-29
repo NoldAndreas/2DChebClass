@@ -1,7 +1,5 @@
 function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,optsNum,optsPlot)
 %************************************************************************* 
-% data = DDFT_DiffusionPlanar_NSpecies(optsPhys,optsNum,optsPlot)
-%
 % define
 %   mu_s_i := kBT*log(rho_i) + sum( int(rho_j(r')*Phi2D(r-r'),dr') , 
 %               j = 1..N) +mu_HS(rho_i) + V_ext_i - mu_i
@@ -12,8 +10,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
 %   (DYN i) rho_i/dt = div(rho_i*grad(mu_s_i))
 %*************************************************************************   
     if(nargin == 0)
-        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT();
-        %[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_MF();
+        [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_MF();
         return;
     end
     
@@ -36,14 +33,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     
     plotTimes    = optsNum.plotTimes;
     
-    if(isfield(optsPhys,'HSBulk'))
-        HS_f       = str2func(optsPhys.HSBulk);  
-    elseif(isfield(optsNum,'HSBulk'))
-        HS_f       = str2func(optsNum.HSBulk); 
-    else
-        HS_f       = @ZeroMap;
-    end   
-    
     getFex = str2func(['Fex_',optsNum.FexNum.Fex]);
     
     if(nargin<3)
@@ -51,8 +40,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         optsPlot.doDDFTPlots=true;
     end
     
+    shape = PhysArea;
+    shape.Conv = optsNum.FexNum;
     
-    IDC = HalfSpace(PhysArea);
+    IDC = HalfSpace(shape);
     
     [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
@@ -118,14 +109,13 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     mu      = x_ic(1,:);
     x_ic    = x_ic(2:end,:);
     
-    if(~isfield(optsNum,'doPlots') ...
-            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-        figure
-        rho_ic  = exp((x_ic-Vext)/kBT);
-        IDC.doPlots(rho_ic,'','r');    
-        
-        pause
-    end
+%     if(~isfield(optsNum,'doPlots') ...
+%             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+%         figure
+%         rho_ic  = exp((x_ic-Vext)/kBT);
+%         IDC.doPlots(rho_ic,'','r');    
+%         
+%     end
     
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
@@ -183,7 +173,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         mu_s         = x(1,:);
         x            = x(2:end,:);       
         rho_full     = exp((x-Vext)/kBT);
-        y            = GetExcessChemPotential(x,0,mu_s); 
+        y            = GetExcessChemPotential(x,0,mu_s);
         y            = [Int*rho_full - nParticlesS';y];
         y            = y(:);
     end
@@ -195,7 +185,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         muInit=zeros(1,nSpecies);
 
         % however, require relatively good guess for rho
-
+        
         % rho without interaction ie exp(-(VBack+VAdd )/kBT)
         rhoInit = exp(-(Vext+VAdd)/kBT);
         
@@ -224,15 +214,15 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
         mu_s(Ind.left,:)  = 0;
         
         h_s      = Diff.grad*x - Vext_grad;
-        h_s(Ind.top,:)   = 0;
-        h_s(Ind.right,:) = 0;
-        h_s(Ind.left,:)  = 0;
+        h_s([Ind.top;Ind.top],:)   = 0;
+        h_s([Ind.right;Ind.right],:) = 0;
+        h_s([Ind.left;Ind.left],:)  = 0;
         
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
   
         %Boundary Conditions: no flux at the walls        
-        flux_dir           = Diff.grad*mu_s;
-        dxdt(Ind.bottom,:) = Ind.normalBottom*flux_dir;           
+        flux_dir           = Diff.grad*mu_s;         
+        dxdt(Ind.bottom,:) = Ind.normalBottom*flux_dir;
         dxdt(Ind.top,:)    = x(Ind.top,:) - x_ic(Ind.top,:);        
         dxdt(Ind.right,:)  = x(Ind.right,:) - x_ic(Ind.right,:);
         dxdt(Ind.left,:)   = x(Ind.left,:) - x_ic(Ind.left,:);  
@@ -245,13 +235,13 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     function mu_s = GetExcessChemPotential(x,t,mu_offset)
         rho_s = exp((x-Vext)/kBT);
         
-        mu_s = getFex(rho_s,IntMatrFex,kBT,R);
+        mu_s = getFex(rho_s,IntMatrFex,kBT);
                        
         for iSpecies=1:nSpecies
            mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
         end
 
-        mu_s = mu_s + x + HS_f(rho_s,kBT) + getVAdd(y1S,y2S,t,optsPhys.V1);
+        mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
                    
     end
 
@@ -269,12 +259,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace(optsPhys,opt
     function [y,flag] = ComputeEquilibrium(params,y0)      
         [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
     end
-    
-    function [muSC,fnCS] = ZeroMap(~,~)
-        muSC = 0;
-        fnCS = 0;
-    end
-
     
 
 end
