@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary()
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF()
 
     Phys_Area = struct('y1Min',-inf,'y1Max',inf,'L1',3,'N',[20;20],...
                        'y2Min',-2,'y2Max',2);
