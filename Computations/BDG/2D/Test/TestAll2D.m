@@ -12,4 +12,4 @@ Test_DDFT_DiffusionInfSpace_FMT(true);
 Test_DDFT_DiffusionHalfSpace_FMT;
 Test_DDFT_DiffusionHalfSpace_MF;
 
-Test_DDFT_DiffusionInfCapillary;
+Test_DDFT_DiffusionInfCapillary_MF;
