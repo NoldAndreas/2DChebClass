@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF()
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_Diffusion_MF()
 
     Phys_Area = struct('shape','InfCapillary','y1Min',-inf,'y1Max',inf,'L1',3,'N',[20;20],...
                        'y2Min',-2,'y2Max',2);
@@ -10,6 +10,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF
                              'y2Min',-2,'y2Max',2);
     
     FexNum = struct('Fex','Meanfield','N',[20,20],'L1',6,'L2',1);
+    %Conv      = struct('L1',6,'L2',1,'N',[30,30]);
 
     tMax = 5;
     
@@ -30,6 +31,5 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF
     AddPaths();
     f = str2func(optsNum.DDFTCode);
     output = f(optsPhys,optsNum);    
-
 
 end       

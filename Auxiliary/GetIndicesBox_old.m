@@ -1,4 +1,4 @@
-function I  = GetIndicesBox_New(this)
+function I  = GetIndicesBox(x1,x2)
 %************************************************************************
 %I  = GetIndicesBox(x1,x2)
 %INPUT:
@@ -12,51 +12,37 @@ function I  = GetIndicesBox_New(this)
 % - corners 
 %************************************************************************
 
-        x1_kv = this.Pts.x1_kv;
-        x2_kv = this.Pts.x2_kv;
-        
-        y1_kv = this.Pts.y1_kv;
-        y2_kv = this.Pts.y2_kv;
-        
+
+        %Sparse Matrices are to be used
+        N1 = length(x1);
+        N2 = length(x2);
+
+        x1_kv   = kron(x1,ones(size(x2)));
+        x2_kv   = kron(ones(size(x1)),x2);
+                
+    
         left    = (x1_kv == min(x1_kv));
         right   = (x1_kv == max(x1_kv)); 
         bottom  = (x2_kv == min(x2_kv));
         top     = (x2_kv == max(x2_kv));
-                
+        
         bound   = (left | right | bottom | top);
         
-        leftFinite   = any(isfinite(y1_kv(left)));
-        rightFinite  = any(isfinite(y1_kv(right)));
-        topFinite    = any(isfinite(y2_kv(top)));
-        bottomFinite = any(isfinite(y2_kv(bottom)));
-        
-        finite = ( (leftFinite & left) | (rightFinite & right) ...
-                   | (topFinite & top) | (bottomFinite & bottom) );
-        
-        infinite = ( (~leftFinite & left) | (~rightFinite & right) ...
-                   | (~topFinite & top) | (~bottomFinite & bottom) );
-               
-               
         corners = ((right & top) | (top & left) | (left & bottom) | (bottom & right));
         
-        Z             = zeros(length(x1_kv));
-
-        nx1Left       = Z;
-        nx1Right      = Z;
+        Z             = zeros(N1*N2);
         
-        nx2Top        = Z;
-        nx2Bottom     = Z;
+        nx1Left       = zeros(N1*N2);
+        nx1Right      = zeros(N1*N2);
+        
+        nx2Top        = zeros(N1*N2);
+        nx2Bottom     = zeros(N1*N2);
          
         nx1Left(left,left)     = -speye(sum(left));
         nx1Right(right,right)  = speye(sum(right));
         
         nx2Top(top,top)        = speye(sum(top));
         nx2Bottom(bottom,bottom)  = -speye(sum(bottom));
-        
-        normalFinite = sparse( [(leftFinite*nx1Left(bound,:) + rightFinite*nx1Right(bound,:)) ...
-                        (topFinite*nx2Top(bound,:) + bottomFinite*nx2Bottom(bound,:))] );
-        normalInfinite = sparse( [((~leftFinite)*nx1Left(bound,:) + (~rightFinite)*nx1Right(bound,:)) ...
-                        ((~topFinite)*nx2Top(bound,:) + (~bottomFinite)*nx2Bottom(bound,:))] );
         
         I = struct('left',left,'right',right,'bottom',bottom,'top',top,...
             'bound',bound,...
@@ -65,8 +51,6 @@ function I  = GetIndicesBox_New(this)
             'normalTop',   sparse( [Z(top,:)  nx2Top(top,:)] ),...
             'normalBottom',sparse( [Z(bottom,:)  nx2Bottom(bottom,:)] ),...
             'normal',sparse( [(nx1Left(bound,:)+nx1Right(bound,:)) (nx2Top(bound,:) + nx2Bottom(bound,:))] ),...
-            'corners',corners, ...
-            'finite',finite,'infinite',infinite, ...
-            'normalFinite',normalFinite,'normalInfinite',normalInfinite);
+            'corners',corners);
         
     end

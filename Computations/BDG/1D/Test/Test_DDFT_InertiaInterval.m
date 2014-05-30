@@ -2,16 +2,19 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_InertiaInterval()
 
     yMax = 13.29;
 
-    Phys_Area = struct('N',100,'yMin',0,'yMax',yMax);
+    Phys_Area = struct('shape','SpectralLine','N',100,'yMin',0,'yMax',yMax);
     Plot_Area = struct('N',200,'yMin',0,'yMax',yMax);
     Fex_Num   = struct('Fex','Percus','N',100);
     
     tMax = 10;
     
+%     DDFTCode = 'DDFT_InertiaInterval';
+    DDFTCode = 'DDFT_Inertia_1D_Planar';
+    
     optsNum   = struct('PhysArea',Phys_Area,...
                          'PlotArea',Plot_Area,...
                          'FexNum',Fex_Num,...
-                         'DDFTCode','DDFT_InertiaInterval',...
+                         'DDFTCode',DDFTCode,...
                          'Tmax',tMax,'plotTimes',0:tMax/100:tMax,...
                          'doPlots',true);
 

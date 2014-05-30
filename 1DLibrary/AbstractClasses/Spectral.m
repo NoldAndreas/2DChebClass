@@ -47,7 +47,7 @@ classdef (Abstract) Spectral < Interval
             end  
         end      
         function Ind = ComputeIndices(this)
-            Ind = GetIndicesInterval(this.Pts.x);
+            Ind = GetIndicesInterval(this);
             this.Ind = Ind;
         end       
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)

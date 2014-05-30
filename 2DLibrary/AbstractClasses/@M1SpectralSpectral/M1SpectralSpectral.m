@@ -80,9 +80,7 @@ classdef (Abstract) M1SpectralSpectral < Shape
             I2 = barychebevalMatrix(this.Pts.x2,interp2);
         end
         function Ind    = ComputeIndices(this)
-            %Ind      = GetIndicesBox(this.Pts.x1,this.Pts.x2);
-            %this = InitializationPts(this)
-            Ind      = GetIndicesBox_New(this);
+            Ind      = GetIndicesBox(this);
             this.Ind = Ind;
         end                 
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)

@@ -4,7 +4,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_InertiaSphericalInfInter
         doHI = true;
     end
 
-    Phys_Area = struct('N',200,'L',4);
+    Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
     Plot_Area = struct('N',200,'yMin',0,'yMax',8);
     Fex_Num   = struct('Fex','FMT','N',100);  
     HI_Num    = struct('N',100,'L',4, ...
@@ -14,10 +14,13 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_InertiaSphericalInfInter
     
     tMax = 2.5;
     
+%     DDFTCode = 'DDFT_InertiaSphericalInfInterval';
+    DDFTCode = 'DDFT_Inertia_1D_Spherical';
+    
     optsNum   = struct('PhysArea',Phys_Area,...
                          'PlotArea',Plot_Area,...
                          'FexNum',Fex_Num,...
-                         'DDFTCode','DDFT_InertiaSphericalInfInterval',...
+                         'DDFTCode',DDFTCode,...
                          'Tmax',tMax,'plotTimes',0:tMax/100:tMax, ...
                          'doPlots',true);
     

@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInfInterval(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,optsNum,optsPlot)
 
     if(nargin == 0)
         [data,optsPhys,optsNum,optsPlot] = Test_DDFT_InertiaInfInterval();
@@ -33,15 +33,16 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInfInterval(optsPhys,opt
     
     Fex_Num = optsNum.FexNum;
     
+    shapeClass = str2func(optsNum.PhysArea.shape);
+    aLine = shapeClass(PhysArea);
+    
+    [Pts,Diff,Int,Ind,~] = aLine.ComputeAll(optsNum.PlotArea); 
+    
+    yS               = repmat(Pts.y,1,nSpecies);
+    
     %************************************************
     %****************  Preprocess  ****************
     %************************************************ 
-    
-    aLine = InfSpectralLine(PhysArea);
-
-    [Pts,Diff,Int,Ind,~] = aLine.ComputeAll(optsNum.PlotArea); 
-
-    yS               = repmat(Pts.y,1,nSpecies);
     
     tic
     fprintf(1,'Computing Fex matrices ...');
@@ -137,20 +138,15 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInfInterval(optsPhys,opt
     %****************************************************************
     %****************  Compute time-dependent solution   ************
     %****************************************************************
-    mMx            = ones(N,1);
-    mMv            = ones(N,1);
+    mMx               = ones(N,1);
+    mMx(Ind.infinite) = 0;
+    mMv               = ones(N,1);
+    mMv(Ind.bound)    = 0;
     mM             = [mMx;mMv];
     mM = repmat(mM,nSpecies,1);
-    opts = odeset('RelTol',10^-6,'AbsTol',10^-6,'Mass',diag(mM));
-    %[~,XV_t] =  ode15s(@dxv_dt,plotTimes,xv_ic,opts);        
-
+    opts = odeset('RelTol',10^-6,'AbsTol',10^-6,'Mass',diag(mM));        
     fprintf(1,'Computing dynamics ...'); 
-    if(doHI)
-        [~,XV_t] =  ode15s(@dxv_dt_HI,plotTimes,xv_ic,opts);        
-    else
-        [~,XV_t] =  ode15s(@dxv_dt,plotTimes,xv_ic,opts);
-    end
-    
+    [~,XV_t] =  ode15s(@dxv_dt,plotTimes,xv_ic,opts);
     fprintf(1,'done.\n');
     
     t_dynSol = toc;
@@ -174,7 +170,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInfInterval(optsPhys,opt
         V_t(:,:,i)    = Vext + getVAddDVAdd1D(yS,plotTimes(i),optsPhys.V1);
     end
     
-    data       = v2struct(IntMatrFex,convStruct,HIStruct,X_t,rho_t,mu,flux_t,V_t);
+    data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
+    if(doHI)
+        data.HIStruct = HIStruct;
+    end
     data.shape = aLine;
 
     if(~isfield(optsNum,'doPlots') ...
@@ -201,13 +200,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_InertiaInfInterval(optsPhys,opt
         
         dvdt  = - gamma.*v - v.*(Diff.Dy*v) - mInv.*(Diff.Dy*mu_s);
         
-        rho_s = exp((x-Vext)/kBT);
-        HI = ComputeHI(rho_s,v,HIStruct);
+        if(doHI)
+            rho_s = exp((x-Vext)/kBT);
+            HI = ComputeHI(rho_s,v,HIStruct);
+            dvdt = dvdt - gamma.*HI;
+        end
         
-        dvdt = dvdt - gamma.*HI;
-        
-        dxdt(Ind.bound,:) = 0;
-        dvdt(Ind.bound,:) = 0;
+        dvdt(Ind.bound,:)     = v(Ind.bound,:);
+        dxdt(Ind.infinite,:)   = x(Ind.infinite,:) - x_ic(Ind.infinite,:);
 
         dxvdt = [dxdt;dvdt];
         
