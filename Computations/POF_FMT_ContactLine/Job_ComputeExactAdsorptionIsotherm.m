@@ -38,7 +38,7 @@ function Job_ComputeExactAdsorptionIsotherm()
     %***********************************************************
     %Check convergence of surface tensions and errors of conact density
     
-    config.optsPhys.V1.epsilon_w = 1.375;%47;%1.25;
+    config.optsPhys.V1.epsilon_w = 1.25; %375;%47;%1.25;
     
     CL = ContactLine(config); %CL with normal high resolution
 	CL.Preprocess();     

@@ -9,12 +9,12 @@ function data = Seppecher_M1Inf()
 %*************************************************************************   
 
     % Numerical Parameters    
-    PhysArea = struct('N',[100,20],'y2Min',0,'y2Max',20,'L1',5);
+    PhysArea = struct('N',[100,20],'y2Min',0,'y2Max',20,'L1',12);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
                        'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
                        'N1Vecs',40,'N2Vecs',6,'Hy2',3);    
-	nParticles  = 0;    
+	nParticles  = 0;
     
     % Physical Parameters
     g           = 0;
@@ -42,11 +42,11 @@ function data = Seppecher_M1Inf()
     %************************************************
     %****************  Preprocess  ******************
     %************************************************    
-    IC                        = InfCapillary(PhysArea);    
+    IC                        = InfCapillaryQuad(PhysArea);    
     [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);   
     PtsCart                   = IC.GetCartPts();
     
-    IC.SetUpBorders(100);
+    IC.SetUpBorders(300);
             
     IBB       = [Ind.bound;Ind.bound];
     bulkSolve = (~Ind.right & ~Ind.left);
@@ -72,7 +72,7 @@ function data = Seppecher_M1Inf()
 
     eps = 10^(-5);    
     figure('Name','Check accuracy of map');
-    subplot(2,2,1); IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho,'CART'); ylim([-1-eps,-1+eps]);    
+    subplot(2,2,1); IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);    
     
     for k = 1:3
         %nParticles = (pi/2 - theta)*(PhysArea.y1Max)^2;        

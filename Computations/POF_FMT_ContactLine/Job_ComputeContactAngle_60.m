@@ -49,10 +49,17 @@ function Job_ComputeContactAngle_60()
     CLT.optsNum.PlotArea.y1Max = 30;
     
     CLT.InitAnalysisGrid([-5 20],[0.5 30]);%[-5 15],[0.5 18]);
-    CLT.ComputeAdsorptionIsotherm(); %load 2014_1_22_10_9 
+    CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_22_10_9 
     CLT.PostProcess_2DDisjoiningPressure();
 
     [f1,f2] = CLT.Post_HFrom2DDisjoiningPressure();
+        
+    print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces'],f1);
+    saveas(f1,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces.fig']);
+    
+    print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure'],f2);
+    saveas(f2,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure.fig']);
+    
     %inset2(f1,f2,0.4,[0.26,0.55]);
     set(gca,'XAxisLocation','top');
     inset2(f1,f2,0.35,[0.62,0.28]);

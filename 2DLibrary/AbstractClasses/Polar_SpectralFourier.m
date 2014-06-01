@@ -233,8 +233,6 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
             end
             
         end             
-
-
     end
        
 end
