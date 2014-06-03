@@ -9,7 +9,11 @@
         ell         = res.ell;
         OmEx        = res.OmEx;
         dmuCheck    = res.dmuCheck; 
-        pts         = res.pts;
+        if(isfield(res,'pts'))
+            pts     = res.pts;
+        else
+            pts     = [];
+        end
         if(isfield(res,'rho_cont'))
             rho_cont  = res.rho_cont;
         else

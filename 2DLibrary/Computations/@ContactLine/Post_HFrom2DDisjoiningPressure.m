@@ -131,17 +131,7 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
 %        end
     end
     
-    %subplot(2,1,1);
-    plot(this.y1,h0 + h_2D,'k:','linewidth',1.5); hold on;
-    
-    plot(z,h0 + h,'k-.','linewidth',1.5);
-    plot(z2,h0 + h2,'k-.','linewidth',1.5);
-    plot(z3,h0 + h3,'k-.','linewidth',1.5);
-    plot(z4,h0 + h4,'k-.','linewidth',1.5);
-    %plot(z,h0 + h,'om');        
-    plot(this.y1,this.filmThickness,'k','linewidth',1.5);            
-    
-    optDetails.clabel = false;  
+	optDetails.clabel = false;  
 	optDetails.linecolor = 'k';
     drho = rhoLiq_sat - rhoGas_sat;
     
@@ -150,6 +140,16 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
 	optDetails.nContours = rhoGas_sat + [0.05,0.5,0.95]*drho;
 	%this.HS.doPlots(this.rho_eq,'contour',optDetails);  hold on;  
     PlotEquilibriumResults(this,[],[],true,false);
+    
+    %subplot(2,1,1);
+    plot(this.y1,h0 + h_2D,'k--','linewidth',1.5); hold on;
+    
+    plot(z,h0 + h,'k-.','linewidth',1.5);
+    plot(z2,h0 + h2,'k-.','linewidth',1.5);
+    plot(z3,h0 + h3,'k-.','linewidth',1.5);
+    plot(z4,h0 + h4,'k-.','linewidth',1.5);
+    %plot(z,h0 + h,'om');        
+    plot(this.y1,this.filmThickness,'k','linewidth',1.5);               
         
 	xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
 	ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
@@ -176,9 +176,9 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
     %subplot(2,1,2);
     f2 = figure('Color','white','Position',[0 0 1000 750]);        
     
-    dp1D = disjoiningPressure1D(h);
-    plot(this.y1,zeros(size(this.y1)),'k--'); hold on;
-    plot(this.y1,this.disjoiningPressure,'k:','linewidth',1.5); 
+    dp1D = disjoiningPressure1D(h);    
+    plot([-10 35],[0 0],'k'); hold on;
+    plot(this.y1,this.disjoiningPressure,'k--','linewidth',1.5); 
     plot(z,dp1D,'k-.','linewidth',1.5);
     plot(z2,disjoiningPressure1D(h2),'k-.','linewidth',1.5);
     plot(z3,disjoiningPressure1D(h3),'k-.','linewidth',1.5);
