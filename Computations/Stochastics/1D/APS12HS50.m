@@ -124,7 +124,7 @@ saveStoc={true,true,true,true};
 %--------------------------------------------------------------------------
 
 
-Phys_Area = struct('N',200,'L',4);
+Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
 Plot_Area = struct('N',200,'yMin',0,'yMax',8);
 Fex_Num   = struct('Fex','FMT','N',100);
 
@@ -142,19 +142,17 @@ HINum    = {[], ...
                        'HI12','JeffreyOnishi12Spherical', ...
                        'HIPreprocess', 'JeffreyOnishiPreprocessSpherical')};
 
-DDFTCode = {'DDFT_DiffusionSphericalInfInterval', ...
-            'DDFT_InertiaSphericalInfInterval', ...
-            'DDFT_DiffusionSphericalInfInterval', ...
-            'DDFT_InertiaSphericalInfInterval'};
-        
-Tmax = tMax;
-
+DDFTCode = {'DDFT_Diffusion_1D_Spherical', ...
+            'DDFT_Inertia_1D_Spherical', ...
+            'DDFT_Diffusion_1D_Spherical', ...
+            'DDFT_Inertia_1D_Spherical'};
+       
 doPlots = true;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'},...
-                   {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'},...
-                   {'PhysArea','PlotArea','FexNum','HINum','Tmax','doPlots'}};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','doPlots'},...
+                   {'PhysArea','PlotArea','FexNum','HINum','doPlots'},...
+                   {'PhysArea','PlotArea','FexNum','HINum','doPlots'}};
 
 HIParamsNamesDDFT={'sigmaH','sigma'};               
                
@@ -172,9 +170,9 @@ doDDFT={true,true,true,true};
 %doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
+%loadDDFT={true,true,true,true};
 %loadDDFT={false,true,true,true};
-%loadDDFT={false,false,false,false};
+loadDDFT={false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup

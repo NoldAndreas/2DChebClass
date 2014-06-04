@@ -10,8 +10,8 @@ stocDim=3;
 % it's one in certain places
 DDFTDim=1;
 
-%nParticlesS=[25;25];
-nParticlesS=[10;10];
+nParticlesS=[25;25];
+%nParticlesS=[10;10];
 
 kBT=1;          % temperature
 mS=[1;1];
@@ -114,7 +114,7 @@ saveStoc={true,true};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','InfSpectralLine','N',200,'L',4);
+Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
 Plot_Area = struct('N',200,'yMin',0,'yMax',10);
 Fex_Num   = struct('Fex','Meanfield','N',100,'L',2);
 

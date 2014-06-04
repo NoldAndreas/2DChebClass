@@ -96,7 +96,7 @@ stocName={'r0','rv0','r1','rv1'};
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
 %doStoc={false,false,false,false};
-doStoc={true,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -115,7 +115,7 @@ stocColour = {{'r','b'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
+Phys_Area = struct('shape','InfSpace','y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                    'y2Min',-inf,'y2Max',inf,'L2',4);
 Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
                        'y2Min',-y0,'y2Max',y0,'N2',100);
@@ -124,18 +124,15 @@ Fex_Num   = struct('Fex','Meanfield','N',[20;20],'L',2);
 
 PhysArea = {Phys_Area, Phys_Area};
 PlotArea = {Plot_Area, Plot_Area};
+FexNum   = {Fex_Num, Fex_Num};
 
-FexNum  = {Fex_Num, Fex_Num};
-
-DDFTCode = {'DDFT_DiffusionInfSpace', ...
-            'DDFT_DiffusionInfSpace'};
+DDFTCode = {'DDFT_Diffusion_2D', ...
+            'DDFT_Diffusion_2D'};
         
-Tmax = tMax;
-
 doPlots = true;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'}};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','doPlots'}};
 
 % HIParamsNamesDDFT={'sigmaH','sigma'};               
 HIParamsNamesDDFT={};
@@ -189,6 +186,6 @@ nBins=[50;50];
 doMovieGif=false;          % .gif movie
 doInitialFinal=false;
 doMeans=false;
-doEquilibria = true;
+doEquilibria = false;
 
 %sendEmail = true;

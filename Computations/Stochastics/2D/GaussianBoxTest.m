@@ -102,8 +102,7 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-%doStoc={false,false,false,false};
-doStoc={true,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -122,7 +121,7 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('N',[30,30],'L1',L1S,'L2',L2S);
+Phys_Area = struct('shape','Box','N',[30,30],'L1',L1S,'L2',L2S);
 Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',100,...
                        'y2Min',0,'y2Max',L2S,'N2',100);
 Fex_Num   = struct('Fex','Meanfield','N',[20;20],'L',2);
@@ -133,8 +132,8 @@ PlotArea = {Plot_Area, Plot_Area};
 
 FexNum  =  {Fex_Num, Fex_Num};
 
-DDFTCode = {'DDFT_DiffusionBox', ...
-            'DDFT_DiffusionBox'};
+DDFTCode = {'DDFT_Diffusion_2D', ...
+            'DDFT_Diffusion_2D'};
         
 doPlots = true;
 
@@ -167,8 +166,8 @@ DDFTColour = {{'g'},{'m'}};
 plotType = 'surf';
 
 % x axis for position and velocity plots
-rMin=[0;0];
-rMax=[L1S;L2S];
+% rMin=[0;0];
+% rMax=[L1S;L2S];
 rMin=[-2;-2];
 rMax=[L1S+2;L2S+2];
 

@@ -182,17 +182,19 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     %****************  Postprocess  ****************
     %************************************************        
 
+    nPlots = length(plotTimes);
+    
     X_t = X_t';
     
-    rho_t     = exp((X_t-Vext(:)*ones(1,length(plotTimes)))/kBT);
+    rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
     
-    X_t       = reshape(X_t,N1*N2,nSpecies,length(plotTimes));
-    rho_t     = reshape(rho_t,N1*N2,nSpecies,length(plotTimes));
-    flux_t    = zeros(2*N1*N2,nSpecies,length(plotTimes));
-    V_t       = zeros(N1*N2,nSpecies,length(plotTimes));
+    X_t       = reshape(X_t,N1*N2,nSpecies,nPlots);
+    rho_t     = reshape(rho_t,N1*N2,nSpecies,nPlots);
+    flux_t    = zeros(2*N1*N2,nSpecies,nPlots);
+    V_t       = zeros(N1*N2,nSpecies,nPlots);
     
     if(doSubArea)
-        accFlux   = zeros(length(plotTimes),1);
+        accFlux   = zeros(nPlots,1);
     end
     
     for i = 1:length(plotTimes)

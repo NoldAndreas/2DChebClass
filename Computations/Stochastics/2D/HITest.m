@@ -102,8 +102,8 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-doStoc={true,false,true,false};
-%doStoc={false,false,false,false};
+%doStoc={true,false,true,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -122,7 +122,7 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
+Phys_Area = struct('shape','InfSpace','y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                        'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Plot_Area = struct('y1Min',-y0,'y1Max',y0,'N1',100,...
@@ -198,7 +198,7 @@ nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = true;          % .gif movie
+doMovieGif     = false;          % .gif movie
 doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;

@@ -167,12 +167,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     %****************  Post process                      ************
     %****************************************************************
     
+    nPlots = length(plotTimes);
+    
     X_t = X_t.';
     X_t = reshape(X_t,[],nSpecies,size(X_t,2));
     
-    rho_t     = zeros(N,nSpecies,length(plotTimes));
-    flux_t    = zeros(N,nSpecies,length(plotTimes));
-    V_t       = zeros(N,nSpecies,length(plotTimes));
+    rho_t     = zeros(N,nSpecies,nPlots);
+    flux_t    = zeros(N,nSpecies,nPlots);
+    V_t       = zeros(N,nSpecies,nPlots);
     for i = 1:length(plotTimes)
         x_t = mirror(X_t(:,:,i));
         rho_t(:,:,i)  = exp((x_t-Vext)/kBT);

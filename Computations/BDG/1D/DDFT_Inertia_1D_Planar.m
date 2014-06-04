@@ -156,15 +156,17 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
     %****************************************************************
     %****************  Post process                      ************
     %****************************************************************
-        
+    
+    nPlots = length(plotTimes);
+    
     XV_t = XV_t.';
     XV_t = reshape(XV_t,[],nSpecies,size(XV_t,2));
     
     X_t  = XV_t(1:end/2,:,:);
     
-    rho_t     = zeros(N,nSpecies,length(plotTimes));
+    rho_t     = zeros(N,nSpecies,nPlots);
     flux_t    = XV_t(end/2+1:end,:,:).*XV_t(1:end/2,:,:);
-    V_t       = zeros(N,nSpecies,length(plotTimes));
+    V_t       = zeros(N,nSpecies,nPlots);
     for i = 1:length(plotTimes)
         rho_t(:,:,i)  = exp((X_t(:,:,i)-Vext)/kBT);
         V_t(:,:,i)    = Vext + getVAddDVAdd1D(yS,plotTimes(i),optsPhys.V1);

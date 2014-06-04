@@ -154,12 +154,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Planar(optsPhys,op
     %****************  Post process                      ************
     %****************************************************************
     
+    nPlots = length(plotTimes);
+    
     X_t = X_t.';
     X_t = reshape(X_t,[],nSpecies,size(X_t,2));
     
-    rho_t     = zeros(N,nSpecies,length(plotTimes));
-    flux_t    = zeros(N,nSpecies,length(plotTimes));
-    V_t       = zeros(N,nSpecies,length(plotTimes));
+    rho_t     = zeros(N,nSpecies,nPlots);
+    flux_t    = zeros(N,nSpecies,nPlots);
+    V_t       = zeros(N,nSpecies,nPlots);
     for i = 1:length(plotTimes)
         rho_t(:,:,i)  = exp((X_t(:,:,i)-Vext)/kBT);
         if(doHI)
