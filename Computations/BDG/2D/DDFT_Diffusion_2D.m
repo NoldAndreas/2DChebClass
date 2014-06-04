@@ -31,6 +31,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     D0 = 1./(gamma.*m);
     
     plotTimes    = optsNum.plotTimes;
+
+    if(isfield(optsPhys,'HSBulk'))
+        HS_f       = str2func(optsPhys.HSBulk);  
+    elseif(isfield(optsNum,'HSBulk'))
+        HS_f       = str2func(optsNum.HSBulk); 
+    else
+        HS_f       = @ZeroMap;
+    end   
     
     getFex = str2func(['Fex_',optsNum.FexNum.Fex]);
     
@@ -290,7 +298,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
            mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
         end
 
-        mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
+        mu_s = mu_s + x + HS_f(rho_s,kBT) + getVAdd(y1S,y2S,t,optsPhys.V1);
                    
     end
 
@@ -317,5 +325,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
         [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
     end
 
+    function [muSC,fnCS] = ZeroMap(~,~)
+        muSC = 0;
+        fnCS = 0;
+    end
 
 end

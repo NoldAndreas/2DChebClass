@@ -97,9 +97,8 @@ stocHIType={[],[]};
 stocName={'r0','rv0'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true};
-%doStoc={true,false,false,false};
-%doStoc={false,false,false,false};
+%doStoc={true,true};
+doStoc={false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true};
@@ -115,22 +114,21 @@ saveStoc={true,true};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-PhysArea = {struct('N',200,'L',4), ...
-            struct('N',200,'L',4)};
-PlotArea = {struct('N',200,'yMin',0,'yMax',10), ...
-            struct('N',200,'yMin',0,'yMax',10)};
-FexNum   = {struct('Fex','Meanfield','N',100,'L',2), ...
-            struct('Fex','Meanfield','N',100,'L',2)};
+Phys_Area = struct('shape','InfSpectralLine','N',200,'L',4);
+Plot_Area = struct('N',200,'yMin',0,'yMax',10);
+Fex_Num   = struct('Fex','Meanfield','N',100,'L',2);
 
-DDFTCode = {'DDFT_DiffusionSphericalInfInterval', ...
-            'DDFT_InertiaSphericalInfInterval'};
+PhysArea = {Phys_Area,Phys_Area};
+PlotArea = {Plot_Area,Plot_Area};
+FexNum   = {Fex_Num,Fex_Num};
+
+DDFTCode = {'DDFT_Diffusion_1D_Spherical', ...
+            'DDFT_Inertia_1D_Spherical'};
         
-Tmax = tMax;
-
 doPlots = true;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','Tmax','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','Tmax','doPlots'}};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
+                   {'PhysArea','PlotArea','FexNum','doPlots'}};
                            
 DDFTName={'r0','rv0'};
 
