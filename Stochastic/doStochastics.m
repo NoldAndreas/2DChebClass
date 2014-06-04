@@ -58,6 +58,8 @@ function stocStruct=doStochastics(optsPhys,optsStocFull)
 %                  (nSamples, dim x nParticles)
 
 
+global dirData;
+
 % number of stochastic calculations to do
 nStoc=length(optsStocFull);
 
@@ -95,7 +97,9 @@ opts.optsStoc = optsStocI;
 
 ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
-xInitial = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
+[xInitial,~,Parameters] = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
+
+ICFilename = [dirData filesep ICDir filesep Parameters.Filename];
 
 fprintf(1,'Finished\n');
 
@@ -114,13 +118,16 @@ if(sampleFinal)
 
     FCDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final'];
     
-    xFinal = DataStorage(FCDir,@samplepdf,opts,[],~loadSamples);
+    [xFinal,~,Parameters] = DataStorage(FCDir,@samplepdf,opts,[],~loadSamples);
 
+    FCFilename = [dirData filesep FCDir filesep Parameters.Filename];
+    
     fprintf(1,'Finished\n');
     
 else
     % return empty data and don't save
-    xFinal=[];            
+    xFinal=[];    
+    FCFilename = [];
 end
 
 %--------------------------------------------------------------------------
@@ -151,8 +158,10 @@ if(MBp && doP)
     
     pDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Momentum'];
     
-    pIF = DataStorage(pDir,@samplepdf,opts,[],~loadSamples);
+    [pIF,~,Parameters] = DataStorage(pDir,@samplepdf,opts,[],~loadSamples);
 
+    pFilename = [dirData filesep pDir filesep Parameters.Filename];
+    
     fprintf(1,'Finished\n');
     
 else
@@ -160,6 +169,7 @@ else
     fprintf(1,'Using zero momentum ... ');
     
     pIF=zeros(optsStoc.nSamples,optsPhys(1).nParticles*optsPhys(1).dim);
+    pFilename = [];
     
     fprintf(1,'Finished\n');
 end    
@@ -199,8 +209,8 @@ for iStoc=1:nStoc
 
     dynDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Dynamics'];
             
-    xpStruct = DataStorage(dynDir,@stochasticStatistics,opts,ICStruct,~loadStoc);
-            
+    [xpStruct,~,Parameters] = DataStorage(dynDir,@stochasticStatistics,opts,ICStruct,~loadStoc);
+    
     % store in output structure
     stocStruct(iStoc).x=xpStruct.x;
     stocStruct(iStoc).p=xpStruct.p;
@@ -209,6 +219,11 @@ for iStoc=1:nStoc
     stocStruct(iStoc).xFinal=xFinal;
     stocStruct(iStoc).pIF=pIF;
 
+    stocStruct(iStoc).Filename = [dirData filesep dynDir filesep Parameters.Filename];
+    stocStruct(iStoc).ICFilename = ICFilename;
+    stocStruct(iStoc).FCFilename = FCFilename;
+    stocStruct(iStoc).pFilename = pFilename;
+    
     fprintf(1,'Finished\n');
 end
 

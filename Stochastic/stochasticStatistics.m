@@ -137,42 +137,44 @@ parfor iRun=1:nRuns
  
     % do dynamics
     [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
-    
-    task   = getCurrentTask();
-    worker = task.ID;
 
-    fid = fopen(tempFile{worker},'r'); %#ok
-    oldProgress = fscanf(fid,'%f');
-    fclose(fid);
-    
-    fid = fopen(tempFile{worker},'w');
-    newProgress = oldProgress + 100/nRuns;
-    fprintf(fid,num2str(newProgress));
-    fclose(fid);
-  
-    if(worker == 1)
-        progress = 0;
+    if(poolsize>1)
+        task   = getCurrentTask();
+        worker = task.ID;
 
-        for iWorker = 1:poolsize
-            fid = fopen(tempFile{iWorker},'r');
-            progress = progress + fscanf(fid,'%f');
-            fclose(fid);
-        end
-        
-        progString = num2str(progress,printFormat);
-        if(length(progString)==printLength)
-            disp(delString);
-            
-            tTaken = etime(clock,tStart);
-            tLeft  = (100-progress)/progress*tTaken;
-            tEst   = addtodate(now,round(tLeft),'second');
-            tString    = datestr(tEst);
-            
-            disp([progString '%']);
-            disp(tString);
+        fid = fopen(tempFile{worker},'r'); %#ok
+        oldProgress = fscanf(fid,'%f');
+        fclose(fid);
+
+        fid = fopen(tempFile{worker},'w');
+        newProgress = oldProgress + 100/nRuns;
+        fprintf(fid,num2str(newProgress));
+        fclose(fid);
+
+        if(worker == 1)
+            progress = 0;
+
+            for iWorker = 1:poolsize
+                fid = fopen(tempFile{iWorker},'r');
+                progress = progress + fscanf(fid,'%f');
+                fclose(fid);
+            end
+
+            progString = num2str(progress,printFormat);
+            if(length(progString)==printLength)
+                disp(delString);
+
+                tTaken = etime(clock,tStart);
+                tLeft  = (100-progress)/progress*tTaken;
+                tEst   = addtodate(now,round(tLeft),'second');
+                tString    = datestr(tEst);
+
+                disp([progString '%']);
+                disp(tString);
+            end
         end
     end
-
+        
 end
 
 

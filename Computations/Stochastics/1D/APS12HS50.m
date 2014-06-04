@@ -80,18 +80,18 @@ tMax=2.5;
 % only relevant if fixedInitial=false or sampleFinal=true
 %nSamples=50000;  
 
-nSamples=500000;  
+nSamples=500;  
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=2000;
+nRuns=2;
 
 %nRuns = 1000;
 
 % number of cores to use in parallel processing
-poolsize=12;
-%poolsize=1;
+%poolsize=12;
+poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r','rv','r','rv'};
@@ -106,14 +106,14 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-%doStoc={true,false,false,false};
-doStoc={false,false,false,false};
+doStoc={true,true,false,false};
+%doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={2*10^4,2*10^4,2*10^4,2*10^4};
+tSteps={10^4,10^4,2*10^4,2*10^4};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
@@ -170,9 +170,9 @@ doDDFT={true,true,true,true};
 %doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
-%loadDDFT={true,true,true,true};
+loadDDFT={true,true,true,true};
 %loadDDFT={false,true,true,true};
-loadDDFT={false,false,false,false};
+%loadDDFT={false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -238,7 +238,7 @@ doMovieGif=false;          % .gif movie
 doPdfs=false;              % .pdfs to make .swf
 doMovieSwf=false;          % .swf movie
 doInitialFinal=false;
-doMeans=true;
+doMeans=false;
 
 % particle movies/plots
 doInitialFinalP=false;

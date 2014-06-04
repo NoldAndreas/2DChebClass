@@ -46,6 +46,8 @@ lineStyles   = optsPlot.lineStyleDDFT;
 lineMarkers  = optsPlot.lineMarkerDDFT;
 lineColours  = optsPlot.lineColourDDFT;
 
+global dirData;
+
 % do each calculation
 for iDDFT=1:nDDFT
     % get relevant options
@@ -78,8 +80,10 @@ for iDDFT=1:nDDFT
             
     DDFTdir = [potNames filesep 'DDFT' filesep optsDDFT.DDFTCode];            
     
-    DDFTStruct = DataStorage(DDFTdir,@DDFTwrapper,opts,optsPlot,~loadDDFT);
-                
+    [DDFTStruct,~,Parameters] = DataStorage(DDFTdir,@DDFTwrapper,opts,optsPlot,~loadDDFT);
+
+    DDFTStruct.Filename = [dirData filesep DDFTdir filesep Parameters.Filename];
+    
     % save to full structure
     DDFTStructFull(iDDFT)=orderfields(DDFTStruct);  %#ok
     
