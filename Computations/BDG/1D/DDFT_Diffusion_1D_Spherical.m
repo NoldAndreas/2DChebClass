@@ -127,8 +127,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     paramsIC.fsolveOpts = fsolveOpts;
     
     fprintf(1,'Computing initial condition ...');        
-    [x_ic,flag]     = DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
+    eqStruct= DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
     fprintf(1,'done.\n');
+    
+    x_ic = eqStruct.x_ic;
+    flag = eqStruct.flag;
     
     if(flag<0)
         fprintf(1,'fsolve failed to converge\n');
@@ -189,6 +192,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
     data.shape = aLine;
     data.shape.Int = IntNP;
+    if(doHI)
+        data.HIStruct = HIStruct;
+    end
 
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
@@ -284,17 +290,19 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     end
 
     function xOut = mirror(x)
-        % flip for negative spacial part
+        % flip for negative spatial part
         xOut = [flipdim(x,1); x];
     end
 
     function xOut = cut(x)
-        % remove negative spacial part
+        % remove negative spatial part
         xOut = x(end/2+1:end,:);
     end
 
-    function [y,flag] = ComputeEquilibrium(params,y0)      
-        [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
+    function eqStruct = ComputeEquilibrium(params,y0)      
+        [y,status]   = fsolve(@f,y0,params.fsolveOpts);
+        eqStruct.x_ic = y;
+        eqStruct.flag = status;
     end
 
 

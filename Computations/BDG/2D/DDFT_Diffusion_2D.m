@@ -133,8 +133,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     paramsIC.fsolveOpts = fsolveOpts;
     
     fprintf(1,'Computing initial condition ...');        
-    [x_ic,flag]     = DataStorage(['EquilibriumData' filesep class(IDC)],@ComputeEquilibrium,paramsIC,x_ic0);
+    eqStruct = DataStorage(['EquilibriumData' filesep class(IDC)],@ComputeEquilibrium,paramsIC,x_ic0);
     fprintf(1,'done.\n');
+    
+    x_ic = eqStruct.x_ic;
+    flag = eqStruct.flag;
     
     if(flag<0)
         fprintf(1,'fsolve failed to converge\n');
@@ -322,9 +325,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     %***************************************************************
     %Auxiliary functions:
     %***************************************************************
-
-    function [y,flag] = ComputeEquilibrium(params,y0)      
-        [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
+    
+    function eqStruct = ComputeEquilibrium(params,y0)      
+        [y,status]   = fsolve(@f,y0,params.fsolveOpts);
+        eqStruct.x_ic = y;
+        eqStruct.flag = status;
     end
 
     function [muSC,fnCS] = ZeroMap(~,~)

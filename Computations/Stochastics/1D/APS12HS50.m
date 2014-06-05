@@ -106,8 +106,8 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-doStoc={true,true,false,false};
-%doStoc={false,false,false,false};
+%doStoc={true,true,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -147,7 +147,7 @@ DDFTCode = {'DDFT_Diffusion_1D_Spherical', ...
             'DDFT_Diffusion_1D_Spherical', ...
             'DDFT_Inertia_1D_Spherical'};
        
-doPlots = true;
+doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
                    {'PhysArea','PlotArea','FexNum','doPlots'},...
@@ -164,15 +164,15 @@ DDFTName={'r0','rv0','r1','rv1'};
 DDFTType={'r','rv','r','rv'};
 
 % whether to do DDFT calculations
+%doDDFT={true,true,true,true};
 doDDFT={true,true,true,true};
-%doDDFT={true,false,true,false};
 %doDDFT={false,false,true,true};
 %doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
-%loadDDFT={false,true,true,true};
-%loadDDFT={false,false,false,false};
+%loadDDFT={true,true,true,true};
+%loadDDFT={true,true,true,true};
+loadDDFT={false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -238,7 +238,7 @@ doMovieGif=false;          % .gif movie
 doPdfs=false;              % .pdfs to make .swf
 doMovieSwf=false;          % .swf movie
 doInitialFinal=false;
-doMeans=false;
+doMeans=true;
 
 % particle movies/plots
 doInitialFinalP=false;

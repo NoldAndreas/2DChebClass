@@ -115,8 +115,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
     paramsIC.fsolveOpts = fsolveOpts;
     
     fprintf(1,'Computing initial condition ...');        
-    [x_ic,flag]     = DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
+    eqStruct = DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
     fprintf(1,'done.\n');
+    
+    x_ic = eqStruct.x_ic;
+    flag = eqStruct.flag;
     
     if(flag<0)
         fprintf(1,'fsolve failed to converge\n');
@@ -173,10 +176,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
     end
     
     data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
+    data.shape = aLine;
     if(doHI)
         data.HIStruct = HIStruct;
     end
-    data.shape = aLine;
+    
 
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
@@ -245,8 +249,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
         mu = zeros(size(rho_s));
     end
 
-    function [y,flag] = ComputeEquilibrium(params,y0)      
-        [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
+    function eqStruct = ComputeEquilibrium(params,y0)      
+        [y,status]   = fsolve(@f,y0,params.fsolveOpts);
+        eqStruct.x_ic = y;
+        eqStruct.flag = status;
     end
 
 end

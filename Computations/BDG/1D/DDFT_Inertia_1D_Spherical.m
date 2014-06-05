@@ -54,7 +54,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Spherical(optsPhys,o
        
     yS               = repmat(Pts.y,1,nSpecies);
     
-        tic
+    tic
     fprintf(1,'Computing Fex matrices ...');
     paramsFex.V2       = optsPhys.V2;
     paramsFex.kBT      = optsPhys.kBT;
@@ -127,8 +127,11 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Spherical(optsPhys,o
     paramsIC.fsolveOpts = fsolveOpts;
     
     fprintf(1,'Computing initial condition ...');        
-    [x_ic,flag]     = DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
+    eqStruct = DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
     fprintf(1,'done.\n');
+    
+    x_ic = eqStruct.x_ic;
+    flag = eqStruct.flag;
     
     if(flag<0)
         fprintf(1,'fsolve failed to converge\n');
@@ -192,6 +195,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Spherical(optsPhys,o
     data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
     data.shape = aLine;
     data.shape.Int = IntNP;
+    if(doHI)
+        data.HIStruct = HIStruct;
+    end
+    
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
         PlotDDFT1D(v2struct(optsPhys,optsNum,data));       
@@ -276,7 +283,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Spherical(optsPhys,o
     end
 
     function vOut = mirrorV(v)
-        % flip for negative spatial part and change sign
+        % flip for negative velocity part and change sign
         vOut = [-flipdim(v,1); v];
     end
 
@@ -285,8 +292,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Spherical(optsPhys,o
         xOut = x(end/2+1:end,:);
     end
 
-    function [y,flag] = ComputeEquilibrium(params,y0)      
-        [y,flag]   = fsolve(@f,y0,params.fsolveOpts); 
+    function eqStruct = ComputeEquilibrium(params,y0)      
+        [y,status]   = fsolve(@f,y0,params.fsolveOpts);
+        eqStruct.x_ic = y;
+        eqStruct.flag = status;
     end
 
 
