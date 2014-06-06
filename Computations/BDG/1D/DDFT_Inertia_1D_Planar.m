@@ -89,6 +89,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
         fprintf(1,'done.\n');
         t_HI = toc;
         display(['HI computation time (sec): ', num2str(t_HI)]); 
+    else
+        HIStruct = [];
     end
        
     %****************************************************************
@@ -175,12 +177,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
         V_t(:,:,i)    = Vext + getVAddDVAdd1D(yS,plotTimes(i),optsPhys.V1);
     end
     
-    data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
-    data.shape = aLine;
-    if(doHI)
-        data.HIStruct = HIStruct;
-    end
-    
+    data       = v2struct(IntMatrFex,convStruct,HIStruct,X_t,rho_t,mu,flux_t,V_t);
+    data.shape = aLine;    
 
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )

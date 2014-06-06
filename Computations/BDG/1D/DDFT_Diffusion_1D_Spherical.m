@@ -99,6 +99,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
         fprintf(1,'done.\n');
         t_HI = toc;
         display(['HI computation time (sec): ', num2str(t_HI)]); 
+    else
+        HIStruct = [];
     end
           
     %****************************************************************
@@ -189,12 +191,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
         V_t(:,:,i)    = Vext + getVAddDVAdd1D(yS,plotTimes(i),optsPhys.V1);
     end
     
-    data       = v2struct(IntMatrFex,convStruct,X_t,rho_t,mu,flux_t,V_t);
+    data       = v2struct(IntMatrFex,convStruct,HIStruct,X_t,rho_t,mu,flux_t,V_t);
     data.shape = aLine;
     data.shape.Int = IntNP;
-    if(doHI)
-        data.HIStruct = HIStruct;
-    end
 
     if(~isfield(optsNum,'doPlots') ...
             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )

@@ -171,8 +171,8 @@ doDDFT={true,true,true,true};
 
 % do we load and save the DDFT data
 %loadDDFT={true,true,true,true};
-%loadDDFT={true,true,true,true};
-loadDDFT={false,false,false,false};
+loadDDFT={true,true,true,true};
+%loadDDFT={false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -238,7 +238,7 @@ doMovieGif=false;          % .gif movie
 doPdfs=false;              % .pdfs to make .swf
 doMovieSwf=false;          % .swf movie
 doInitialFinal=false;
-doMeans=true;
+doMeans=false;
 
 % particle movies/plots
 doInitialFinalP=false;
