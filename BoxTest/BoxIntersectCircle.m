@@ -138,13 +138,12 @@ edgeIn = (Nin || Sin || Ein || Win);
 edgeOut = (Nout || Sout || Eout || Wout);
 
 if(central)
-    shape.N = [20;20];
+    shape.N = 20;
     shape.R = R;
-    area = Disc(shape);
+    line = Circle(shape);
 
 elseif(corner)
-    shape.NT = [10;10];
-    shape.NS = [20;20];
+    shape.N = 20;
     shape.Origin = [y10;y20];
     shape.R = R;
     
@@ -162,7 +161,7 @@ elseif(corner)
         shape.CornerPos = [right;bottom];
     end
     
-    area = CornerDisc(shape);
+    line = CornerCircle(shape);
     
 elseif(doubleCut)
     shape.NT = [10;10];
@@ -231,26 +230,29 @@ else
     area = [];
 end
 
-shapeD.N = [20;20];
-shapeD.R = R;
-areaD = Disc(shapeD);
+shapeC.N = 20;
+shapeC.R = R;
+lineC = Circle(shapeC);
 
-if(~isempty(area))
-    dataDisk.pts       = area.GetCartPts();           
+if(~isempty(line))
+  
     %dataDisk.ptsPolLoc = Cart2PolPts(dataDisk.pts);
     
     if(central)
-        dataDisk.pts.y1_kv = dataDisk.pts.y1_kv + y10;
-        dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
+        dataCircle.pts       = Pol2CartPts(line.Pts); 
+        dataCircle.pts.y1_kv = dataCircle.pts.y1_kv + y10;
+        dataCircle.pts.y2_kv = dataCircle.pts.y2_kv + y20;
+    else
+        dataCircle.pts = line.Pts;
     end
     
-    fullDisk.pts = areaD.GetCartPts();
-    fullDisk.pts.y1_kv = fullDisk.pts.y1_kv + y10;
-    fullDisk.pts.y2_kv = fullDisk.pts.y2_kv + y20;
+    fullCircle.pts = Pol2CartPts(lineC.Pts);
+    fullCircle.pts.y1_kv = fullCircle.pts.y1_kv + y10;
+    fullCircle.pts.y2_kv = fullCircle.pts.y2_kv + y20;
     
-    scatter(fullDisk.pts.y1_kv,fullDisk.pts.y2_kv,'b');
+    scatter(fullCircle.pts.y1_kv,fullCircle.pts.y2_kv,'b');
     hold on;
-    scatter(dataDisk.pts.y1_kv,dataDisk.pts.y2_kv,'r');
+    scatter(dataCircle.pts.y1_kv,dataCircle.pts.y2_kv,'r');
     
 end
 
