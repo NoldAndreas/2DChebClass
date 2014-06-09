@@ -6,10 +6,6 @@ R = 2;
 xw = 1;
 yw = 3;
 
-x0 = xw + R*(2*rand-1);
-y0 = yw + R*(2*rand-1);
-
-
 figure
 hold on
 
