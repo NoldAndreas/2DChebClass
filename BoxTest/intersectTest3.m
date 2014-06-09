@@ -22,6 +22,9 @@ plot(xlim(gca),[yw+R,yw+R],'Color','b','LineWidth',2,'LineStyle','--')
 
 [x0,y0] = ginput(1);
 
+% x0 = xw - 0.32*R;
+% y0 = yw - 0.5*R;
+
 originInDisc = ( (x0-xw)^2 + (y0-yw)^2 <= R^2);
 
 if(originInDisc)
