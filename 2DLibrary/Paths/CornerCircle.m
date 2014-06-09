@@ -31,13 +31,21 @@ classdef CornerCircle < SpectralPath
                     yi2 = this.Origin(2) + dw2;
                     this.th1 = - atan((this.Origin(2)-this.CornerPos(2))/(yi1-this.Origin(1)));
                     this.th2 = pi/2 + atan((this.Origin(1)-this.CornerPos(1))/(yi2-this.Origin(2)));
-
                 case 'NW'
-
+                    yi1 = this.Origin(1) + dw1;
+                    yi2 = this.Origin(2) - dw2;
+                    this.th1 = atan( (this.CornerPos(2) - this.Origin(2))/(yi1 - this.Origin(1)) );
+                    this.th2 = - pi/2 - atan( (this.Origin(1) - this.CornerPos(1))/(this.Origin(2) - yi2) );
                 case 'NE'
-
+                    yi1 = this.Origin(1) - dw1;
+                    yi2 = this.Origin(2) - dw2;
+                    this.th1 = pi - atan( (this.CornerPos(2) - this.Origin(2))/(this.Origin(1) - yi1) );
+                    this.th2 = 3*pi/2 + atan( (this.CornerPos(1) - this.Origin(1))/(this.Origin(2) - yi2) );
                 case 'SE'
-
+                    yi1 = this.Origin(1) - dw1;
+                    yi2 = this.Origin(2) + dw2;
+                    this.th1 = pi/2 - atan( (this.CornerPos(1) - this.Origin(1))/(yi2 - this.Origin(2)));
+                    this.th2 = pi + atan( (this.Origin(2) - this.CornerPos(2))/(this.Origin(1) - yi1) );
             end
             
             

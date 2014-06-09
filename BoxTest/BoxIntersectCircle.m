@@ -164,9 +164,7 @@ elseif(corner)
     line = CornerCircle(shape);
     
 elseif(doubleCut)
-    shape.NT = [10;10];
-    shape.NW = [20;20];
-
+    shape.N = 20;
     shape.Origin = [y10;y20];
     shape.R = R;
     
@@ -184,7 +182,7 @@ elseif(doubleCut)
         shape.CornerPos = [right;bottom];
     end
     
-    area = DoubleCutDisc(shape);
+    line = DoubleCutCircle(shape);
 
     
 elseif(edgeIn)
