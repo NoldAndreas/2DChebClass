@@ -1,4 +1,4 @@
-function HIStruct = HIMatrices2D(opts,IDC)
+function HIStruct = HIMatrices2D_FMT(opts,IDC)
 
     optsPhys = opts.optsPhys;
     optsNum  = opts.optsNum;
@@ -12,11 +12,13 @@ function HIStruct = HIMatrices2D(opts,IDC)
     params = optsPhys.HI;
     optsNum = optsNum.HINum;
     
+    isfield(params,'HIPreprocess')
+    
     if(isfield(optsNum,'HIPreprocess'))
         fPreprocess = str2func(optsNum.HIPreprocess);
         params = fPreprocess(params);
     end
-   
+    
     f11      = str2func(optsNum.HI11);
     f12      = str2func(optsNum.HI12);
     
@@ -31,7 +33,7 @@ function HIStruct = HIMatrices2D(opts,IDC)
     elseif(isfield(IDC,'L'))
         params.L = IDC.L;
     end
-        
+    
     paramNames = fieldnames(params);
     nParams = length(paramNames);
     
@@ -41,8 +43,20 @@ function HIStruct = HIMatrices2D(opts,IDC)
         for jS = iS:nSpecies
             paramsIJ = getIJParams(iS,jS);
 
-            HITemp11 = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  
-            HITemp12 = IDC.ComputeConvolutionMatrix(@F12,paramsIJ); 
+            HITemp11_Full = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  
+            HITemp12_Full = IDC.ComputeConvolutionMatrix(@F12,paramsIJ); 
+            
+            
+            
+            HITemp11_Disc = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  
+            HITemp12_Disc = IDC.ComputeConvolutionMatrix(@F12,paramsIJ); 
+            
+            paramsIJ = rmfield(paramsIJ,'R');
+            
+       
+            
+            HITemp11 = HITemp11_Full - HITemp11_Disc;
+            HITemp12 = HITemp12_Full - HITemp12_Disc;
             
             HIInt11 = [HITemp11(:,:,1,1), HITemp11(:,:,1,2) ; ...
                        HITemp11(:,:,2,1), HITemp11(:,:,2,2) ];
@@ -60,11 +74,15 @@ function HIStruct = HIMatrices2D(opts,IDC)
 
     %--------------------------------------------------------------------------
     function z = F11(x,y)         
-        z = f11(x,y,paramsIJ);                    
+        paramsIJ.HIfn = f11;
+        %z = f11(x,y,paramsIJ);
+        z = MollifyHIFunction(x,y,paramsIJ);
     end
 
-    function z = F12(x,y)         
-        z = f12(x,y,paramsIJ);                    
+    function z = F12(x,y) 
+        paramsIJ.HIfn = f12;
+        %z = f12(x,y,paramsIJ);
+        z = MollifyHIFunction(x,y,paramsIJ);
     end
 
     function paramsIJ = getIJParams(iS,jS)

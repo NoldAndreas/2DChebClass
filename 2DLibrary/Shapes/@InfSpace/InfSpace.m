@@ -71,7 +71,7 @@ classdef InfSpace < SpectralSpectral
 
             if(isfield(shapeParams,'R'))
                 subShape = Disc(shapeParams);
-                rRange = (-1:0.05:1)';
+                rRange = (-1:0.05:1)';   
             elseif(isfield(shapeParams,'RMin'))
                 if(isfield(shapeParams,'RMax'))
                     subShape = Annulus(shapeParams);

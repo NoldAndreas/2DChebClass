@@ -1,9 +1,11 @@
 clear all
 
-data =  TestFMT_DDFT_DiffusionInfSpace_HI_switch(0);
-data_HI = TestFMT_DDFT_DiffusionInfSpace_HI_switch(1);
+[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(false);
 
-struct(1) = data;
-struct(2) = data_HI;
+output(1) = v2struct(optsPhys,optsNum,data);
 
-PlotMultipleDDFTs2D(struct);
+[data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(true);
+
+output(2) = v2struct(optsPhys,optsNum,data);
+
+PlotMultipleDDFTs2D(output);
