@@ -1,18 +1,46 @@
 classdef ArcNSEW < SpectralPath
     properties
-        R,th1,th2
+        R,h,th1,th2
+        % h>0 => inside box
         Origin = [0,0]
+        WallPos = 'S';
     end
     
     methods
         function this = ArcNSEW(Geometry)
             this@SpectralPath(Geometry.N,'polar');
+           
+            if(isfield(Geometry,'Origin'))
+                this.Origin = Geometry.Origin;
+            end
+            if(isfield(Geometry,'WallPos'))
+                this.WallPos = Geometry.WallPos;
+            end
             
             this.R      = Geometry.R;
-            this.th1    = Geometry.th1;
-            this.th2    = Geometry.th2;                       
+            this.h      = Geometry.h;
             
-            InitializationPts(this);            
+            th = acos(-this.h/this.R);
+            
+            switch this.WallPos
+                case 'N'
+                    this.th1   = 3/2*pi-th;            
+                    this.th2   = 3/2*pi+th;
+                case 'S'
+                    this.th1   = pi/2+th;
+                    this.th2   = pi/2-th;
+                case 'E'
+                    this.th1   = pi+th;
+                    this.th2   = pi-th;
+                case 'W'
+                    this.th1   = -th;
+                    this.th2   = th;
+            end
+
+            InitializationPts(this);   
+            
+            ShiftArc(this);
+            
         end
         
         function [y1 ,y2 , dy1_dt , dy2_dt ]  = f_path(this,t)
@@ -35,6 +63,12 @@ classdef ArcNSEW < SpectralPath
                 disp(['Arc: Error of integration of length(ratio): ',...
                                         num2str(1-sum(this.IntSc)/length)]);
             end
+        end
+        
+        function ShiftArc(this)
+            this.Pts = Pol2CartPts(this.Pts);
+            this.Pts.y1_kv = this.Pts.y1_kv + this.Origin(1);
+            this.Pts.y2_kv = this.Pts.y2_kv + this.Origin(2);
         end
 
     end

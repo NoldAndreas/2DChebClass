@@ -141,7 +141,10 @@ if(central)
     shape.N = 20;
     shape.R = R;
     line = Circle(shape);
-
+    line.Pts       = Pol2CartPts(line.Pts); 
+    line.Pts.y1_kv = line.Pts.y1_kv + y10;
+    line.Pts.y2_kv = line.Pts.y2_kv + y20;
+    line.polar = 'cart';
 elseif(corner)
     shape.N = 20;
     shape.Origin = [y10;y20];
@@ -184,48 +187,29 @@ elseif(doubleCut)
     
     line = DoubleCutCircle(shape);
 
-    
-elseif(edgeIn)
-    shape.NW = [20;20];
-    shape.NT = [10;10];
+elseif(edgeIn || edgeOut)
+    shape.N = 20;
     shape.R  = R;
     shape.Origin = [y10;y20];
-    if(Sin)
+    if(Sin || Sout)
         shape.h = y20 - bottom;
         shape.WallPos = 'S';
-    elseif(Nin)
+    elseif(Nin || Nout)
         shape.h = top - y20;
         shape.WallPos = 'N';
-    elseif(Ein)
+    elseif(Ein || Eout)
         shape.h = right - y10;
         shape.WallPos = 'E';
-    elseif(Win)
+    elseif(Win || Wout)
         shape.h = y10 - left;
         shape.WallPos = 'W';
     end
-    area = BigSegmentNSEW(shape); 
+    
+    line = ArcNSEW(shape); 
 
-elseif(edgeOut)
-    shape.N = [20;20];
-    shape.R = R;
-    shape.Origin = [y10;y20];
-    if(Sout)
-        shape.h = bottom - y20;
-        shape.WallPos = 'S';
-    elseif(Nout)
-        shape.h = y20 - top;
-        shape.WallPos = 'N';
-    elseif(Eout)
-        shape.h = y10 - right;
-        shape.WallPos = 'E';
-    elseif(Wout)
-        shape.h = left - y10;
-        shape.WallPos = 'W';
-    end
-    area = SegmentNSEW(shape); 
 else
     
-    area = [];
+    line = [];
 end
 
 shapeC.N = 20;
@@ -233,16 +217,8 @@ shapeC.R = R;
 lineC = Circle(shapeC);
 
 if(~isempty(line))
-  
-    %dataDisk.ptsPolLoc = Cart2PolPts(dataDisk.pts);
     
-    if(central)
-        dataCircle.pts       = Pol2CartPts(line.Pts); 
-        dataCircle.pts.y1_kv = dataCircle.pts.y1_kv + y10;
-        dataCircle.pts.y2_kv = dataCircle.pts.y2_kv + y20;
-    else
-        dataCircle.pts = line.Pts;
-    end
+    dataCircle.pts = line.Pts;
     
     fullCircle.pts = Pol2CartPts(lineC.Pts);
     fullCircle.pts.y1_kv = fullCircle.pts.y1_kv + y10;

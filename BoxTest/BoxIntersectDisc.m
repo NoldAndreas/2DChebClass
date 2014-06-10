@@ -141,6 +141,10 @@ if(central)
     shape.N = [20;20];
     shape.R = R;
     area = Disc(shape);
+    area.Pts       = area.GetCartPts();           
+    area.Pts.y1_kv = area.Pts.y1_kv + y10;
+    area.Pts.y2_kv = area.Pts.y2_kv + y20;
+    area.polar = 'cart';
 
 elseif(corner)
     shape.NT = [10;10];
@@ -239,10 +243,10 @@ if(~isempty(area))
     dataDisk.pts       = area.GetCartPts();           
     %dataDisk.ptsPolLoc = Cart2PolPts(dataDisk.pts);
     
-    if(central)
-        dataDisk.pts.y1_kv = dataDisk.pts.y1_kv + y10;
-        dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
-    end
+%     if(central)
+%         dataDisk.pts.y1_kv = dataDisk.pts.y1_kv + y10;
+%         dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
+%     end
     
     fullDisk.pts = areaD.GetCartPts();
     fullDisk.pts.y1_kv = fullDisk.pts.y1_kv + y10;
