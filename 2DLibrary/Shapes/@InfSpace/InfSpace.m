@@ -70,17 +70,21 @@ classdef InfSpace < SpectralSpectral
             n1 = this.N1;   n2 = this.N2;
 
             if(isfield(shapeParams,'R'))
+                disp('Disc');
                 subShape = Disc(shapeParams);
                 rRange = (-1:0.05:1)';   
             elseif(isfield(shapeParams,'RMin'))
                 if(isfield(shapeParams,'RMax'))
+                    disp('Annulus');
                     subShape = Annulus(shapeParams);
                     rRange = (-1:0.05:1)';
                 else
+                    disp('InfAnnulus');
                     subShape = InfAnnulus(shapeParams);
                     rRange = (-1:0.05:0.9)';
                 end
             else
+                disp('InfDisc');
                 subShape = InfDisc(shapeParams);
                 rRange = (-0.9:0.05:0.9)';
             end

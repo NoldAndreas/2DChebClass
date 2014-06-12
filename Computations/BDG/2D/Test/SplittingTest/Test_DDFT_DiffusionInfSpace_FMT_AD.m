@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(doHI)
+function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT_AD(doHI)
 
     if(nargin==0)
         doHI = true;
@@ -14,11 +14,11 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
                        'Ncircle',10,'N1disc',10,'N2disc',10);
                    
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
-                      'HIPreprocess', 'RotnePragerPreprocess2D');  
+                      'HIPreprocess', 'RotnePragerPreprocess2D_AD');  
     
     tMax = 0.15;
 
-    DDFTCode = 'DDFT_Diffusion_2D';
+    DDFTCode = 'DDFT_Diffusion_2D_AD';
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...

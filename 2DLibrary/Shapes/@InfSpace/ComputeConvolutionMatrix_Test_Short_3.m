@@ -58,18 +58,34 @@ function ComputeConvolutionMatrix_Test_Short_2(this)
 
     M_conv_New_M = ComputeConvolutionMatrix(this,@gMat,shapeParams);
 
+    
+    R = 0.5;
+    discParams.N = [20;20];
+    discParams.R = R;
+    
+    M_conv_inner_M =  ComputeConvolutionMatrix(this,@gMat,discParams);
 
+    annulusParams.N = [20;20];
+    annulusParams.L = 2;
+    annulusParams.RMin = R;
+    
+    M_conv_outer_M =  ComputeConvolutionMatrix(this,@gMat,annulusParams);
+    
+    M_conv_New_M_2 = M_conv_inner_M + M_conv_outer_M;
+    
+    
     N1 = this.Pts.N1;
     N2 = this.Pts.N2;
 
     conv_M = zeros(N1*N2,2,2);
-
     conv_New_M = zeros(N1*N2,2,2);
+    conv_New_M_2 = zeros(N1*N2,2,2);
 
     for k1 = 1:2
         for k2 = 1:2 
             conv_M(:,k1,k2)     = M_conv_M(:,:,k1,k2)*g4(X,Y);
             conv_New_M(:,k1,k2) = M_conv_New_M(:,:,k1,k2)*g4(X,Y);
+            conv_New_M_2(:,k1,k2) = M_conv_New_M_2(:,:,k1,k2)*g4(X,Y);
         end
     end
 
@@ -81,6 +97,10 @@ function ComputeConvolutionMatrix_Test_Short_2(this)
     figure
     this.doPlots(reshape(conv_New_M,N1*N2,4));
     set(gcf,'Name','Pointwise Convolution Matrix');
+    
+    figure
+    this.doPlots(reshape(conv_New_M_2,N1*N2,4));
+    set(gcf,'Name','Split Convolution Matrix');
 
     figure
     this.doPlots(reshape(conv_M,N1*N2,4));
@@ -98,7 +118,20 @@ function ComputeConvolutionMatrix_Test_Short_2(this)
     disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''pointwise'' error: ' ...
             num2str( sum(abs(exact34-conv_New_M(:,2,2)).^2) / sum(abs(exact34).^2) )])
 
+        
+    disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''split'' error: ' ...
+              num2str( sum(abs(exact14-conv_New_M_2(:,1,1)).^2) / sum(abs(exact14).^2) )])
 
+    disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''split'' error: ' ...
+            num2str( sum(abs(exact24-conv_New_M_2(:,1,2)).^2) / sum(abs(exact24).^2) )])
+
+    disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''split'' error: ' ...
+            num2str( sum(abs(exact24-conv_New_M_2(:,2,1)).^2) / sum(abs(exact24).^2) )])
+
+    disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''split'' error: ' ...
+            num2str( sum(abs(exact34-conv_New_M_2(:,2,2)).^2) / sum(abs(exact34).^2) )])
+        
+        
     disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''standard'' error: ' ...
               num2str( sum(abs(exact14-conv_M(:,1,1)).^2) / sum(abs(exact14).^2) )])
 
