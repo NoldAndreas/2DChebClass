@@ -1,6 +1,8 @@
 classdef Border < Isoline
     properties
         InterpOntoBorder
+        
+        IntSC_Path,IntNormal_Path,IntTang_Path
     end
     methods        
         function this = Border(N,ashape,border,polar)        
@@ -28,7 +30,12 @@ classdef Border < Isoline
         
         function ComputeIntegrationVector(this)            
             ComputeIntegrationVector@SpectralPath(this);
-            IP = this.InterpOntoBorder;
+            
+            this.IntSC_Path      = this.IntSc; 
+            this.IntNormal_Path  = this.IntNormal;
+            this.IntTang_Path    = this.IntTang_Path;
+            
+            IP              = this.InterpOntoBorder;
             
             this.IntSc      = this.IntSc*IP;
             this.IntNormal  = this.IntNormal*blkdiag(IP,IP);

@@ -40,7 +40,7 @@ classdef (Abstract) SpectralPath < handle
             
         end        
         function int = ComputeIntegrationVector(this)            
-            [h1,wInt]     = ClenCurtFlip(this.N-1);
+            [h1,wInt]    = ClenCurtFlip(this.N-1);
             this.IntSc   = this.ds'.*wInt;
             this.IntSc(this.IntSc == inf)   = 0; %assuming that the function to integrate
                                          %converges to zero fast enough, s.t. the

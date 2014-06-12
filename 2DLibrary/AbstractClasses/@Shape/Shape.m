@@ -411,7 +411,19 @@ classdef (Abstract) Shape < handle
                 set(gca,'fontsize',15);
             end
         end            
-        function PlotGridLines(this)            
+        function PlotGridLines(this,optDetails)
+            
+            if((nargin >= 2) && isfield(optDetails,'y2CartShift'))
+                y2CartShift = optDetails.y2CartShift;
+            else
+                y2CartShift = 0;
+            end            
+            
+            if((nargin >= 2) && isfield(optDetails,'nthGridLines'))
+                nthGridLines = optDetails.nthGridLines;
+            else
+                nthGridLines = 1;
+            end            
             
             xI = (-1:0.01:1)';
             x1I = (min(this.Pts.x1):0.01:max(this.Pts.x1))';
@@ -421,17 +433,17 @@ classdef (Abstract) Shape < handle
             O1  = ones(size(x1I));
             O2  = ones(size(x2I));
             %(1) Plot x1-isolines
-            for i1=1:this.N1
+            for i1=1:nthGridLines:this.N1
                 [y1_kv,y2_kv] = PhysSpace(this,this.Pts.x1(i1)*O2,x2I);                
                 GL_CartPts = GetCartPts(this,y1_kv,y2_kv);
-                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv); hold on;
+                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift); hold on;
             end
             
             %(2) Plot x2-isolines
-            for i2=1:this.N2
+            for i2=1:nthGridLines:this.N2
                 [y1_kv,y2_kv] = PhysSpace(this,x1I,this.Pts.x2(i2)*O1);
                 GL_CartPts = GetCartPts(this,y1_kv,y2_kv);
-                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv,'linewidth',1.); hold on;                
+                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift,'linewidth',1.); hold on;                
             end            
             
         end        
@@ -476,7 +488,16 @@ classdef (Abstract) Shape < handle
                 I = w*f;
             end
         end        
-        function doPlotFLine(this,y1P,y2P,f,CART,plain)
+        function doPlotFLine(this,y1P,y2P,f,CART,opts)
+            
+            color   = 'k';
+            
+            if((nargin > 5) && islogical(opts))
+                plain = opts;                
+            elseif((nargin > 5) && ischar(opts))                
+                plain = true;
+                color   = opts;            
+            end
             
             if((nargin < 5) || isempty(CART))
                 CART = 'CART';
@@ -540,7 +561,7 @@ classdef (Abstract) Shape < handle
                 IPG1     = SubShapePts(this,ptsG1);
                 IPG2     = SubShapePts(this,ptsG2);
             end
-            plot(dist,IP*f,'k','linewidth',1.5); hold on;
+            plot(dist,IP*f,color,'linewidth',1.5); hold on;
             if(~plain)
                 plot(distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
                 plot(distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
@@ -548,7 +569,7 @@ classdef (Abstract) Shape < handle
                 ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
                 title(['Values on line from ',ptsStr]);                                                                                        
             end                        
-        end
+        end             
         
     end    
 end

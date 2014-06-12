@@ -1,9 +1,10 @@
-function PlotDensitySlices(this)
-    
+function PlotDensitySlices(this)       
 
     %% Initialization 
-    n     = 100;
-    y2Max = 15;
+    global dirData
+    
+    n     = 5;
+    y2Max = 15.5;
     y1Min = 0;
     y1Max = 15;
     
@@ -15,66 +16,47 @@ function PlotDensitySlices(this)
                                    'y2Min',0.5,'y2Max',y2Max,...
                                    'N1',100,'N2',100);
     InitInterpolation(this,true);
-    
-    k = 1; fileNames = [];
+
+    str = {'r','b','m','g','c'};
     
     %% Plotting
-    figure('color','white','Position',[0 0 1200 600]);    
-    
+    f1 = figure('color','white','Position',[0 0 700 700]);    
+
     for i = 1:n
         % get adsorption
 
         ell      = this.HS.doIntFLine([y1P(i) y1P(i)],[0.5 y2Max],this.rho_eq-rhoGas_sat,'CHEB')/(rhoLiq_sat-rhoGas_sat);
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
         
-        subplot(1,2,1);
-        hold off;
-        plot(this.AdsorptionIsotherm_Pts.y2_kv-0.5,rho,'b','linewidth',1.5); hold on;
-        this.HS.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.rho_eq,'CART',true);
-        xlim([0 (y2Max-0.5)]);
-        ylim([0 1.1]);%max(this.rho_eq)]);
-        xlabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
-        ylabel('$n\sigma^3$','Interpreter','Latex','fontsize',25);
-        set(gca,'fontsize',20);                        
-        set(gca,'linewidth',1.5);          
-        pbaspect([(y1Max-y1Min) (y2Max) 1]);
-        
-        subplot(1,2,2);
-        hold off;
-        PlotEquilibriumResults(this,[y1Min y1Max],[0.5 y2Max],true,false); hold on;        
-        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],'k--','linewidth',1.5);
-        
-%         subplot(2,2,3);
-%         hold off;
-%         plot(this.AdsorptionIsotherm_Mu,this.AdsorptionIsotherm_FT,'b','linewidth',1.5); hold on;
-%         plot(mu,ell,'o','MarkerEdgeColor','r','MarkerFaceColor','r');
-%         
-%         subplot(2,2,4);
-%         hold off;
-%         plot();
-        
-      %  pause(0.1);
-        %For gif-recording
-       % Record(i,gifFile);
+        hold on;
+        plot(this.AdsorptionIsotherm_Pts.y2_kv-0.5,rho,[str{i},'--'],'linewidth',1.5); hold on;
+        this.HS.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.rho_eq,'CART',str{i});        
+    end
+    
+    box on;
+    xlim([0 (y2Max-0.5)]);
+    ylim([0 1.1]);%max(this.rho_eq)]);
+    xlabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
+    ylabel('$n\sigma^3$','Interpreter','Latex','fontsize',25);
+    set(gca,'fontsize',20);                        
+    set(gca,'linewidth',1.5);          
+    pbaspect([(y1Max-y1Min) (y2Max) 1]);
 
-        % for swf Recording
-        fileName = getPDFMovieFile('Movie1',k);
-        %fileName = ['Movie1',num2str(k),'.pdf'];
-        save2pdf(fileName,gcf);
-        k = k+1;
-        fileNames = [fileNames,' ',fileName];        
-        
+    f2 = figure('color','white','Position',[0 0 600 500]);    
+    
+    PlotEquilibriumResults(this,[y1Min y1Max],[0.5 y2Max],true,false); hold on;        
+    for i = 1:n
+        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],[str{i},':'],'linewidth',1.5);
     end
 
-    %% Save Movie
-	str         = 'DensitySlices';
-    allPdfFiles = [str,'.pdf'];
-    swfFile     = [str,'.swf'];
+    inset2(f1,f2,0.4,[0.55,0.55]);
+    set(gca,'fontsize',10);
     
-    system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
-    system(['C:\pdf2swf.exe -s framerate=5 -o ',swfFile,' ', allPdfFiles]);
-    system(['copy ',getPDFMovieFile('Movie1',1),' ',str,'POSTER.pdf']);
-    system(['del ',fileNames]);       
-    disp(['Swf Movie` saved in: ',swfFile]);
+    %inset2(f1,f2,0.35,[0.22,0.55]);
+    close(f2);      
+        
+    %% Save plot
+	print2eps([dirData filesep 'DensitySlices'],f1);
+    saveas(f1,[dirData filesep 'DensitySlices.fig']);
 
 end

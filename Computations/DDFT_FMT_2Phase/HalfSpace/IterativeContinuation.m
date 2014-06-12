@@ -11,7 +11,13 @@ function x = IterativeContinuation(func,Nosteps,theta,xInitial,params,user_scala
         user_scalarProduct = @times;
     end
 
-    opts     = optimset('Display','off');   
+    
+    if(isfield(params,'Algorithm'))
+        opts     = optimset('Display','off','Algorithm',params.Algorithm);   
+    else 
+        opts     = optimset('Display','off');   
+    end
+    
     xTTangent = 0*xInitial';    
     xTTangent(1) = 1;
     xTLast    = userXTransform(xInitial);    
@@ -21,7 +27,7 @@ function x = IterativeContinuation(func,Nosteps,theta,xInitial,params,user_scala
 
     function [x,stop] = SolveIterativeStep(params,x_ic)
         stop = false;
-        if(params.i == 1)         
+        if(params.i == 1)
             x  = fsolve(@fPoint,x_ic,opts);    
             xT = userXTransform(x);
             xTLast = xT;

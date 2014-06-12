@@ -82,12 +82,12 @@ function PlotPhaseDiagram()
         plot(rhoGas_satP,optsPhys.kBT,'or','MarkerFace','r','MarkerSize',10);
         plot(rhoLiq_satP,optsPhys.kBT,'or','MarkerFace','r','MarkerSize',10);
     end
-    xlabel('$\varrho_{\{gas,liq\}}$','Interpreter','Latex','fontsize',fontS + 5); %\{\text{liq},\text{gas}\},\text{sat} 
-    ylabel('$k_BT$','Interpreter','Latex','fontsize',20);
+    xlabel('$n\sigma^3$','Interpreter','Latex','fontsize',fontS + 5); %\{\text{liq},\text{gas}\},\text{sat} 
+    ylabel('$k_BT/\varepsilon$','Interpreter','Latex','fontsize',20);
     ylim([min(kBT),1.35])
     xlim([0 0.82]);
     
-    set(gca,'ytick',0.5:0.1:1);
+    set(gca,'ytick',0.5:0.1:1.4);
     set(gca,'fontsize',fontS);                        
     set(gca,'linewidth',1.5);  
 

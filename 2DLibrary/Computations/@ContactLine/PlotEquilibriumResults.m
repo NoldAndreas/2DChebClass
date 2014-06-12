@@ -83,17 +83,17 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         drho = rhoLiq_sat - rhoGas_sat;
         
-        optDetails.nContours = rhoGas_sat + 0.1*drho;
-        optDetails.linecolor = 'b';
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+%        optDetails.nContours = rhoGas_sat + 0.1*drho;
+%        optDetails.linecolor = 'b';
+%        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
         
         optDetails.nContours = rhoGas_sat + 0.5*drho;
-        optDetails.linecolor = [0 0.75 0];
+        optDetails.linecolor = 'k';%[0 0.75 0];
         this.HS.doPlots(rho,'contour',optDetails);  hold on;  
         
-        optDetails.nContours = rhoGas_sat + 0.9*drho;
-        optDetails.linecolor = 'r';
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+%        optDetails.nContours = rhoGas_sat + 0.9*drho;
+%        optDetails.linecolor = 'r';
+%        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
         
         xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
         ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
@@ -124,7 +124,7 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     else
 
  %   pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 1]);
-    if((nargin == 1) || saveFigs)      
+    if((nargin < 5) || saveFigs)      
         print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour'],gcf);
         saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour.fig']);
     end
@@ -144,7 +144,7 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
     view([-10 5 3]);
 
-    if((nargin == 1) || saveFigs)
+    if((nargin < 5) || saveFigs)
         print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq],gcf);
         saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '.fig']);
     end

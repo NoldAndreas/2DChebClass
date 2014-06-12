@@ -270,6 +270,7 @@ classdef ContactLine < handle
         [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
         
         PlotDensitySlices(this);
+        PlotDensitySlicesMovie(this);
                 
         I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
         SumRule_DisjoiningPotential(this,ST_LG)

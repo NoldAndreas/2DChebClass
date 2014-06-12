@@ -21,7 +21,7 @@ function data = Seppecher_M1Inf()
     theta       = pi/2;
     D_A         = 0.;    
     rho_m       = 2;
-    nu          = 10;
+    nu          = 10;  %what is nu??
     zeta        = 10 + 2/3;
     Ca          = 0.02; 
     Cn          = 4/3;    
@@ -102,7 +102,7 @@ function data = Seppecher_M1Inf()
             figure;
             StreamlinePlotInterp(InterpPlotUV,Pts,uv); hold on;
             NormQuiverPlotInterp_NSpecies(InterpPlotUV,Pts,uv,uwall,[0 -1],1,{'b'});
-            PlotPtsSepp();            
+            PlotPtsSepp();
             doPlots_IP_Contour(Interp,rho);  hold off;                 
             %subplot(2,1,2);
             figure;
@@ -142,20 +142,17 @@ function data = Seppecher_M1Inf()
         [~,y,dy]    = W(rhoInf);
         y           = y - muInf(1);        
     end
-
     function [mu_s,J] = GetExcessChemPotential(rho_s,mu_offset)    
         [WE,dWE,ddWE]    = W(rho_s);
         mu_s             = dWE - Cn*(Diff.Lap*rho_s) - mu_offset;                                   
         J                = diag(ddWE) - Cn*Diff.Lap;
         J                = [-ones(length(rho),1),J];  
     end
-
     function [z,dz,ddz] = W(rho)        
         z   = (1-rho.^2).^2/(2*Cn);
         dz  = -2*rho.*(1-rho.^2)/Cn;
         ddz = 2*(3*rho.^2-1)/Cn;
     end
-
     function [y,J] = f_eq(x)
         %solves for T*log*rho + Vext          
         mu_s        = x(1);        
@@ -306,8 +303,17 @@ function data = Seppecher_M1Inf()
         %Density at infinity : -1,
         %Density at -infinity: 1.
         massFlux   = ((-1+rho_m)-(1+rho_m))*(PhysArea.y2Max-0)*UWall;      %due to mapping to infinity
-        u_flow     = GetSeppecherSolutionCart(Pts,UWall,D_A,dB,theta);
-        m          = IC.borderTop.IntNormal*(u_flow.*(repmat(rho,2,1)+rho_m)) + massFlux;
+        
+        %********************************
+        %previous version:
+        %u_flow     = GetSeppecherSolutionCart(Pts,UWall,D_A,dB,theta);
+        %m          = IC.borderTop.IntNormal*(u_flow.*(repmat(rho,2,1)+rho_m)) + massFlux;
+        %********************************
+        
+        u_flow     = GetSeppecherSolutionCart(IC.borderTop.Pts,UWall,D_A,dB,theta);                        
+        rhoBorder  = IC.borderTop.InterpOntoBorder*(rho+rho_m);
+        
+        m          = IC.borderTop.IntNormal_Path*(u_flow.*repmat(rhoBorder,2,1)) + massFlux;
     end
     function [h2,dh2,ddh2] = Interface(y)
         
@@ -495,7 +501,8 @@ function data = Seppecher_M1Inf()
     function [A,b] = CahnHilliard_StressTensorIJ(rho,i,j)
     % get matrices for
     % T = Ca*( grad(u) + grad(u)^T + (zeta - 2/3) div(u)*I ) +...
-    %   + (W(rho) + Cn/2*|grad(rho)|^2 - mu*(rho+rho_m))*I - Cn*(grad(rho) X grad(rho))
+    %           + (W(rho) + Cn/2*|grad(rho)|^2 - mu*(rho+rho_m))*I - Cn*(grad(rho) X grad(rho))
+    %   = A(rho)*[mu;uv] + b(rho)
 
         bDiag   = W(rho) + Cn/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
         %bDiag   = W(rho) + 1/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
