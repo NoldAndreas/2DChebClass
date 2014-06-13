@@ -1,8 +1,7 @@
 classdef Disc < Polar_SpectralFourier
 
     properties        
-        R
-        Origin = [0;0];
+        R        
         Ch 
         sphere = false;
     end
@@ -51,11 +50,7 @@ classdef Disc < Polar_SpectralFourier
             end
             if(nargout < 2)
                 disp(['Disc: Error of integration of area (ratio): ',...
-                                        num2str(1-sum(this.Int)/area)]);  
-                intF4 = -pi*(exp(-this.R^2)-1);
-                f4 = exp(-this.Pts.y1_kv.^2);
-                disp(['Disc: Error of integration of exp(-r^2) (ratio): ',...
-                                    num2str(1-sum(this.Int*f4)/intF4)]); 
+                                        num2str(1-sum(this.Int)/area)]);                
             end
         end
         
