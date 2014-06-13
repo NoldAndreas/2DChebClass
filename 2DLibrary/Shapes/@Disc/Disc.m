@@ -1,8 +1,7 @@
 classdef Disc < Polar_SpectralFourier
 
     properties        
-        R
-        Origin = [0;0];
+        R        
         Ch 
         sphere = false;
     end
