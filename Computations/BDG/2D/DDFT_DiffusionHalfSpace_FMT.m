@@ -93,7 +93,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace_FMT(optsPhys
         paramsHI.optsNum.Pts       = IDC.Pts;    
         paramsHI.optsNum.Polar     = 'cart';
         paramsHI.optsPhys.nSpecies = nSpecies;
-        IntMatrHI     = DataStorage(['HIData' filesep class(IDC)],@HIMatrices2D,paramsHI,IDC);      
+        IntMatrHI     = DataStorage(['HIData' filesep class(IDC)],@HIMatrices_HalfSpace,paramsHI,IDC,true);      
         fprintf(1,'done.\n');
         t_HI = toc;
         display(['HI computation time (sec): ', num2str(t_HI)]); 

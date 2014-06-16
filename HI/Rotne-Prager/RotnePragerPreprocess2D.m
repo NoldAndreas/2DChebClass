@@ -18,6 +18,6 @@ function params = RotnePragerPreprocess2D(params)
     params.alpha = alpha;
     params.RMin  = sigma; 
 
-    params.RMax = 50;
+    %params.RMax = 50;
     
 end

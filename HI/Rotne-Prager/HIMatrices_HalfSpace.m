@@ -1,4 +1,4 @@
-function HIStruct = HIMatrices2D(opts,IDC)
+function HIStruct = HIMatrices_HalfSpace(opts,IDC)
 
     optsPhys = opts.optsPhys;
     optsNum  = opts.optsNum;
@@ -19,6 +19,8 @@ function HIStruct = HIMatrices2D(opts,IDC)
    
     f11      = str2func(optsNum.HI11);
     f12      = str2func(optsNum.HI12);
+    
+    weights = {'HIweight_11','HIweight_12','HIweight_21','HIweight_22'};
     
     if(isfield(optsNum,'N'))
         params.N = optsNum.N;
@@ -41,22 +43,27 @@ function HIStruct = HIMatrices2D(opts,IDC)
         for jS = iS:nSpecies
             paramsIJ = getIJParams(iS,jS);
 
-            
-            % need to 
             % 1) make annulus
-            % 2) check how ComputeConvolutionFiniteSupport works with
-            % multiple functions, i.e. matrices?  as given by HI functions
-            % 3) work out what pts should be
-            HITemp11 = IDC.ComputeConvolutionFiniteSupport(area,weights,pts)
-            HITemp11 = IDC.ComputeConvolutionFiniteSupport(area,weights,pts)
-            %HITemp11 = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  
-            %HITemp12 = IDC.ComputeConvolutionMatrix(@F12,paramsIJ); 
+            shape.N    = paramsIJ.N;
+            shape.L    = paramsIJ.L;
+            shape.RMin = paramsIJ.RMin;
+             
+            area = InfAnnulus(shape);
             
-            HIInt11 = [HITemp11(:,:,1,1), HITemp11(:,:,1,2) ; ...
-                       HITemp11(:,:,2,1), HITemp11(:,:,2,2) ];
+            paramsIJ.HIfn = f11;
+            
+            HITemp11 = IDC.ComputeConvolutionFiniteSupport2(area,weights,IDC.Pts,paramsIJ);
+            
+            paramsIJ.HIfn = f12;
+            
+            HITemp12 = IDC.ComputeConvolutionFiniteSupport2(area,weights,IDC.Pts,paramsIJ);
+            
+            % padded with weight of 1, so start indexing at 2
+            HIInt11 = [HITemp11(:,:,2), HITemp11(:,:,3) ; ...
+                       HITemp11(:,:,4), HITemp11(:,:,5) ];
 
-            HIInt12 = [HITemp12(:,:,1,1), HITemp12(:,:,1,2) ; ...
-                       HITemp12(:,:,2,1), HITemp12(:,:,2,2) ];                   
+            HIInt12 = [HITemp12(:,:,2), HITemp12(:,:,3) ; ...
+                       HITemp12(:,:,4), HITemp12(:,:,5) ];                   
                    
             HIStruct(iS,jS).HIInt11 = HIInt11;
             HIStruct(iS,jS).HIInt12 = HIInt12;
@@ -67,15 +74,6 @@ function HIStruct = HIMatrices2D(opts,IDC)
     end
 
     %--------------------------------------------------------------------------
-    function z = F11(ptsPolLoc)         
-        ptsCart = Pol2CartPts(ptsPolLoc);
-        z = f11(ptsCart.y1_kv,ptsCart.y2_kv,paramsIJ);
-    end
-
-    function z = F12(ptsPolLoc)
-        ptsCart = Pol2CartPts(ptsPolLoc);
-        z = f12(ptsCart.y1_kv,ptsCart.y2_kv,paramsIJ);                   
-    end
 
     function paramsIJ = getIJParams(iS,jS)
 

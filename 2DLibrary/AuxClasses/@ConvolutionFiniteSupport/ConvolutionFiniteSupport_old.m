@@ -22,8 +22,8 @@ classdef ConvolutionFiniteSupport < ConvolutionFiniteSupport_NotLinear
     end
     
     methods (Access = public)
-        X = Conv_LinearGridXY(this,ptsC,area,weights,params);       
-        [X,checkSum] = Conv_LinearGridX(this,ptsC,refpts,dataAD,weights,params);        
+        X = Conv_LinearGridXY(this,ptsC,area,weights);       
+        [X,checkSum] = Conv_LinearGridX(this,ptsC,refpts,dataAD,weights);        
     end
     
     methods (Abstract = true,Access = public)        

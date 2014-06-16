@@ -1,4 +1,4 @@
-function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
+function X = Conv_LinearGridXY(this,ptsC,area,weights)
 %% Input
 %%
 % 
@@ -170,12 +170,7 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
             X(iPts,:,1)       = ones(sum(iPts),1)*(convArea.int*IP);
             for k = 1:noW
                 f             = str2func(weights{k});
-                if(nargin == 5)
-                    F = f(convArea.ptsPolLoc,params);
-                else
-                    F = f(convArea.ptsPolLoc);
-                end
-                X(iPts,:,1+k) = ones(sum(iPts),1)*((convArea.int.*F')*IP);
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((convArea.int.*f(convArea.ptsPolLoc)')*IP);
             end
         end
     end
