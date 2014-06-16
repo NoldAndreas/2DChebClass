@@ -8,27 +8,27 @@ function data = Seppecher_M1Inf()
 %
 %*************************************************************************   
 
-    %% Parameters    
+    % Numerical Parameters    
     PhysArea = struct('N',[100,20],'y2Min',0,'y2Max',20,'L1',12);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
                        'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
                        'N1Vecs',40,'N2Vecs',6,'Hy2',3);    
-
-	optsNum  = v2struct(PhysArea,PlotArea);
-                   
 	nParticles  = 0;
     
-    optsPhys = struct('theta',pi/2,'g',0,...
-                        'D_A',0,...
-                        'zeta',10+2/3,'eta',1,...
-                        'Cak',0.02,'Cn',4/3,...
-                        'UWall',-1,...
-                        'rho_m',2);
-                    
-    config = v2struct(optsPhys,optsNum);
-                       
-        
+    Parameters = struct()
+    
+    % Physical Parameters
+    g           = 0;
+    theta       = pi/2;
+    D_A         = 0.;    
+    rho_m       = 2;    
+    zeta        = 10 + 2/3; % bulk viscosity, Seppecher defines K = zeta - 2/3 = 10
+    eta         = 1;  %shear viscosity
+    Ca          = 0.02; 
+    Cn          = 4/3;    
+    UWall       = -1;        
+    
     %************************************************
     %***************  Initialization ****************
     %************************************************
@@ -39,19 +39,16 @@ function data = Seppecher_M1Inf()
     OO = ones(2*M,1);  O = ones(M,1);
     ZZ = zeros(2*M,1); Z = zeros(M,1);
 
-    %uwall      = [UWall*O ; 0*O];       
+    uwall      = [UWall*O ; 0*O];       
         
     %************************************************
     %****************  Preprocess  ******************
-    %************************************************
+    %************************************************    
+    IC                        = InfCapillaryQuad(PhysArea);    
+    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);   
+    PtsCart                   = IC.GetCartPts();
     
-    DI = DiffuseInterface(config);
-    DI.Preprocess();
-    
-%    IC                        = InfCapillaryQuad(PhysArea);    
-%    [Pts,Diff,Int,Ind,Interp] = IC.ComputeAll(PlotArea);   
-%    PtsCart                   = IC.GetCartPts();    
-%    IC.SetUpBorders(300);
+    IC.SetUpBorders(300);
             
     IBB       = [Ind.bound;Ind.bound];
     bulkSolve = (~Ind.right & ~Ind.left);
@@ -157,6 +154,11 @@ function data = Seppecher_M1Inf()
         mu_s             = dWE - Cn*(Diff.Lap*rho_s) - mu_offset;                                   
         J                = diag(ddWE) - Cn*Diff.Lap;
         J                = [-ones(length(rho),1),J];  
+    end
+    function [z,dz,ddz] = W(rho)        
+        z   = (1-rho.^2).^2/(2*Cn);
+        dz  = -2*rho.*(1-rho.^2)/Cn;
+        ddz = 2*(3*rho.^2-1)/Cn;
     end
     function [y,J] = f_eq(x)
         %solves for T*log*rho + Vext          
@@ -507,7 +509,31 @@ function data = Seppecher_M1Inf()
         b(1+M:end)     = - repmat(ys,2,1).*(Diff.grad*rho); 
 
     end
+    function [A,b] = CahnHilliard_StressTensorIJ(rho,i,j)
+    % get matrices for
+    % T = Ca*( eta*(grad(u) + grad(u)^T) + (zeta - 2/3*eta) div(u)*I ) +...
+    %           + (W(rho) + Cn/2*|grad(rho)|^2 - mu*(rho+rho_m))*I - Cn*(grad(rho) X grad(rho))
+    %   = A(rho)*[mu;uv] + b(rho)
 
+        bDiag   = W(rho) + Cn/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
+        %bDiag   = W(rho) + 1/2*((Diff.Dy1*rho).^2 + (Diff.Dy2*rho).^2); %CahnHilliardFreeEnergy(rho,Cn,Diff);
+        if(i == 1 && j == 1)
+            Amu     = -diag(rho+rho_m);
+            Auv     = Ca*(eta*[2*Diff.Dy1 , zeros(M)] + (zeta - 2/3*eta)*Diff.div);
+            b       = bDiag - Cn*(Diff.Dy1*rho).*(Diff.Dy1*rho);
+        elseif((i==2 && j == 1)  || (i==1 && j == 2))
+            Amu     = zeros(M);
+            Auv     = Ca*[Diff.Dy2 , Diff.Dy1]*eta;
+            b       = - Cn*(Diff.Dy1*rho).*(Diff.Dy2*rho);            
+        elseif(i==2 && j == 2)
+            Amu     = -diag(rho+rho_m);
+            Auv     = Ca*(eta*[zeros(M) , 2*Diff.Dy2] + (zeta - 2/3)*Diff.div);
+            b       = bDiag - Cn*(Diff.Dy2*rho).*(Diff.Dy2*rho);
+        end
+
+        A = [Amu Auv];
+
+    end
     function [A,b] = CahnHilliard_DivergenceOfStressTensor(rho)
 
         [A11,b11] = CahnHilliard_StressTensorIJ(rho,1,1); 
