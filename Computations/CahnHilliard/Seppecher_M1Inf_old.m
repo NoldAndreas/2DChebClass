@@ -1,4 +1,4 @@
-function data = Seppecher_M1Inf()
+function data = Seppecher_M1Inf_old()
 %************************************************************************* 
 %data = Seppecher(optsPhys,optsNum)
 %
@@ -14,9 +14,7 @@ function data = Seppecher_M1Inf()
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
                        'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
                        'N1Vecs',40,'N2Vecs',6,'Hy2',3);    
-	nParticles  = 0;
-    
-    Parameters = struct()
+	nParticles  = 0;   
     
     % Physical Parameters
     g           = 0;
@@ -232,9 +230,10 @@ function data = Seppecher_M1Inf()
 
     function [mu,uv,A,b] = GetVelocityAndChemPot(rho)
         
-        A               = eye(3*M);  b = zeros(3*M,1);
+        A   = eye(3*M);  
+        b   = zeros(3*M,1);
         
-        [Af,bf]         = ContMom_DiffuseInterfaceSingleFluid(rho);
+        [Af,bf]                  = ContMom_DiffuseInterfaceSingleFluid(rho);
         A([~Ind.bound;~IBB],:)   = Af([~Ind.bound;~IBB],:);   
         b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
         
@@ -282,9 +281,9 @@ function data = Seppecher_M1Inf()
         IntPathUpLow       = IC.borderTop.IntNormal + IC.borderBottom.IntNormal; %?? => to check!!
 %        IntPathUpLow       = (Int_of_pathUpper.Vec + Int_of_pathLower.Vec);        
         [Tt11,Tb11]        = CahnHilliard_StressTensorIJ(rho,1,1);
-        [Tt12,Tb12]        = CahnHilliard_StressTensorIJ(rho,1,2);            
-        TtHor              = [Tt11;Tt12];        
-        TbHor              = [Tb11;Tb12];        
+        [Tt12,Tb12]        = CahnHilliard_StressTensorIJ(rho,1,2);
+        TtHor              = [Tt11;Tt12];
+        TbHor              = [Tb11;Tb12];
                 
         A(Ind.right,:)        = (OR*IntPathUpLow)*TtHor;
         A(Ind.right,[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) - ...
