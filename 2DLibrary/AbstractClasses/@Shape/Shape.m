@@ -179,7 +179,7 @@ classdef (Abstract) Shape < handle
             end
         end           
         
-        function doPlotsStreamlines(this,flux,startMask)
+        function doPlotsStreamlines(this,flux,startMask,startMask2)
             mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
                                (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
                                (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
@@ -196,11 +196,15 @@ classdef (Abstract) Shape < handle
             y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
             y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);                               
             
-            streamline(y1M,y2M,fl_y1,fl_y2,...
+            if(nargin < 4)
+                streamline(y1M,y2M,fl_y1,fl_y2,...
                        PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
-            hold on;
-            streamline(y1M,y2M,-fl_y1,-fl_y2,...
-                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
+%                hold on;
+%                streamline(y1M,y2M,-fl_y1,-fl_y2,...
+%                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
+            else
+                streamline(y1M,y2M,fl_y1,fl_y2,startMask,startMask2);                       
+            end
         end
         
         function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c)

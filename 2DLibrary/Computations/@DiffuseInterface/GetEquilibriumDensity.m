@@ -1,4 +1,4 @@
-function rho = GetEquilibriumDensity(this,theta,nParticles,rho)
+function rho = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
     Cn     = this.optsPhys.Cn;
     g      = this.optsPhys.g;
     rhoInf = -1;
@@ -7,9 +7,12 @@ function rho = GetEquilibriumDensity(this,theta,nParticles,rho)
     Ind    = this.IC.Ind;    
     Diff   = this.IC.Diff;
     Int    = this.IC.Int;
-    
-    mu     = zeros(M,1);    
+         
     bulkSolve = (~Ind.right & ~Ind.left);
+    
+    if(isscalar(mu))
+        mu = mu*ones(M,1);
+    end
             
     rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
 

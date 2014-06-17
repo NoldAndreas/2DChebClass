@@ -22,6 +22,8 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     
     y10     = 0; %this has to be adapted for next iteration
     
+	uwall                                    = [UWall*ones(M,1) ; zeros(M,1);];
+    uvBound(repmat(Ind.bound &~Ind.top,2,1)) =  uwall(repmat(Ind.bound &~Ind.top,2,1));               
     uvBound([Ind.top;Ind.top]) = ...
                 GetSeppecherSolutionCart([PtsCart.y1_kv(Ind.top)- y10,PtsCart.y2_kv(Ind.top)],UWall,D_A,D_B,theta);
 
@@ -49,12 +51,9 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     % ******** check    
     ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;
 
-    Cmu            = -Diff.Lap*diag(rho + rho_m);           
-
-    %logGradRho_T   = transposeVec(Diff.grad*log(rho + rho_m));        %??? I dont get it
-    logGradRho_T   = Diff.div;%transposeVec(Diff.grad);      
-    Cuv            = -Cak*(zeta + 4/3*eta)*Diff.Lap*logGradRho_T;        
-    C              = [Cmu,Cuv];               
+    Cmu            = -Diff.Lap*diag(rho + rho_m);                   
+    Cuv            = -Cak*(zeta + 4/3*eta)*(Diff.Lap*Diff.div);
+    C              = [Cmu,Cuv];
     bBound         = - repmat(ys,2,1).*(Diff.grad*rho); 
 
     A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
@@ -70,18 +69,17 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     %3. Right boundary:
     OR                 = ones(sum(Ind.right),1);        
     IntPathUpLow       = this.IC.borderTop.IntNormal + this.IC.borderBottom.IntNormal; %?? => to check!!
-%        IntPathUpLow       = (Int_of_pathUpper.Vec + Int_of_pathLower.Vec);        
-    [Tt11,Tb11]        = CahnHilliard_StressTensorIJ(this,rho,1,1);
-    [Tt12,Tb12]        = CahnHilliard_StressTensorIJ(this,rho,1,2);            
+    [Tt11,Tb11]        = FullStressTensorIJ(this,rho,1,1);
+    [Tt12,Tb12]        = FullStressTensorIJ(this,rho,1,2);            
     TtHor              = [Tt11;Tt12];        
     TbHor              = [Tb11;Tb12];        
 
-    A(Ind.right,:)        = (OR*IntPathUpLow)*TtHor;
+    A(Ind.right,:)                = (OR*IntPathUpLow)*TtHor;
     A(Ind.right,[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) - ...
                                     diag(rho(Ind.right)+rho_m)*y2Max;
-    b(Ind.right)          = -IntPathUpLow*TbHor;
+    b(Ind.right)                  = -IntPathUpLow*TbHor;
+    
     %******************************************************
-
     x               = A\b;
 
     disp(['Error: ',num2str(max(abs(A*x-b)))]);
@@ -89,7 +87,7 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     mu              = x(1:M);
     uv              = x(1+M:end);
 
-    [At,bt] = CahnHilliard_DivergenceOfStressTensor(this,rho);
+    [At,bt] = Div_FullStressTensor(this,rho);
     disp(['Error of divergence of stress tensor: ',num2str(max(abs(At*[mu;uv] + bt)))]);       
 
   %  figure;

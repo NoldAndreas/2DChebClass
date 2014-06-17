@@ -9,11 +9,11 @@ function data = Seppecher_M1Inf()
 %*************************************************************************   
 
     %% Parameters    
-    PhysArea = struct('N',[100,20],'y2Min',0,'y2Max',20,'L1',12);
+    PhysArea = struct('N',[80,40],'y2Min',0,'y2Max',20,'L1',12,...
+                      'NBorder',500);
 
-    PlotArea = struct('y1Min',-20,'y1Max',20,'N1',120,...
-                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',40,...
-                       'N1Vecs',40,'N2Vecs',6,'Hy2',3);    
+    PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
+                      'y2Min',0,'y2Max',PhysArea.y2Max,'N2',100);                      
 
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
     
@@ -44,20 +44,17 @@ function data = Seppecher_M1Inf()
     
     DI = DiffuseInterface(config);
     DI.Preprocess();                  
-         
-    %BC at wall and left and right boundaries (at +/- infinity)
-%    uvBound  = Z;
-%    uvBound(repmat(Ind.bound &~Ind.top,2,1)) =  uwall(repmat(Ind.bound &~Ind.top,2,1));               
-                
+                             
     %****************************************************************
     %******** Solve for equilibrium density distribution ************
     %****************************************************************        
     
-    nParticles = 0; D_B = 0;
+    nParticles = 0; 
+    D_B        = 0;     
     
     rho    = DI.InitialGuessRho();    
-    theta  = DI.FindInterfaceAngle(rho);
-    rho    = DI.GetEquilibriumDensity(theta,nParticles,rho);
+    theta  = DI.FindInterfaceAngle(rho);    
+    rho    = DI.GetEquilibriumDensity(0,theta,nParticles,rho);
     
     eps = 10^(-5);    
     figure('Name','Check accuracy of map');
@@ -72,27 +69,16 @@ function data = Seppecher_M1Inf()
             DI.PlotSeppecherSolution(D_B,theta,rho);
             
             %*** 2nd step ***
-            %Solve continuity and momentum eq. for chem. potential and
-            %velocities            
             [mu,uv,A,b] = DI.GetVelocityAndChemPot(rho,D_B,theta);
-            DI.PlotMu_and_U(mu,uv);
             
-            %*** 3rd step ***
-            %Plot intermediate step
-            %subplot(2,1,1);            
+            DI.PlotMu_and_U(mu,uv);            
+            figure; DI.IC.doPlotFLine([-20,20],[PhysArea.y2Max,PhysArea.y2Max],mu,'CART');
                         
-            figure;
-            StreamlinePlotInterp(InterpPlotUV,Pts,uv); hold on;
-            NormQuiverPlotInterp_NSpecies(InterpPlotUV,Pts,uv,uwall,[0 -1],1,{'b'});
-            PlotPtsSepp();
-            doPlots_IP_Contour(Interp,rho);  hold off;                 
-            %subplot(2,1,2);
-            figure;
-            doPlots_SC(Interp,Pts,mu); 
-            
             %*** 4th Step ***
             %Solve for density, for given chemical potential field            
             for i=1:2
+                
+                rho    = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
                 theta = pi/2 + atan((IF.y1(1)-IF.y1(end))/PhysArea.y2Max);
                 %rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
                 y = fsolve(@f_eqFull,[0;rho]);

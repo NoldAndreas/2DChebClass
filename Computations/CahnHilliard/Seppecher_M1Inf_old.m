@@ -256,7 +256,7 @@ function data = Seppecher_M1Inf_old()
         %*** Take divergence of momentum eq ***
         % ******** check
         [~,ys,~]       = W(rho);
-        ys             = ys - Cn*Diff.Lap*rho;
+        ys             = ys - Cn*Diff.Lap*rho; 
         
         Cmu            = -Diff.Lap*diag(rho + rho_m);           
         
