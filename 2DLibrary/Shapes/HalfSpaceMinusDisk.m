@@ -25,7 +25,6 @@ classdef HalfSpaceMinusDisk < handle
             elseif(((Geometry.Origin(2)-Geometry.y2Wall) < 0))            
                 errror('Not yet implemented');
             end                        
-            
         end        
         function ptsCart = GetPts(this)            
             ptsCart.y1_kv = [];

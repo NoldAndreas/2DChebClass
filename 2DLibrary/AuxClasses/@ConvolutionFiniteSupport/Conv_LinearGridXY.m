@@ -140,6 +140,10 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
     Interp1 = permute(Interp1,[1 3 2]);
     Interp2 = permute(Interp2,[1 3 2]);    
     
+%     max(max(abs(Interp1)))
+%     max(max(abs(Interp2)))
+%     pause
+    
     mark_id_1 = this.mark_id_1;    
     mark_id_2 = this.mark_id_2;
     mark_12   = this.mark_12;
@@ -166,6 +170,12 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
                 i2mark = interp2_mark(iPtsData,i2Pts); %Get identifying dimensional ID for second dimension for given point to interpolate
                 IP(iPtsData,mark_id(:,mark_12(i1mark,i2mark))) = ...
                     kronecker(Interp1(iPtsData,mark_id_1(:,i1mark),i1Pts),Interp2(iPtsData,mark_id_2(:,i2mark),i2Pts));
+                                
+%                 [Interp1(iPtsData,mark_id_1(:,i1mark),i1Pts)' Interp2(iPtsData,mark_id_2(:,i2mark),i2Pts)']
+%                     ptsC.y1(i1Pts)
+%                     ptsC.y2(i2Pts)
+%                 pause(0.1)
+                %IP(~isfinite(IP)) = 0;
             end
             X(iPts,:,1)       = ones(sum(iPts),1)*(convArea.int*IP);
             for k = 1:noW
@@ -176,6 +186,7 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
                     F = f(convArea.ptsPolLoc);
                 end
                 X(iPts,:,1+k) = ones(sum(iPts),1)*((convArea.int.*F')*IP);
+                
             end
         end
     end

@@ -185,19 +185,20 @@ classdef HalfSpace_FMT < HalfSpace & ConvolutionFiniteSupport
             ptsHS.y2    = pts.y2(~markY2);
             ptsHS.y1    = pts.y1;
     
-            ptsy2 = ptsStrip.y2; 
+            ptsy2 = ptsStrip.y2;
+            
             for iPts = 1:length(ptsy2)
                 dataAD(iPts) = Intersect(this,area,struct('offset_y2',ptsy2(iPts)));
             end
             
             if(nargin==5)
-                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);        
+                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
                 AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights,params);    
             else
                 AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights);        
                 AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights);    
             end
-
+            
             t = toc;
             disp([num2str(t),'s']);  
         end        

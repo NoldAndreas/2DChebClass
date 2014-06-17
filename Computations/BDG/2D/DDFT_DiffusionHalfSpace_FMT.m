@@ -99,6 +99,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace_FMT(optsPhys
         display(['HI computation time (sec): ', num2str(t_HI)]); 
     end
     
+    max(max(abs(IntMatrHI.HIInt11)))
+    max(max(abs(IntMatrHI.HIInt12)))
+    pause
+    
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);
     [Vext,Vext_grad]  = getVBackDVBack(y1S,y2S,optsPhys.V1);       

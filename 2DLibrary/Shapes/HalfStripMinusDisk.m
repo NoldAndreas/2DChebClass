@@ -59,7 +59,11 @@
             [y2_kv,dy2] = LinearMap(x2,thMin,thMax);
             rMax        = max(abs((this.Origin(2)-this.y2Wall)./sin(y2_kv)),this.R);
             rMax        = min(rMax,this.Rmax);
-            rMax(y2_kv == pi) = this.Rmax;
+            if(strcmp(this.LeftRight,'Left'))
+                rMax(y2_kv == pi) = this.Rmax;
+            else
+                rMax(y2_kv == 2*pi) = this.Rmax;
+            end
             rd                = rMax-this.R;
             %L1_r              = min(O*this.L1,rd/3);
             L1_r              = this.L1*rd./(this.L1*3+rd);
