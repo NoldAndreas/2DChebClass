@@ -1,12 +1,4 @@
-function data = Seppecher_M1Inf()
-%************************************************************************* 
-%data = Seppecher(optsPhys,optsNum)
-%
-%            (Eq)  0 = 
-% with   (BC Wall) 0 = Cn*normal*grad(rho_s) + cos(theta)*(rho-1)*rho
-%(BC outer Radius) 0 = normal*grad(rho_s);
-%
-%*************************************************************************   
+function Seppecher_M1Inf()
 
     %% Parameters    
     PhysArea = struct('N',[80,40],'y2Min',0,'y2Max',20,'L1',12,...
@@ -24,19 +16,7 @@ function data = Seppecher_M1Inf()
                         'UWall',-1,...
                         'rho_m',2);
                     
-    config = v2struct(optsPhys,optsNum);
-                               
-    %************************************************
-    %***************  Initialization ****************
-    %************************************************
-    
-%    M  = PhysArea.N(1)*PhysArea.N(2);
-%    FF = false(2*M,1); F = false(M,1); 
-%    TT = true(2*M,1);  T = true(M,1); 
-%    OO = ones(2*M,1);  O = ones(M,1);
-%    ZZ = zeros(2*M,1); Z = zeros(M,1);
-
-    %uwall      = [UWall*O ; 0*O];       
+    config = v2struct(optsPhys,optsNum);   
         
     %************************************************
     %****************  Preprocess  ******************
@@ -45,9 +25,9 @@ function data = Seppecher_M1Inf()
     DI = DiffuseInterface(config);
     DI.Preprocess();                  
                              
-    %****************************************************************
-    %******** Solve for equilibrium density distribution ************
-    %****************************************************************        
+    %***********************************************
+    %******** Start iterative procedure ************
+    %***********************************************
     
     nParticles = 0; 
     D_B        = 0;     
@@ -60,83 +40,37 @@ function data = Seppecher_M1Inf()
     figure('Name','Check accuracy of map');
     DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);    
     
-    for k = 1:3
-        %nParticles = (pi/2 - theta)*(PhysArea.y1Max)^2;        
-        for j = 1:10             
-            
-            %*** 1st step ***
-            D_B    = DI.SetD_B(theta,rho,D_B);               
-            DI.PlotSeppecherSolution(D_B,theta,rho);
-            
-            %*** 2nd step ***
-            [mu,uv,A,b] = DI.GetVelocityAndChemPot(rho,D_B,theta);
-            
-            DI.PlotMu_and_U(mu,uv);            
-            figure; DI.IC.doPlotFLine([-20,20],[PhysArea.y2Max,PhysArea.y2Max],mu,'CART');
-                        
-            %*** 4th Step ***
-            %Solve for density, for given chemical potential field            
-            for i=1:2
-                
-                rho    = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
-                theta = pi/2 + atan((IF.y1(1)-IF.y1(end))/PhysArea.y2Max);
-                %rhoInf = NewtonMethod(rhoInf,@f_eq_inf);
-                y = fsolve(@f_eqFull,[0;rho]);
-                
-                %y     = NewtonMethod([0;rho],@f_eqFull);  
-                rho   = y(2:end);
-                %y     = NewtonMethod([0;rho(bulkSolve)],@f_eq);                 
-                %y     = fsolve(@f_eq,rho(bulkSolve));
-                %rho   = GetFullRho(y(2:end));                    
+    
+    for j = 1:10             
 
-                %*** 2nd Step ***
-                %Determine angle theta from density field            
-                IPUpdate  = UpdateInterfaceAndMap();
-                rho = IPUpdate*rho;   mu  = IPUpdate*mu;
-                
-                subplot(2,1,1); doPlots_IP_Contour(Interp,rho); hold on;
-                plot(IF.y1,IF.y2,'linewidth',2); hold on;    PlotPtsSepp(); 
-                subplot(2,1,2); doPlots_SC(Interp,Pts,rho);                            
-            end
+        %*** 1st step ***
+        D_B    = DI.SetD_B(theta,rho,D_B);               
+        DI.PlotSeppecherSolution(D_B,theta,rho);
+
+        %*** 2nd step ***
+        [mu,uv] = DI.GetVelocityAndChemPot(rho,D_B,theta);
+
+        DI.PlotMu_and_U(mu,uv);            
+        figure; DI.IC.doPlotFLine([-20,20],[PhysArea.y2Max,PhysArea.y2Max],mu,'CART');
+
+        %*** 3rd step ***        
+        for i=1:2
+
+            rho    = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
+            theta  = DI.FindInterfaceAngle(rho);                
+
+%                 IPUpdate  = UpdateInterfaceAndMap();
+%                 rho = IPUpdate*rho;   mu  = IPUpdate*mu;
 
         end
+
     end
+    
   
     %***************************************************************
     %   Physical Auxiliary functions:
     %***************************************************************                            
-    function [y] = f_eqFull(x)
-        %solves for T*log*rho + Vext          
-        mu_s        = x(1);        
-        rho_s       = x(2:end);
-        [~,y,J]     = CahnHilliardFreeEnergy(rho_s,Cn,Diff,mu+mu_s);
-        
-        %Boundary Condition for the density
-        y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
-        %J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];
-        
-        E               = eye(M);
-        ETop            = E(Ind.top,:);
-        topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
-        y(Ind.top)      = topDirection*(Diff.grad*rho_s); %Ind.normalTop*(Diff.grad*rho_s); %TODO!!!
-        %J(Ind.top,:)    = [zeros(sum(Ind.top),1),topDirection*Diff.grad];
-        
-        [~,y(Ind.right)]     = DoubleWellPotential(rho_s(Ind.right),Cn,mu_s);
-        [~,y(Ind.left)]     = DoubleWellPotential(rho_s(Ind.left),Cn,mu_s);        
-        
-        y           = [Int_SubOnFull*rho_s - nParticles;y];
-        
-        
-        %J           = [0,Int_SubOnFull;J];
-        %y           = [Int_SubOnFull*rho_s - nParticles;y(bulkSolve)];
-        %J           = [Int_SubOnFull(bulkSolve);J(bulkSolve,[false;bulkSolve])];
-        %y           = y(bulkSolve);
-        %J           = J(bulkSolve,[false;bulkSolve]);
-        %y           = [Int_SubOnFull*rho_s - nParticles;y(bulkSolve)];
-        %J           = [Int_SubOnFull(bulkSolve);J(bulkSolve,[false;bulkSolve])];
-        
-    end
-
+   
     function [h2,dh2,ddh2] = Interface(y)
         
         InterpIF   = Spectral_Interpolation(y,PtsIFY2,MapsIF);        
@@ -202,12 +136,7 @@ function data = Seppecher_M1Inf()
         dy1_dt      = J(:,1,1);
         dy2_dt      = J(:,2,1);                
     end    
-
-    function aT = transposeVec(a)              
-        aT                = zeros(M,2*M);
-        aT(:,1:M)     = diag(a(1:M));
-        aT(:,1+M:end) = diag(a(1+M:end));
-    end
+    
     function [InterpPlotUV,PtsPlotSepp] = GetUVInterpPlotting()%y1Int,y2Int,n1,n2)
         
         n1 = PlotArea.N1Vecs;  n2 = PlotArea.N2Vecs;
@@ -245,19 +174,5 @@ function data = Seppecher_M1Inf()
              [IF.y2(end),IF.y2(end)+sin(theta)*PlotArea.Hy2],'linewidth',2,'color','k'); hold on;
         ylim([PhysArea.y2Min (PhysArea.y2Max+PlotArea.Hy2)]);             
     end    
-
-%     function [w,dw,J] = DoubleWellPotential(rho,Cn,mu)
-%         %rho in [-1,1]
-%         %w = 1/(2*Cn^2)*(1-rho.^2).^2 + 0.5 |grad(rho)|^2 
-%         w       = 1/(2*Cn^2)*(1-rho.^2).^2;
-%         dw      = - 2/(Cn^2)*(1-rho.^2).*rho ;  
-%         J       = - 2/(Cn^2)*diag(1-3*rho.^2);    
-% 
-%         if(nargin == 3) %if mu is passed as a variable
-%             w      = w - mu.*rho;
-%             dw     = dw - mu;  
-%             J      = [-ones(length(rho),1),J];  
-%         end
-%     end
 
 end

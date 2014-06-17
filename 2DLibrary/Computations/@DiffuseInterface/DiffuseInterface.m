@@ -27,18 +27,16 @@ classdef DiffuseInterface < handle
         end        
         function theta = FindInterfaceAngle(this,rho)
 
-            PtsCart      = this.IC.GetCartPts();
-            fsolveOpts   = optimset('Display','off');                
+            y2M = 0; y2P = 10;
+          %  fsolveOpts   = optimset('Display','off');                
 
-            pt.y2_kv  =  min(PtsCart.y2_kv);
-            y1CartStart = fsolve(@rhoX1,0,fsolveOpts);
+            pt.y2_kv  =  y2M;
+            y1CartStart = fsolve(@rhoX1,10);%,fsolveOpts);
 
-            pt.y2_kv  =  max(PtsCart.y2_kv);
-            y1CartEnd = fsolve(@rhoX1,0,fsolveOpts);                
+            pt.y2_kv  = y2P;
+            y1CartEnd = fsolve(@rhoX1,10);%,fsolveOpts);                
 
-            alpha = atan((y1CartStart-y1CartEnd)/...
-                            (max(PtsCart.y2_kv)-  min(PtsCart.y2_kv)));
-
+            alpha = atan((y1CartStart-y1CartEnd)/(y2P-  y2M));
             theta = alpha + pi/2;
 
             function z = rhoX1(y1)
@@ -100,7 +98,7 @@ classdef DiffuseInterface < handle
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
         [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
         [A,b] = Div_FullStressTensor(this,rho)
-        [A,b] = FullStressTensorIJ(this,rho,i,j)
+        [A,b] = FullStressTensorIJ(this,rho,i,j)        
    end
     
 end
