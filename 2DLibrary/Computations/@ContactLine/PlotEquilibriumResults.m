@@ -83,17 +83,18 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         drho = rhoLiq_sat - rhoGas_sat;
         
-%        optDetails.nContours = rhoGas_sat + 0.1*drho;
-%        optDetails.linecolor = 'b';
-%        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
-        
-        optDetails.nContours = rhoGas_sat + 0.5*drho;
-        optDetails.linecolor = 'k';%[0 0.75 0];
+        optDetails.nContours = rhoGas_sat + 0.1*drho;
+        optDetails.linecolor = 'b';
+        optDetails.linestyle = '--';
         this.HS.doPlots(rho,'contour',optDetails);  hold on;  
         
-%        optDetails.nContours = rhoGas_sat + 0.9*drho;
-%        optDetails.linecolor = 'r';
-%        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        optDetails.nContours = rhoGas_sat + 0.5*drho;
+        optDetails.linecolor = [0 0.75 0];
+        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        
+        optDetails.nContours = rhoGas_sat + 0.9*drho;
+        optDetails.linecolor = 'r';
+        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
         
         xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
         ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);

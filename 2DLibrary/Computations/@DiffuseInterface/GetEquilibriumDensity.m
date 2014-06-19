@@ -1,4 +1,4 @@
-function rho = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
+function [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
     Cn     = this.optsPhys.Cn;
     g      = this.optsPhys.g;    
     
@@ -11,8 +11,11 @@ function rho = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
         mu = mu*ones(M,1);
     end                   
     
-    y     = NewtonMethod([0;rho],@f_eq);
-    rho   = y(2:end);
+    y        = NewtonMethod([0;rho],@f_eq);    
+    muDelta  = y(1);
+    rho      = y(2:end);
+    
+    disp(['Delta mu = ',num2str(muDelta)]);
     
 	
     function [mu_s,J] = GetExcessChemPotential(rho_s,mu_offset)    

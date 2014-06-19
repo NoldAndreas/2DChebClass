@@ -31,13 +31,15 @@ classdef DiffuseInterface < handle
           %  fsolveOpts   = optimset('Display','off');                
 
             pt.y2_kv  =  y2M;
-            y1CartStart = fsolve(@rhoX1,10);%,fsolveOpts);
+            y1CartStart = fsolve(@rhoX1,5);%,fsolveOpts);
 
             pt.y2_kv  = y2P;
-            y1CartEnd = fsolve(@rhoX1,10);%,fsolveOpts);                
+            y1CartEnd = fsolve(@rhoX1,5);%,fsolveOpts);                
 
             alpha = atan((y1CartStart-y1CartEnd)/(y2P-  y2M));
             theta = alpha + pi/2;
+            
+            disp(['Contact angle: ',num2str(theta*180/pi),'[deg].']);
 
             function z = rhoX1(y1)
                 pt.y1_kv = y1;
@@ -93,12 +95,13 @@ classdef DiffuseInterface < handle
         %**********************************
         %External files:
         %**********************************
-        rho = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
+        [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
         D_B = SetD_B(this,theta,rho,initialGuessDB)
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
         [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
         [A,b] = Div_FullStressTensor(this,rho)
-        [A,b] = FullStressTensorIJ(this,rho,i,j)        
+        [A,b] = FullStressTensorIJ(this,rho,i,j)   
+        [rho,uv] = SolveFull(this)
    end
     
 end

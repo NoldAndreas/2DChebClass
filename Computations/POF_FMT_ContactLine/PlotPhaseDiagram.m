@@ -79,8 +79,8 @@ function PlotPhaseDiagram()
     plot(rhoLiq_sat,kBT,'k','linewidth',1.5);
     plot(rho_crit,kBT_crit,'ob','MarkerFace','b','MarkerSize',10);   
     if(isfield(optsPhys,'kBT'))
-        plot(rhoGas_satP,optsPhys.kBT,'or','MarkerFace','r','MarkerSize',10);
-        plot(rhoLiq_satP,optsPhys.kBT,'or','MarkerFace','r','MarkerSize',10);
+        plot(rhoGas_satP,optsPhys.kBT,'^r','MarkerFace','r','MarkerSize',10);
+        plot(rhoLiq_satP,optsPhys.kBT,'^r','MarkerFace','r','MarkerSize',10);
     end
     xlabel('$n\sigma^3$','Interpreter','Latex','fontsize',fontS + 5); %\{\text{liq},\text{gas}\},\text{sat} 
     ylabel('$k_BT/\varepsilon$','Interpreter','Latex','fontsize',20);

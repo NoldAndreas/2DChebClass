@@ -233,7 +233,7 @@ classdef ContactLine < handle
                 this.HS.InterpolationPlotCart(PlotArea,true);
             else
                 if(nargin > 2)
-                    if(~isequal(this.optsNum.PlotArea,PlotArea))
+                    if(~isfield(this.optsNum,'PlotArea') || ~isequal(this.optsNum.PlotArea,PlotArea))
                         this.optsNum.PlotArea = PlotArea;
                         this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);
                     end

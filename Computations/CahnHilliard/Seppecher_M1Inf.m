@@ -1,7 +1,7 @@
 function Seppecher_M1Inf()
 
     %% Parameters    
-    PhysArea = struct('N',[80,40],'y2Min',0,'y2Max',20,'L1',12,...
+    PhysArea = struct('N',[80,50],'y2Min',0,'y2Max',20,'L1',12,...
                       'NBorder',500);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
@@ -30,16 +30,14 @@ function Seppecher_M1Inf()
     %***********************************************
     
     nParticles = 0; 
-    D_B        = 0;     
+    D_B        = 0;       
     
-    rho    = DI.InitialGuessRho();    
-    theta  = DI.FindInterfaceAngle(rho);    
-    rho    = DI.GetEquilibriumDensity(0,theta,nParticles,rho);
+    rho       = DI.InitialGuessRho();    
+    theta     = DI.FindInterfaceAngle(rho);    
+    rho       = DI.GetEquilibriumDensity(0,theta,nParticles,rho);
     
-    eps = 10^(-5);    
-    figure('Name','Check accuracy of map');
-    DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);    
-    
+    eps = 10^(-5);        
+    DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
     
     for j = 1:10             
 
@@ -56,9 +54,8 @@ function Seppecher_M1Inf()
         %*** 3rd step ***        
         for i=1:2
 
-            rho    = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
-            theta  = DI.FindInterfaceAngle(rho);                
-
+            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
+            theta = DI.FindInterfaceAngle(rho);                
 %                 IPUpdate  = UpdateInterfaceAndMap();
 %                 rho = IPUpdate*rho;   mu  = IPUpdate*mu;
 

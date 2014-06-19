@@ -61,10 +61,11 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     %*****************************************************
 
     %2. Left boundary:
-    %Set Chemical potential at -infinty to zero        
+    %Set Chemical potential at -infinty to equilibrium
+    %
     A([Ind.left;FF],:)             = 0;        
     A([Ind.left;FF],[Ind.left;FF]) = eye(sum(Ind.left)); 
-    b([Ind.left;FF])               = 0;
+    b([Ind.left;FF])               = DoublewellPotential(rho(Ind.left),Cn) - Cn*Diff.DDy2(Ind.left,:)*rho;
 
     %3. Right boundary:
     OR                 = ones(sum(Ind.right),1);        
@@ -75,8 +76,10 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     TbHor              = [Tb11;Tb12];        
 
     A(Ind.right,:)                = (OR*IntPathUpLow)*TtHor;
-    A(Ind.right,[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) - ...
-                                    diag(rho(Ind.right)+rho_m)*y2Max;
+    A(Ind.right,[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) ...
+                                    - diag(rho(Ind.right)+rho_m)*y2Max;
+    A(Ind.right,[Ind.left;FF])   = A(Ind.right,[Ind.left;FF])  ...
+                                    + diag(rho(Ind.left)+rho_m)*y2Max;
     b(Ind.right)                  = -IntPathUpLow*TbHor;
     
     %******************************************************
