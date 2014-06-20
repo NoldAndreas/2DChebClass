@@ -1,11 +1,12 @@
 function Seppecher_M1Inf()
 
+    close all;
     %% Parameters    
-    PhysArea = struct('N',[80,50],'y2Min',0,'y2Max',20,'L1',12,...
-                      'NBorder',500);
+    PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',20,'L1',12,... %80,50
+                      'NBorder',200);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
-                      'y2Min',0,'y2Max',PhysArea.y2Max,'N2',100);                      
+                      'y2Min',0,'y2Max',PhysArea.y2Max,'N2',100);   
 
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
     
@@ -27,14 +28,15 @@ function Seppecher_M1Inf()
                              
     %***********************************************
     %******** Start iterative procedure ************
-    %***********************************************
+    %***********************************************    
     
     nParticles = 0; 
     D_B        = 0;       
     
     rho       = DI.InitialGuessRho();    
     theta     = DI.FindInterfaceAngle(rho);    
-    rho       = DI.GetEquilibriumDensity(0,theta,nParticles,rho);
+    uv        = zeros(3*DI.IC.M,1);
+    rho       = DI.GetEquilibriumDensity(0,theta,nParticles,uv,rho);
     
     eps = 10^(-5);        
     DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
@@ -47,14 +49,20 @@ function Seppecher_M1Inf()
 
         %*** 2nd step ***
         [mu,uv] = DI.GetVelocityAndChemPot(rho,D_B,theta);
-
+                
+        
         DI.PlotMu_and_U(mu,uv);            
-        figure; DI.IC.doPlotFLine([-20,20],[PhysArea.y2Max,PhysArea.y2Max],mu,'CART');
+        figure; L_ana = 40;
+        DI.IC.doPlotFLine([-L_ana L_ana],...
+                         [PhysArea.y2Max,PhysArea.y2Max],mu,'CART'); hold on;
+        muM = mu(DI.IC.Ind.left);   muP = mu(DI.IC.Ind.right);
+        plot([0 2*L_ana],[muM(1) muM(1)],'k:');
+        plot([0 2*L_ana],[muP(1) muP(1)],'k:');
 
         %*** 3rd step ***        
         for i=1:2
-
-            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,rho);
+            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
+      %      [rho,uv] = DI.SolveFull([D_B;rho;uv]);
             theta = DI.FindInterfaceAngle(rho);                
 %                 IPUpdate  = UpdateInterfaceAndMap();
 %                 rho = IPUpdate*rho;   mu  = IPUpdate*mu;

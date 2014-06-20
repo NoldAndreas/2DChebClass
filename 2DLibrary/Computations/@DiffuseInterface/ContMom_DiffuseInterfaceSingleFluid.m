@@ -23,6 +23,7 @@ function [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
     aT(:,1+M:end)  = diag(gradRho_T(1+M:end));
 
     A_cont_mu      = zeros(M);
+    %A_cont_uv      = Diff.div*diag(rho_f2);%aT + diag(rho_f)*Diff.div; 
     A_cont_uv      = aT + diag(rho_f)*Diff.div; 
 
     %A_mom_mu       = -diag(rho_f2)*Diff.grad - [diag(Diff.Dy1*rho);diag(Diff.Dy2*rho)];

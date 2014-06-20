@@ -2,7 +2,8 @@ classdef DiffuseInterface < handle
     
    properties (Access = public)              
        IC              
-       optsNum,optsPhys                                    
+       optsNum,optsPhys    
+       IntSubArea
    end
    
    
@@ -18,7 +19,15 @@ classdef DiffuseInterface < handle
             this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
             this.IC.ComputeAll(this.optsNum.PlotArea);               
             this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
-        end                
+
+            bxArea          = this.optsNum.PlotArea;
+            bxArea.N        = [100,100];
+            BX              = Box(bxArea);
+            IntBx           = BX.ComputeIntegrationVector();
+            this.IntSubArea = IntBx*this.IC.SubShapePts(BX.GetCartPts());
+            
+        end
+        
         function rho = InitialGuessRho(this)
             PtsCart    = this.IC.GetCartPts();
             Cn         = this.optsPhys.Cn;
@@ -95,13 +104,13 @@ classdef DiffuseInterface < handle
         %**********************************
         %External files:
         %**********************************
-        [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,rho)
+        [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
         D_B = SetD_B(this,theta,rho,initialGuessDB)
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
         [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
         [A,b] = Div_FullStressTensor(this,rho)
         [A,b] = FullStressTensorIJ(this,rho,i,j)   
-        [rho,uv] = SolveFull(this)
+        [rho,uv] = SolveFull(this,ic)
    end
     
 end

@@ -1,4 +1,5 @@
-function [uCart,p,mask_A,mask_B] = GetSeppecherSolutionCart(Pts,Vc,D_A,D_B,Phi)
+function [uCart] = GetSeppecherSolutionCart(Pts,Vc,D_A,D_B,Phi)
+%,p,mask_A,mask_B]
     
     if(~isstruct(Pts))
         Pts = struct('y1_kv',Pts(:,1),'y2_kv',Pts(:,2));
@@ -9,7 +10,7 @@ function [uCart,p,mask_A,mask_B] = GetSeppecherSolutionCart(Pts,Vc,D_A,D_B,Phi)
     PtsP.y1_kv = r;
     PtsP.y2_kv = th;
         
-    [u,p,mask_A,mask_B] = GetSeppecherSolution(PtsP,Vc,D_A,D_B,Phi);        
+    [u] = GetSeppecherSolution(PtsP,Vc,D_A,D_B,Phi);        %,p,mask_A,mask_B]
     [ux,uy] = GetCartesianFromPolar(u(1:end/2),u(1+end/2:end),th);
     
     uCart = [ux;uy];

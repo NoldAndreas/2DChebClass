@@ -47,12 +47,11 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     %b([Ind.bottom;FF])   = Ind.normalBottom*bf([F;TT],:);        
 
     %*****************************************************
-    %*** Take divergence of momentum eq ***
-    % ******** check    
+    %*** Take divergence of momentum eq ***    
     ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;
 
     Cmu            = -Diff.Lap*diag(rho + rho_m);                   
-    Cuv            = -Cak*(zeta + 4/3*eta)*(Diff.Lap*Diff.div);
+    Cuv            = Cak*(zeta + 4/3*eta)*(Diff.Lap*Diff.div); %-
     C              = [Cmu,Cuv];
     bBound         = - repmat(ys,2,1).*(Diff.grad*rho); 
 
@@ -81,7 +80,7 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     A(Ind.right,[Ind.left;FF])   = A(Ind.right,[Ind.left;FF])  ...
                                     + diag(rho(Ind.left)+rho_m)*y2Max;
     b(Ind.right)                  = -IntPathUpLow*TbHor;
-    
+        
     %******************************************************
     x               = A\b;
 

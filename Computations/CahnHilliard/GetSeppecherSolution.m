@@ -1,4 +1,4 @@
-function [u,p,mask_A,mask_B] = GetSeppecherSolution(Pts,Vc,D_A,D_B,Phi)
+function [u] = GetSeppecherSolution(Pts,Vc,D_A,D_B,Phi) %,p,mask_A,mask_B]
 
     r   = Pts.y1_kv;
     th  = Pts.y2_kv;      
@@ -49,14 +49,14 @@ function [u,p,mask_A,mask_B] = GetSeppecherSolution(Pts,Vc,D_A,D_B,Phi)
     u(mask_A2) = u_A(mask_A2);
     u(mask_B2) = u_B(mask_B2);
 
-    p  = zeros(size(r));
-    if(((D_A~= 0)||(D_B~=0)))
-        disp('GetSeppecherSolution: Pressure for DA,DB ~= 0 not yet implemented.');
-    else
-        pA = 2./r.*(a1*sin(th-Phi) + a2*sin(th));
-        pB = 2./r.*(b1*sin(th-Phi) + b2*sin(th));            
-        p(mask_A) = pA(mask_A);
-        p(mask_B) = pB(mask_B);
-    end            
+%    p  = zeros(size(r));
+ %   if(((D_A~= 0)||(D_B~=0)))
+%        disp('GetSeppecherSolution: Pressure for DA,DB ~= 0 not yet implemented.');
+%    else
+     %   pA = 2./r.*(a1*sin(th-Phi) + a2*sin(th));
+%        pB = 2./r.*(b1*sin(th-Phi) + b2*sin(th));            
+%        p(mask_A) = pA(mask_A);
+%        p(mask_B) = pB(mask_B);
+%    end            
 
 end
