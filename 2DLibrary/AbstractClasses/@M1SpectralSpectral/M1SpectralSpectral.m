@@ -80,16 +80,26 @@ classdef (Abstract) M1SpectralSpectral < Shape
             I2 = barychebevalMatrix(this.Pts.x2,interp2);
         end
         function Ind    = ComputeIndices(this)
-            Ind      = GetIndicesBox(this.Pts.x1,this.Pts.x2);
+            Ind      = GetIndicesBox(this);
             this.Ind = Ind;
         end                 
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
             
+            if(nargin(f)==1)
+                useDistance = true;
+            else
+                useDistance = false;
+            end
+
             N1  = this.N1;  N2  = this.N2;
             Pts = this.Pts;
             Int = this.Int;  % 1 x N1*N2
 
-            fPTemp = f(GetDistance(this,Pts.y1_kv,Pts.y2_kv));
+            if(useDistance)
+                fPTemp = f(GetDistance(this,Pts.y1_kv,Pts.y2_kv));
+            else
+                fPTemp = f(Pts.y1_kv,Pts.y2_kv);
+            end
             
             fDim = size(fPTemp);
             
@@ -105,13 +115,17 @@ classdef (Abstract) M1SpectralSpectral < Shape
             Mmask = repmat({':'},[1,fDim]);
             
             for i=1:(N1*N2) 
-                fP          = f(GetDistance(this,Pts.y1_kv(i) - Pts.y1_kv,Pts.y2_kv(i) - Pts.y2_kv));
+                if(useDistance)
+                    fP          = f(GetDistance(this,Pts.y1_kv(i) - Pts.y1_kv,Pts.y2_kv(i) - Pts.y2_kv));
+                else
+                    fP          = f(Pts.y1_kv(i) - Pts.y1_kv,Pts.y2_kv(i) - Pts.y2_kv);
+                end
                 Mmask{1} = i;
                 M_conv(Mmask{:}) = IntT.*fP;
             end
             M_conv(isnan(M_conv)) = 0;
             
-            if((nargin == 3) && islogical(saveBool) && saveBool)
+            if((nargin >= 3) && islogical(saveBool) && saveBool)
                 this.Conv = M_conv;
             end
             

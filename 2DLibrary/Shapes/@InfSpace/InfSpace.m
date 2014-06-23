@@ -52,27 +52,39 @@ classdef InfSpace < SpectralSpectral
             In matlab this is
             M_conv = Int_D(0) .* f(-z) .* IP_D(x)
             %}
-            if((nargin == 4) && parent)
-                M_conv = ComputeConvolutionMatrix@M1SpectralSpectral(this,f);
+            
+            if((nargin>=4) && parent)
+                M_conv = ComputeConvolutionMatrix@M1SpectralSpectral(this,f,[]);
                 return;
+            end
+            
+            
+            if(nargin(f)==1)
+                useDistance = true;
+            else
+                useDistance = false;
             end
             
             disp('Computing Convolution matrices...'); 
 
             n1 = this.N1;   n2 = this.N2;
-            
+
             if(isfield(shapeParams,'R'))
+                disp('Disc');
                 subShape = Disc(shapeParams);
-                rRange = (-1:0.05:1)';
+                rRange = (-1:0.05:1)';   
             elseif(isfield(shapeParams,'RMin'))
                 if(isfield(shapeParams,'RMax'))
+                    disp('Annulus');
                     subShape = Annulus(shapeParams);
                     rRange = (-1:0.05:1)';
                 else
+                    disp('InfAnnulus');
                     subShape = InfAnnulus(shapeParams);
                     rRange = (-1:0.05:0.9)';
                 end
             else
+                disp('InfDisc');
                 subShape = InfDisc(shapeParams);
                 rRange = (-0.9:0.05:0.9)';
             end
@@ -84,7 +96,12 @@ classdef InfSpace < SpectralSpectral
             % f(-z)
             subShapeCartPts = Pol2CartPts(subShape.Pts);
             invSubShapePts = invertPts(subShapeCartPts,'cart');
-            fP       = f(invSubShapePts.y1_kv,invSubShapePts.y2_kv);
+            
+            if(useDistance)
+                fP       = f(this.GetDistance(invSubShapePts.y1_kv,invSubShapePts.y2_kv));
+            else
+                fP       = f(invSubShapePts.y1_kv,invSubShapePts.y2_kv);
+            end
  
             nDim = length(size(fP));
             if(nDim>2)
@@ -98,9 +115,8 @@ classdef InfSpace < SpectralSpectral
             
             M_conv = zeros(n1*n2,n1*n2,nf);  
                         
-
             figure
-            subShape.doPlots(fP);%doPlots_SC_Polar(Interp,subShape.Pts,fP);
+            subShape.doPlots(fP);
             title('Interpolation of Convolution function'); drawnow;
 
             
@@ -139,9 +155,9 @@ classdef InfSpace < SpectralSpectral
         end
         
         function test(this)            
-%             this.ComputeConvolutionMatrix_Test;            
-            this.ComputeConvolutionMatrix_Test_Short_1; % works for pointwise
-            %this.ComputeConvolutionMatrix_Test_Short_2;  % works for both
+            %this.ComputeConvolutionMatrix_Test;            
+            %this.ComputeConvolutionMatrix_Test_Short_1; % works for pointwise
+            this.ComputeConvolutionMatrix_Test_Short_2;  % works for both
         end
         
     end 

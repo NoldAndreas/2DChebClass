@@ -6,24 +6,20 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
     if(isfield(optsPhys,'nParticlesS'))
         nSpecies=length(optsPhys.nParticlesS);
     else
-        nSpecies=length(optsPhys.nSpecies);
+        nSpecies=optsPhys.nSpecies;
     end
 
     params = optsPhys.HI;
     optsNum = optsNum.HINum;
     
-    if(isfield(params,'HIPreprocess'))
-        fPreprocess = str2func(params.HIPreprocess);
+    if(isfield(optsNum,'HIPreprocess'))
+        fPreprocess = str2func(optsNum.HIPreprocess);
         params = fPreprocess(params);
-        params = rmfield(params,'HIPreprocess');
     end
     
-    f11      = str2func(params.HI11);
-    f12      = str2func(params.HI12);
+    f11      = str2func(optsNum.HI11);
+    f12      = str2func(optsNum.HI12);
 
-    params  = rmfield(params,'HI11');
-    params  = rmfield(params,'HI12');
-    
     if(isfield(optsNum,'N'))
         params.N = optsNum.N;
     else

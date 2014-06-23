@@ -72,18 +72,29 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
         end
         function Ind = ComputeIndices(this)
 
-            x_kv    = kron(this.Pts.x1,ones(size(this.Pts.x2)));
-            outR    = (x_kv == 1);        
+            x1_kv    = kron(this.Pts.x1,ones(size(this.Pts.x2)));
+            outR    = (x1_kv == 1);        
 
+            infBoundary = any(~isfinite(this.Pts.y1_kv));
+            finite   = ~infBoundary & outR;
+            infinite =  infBoundary & outR;
+            
             Z                   = zeros(this.N1*this.N2);        
             nRout               = Z;
 
             nRout(outR,outR)    = speye(sum(outR));
+            
+            normalOutR  = sparse( [nRout(outR,:)  Z(outR,:)]);
 
+            normalFinite   = sparse( [~infBoundary*nRout(finite,:)  Z(finite,:)]);
+            normalInfinite = sparse( [ infBoundary*nRout(infinite,:)  Z(infinite,:)]);
+            
             Ind = struct('outR',outR,...
-                       'normalOutR',  sparse( [nRout(outR,:)  Z(outR,:)]),...
+                       'normalOutR',normalOutR ,...
                        'bound',outR,...
-                       'corners',false(this.N1*this.N2,1));
+                       'corners',false(this.N1*this.N2,1), ...
+                       'finite',finite,'infinite',infinite, ...
+                       'normalFinite',normalFinite,'normalInfinite',normalInfinite);
                    
             this.Ind = Ind;
         end

@@ -4,7 +4,7 @@ function HI = ComputeHI(rho,Dmu,IntMatrHI)
 % needed to give the HI takes exactly the same form.
 
     nSpecies=size(rho,2);
-    
+
     rhoDmu = rho.*Dmu;
 
     HI_11=zeros(size(rho));

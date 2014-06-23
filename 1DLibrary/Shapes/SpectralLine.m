@@ -152,59 +152,59 @@ classdef SpectralLine < Spectral
             end % subshape loop
                 
         end % convolution               
-        function Eta = ComputeFMTMatrices(this,opts)
-            y = this.Pts.y;
-            
-            sigma = opts.sigma;
-            
-            % FIX THIS FOR MULTIPLE SPECIES
-            sigma = sigma(1);
-            
-            if(isfield(opts,'N'))
-                N = opts.N;
-            else
-                N = 100;
-            end
-                
-            F = zeros(this.N,this.N);
-            B = zeros(this.N,this.N);
-            
-            for iY = 1:length(y)
-                
-                % forwards integration
-                geom.yMin = y(iY); geom.yMax = min(y(iY)+sigma,this.yMax); geom.N = N;
-                
-                aLine = SpectralLine(geom);
-                Int  = aLine.ComputeIntegrationVector;
-                
-                x = this.CompSpace(aLine.Pts.y);
-                
-                Interp = this.ComputeInterpolationMatrix(x,false);
-                InterPol = Interp.InterPol;
-                InterPol(InterPol==inf) = 0;
-                
-                F(iY,:) = Int*InterPol;
-                
-                % backwards integration
-                geom.yMin = max(y(iY)-sigma, this.yMin); geom.yMax = y(iY); geom.N = N;
-                
-                aLine = SpectralLine(geom);
-                Int  = aLine.ComputeIntegrationVector;
-                
-                x = this.CompSpace(aLine.Pts.y);
-                
-                Interp = this.ComputeInterpolationMatrix(x,false);
-                InterPol = Interp.InterPol;
-                InterPol(InterPol==inf) = 0;
-                
-                B(iY,:) = Int*InterPol;
-                
-            end
-            
-            Eta.F = F;
-            Eta.B = B;
-                
-        end
+%         function Eta = ComputeFMTMatrices(this,opts)
+%             y = this.Pts.y;
+%             
+%             sigma = opts.sigma;
+%             
+%             % FIX THIS FOR MULTIPLE SPECIES
+%             sigma = sigma(1);
+%             
+%             if(isfield(opts,'N'))
+%                 N = opts.N;
+%             else
+%                 N = 100;
+%             end
+%                 
+%             F = zeros(this.N,this.N);
+%             B = zeros(this.N,this.N);
+%             
+%             for iY = 1:length(y)
+%                 
+%                 % forwards integration
+%                 geom.yMin = y(iY); geom.yMax = min(y(iY)+sigma,this.yMax); geom.N = N;
+%                 
+%                 aLine = SpectralLine(geom);
+%                 Int  = aLine.ComputeIntegrationVector;
+%                 
+%                 x = this.CompSpace(aLine.Pts.y);
+%                 
+%                 Interp = this.ComputeInterpolationMatrix(x,false);
+%                 InterPol = Interp.InterPol;
+%                 InterPol(InterPol==inf) = 0;
+%                 
+%                 F(iY,:) = Int*InterPol;
+%                 
+%                 % backwards integration
+%                 geom.yMin = max(y(iY)-sigma, this.yMin); geom.yMax = y(iY); geom.N = N;
+%                 
+%                 aLine = SpectralLine(geom);
+%                 Int  = aLine.ComputeIntegrationVector;
+%                 
+%                 x = this.CompSpace(aLine.Pts.y);
+%                 
+%                 Interp = this.ComputeInterpolationMatrix(x,false);
+%                 InterPol = Interp.InterPol;
+%                 InterPol(InterPol==inf) = 0;
+%                 
+%                 B(iY,:) = Int*InterPol;
+%                 
+%             end
+%             
+%             Eta.F = F;
+%             Eta.B = B;
+%                 
+%         end
 
         
         

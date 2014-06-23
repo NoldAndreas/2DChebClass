@@ -1,4 +1,4 @@
- function X = Conv_LinearGridX(this,ptsC,dataAD,weights)
+ function X = Conv_LinearGridX(this,ptsC,dataAD,weights,params)
 %% Input
 %
 % * ptsC     - structure with the following members:
@@ -153,7 +153,13 @@
             X(iPts,:,1)       = ones(sum(iPts),1)*(data.int*IP);            
             for k = 1:noW
                 f             = str2func(weights{k});
-                X(iPts,:,1+k) = ones(sum(iPts),1)*((data.int.*f(data.ptsPolLoc)')*IP);
+                if(nargin == 5)
+                    F = f(data.ptsPolLoc,params);
+                else
+                    F = f(data.ptsPolLoc);
+                end
+                X(iPts,:,1+k) = ones(sum(iPts),1)*((data.int.*F')*IP);
+                %X(iPts,:,1+k) = ones(sum(iPts),1)*((data.int.*f(data.ptsPolLoc)')*IP);
             end
             checkSum(iPts)  = data.area;                                
            

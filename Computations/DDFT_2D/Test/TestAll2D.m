@@ -1,0 +1,15 @@
+Test_DDFT_DiffusionBox_MF;
+
+Test_DDFT_DiffusionDisc_MF;
+
+Test_DDFT_DiffusionInfDisc_MF;
+
+Test_DDFT_DiffusionInfSpace_MF;
+
+Test_DDFT_DiffusionInfSpace_FMT(false);
+Test_DDFT_DiffusionInfSpace_FMT(true);
+
+Test_DDFT_DiffusionHalfSpace_FMT;
+Test_DDFT_DiffusionHalfSpace_MF;
+
+Test_DDFT_DiffusionInfCapillary_MF;

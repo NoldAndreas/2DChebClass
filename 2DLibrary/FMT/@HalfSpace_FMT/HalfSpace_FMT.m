@@ -140,6 +140,69 @@ classdef HalfSpace_FMT < HalfSpace & ConvolutionFiniteSupport
             t = toc;
             disp([num2str(t),'s']);  
         end        
+        
+        function AD = ComputeConvolutionFiniteSupport2(this,area,weights,pts,params)
+            %only tested if pts are in a shape of a HalfSpace                   
+            %**********************************************************
+            %INPUT:
+            %   - area: an object with properties: ...
+            %   - weights: a list of functions which get a structure with 
+            %         two arrays [y1_kv,y2_kv] as input and returns one
+            %         array of same size. Here, [y1_kv,y2_kv] are in polar
+            %         coordinates, representing the radial and angular
+            %         component, respectively.
+            %   - pts : structure with 'y1_kv','y2_kv','y1','y2'. 
+            %           (y1_kv,y2_kv) is in the cartesian coordinate
+            %           system, and is a grid defined through [y1 (X) y2]            
+            %
+            %OUTPUT:
+            %AD  - Average densities to get average densities
+            %
+            %AD(i,:,l)*rho  = int(rho(r_i+rd)*weights{k}(rd), 
+            %            rd in area and (r_i + rd) in Halfspace)   
+            %           where r_i is defined through the input pts
+            %            
+            %**********************************************************            
+                        
+            %*********************************
+            %Initialization:
+            fprintf('Computing interpolation for matrices for averaged densities..\n');
+            tic
+            
+            AD  = zeros(this.M,this.M,numel(weights)+1);%always include unity weight
+            %*********************************
+            
+            markY2  = (pts.y2 < this.y2wall + 2*this.R);
+            markYkv = (pts.y2_kv < this.y2wall + 2*this.R);
+            
+            ptsStrip.y1_kv = pts.y1_kv(markYkv);
+            ptsStrip.y2_kv = pts.y2_kv(markYkv);
+            ptsStrip.y2    = pts.y2(markY2);
+            ptsStrip.y1    = pts.y1;
+            
+            ptsHS.y1_kv = pts.y1_kv(~markYkv);
+            ptsHS.y2_kv = pts.y2_kv(~markYkv);
+            ptsHS.y2    = pts.y2(~markY2);
+            ptsHS.y1    = pts.y1;
+    
+            ptsy2 = ptsStrip.y2;
+            
+            for iPts = 1:length(ptsy2)
+                dataAD(iPts) = Intersect(this,area,struct('offset_y2',ptsy2(iPts)));
+            end
+            
+            if(nargin==5)
+                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
+                AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights,params);    
+            else
+                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights);        
+                AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights);    
+            end
+            
+            t = toc;
+            disp([num2str(t),'s']);  
+        end        
+        
         function [AD,AAD] = GetAverageDensities(this,area,weights)
             %**********************************************************
             %INPUT:

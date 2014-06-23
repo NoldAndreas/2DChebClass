@@ -178,59 +178,60 @@ classdef InfSpectralLine < Spectral
             end % subshape loop
                 
         end % convolution
-        function Eta = ComputeFMTMatrices(this,opts)
-            y = this.Pts.y;
-            
-            sigma = opts.sigma;
-            
-            if(isfield(opts,'N'))
-                N = opts.N;
-            else
-                N = 100;
-            end
-                
-            F = zeros(this.N,this.N);
-            B = zeros(this.N,this.N);
-            
-            for iY = 1:length(y)
-                
-                % forwards integration
-                geom.yMin = y(iY); geom.yMax = y(iY)+sigma; geom.N = N;
-                
-                aLine = SpectralLine(geom);
-                Int  = aLine.ComputeIntegrationVector;
-                
-                x = this.CompSpace(aLine.Pts.y);
-                
-                Interp   = this.ComputeInterpolationMatrix(x,false);
-                InterPol = Interp.InterPol;
-                InterPol(InterPol==inf) = 0;
-                
-                F(iY,:) = Int*InterPol;
-                
-                % backwards integration
-                geom.yMin = y(iY)-sigma; geom.yMax = y(iY); geom.N = N;
-                
-                aLine = SpectralLine(geom);
-                Int  = aLine.ComputeIntegrationVector;
-                
-                x = this.CompSpace(aLine.Pts.y);
-                
-                Interp = this.ComputeInterpolationMatrix(x,false);
-                InterPol = Interp.InterPol;
-                InterPol(InterPol==inf) = 0;
-                
-                B(iY,:) = Int*InterPol;
-                
-            end
-            
-            F(isnan(F)) = 0;
-            B(isnan(B)) = 0;
-            
-            Eta.F = F;
-            Eta.B = B;
-                
-        end
+        
+%         function Eta = ComputeFMTMatrices(this,opts)
+%             y = this.Pts.y;
+%             
+%             sigma = opts.sigma;
+%             
+%             if(isfield(opts,'N'))
+%                 N = opts.N;
+%             else
+%                 N = 100;
+%             end
+%                 
+%             F = zeros(this.N,this.N);
+%             B = zeros(this.N,this.N);
+%             
+%             for iY = 1:length(y)
+%                 
+%                 % forwards integration
+%                 geom.yMin = y(iY); geom.yMax = y(iY)+sigma; geom.N = N;
+%                 
+%                 aLine = SpectralLine(geom);
+%                 Int  = aLine.ComputeIntegrationVector;
+%                 
+%                 x = this.CompSpace(aLine.Pts.y);
+%                 
+%                 Interp   = this.ComputeInterpolationMatrix(x,false);
+%                 InterPol = Interp.InterPol;
+%                 InterPol(InterPol==inf) = 0;
+%                 
+%                 F(iY,:) = Int*InterPol;
+%                 
+%                 % backwards integration
+%                 geom.yMin = y(iY)-sigma; geom.yMax = y(iY); geom.N = N;
+%                 
+%                 aLine = SpectralLine(geom);
+%                 Int  = aLine.ComputeIntegrationVector;
+%                 
+%                 x = this.CompSpace(aLine.Pts.y);
+%                 
+%                 Interp = this.ComputeInterpolationMatrix(x,false);
+%                 InterPol = Interp.InterPol;
+%                 InterPol(InterPol==inf) = 0;
+%                 
+%                 B(iY,:) = Int*InterPol;
+%                 
+%             end
+%             
+%             F(isnan(F)) = 0;
+%             B(isnan(B)) = 0;
+%             
+%             Eta.F = F;
+%             Eta.B = B;
+%                 
+%         end
        
         
    end

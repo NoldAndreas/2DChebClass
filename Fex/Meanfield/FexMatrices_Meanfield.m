@@ -15,11 +15,12 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
 %OUTPUT:
 % M_conv = convolution matrix, size (N1*N2,N1*N2) , see above
 %************************************************************************
+
     if(isfield(optsPhys,'nParticlesS'))
         nSpecies=length(optsPhys.nParticlesS);
     else
-        nSpecies=length(optsPhys.nSpecies);
-	end
+        nSpecies=optsPhys.nSpecies;
+    end
 
     %paramNames = optsPhys.potParams2Names;
     %nParams    = length(paramNames);
@@ -59,7 +60,7 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
              for jSpecies = 1:nSpecies
                  
                 optsPhysIJ = getIJParams(iSpecies,jSpecies);
-                
+
                 z(:,iSpecies,jSpecies) = f(r,optsPhysIJ);                
              end
          end                 

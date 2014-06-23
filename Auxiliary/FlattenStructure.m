@@ -21,17 +21,17 @@ function C = FlattenStructure(A,decimalCut,AllStr)
 
     end
     
-    %(2) Transform vectors to multiple entries
+    %(2) Transform vectors and cells to multiple entries
     f_names     = fieldnames(C);
     for i=1:length(f_names)
-        val  = C.(f_names{i});
+        val  = C.(f_names{i});        
         if(isnumeric(val))
             [s1,s2] = size(val);
             if((s1>1) || (s2 > 1))
                 for j1 = 1:s1
                     for j2 = 1:s2                        
                         if((s1 > 1) && (s2 > 1))
-                            newname = [f_names{i},'_',num2str(s1),'_',num2str(s2)];
+                            newname = [f_names{i},'_',num2str(j1),'_',num2str(j2)];
                         elseif((s1 == 1) || (s2 == 1))
                             newname = [f_names{i},'_',num2str(max(j1,j2))];                           
                         end                        
@@ -40,13 +40,34 @@ function C = FlattenStructure(A,decimalCut,AllStr)
                 end
                 C = rmfield(C,f_names{i});
             end
+        elseif(iscell(val))
+            [s1,s2] = size(val);
+            if(s1==1 && s2==1)
+                C.(f_names{i}) = C.(f_names{i}){1};
+            else
+                for j1 = 1:s1
+                    for j2 = 1:s2                        
+                        if((s1 > 1) && (s2 > 1))
+                            newname = [f_names{i},'_',num2str(j1),'_',num2str(j2)];
+                        elseif((s1 == 1) || (s2 == 1))
+                            newname = [f_names{i},'_',num2str(max(j1,j2))];                           
+                        end                        
+                        C.(newname) = val{j1,j2};
+                    end
+                end
+                C = rmfield(C,f_names{i});
+            end
         end
     end
-    
+     
     %(3) Also cut down numbers to decimalCut decimal places    
     if(nargin > 1)        
         f_names     = fieldnames(C);
         for i=1:length(f_names)
+            % deal with logical values
+            if(islogical(C.(f_names{i})))
+                C.(f_names{i}) = double(C.(f_names{i}));
+            end
             if(isempty(C.(f_names{i})))
                 C.(f_names{i}) = '[]';
             elseif(isnumeric(C.(f_names{i})))
@@ -62,7 +83,7 @@ function C = FlattenStructure(A,decimalCut,AllStr)
             end
         end
     end
-    
+   
     function snew = concatenateStructures(s1,s2)
         snew = struct();
         

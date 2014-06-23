@@ -34,7 +34,7 @@
            this.Pts.y2_kv   = [this.Sub_Strip.Pts.y2_kv;...
                                this.Sub_HalfSpace.Pts.y2_kv];
                            
-           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == 0);
+           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == 0);    % should this not depend on y2Min?
            this.Pts.y2      = this.Pts.y2_kv(this.Pts.y1_kv == inf);
            
            this.Pts.x1      = this.Sub_Strip.Pts.x1;
