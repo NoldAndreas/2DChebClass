@@ -35,8 +35,7 @@ classdef InfCapillarySkewed < InfCapillary
                 exc = MException('HalfSpaceSkewed:GetInvCartPts','select cartSkewed');
                 throw(exc);                
             end            
-        end        
-        
+        end                
         function [Int,Int1,Int2]    = ComputeIntegrationVector(this)
             %This gives the integration in the real (cartesian) space!
             [Int,Int1,Int2] = ComputeIntegrationVector@SpectralSpectral(this);  
@@ -94,8 +93,7 @@ classdef InfCapillarySkewed < InfCapillary
             % 
             %Diff.DDy1 = ;
             
-        end
-        
+        end        
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool,ptsCheck)
             if(nargin>=4)
                 M_conv  = ComputeConvolutionMatrix@InfCapillary(this,f,ptsCheck);

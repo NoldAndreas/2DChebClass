@@ -29,7 +29,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
     diary(diaryFile); diary on;
        
     if((nargin > 0) && islogical(configIn))
-        PhysArea = struct('N',[20,20],'L1_Skewed',2,'L2',2,'y2wall',0.,...
+        PhysArea = struct('N',[20,20],'L1',2,'L2',2,'y2wall',0.,...
                           'N2bound',24,'h',1,'L2_AD',2.,'alpha_deg',90);
 
         PhysArea.Conv  = struct('L',[],'L2',1.,'N',[50,50]);         
@@ -115,7 +115,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
     %(2) Numerical Integration, Differentiation
     optsHS       = PhysArea;
     optsHS.alpha = theta_CS;
-    HS                 = HalfSpaceSkewed_FMT(optsHS,diag(optsPhys.sigmaS)/2);
+    HS                 = HalfSpace_FMT(optsHS,diag(optsPhys.sigmaS)/2);
     [Pts,Diff,Int,Ind] = HS.ComputeAll();
     HS.InterpolationPlotCart(PlotArea,true);
     PtsCart  = HS.GetCartPts();

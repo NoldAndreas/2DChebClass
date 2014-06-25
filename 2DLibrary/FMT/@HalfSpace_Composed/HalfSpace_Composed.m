@@ -8,25 +8,33 @@
        Sub_HalfSpace    %Area_ID: 1
        %mark_id_1,mark_id_2,mark_id,mark_12
        Pts,N1,N2
-       Mstrip,MHS,M     %no of points (in both dimensions)       
+       Mstrip,MHS,M     %no of points (in both dimensions)
+       alpha                
    end
    
    methods
        function this = HalfSpace_Composed(Geometry)
            %Geometry includes:
            % y2Min,h,L1,L2,N,N2bound
+           if(~isfield(Geometry,'alpha'))
+               Geometry.alpha = pi/2;
+           end
+           
            shapeStrip      = struct('y2Min',Geometry.y2Min,...
                                     'y2Max',Geometry.y2Min + Geometry.h,...
                                     'L1',Geometry.L1,...
-                                    'N',[Geometry.N(1),Geometry.N2bound]);
+                                    'N',[Geometry.N(1),Geometry.N2bound],...
+                                    'alpha',Geometry.alpha);
                                 
-           this.Sub_Strip  = InfCapillary(shapeStrip); 
+           this.Sub_Strip  = InfCapillarySkewed(shapeStrip); 
            
            shapeHalfSpace  = struct('y2Min',Geometry.y2Min + Geometry.h,...
                                     'L2',Geometry.L2,'L1',Geometry.L1,...
-                                    'N',Geometry.N);
-           this.Sub_HalfSpace = HalfSpace(shapeHalfSpace);
+                                    'N',Geometry.N,...
+                                    'alpha',Geometry.alpha);
+           this.Sub_HalfSpace = HalfSpaceSkewed(shapeHalfSpace);
            
+           this.alpha       = Geometry.alpha;
            
            this.Pts.y1_kv   = [this.Sub_Strip.Pts.y1_kv;...
                                this.Sub_HalfSpace.Pts.y1_kv];
@@ -34,7 +42,7 @@
            this.Pts.y2_kv   = [this.Sub_Strip.Pts.y2_kv;...
                                this.Sub_HalfSpace.Pts.y2_kv];
                            
-           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == 0);    % should this not depend on y2Min?
+           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == 0);
            this.Pts.y2      = this.Pts.y2_kv(this.Pts.y1_kv == inf);
            
            this.Pts.x1      = this.Sub_Strip.Pts.x1;
@@ -75,96 +83,55 @@
            this.mark_12(1,1) = 1;
            this.mark_12(1,2) = 2;
        end       
-       
-       function pts = GetCartPts(this,pts1,pts2)
-           if(nargin==3)
-                pts.y1_kv = pts1;
-                pts.y2_kv = pts2;
-           else
-               pts = this.Pts;
-           end
-       end
-       function pts = GetInvCartPts(this,pts1,pts2)
-           pts.y1_kv = pts1;
-           pts.y2_kv = pts2;
-       end
-       
-       function [refpts,ptsy2] = GetRefY2Pts(this,diskLimit) 
-           
-           M = length(this.Sub_Strip.Pts.y1_kv);
-           
-           N21 = this.Sub_Strip.Pts.N2;
-           
-           %Set up ptsy2           
-           for i = 1:N21
-               ptsy2(i)  = this.Pts.y2_kv(i);
-           end
-           for i = 1:this.Sub_HalfSpace.Pts.N2
-               if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
-                   ptsy2(N21 + i) = this.Sub_HalfSpace.Pts.y2_kv(i);               
-               else
-                   break;
-               end
-           end
-           
-           %Set up refpts
-           refpts    = zeros(length(this.Pts.y1_kv),1);
-           for i = 1:M
-               refpts(i) = mmod(i,this.Sub_Strip.N2);               
-           end
-           
-           for i = 1:length(this.Sub_HalfSpace.Pts.y1_kv)
-               if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
-                   refpts(M+i) = N21 + mmod(i,this.Sub_HalfSpace.N2);
-               else
-                   refpts(M+i) = -1;
-               end
-           end
-       end       
-       function [VIP,ptsPlot] = doPlots(this,V,SC)
+
+       function ptsCart = GetCartPts(this,pts_y1,pts_y2)            
+            if(nargin == 1)
+                pts_y1 = this.Pts.y1_kv;
+                pts_y2 = this.Pts.y2_kv;
+            end                                              
+            [ptsCart.y1_kv,ptsCart.y2_kv] = SkewedGrid(pts_y1,pts_y2,this.alpha);
+       end    
+       function pts = GetInvCartPts(this,ptsCart_y1,ptsCart_y2)                                              
+            [pts.y1_kv,pts.y2_kv] = InvSkewedGrid(ptsCart_y1,ptsCart_y2,this.alpha);            
+        end              
+       function doPlots(this,V,opts)                      
            global PersonalUserOutput
            if(~PersonalUserOutput)
                 return;
            end
+           xl = [-5 5];
+           yl = [0 5];
+           N  = 50;
            
-           N = 50;
+           PlotArea = struct('y1Min',xl(1),'y1Max',xl(2),...
+                             'y2Min',this.Sub_Strip.y2Min,'y2Max',this.Sub_Strip.y2Max,...
+                             'N1',N,'N2',N);
+           this.Sub_Strip.InterpolationPlot(PlotArea,true);           
            
-           y1Abs = 2*this.Sub_HalfSpace.L1;
-           y2Abs = 2*this.Sub_HalfSpace.L2;
+           PlotArea.y2Min = this.Sub_HalfSpace.y2Min;
+           PlotArea.y2Max = yl(2);
            
-           y1 = (-N/2:N/2)'*2/N*y1Abs;
-           y2 = (0:N)'/N*y2Abs;
-
-           ptsPlot.y1_kv = kron(y1,ones(size(y2)));
-           ptsPlot.y2_kv = kron(ones(size(y1)),y2);
-
-           IP = this.SubShapePts(ptsPlot);          
+           this.Sub_HalfSpace.InterpolationPlot(PlotArea,true);
            
-           VIP = IP*V;
-           
-           surf_from_scatter(ptsPlot.y1_kv,ptsPlot.y2_kv,VIP); hold on;
-           if((nargin > 2) && strcmp(SC,'SC'))
-               mask    = ((this.Pts.y1_kv <= max(ptsPlot.y1_kv)) & ...
-                                   (this.Pts.y1_kv >= min(ptsPlot.y1_kv)) & ...
-                                   (this.Pts.y2_kv <= max(ptsPlot.y2_kv)) & ...
-                                   (this.Pts.y2_kv >= min(ptsPlot.y2_kv)));                                        
-
-                h       = scatter3(this.Pts.y1_kv(mask),this.Pts.y2_kv(mask),...
-                                                        V(mask),'o');
-                set(h,'MarkerEdgeColor','k','MarkerFaceColor','g');
+           if((nargin > 2) && (ischar(opts)))
+                this.Sub_Strip.doPlots(V(this.mark_id(:,1)),opts); hold on;           
+                this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)),opts);
+           else
+               this.Sub_Strip.doPlots(V(this.mark_id(:,1))); hold on;           
+               this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)));
            end
-           %scatter3(this.Pts.y1_kv,this.Pts.y2_kv,V);
-           
-                       
-            xl = [-y1Abs,y1Abs];
-            yl = [0,y2Abs];
-            
-            xlim(xl);
-            ylim(yl);
-            pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);
-           
+                      
+           xlim(xl);
+           ylim(yl);
+           pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);
+          
        end       
-       function IP = SubShapePts(this,a_shapePts)                   
+       function IP = SubShapePtsCart(this,a_shapePts)
+            pts = GetInvCartPts(this,a_shapePts.y1_kv,a_shapePts.y2_kv);
+            IP  = SubShapePts(this,pts);  
+            %IP = InterpolationMatrix_Pointwise(this,pts.y1_kv,pts.y2_kv);                           
+       end 
+       function IP = SubShapePts(this,a_shapePts)
            maskStrip = (a_shapePts.y2_kv < this.Sub_Strip.y2Max);
            maskHS    = (a_shapePts.y2_kv >= this.Sub_HalfSpace.y2Min);
            
@@ -199,11 +166,10 @@
            
            mark_id = interp2(:,2);
            
-       end
-       
+       end 
        function [x1] = CompSpace1(this,y1)           
             x1 = this.Sub_Strip.CompSpace1(y1);           
-       end       
+       end 
 	   function [x2] = CompSpace2(this,y2)
            
            mark_id = GetArea_ID(this,1,y2);
@@ -211,34 +177,16 @@
            x2(mark_id==1,1) = this.Sub_Strip.CompSpace2(y2(mark_id==1));
            x2(mark_id==2,1) = this.Sub_HalfSpace.CompSpace2(y2(mark_id==2));
            x2(:,2)          = mark_id;          
-       end       
+       end    
        function [I12] = Combine12(this,I1,I2)
            %I1 - linear Operator on first dimension
            %I2 - linear Operator on second dimension           
            I12 = [kronecker(I1,I2(:,this.mark_id_2{1})),kronecker(I1,I2(:,this.mark_id_2{2}))];
-       end                  
+       end
        function id = GetArea_ID(this,y1,y2)
            id = ones(size(y2));
            id(y2 >= this.Sub_Strip.y2Max) = 2;
        end
-       function PlotGrid(this)
-           global PersonalUserOutput
-            if(~PersonalUserOutput)
-                return;
-            end
-            scatter(this.Sub_Strip.Pts.y1_kv,...
-                    this.Sub_Strip.Pts.y2_kv,'ob');    hold on;
-            scatter(this.Sub_HalfSpace.Pts.y1_kv,...
-                    this.Sub_HalfSpace.Pts.y2_kv,'or');
-            plot([-7 7],[1. 1.],'b');
-            plot([-7 7],[0. 0.],'k','linewidth',2);
-            plot([-7 7],[0.5 0.5],'--b','linewidth',1.2);
-            xlim([-7 7]);
-            ylim([-0.5 3]);
-            pbaspect([14 3.5 1]);
-            set(gca,'fontsize',15);
-       end
-       
 	   function do1DPlotNormal(this,V)
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -246,21 +194,21 @@
             end
             %V: Vector of length N2
             y2Max       = 10;
-            mark        = (this.Pts.y1_kv == inf);                                    
-            y2IP        = (0:0.1:y2Max)'; 
-            [h_1,IP]    = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));                     
+            mark        = (this.Pts.y1_kv == inf);            
+            y2IP        = (0:0.1:y2Max)';
+            [h_1,IP]      = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));
             
-            PtsCart     = GetCartPts(this);            
+            PtsCart     = GetCartPts(this);
+            y2IPCart    = y2IP*sin(this.alpha);            
             plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
             hold on;
-            plot(y2IP,IP*V,'linewidth',1.5);
-            xlim([min(y2IP) max(y2IP)]);
+            plot(y2IPCart,IP*V,'linewidth',1.5);
+            xlim([min(y2IPCart) max(y2IPCart)]);
             xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);       
-       end
-        
-	   function do1DPlotParallel(this,V)   
+       end    
+       function do1DPlotParallel(this,V)  
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -281,8 +229,57 @@
             xlabel('$y_{1}$','Interpreter','Latex','fontsize',25);        
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);       
-       end        
-               
-        
+       end 
+       function PlotGridLines(this)
+            this.Sub_HalfSpace.PlotGridLines(); hold on;
+            this.Sub_Strip.PlotGridLines();
+       end
+%        
+%        function [refpts,ptsy2] = GetRefY2Pts(this,diskLimit) 
+%            
+%            M = length(this.Sub_Strip.Pts.y1_kv);
+%            
+%            N21 = this.Sub_Strip.Pts.N2;
+%            
+%            %Set up ptsy2           
+%            for i = 1:N21
+%                ptsy2(i)  = this.Pts.y2_kv(i);
+%            end
+%            for i = 1:this.Sub_HalfSpace.Pts.N2
+%                if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
+%                    ptsy2(N21 + i) = this.Sub_HalfSpace.Pts.y2_kv(i);               
+%                else
+%                    break;
+%                end
+%            end
+%            
+%            %Set up refpts
+%            refpts    = zeros(length(this.Pts.y1_kv),1);
+%            for i = 1:M
+%                refpts(i) = mmod(i,this.Sub_Strip.N2);               
+%            end
+%            
+%            for i = 1:length(this.Sub_HalfSpace.Pts.y1_kv)
+%                if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
+%                    refpts(M+i) = N21 + mmod(i,this.Sub_HalfSpace.N2);
+%                else
+%                    refpts(M+i) = -1;
+%                end
+%            end
+%        end      
+       
+%        function PlotGrid(this)
+%             scatter(this.Sub_Strip.Pts.y1_kv,...
+%                     this.Sub_Strip.Pts.y2_kv,'ob');    hold on;
+%             scatter(this.Sub_HalfSpace.Pts.y1_kv,...
+%                     this.Sub_HalfSpace.Pts.y2_kv,'or');
+%             plot([-7 7],[1. 1.],'b');
+%             plot([-7 7],[0. 0.],'k','linewidth',2);
+%             plot([-7 7],[0.5 0.5],'--b','linewidth',1.2);
+%             xlim([-7 7]);
+%             ylim([-0.5 3]);
+%             pbaspect([14 3.5 1]);
+%             set(gca,'fontsize',15);
+%        end
    end
 end

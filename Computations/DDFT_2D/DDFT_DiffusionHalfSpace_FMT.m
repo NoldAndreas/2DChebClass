@@ -51,12 +51,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace_FMT(optsPhys
         optsPlot.lineColourDDFT={'r','b','g','k','m'};
         optsPlot.doDDFTPlots=true;
     end
-    
-    if(~isfield(optsNum,'Accuracy_Averaging'))
-        optsNum.Accuracy_Averaging = 1e-6;
-    end
-    
-    IDC = HalfSpace_FMT(PhysArea,R,optsNum.Accuracy_Averaging);
+        
+    IDC = HalfSpace_FMT(PhysArea,R);
     
     [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(optsNum.PlotArea);
     
@@ -99,9 +95,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionHalfSpace_FMT(optsPhys
         display(['HI computation time (sec): ', num2str(t_HI)]); 
     end
     
-    max(max(abs(IntMatrHI.HIInt11)))
-    max(max(abs(IntMatrHI.HIInt12)))
-    pause
+%    max(max(abs(IntMatrHI.HIInt11)))
+%    max(max(abs(IntMatrHI.HIInt12)))
+%    pause
     
     y1S     = repmat(Pts.y1_kv,1,nSpecies); 
     y2S     = repmat(Pts.y2_kv,1,nSpecies);

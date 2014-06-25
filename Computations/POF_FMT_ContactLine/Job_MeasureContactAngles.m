@@ -6,9 +6,7 @@ function Job_MeasureContactAngles()
     ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
 
     PhysArea = struct('N',[35,65],...
-                      'L1_Skewed',5,...
-                      'L2_Skewed',2,...
-                      'L2_AD_Skewed',2.,...
+                      'L1',5,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',24,'h',1,...
                       'alpha_deg',90);
@@ -61,7 +59,7 @@ function Job_MeasureContactAngles()
     opts90_a.config.optsNum.PhysArea.alpha_deg = 90; 
     opts90_a.config.optsNum.maxComp_y2         = 15;
     opts90_a.config.optsNum.PhysArea.N         = [50,80];
-    opts90_a.config.optsNum.PhysArea.L1_Skewed = 4; 
+    opts90_a.config.optsNum.PhysArea.L1        = 4; 
     opts90_a.config.optsNum.PhysArea.N2bound   = 14; 
     opts90_a.epw                               = 1.:0.02:1.08;
     resM90_a = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_a,[]);    
@@ -83,7 +81,7 @@ function Job_MeasureContactAngles()
 	opts60.config                            = config;
     opts60.config.optsNum.PhysArea.alpha_deg = 60;
     opts60.config.optsNum.PhysArea.N         = [45,90];
-    opts60.config.optsNum.PhysArea.L1_Skewed = 4;
+    opts60.config.optsNum.PhysArea.L1        = 4;
     opts60.config.optsNum.PhysArea.N2bound   = 14;
     opts60.config.optsNum.maxComp_y2         = 15;
     opts60.epw                               = 1.2:0.02:1.3;%resM90.epw(abs(resM90.thetaM-40)<=10);
@@ -102,7 +100,7 @@ function Job_MeasureContactAngles()
 	opts40.config                            = config;
     opts40.config.optsNum.PhysArea.alpha_deg = 40;
     opts40.config.optsNum.PhysArea.N         = [45,80];
-    opts40.config.optsNum.PhysArea.L1_Skewed = 4;     
+    opts40.config.optsNum.PhysArea.L1        = 4;     
     opts40.config.optsNum.PhysArea.N2bound   = 14;
     opts40.epw                               = 1.3:0.02:1.4;%resM90.epw(abs(resM90.thetaM-40)<=10);
     resM40 = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts40,[]);
@@ -293,7 +291,7 @@ end
 
 
 
-%         PhysArea = struct('N',[40,40],'L1_Skewed',2,'L2',2,'y2wall',0.,...
+%         PhysArea = struct('N',[40,40],'L1',2,'L2',2,'y2wall',0.,...
 %                           'N2bound',24,'h',1,'L2_AD',2.,'alpha_deg',90);
 % 
 %         PhysArea.Conv  = struct('L',1,'L2',[],'N',[20,20]);

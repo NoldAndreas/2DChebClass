@@ -5,7 +5,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT_T
     end
 
     Phys_Area = struct('shape','HalfSpace_FMT','N',[20;20],'L1',2,'L2',2, ...
-                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1);
+                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90);                    
     
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
                        'y2Min',0.5,'y2Max',5,'N2',100);
@@ -18,7 +18,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT_T
     
     tMax = 0.25;
 
-    DDFTCode = 'DDFT_DiffusionHalfSpace_FMT';
+    DDFTCode = 'DDFT_DiffusionHalfSpace_FMT_skewed';
 %     DDFTCode = 'DDFT_Diffusion_2D';    
     
     optsNum = struct('PhysArea',Phys_Area,...

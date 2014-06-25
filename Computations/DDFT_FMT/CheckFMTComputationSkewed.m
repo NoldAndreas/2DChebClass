@@ -48,7 +48,7 @@ function CheckFMTComputationSkewed()
     %************************************************
     PhysArea  = optsNum.PhysArea;           
     Rs        = diag(optsPhys.sigmaS)/2;     
-    HS        = HalfSpaceSkewed_FMT(PhysArea,Rs);
+    HS        = HalfSpace_FMT(PhysArea,Rs);
     
     %************************************************
     %****************  Preprocess  ******************

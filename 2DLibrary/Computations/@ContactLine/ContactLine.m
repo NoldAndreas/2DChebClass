@@ -87,16 +87,16 @@ classdef ContactLine < handle
             %(2) Numerical Integration, Differentiation
             optsHS             = this.optsNum.PhysArea;
             optsHS.alpha       = this.optsNum.PhysArea.alpha_deg*pi/180;
-            this.HS            = HalfSpaceSkewed_FMT(optsHS,diag(this.optsPhys.sigmaS)/2);
+            this.HS            = HalfSpace_FMT(optsHS,diag(this.optsPhys.sigmaS)/2);
             [Pts,Diff,Int,Ind] = this.HS.ComputeAll();
             PtsCart            = this.HS.GetCartPts();
 
             %(3) Numerical Convolution
             opts.V2                 = this.optsPhys.V2;
             opts.nSpecies           = this.optsPhys.nSpecies;
-            opts.optsNum.PhysArea.N         = this.optsNum.PhysArea.N;
-            opts.optsNum.PhysArea.L1_Skewed = this.optsNum.PhysArea.L1_Skewed;
-            opts.optsNum.PhysArea.L2_Skewed = this.optsNum.PhysArea.L2_Skewed;
+            opts.optsNum.PhysArea.N  = this.optsNum.PhysArea.N;
+            opts.optsNum.PhysArea.L1 = this.optsNum.PhysArea.L1;
+            opts.optsNum.PhysArea.L2 = this.optsNum.PhysArea.L2;
             opts.optsNum.PhysArea.alpha_deg = this.optsNum.PhysArea.alpha_deg;
             opts.optsNum.PhysArea.Conv      = this.optsNum.PhysArea.Conv;
             opts.Comments           = ['ConfigFile: ',this.configName,'.txt'];

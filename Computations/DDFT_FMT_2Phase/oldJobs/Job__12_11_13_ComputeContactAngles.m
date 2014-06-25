@@ -4,7 +4,7 @@ function Job__12_11_13_ComputeContactAngles()
 % For enhanced accuracy, 60x60 points are used. 
 % No dynamics is to be computed
 
-    PhysArea = struct('N',[40,40],'L1_Skewed',2,'L2',2,'y2wall',0.,...
+    PhysArea = struct('N',[40,40],'L1',2,'L2',2,'y2wall',0.,...
                       'N2bound',24,'h',1,'L2_AD',2.,'alpha_deg',90);
 
     PhysArea.Conv  = struct('L',1,'L2',[],'N',[20,20]);

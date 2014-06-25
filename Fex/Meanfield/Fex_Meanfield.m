@@ -5,10 +5,14 @@ function MeanField = Fex_Meanfield(rho,IntMatrFex,kBT)
 
     MeanField=zeros(size(rho));
 
-    for iSpecies=1:nSpecies
-        for jSpecies=1:nSpecies
-            MeanField(:,iSpecies) = MeanField(:,iSpecies) ...
-              + IntMatrFex(iSpecies,jSpecies).Conv*rho(:,jSpecies);
-        end
-    end    
+    if((nSpecies > 1) || isstruct(IntMatrFex))
+        for iSpecies=1:nSpecies
+            for jSpecies=1:nSpecies
+                MeanField(:,iSpecies) = MeanField(:,iSpecies) ...
+                  + IntMatrFex(iSpecies,jSpecies).Conv*rho(:,jSpecies);
+            end
+        end    
+    else
+        MeanField = IntMatrFex*rho;
+    end
 end

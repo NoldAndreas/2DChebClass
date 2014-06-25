@@ -3,7 +3,7 @@ function CL = ThreePhaseContactLine_FMT_BH(configIn)
     global dirData
     
     if((nargin > 0) && islogical(configIn))
-        PhysArea = struct('N',[40,40],'L1_Skewed',2,'L2',2,'y2wall',0.,...
+        PhysArea = struct('N',[40,40],'L1',2,'L2',2,'y2wall',0.,...
                           'N2bound',24,'h',1,'L2_AD',2.,'alpha_deg',90);
 
         PhysArea.Conv  = struct('L',1,'L2',[],'N',[20,20]);

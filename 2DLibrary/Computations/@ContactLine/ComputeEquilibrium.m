@@ -49,17 +49,13 @@ function sol = ComputeEquilibrium(this,redo)
     misc.FexNum = this.optsNum.FexNum;
     
     if(nargin == 1)
-        [x_ic,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
+        [this.rho_eq,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
                             @ComputeEquilibriumCondition,opts,misc); %true      
     else
-        [x_ic,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
+        [this.rho_eq,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
                             @ComputeEquilibriumCondition,opts,misc,redo); %true      
     end
-    
-             
-    x_ic(mark)  = x_ic;
-    x_ic(~mark) = x_ig(~mark);                                       
-    this.rho_eq = exp((x_ic-this.Vext)/kBT);
+
     this.FilenameEq  = paramsEq.Filename;
 	sol.Filename     = [dirData filesep 'EquilibriumSolutions' filesep paramsEq.Filename];
     

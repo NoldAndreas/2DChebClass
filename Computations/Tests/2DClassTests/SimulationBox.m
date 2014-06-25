@@ -32,7 +32,7 @@ function data = SimulationBox(N1,N2,L1,L2,vext)
     [VP]             = vext(Interp.pts1,Interp.pts2);                          
 
     %Check Differentiation
-    vplot   = Interp.InterPol*V;        
+    vplot   = Interp.InterPol*V;
     data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');
     
     %Check Interpolation        

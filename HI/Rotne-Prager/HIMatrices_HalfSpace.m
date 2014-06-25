@@ -52,11 +52,11 @@ function HIStruct = HIMatrices_HalfSpace(opts,IDC)
             
             paramsIJ.HIfn = f11;
             
-            HITemp11 = IDC.ComputeConvolutionFiniteSupport2(area,weights,IDC.Pts,paramsIJ);
+            HITemp11 = IDC.ComputeConvolutionFiniteSupport(area,weights,IDC.Pts,paramsIJ);
             
             paramsIJ.HIfn = f12;
             
-            HITemp12 = IDC.ComputeConvolutionFiniteSupport2(area,weights,IDC.Pts,paramsIJ);
+            HITemp12 = IDC.ComputeConvolutionFiniteSupport(area,weights,IDC.Pts,paramsIJ);
             
             % padded with weight of 1, so start indexing at 2
             HIInt11 = [HITemp11(:,:,2), HITemp11(:,:,3) ; ...

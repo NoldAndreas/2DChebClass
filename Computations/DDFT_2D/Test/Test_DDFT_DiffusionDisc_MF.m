@@ -5,12 +5,18 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
     Plot_Area = struct('y1Min',0,'y1Max',2,'N1',100,...
                        'y2Min',0,'y2Max',2*pi,'N2',100);
                    
-    FexNum = struct('Fex','Meanfield','N',[20,20],'L',1);
+    Sub_Area = struct('shape','Box','N',[20,20],...
+                      'y1Min',-1,'y1Max',1,...
+                      'y2Min',-1,'y2Max',1);  
+                   
+    V2Num    = struct('Fex','Meanfield','N',[20,20],'L',1);
+%    Fex_Num   = struct('Fex','FMTRosenfeld',...
+%                       'Ncircle',10,'N1disc',10,'N2disc',10);
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D',...
+                     'SubArea',Sub_Area,...
+                     'V2Num',V2Num,...%'FexNum',FexNum,...%'DDFTCode','DDFT_Diffusion_2D',...                     
                      'plotTimes',0:7/100:7);
 
     epsilonS=2*[ 1 1 1 ;
@@ -30,7 +36,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
             alpha13 alpha23 alpha3  ];
         
         
-    V1 = struct('V1DV1','V1_Test_Disc','V0',0.5,'grav',1); 
+    V1 = struct('V1DV1','V1_Test_Disc_Cart','V0',0.5,'grav',1); 
                            
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
     
@@ -42,9 +48,19 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
+    
+    config = v2struct(optsPhys,optsNum);
+    
+    %****************************
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();
+    
+    
+%    f = str2func(optsNum.DDFTCode);
+%    output = f(optsPhys,optsNum,optsPlot);                 
 
 end                 
 

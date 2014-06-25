@@ -1,37 +1,60 @@
-classdef HalfSpace_FMT < HalfSpace & ConvolutionFiniteSupport
+classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
     properties
         R
-        AD %Check how to handle multiple Species!        
-        %InterpFull
+        AD        
         y2wall
-        Accuracy        
     end
     
     methods
-        function this = HalfSpace_FMT(Geometry,R,accuracy)   
+        
+        %% Exemple for grids such as defined by HalfSpace_FMT
+        % 
+        % <<GridsDensities.PNG>>
+        % 
+        % *Caption:* the grid depicted on the left is defined by _this_ object and its parents, and the
+        % grid on the right by the property object _AD_ of this class         
+        
+        function this = HalfSpace_FMT(Geometry,R)   
+            
+            if(~isfield(Geometry,'alpha') && ~isfield(Geometry,'alpha_deg'))
+                Geometry.alpha = pi/2; %default: 90 deg
+                Geometry.alpha_deg = 90; %default: 90 deg
+            elseif(~isfield(Geometry,'alpha') && isfield(Geometry,'alpha_deg'))                
+                Geometry.alpha = Geometry.alpha_deg*pi/180;                            
+            elseif(isfield(Geometry,'alpha') && ~isfield(Geometry,'alpha_deg'))                
+                Geometry.alpha_deg = Geometry.alpha*180/pi;
+            end            
+            
+            % multiply with factor to take into account skewed grid by
+            % angle alpha
+            
+            alpha_rad = Geometry.alpha_deg*pi/180;
+            L1        = Geometry.L1/sin(alpha_rad);
+            L2        = Geometry.L2/sin(alpha_rad);
+            L2_AD     = Geometry.L2_AD/sin(alpha_rad);
+            %config.optsNum.PhysArea.L2        = 2/sin(config.optsNum.PhysArea.alpha_deg*pi/180);
             
             shapeHS       = Geometry;
             shapeHS.y2Min = Geometry.y2wall+R;
+            shapeHS.L1    = L1;
+            shapeHS.L2    = L2;
             
-            this@HalfSpace(shapeHS);
+            this@HalfSpaceSkewed(shapeHS);
             
             this.R        = R;
-            this.y2wall   = Geometry.y2wall;
-            if(nargin == 3)
-                this.Accuracy = accuracy;
-            else
-                this.Accuracy = 1;
-            end
+            this.y2wall   = Geometry.y2wall;            
             
             %Geometry includes:
            % y2Min,h,L1,L2,N
             %Check how to handle multiple Species!
             %this.Boundary(1,length(R)) = InfCapillary();
-            %for i = 1:length(R)
-            shapeAD = struct('L1',Geometry.L1,'L2',Geometry.L2_AD,...
-                            'y2Min',Geometry.y2wall,...
-                            'h',Geometry.h,...
-                            'N',Geometry.N,'N2bound',Geometry.N2bound);
+            %for i = 1:length(R)            
+            shapeAD = struct('L1',L1,...
+                             'L2',L2_AD,...
+                             'y2Min',Geometry.y2wall,...
+                             'h',Geometry.h,...
+                             'N',Geometry.N,'N2bound',Geometry.N2bound,...
+                             'alpha',Geometry.alpha);
 
             this.AD = HalfSpace_Composed(shapeAD);                        
             
@@ -57,6 +80,10 @@ classdef HalfSpace_FMT < HalfSpace & ConvolutionFiniteSupport
              this.mark_12   = ones(1,1); 
         end                  
         function do1Dplot(this,val,y1)  
+            global PersonalUserOutput
+            if(~PersonalUserOutput)
+                return;
+            end
             
             %TODO: Do proper interpolation
             if(nargin == 2)
@@ -85,154 +112,8 @@ classdef HalfSpace_FMT < HalfSpace & ConvolutionFiniteSupport
             set(gca,'linewidth',1.5);                                    
         end
         
-        function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts)
-            %only tested if pts are in a shape of a HalfSpace                   
-            %**********************************************************
-            %INPUT:
-            %   - area: an object with properties: ...
-            %   - weights: a list of functions which get a structure with 
-            %         two arrays [y1_kv,y2_kv] as input and returns one
-            %         array of same size. Here, [y1_kv,y2_kv] are in polar
-            %         coordinates, representing the radial and angular
-            %         component, respectively.
-            %   - pts : structure with 'y1_kv','y2_kv','y1','y2'. 
-            %           (y1_kv,y2_kv) is in the cartesian coordinate
-            %           system, and is a grid defined through [y1 (X) y2]            
-            %
-            %OUTPUT:
-            %AD  - Average densities to get average densities
-            %
-            %AD(i,:,l)*rho  = int(rho(r_i+rd)*weights{k}(rd), 
-            %            rd in area and (r_i + rd) in Halfspace)   
-            %           where r_i is defined through the input pts
-            %            
-            %**********************************************************            
-                        
-            %*********************************
-            %Initialization:
-            fprintf('Computing interpolation for matrices for averaged densities..\n');
-            tic
-            
-            AD  = zeros(this.AD.M,this.M,numel(weights)+1);%always include unity weight
-            %*********************************
-            
-            markY2  = (pts.y2 < this.y2wall + 2*this.R);
-            markYkv = (pts.y2_kv < this.y2wall + 2*this.R);
-            
-            ptsStrip.y1_kv = pts.y1_kv(markYkv);
-            ptsStrip.y2_kv = pts.y2_kv(markYkv);
-            ptsStrip.y2    = pts.y2(markY2);
-            ptsStrip.y1    = pts.y1;
-            
-            ptsHS.y1_kv = pts.y1_kv(~markYkv);
-            ptsHS.y2_kv = pts.y2_kv(~markYkv);
-            ptsHS.y2    = pts.y2(~markY2);
-            ptsHS.y1    = pts.y1;
-    
-            ptsy2 = ptsStrip.y2; 
-            for iPts = 1:length(ptsy2)
-                dataAD(iPts) = Intersect(this,area,struct('offset_y2',ptsy2(iPts)));
-            end
-            
-            AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights);        
-            AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights);    
-
-            t = toc;
-            disp([num2str(t),'s']);  
-        end        
-        
-        function AD = ComputeConvolutionFiniteSupport2(this,area,weights,pts,params)
-            %only tested if pts are in a shape of a HalfSpace                   
-            %**********************************************************
-            %INPUT:
-            %   - area: an object with properties: ...
-            %   - weights: a list of functions which get a structure with 
-            %         two arrays [y1_kv,y2_kv] as input and returns one
-            %         array of same size. Here, [y1_kv,y2_kv] are in polar
-            %         coordinates, representing the radial and angular
-            %         component, respectively.
-            %   - pts : structure with 'y1_kv','y2_kv','y1','y2'. 
-            %           (y1_kv,y2_kv) is in the cartesian coordinate
-            %           system, and is a grid defined through [y1 (X) y2]            
-            %
-            %OUTPUT:
-            %AD  - Average densities to get average densities
-            %
-            %AD(i,:,l)*rho  = int(rho(r_i+rd)*weights{k}(rd), 
-            %            rd in area and (r_i + rd) in Halfspace)   
-            %           where r_i is defined through the input pts
-            %            
-            %**********************************************************            
-                        
-            %*********************************
-            %Initialization:
-            fprintf('Computing interpolation for matrices for averaged densities..\n');
-            tic
-            
-            AD  = zeros(this.M,this.M,numel(weights)+1);%always include unity weight
-            %*********************************
-            
-            markY2  = (pts.y2 < this.y2wall + 2*this.R);
-            markYkv = (pts.y2_kv < this.y2wall + 2*this.R);
-            
-            ptsStrip.y1_kv = pts.y1_kv(markYkv);
-            ptsStrip.y2_kv = pts.y2_kv(markYkv);
-            ptsStrip.y2    = pts.y2(markY2);
-            ptsStrip.y1    = pts.y1;
-            
-            ptsHS.y1_kv = pts.y1_kv(~markYkv);
-            ptsHS.y2_kv = pts.y2_kv(~markYkv);
-            ptsHS.y2    = pts.y2(~markY2);
-            ptsHS.y1    = pts.y1;
-    
-            ptsy2 = ptsStrip.y2;
-            
-            for iPts = 1:length(ptsy2)
-                dataAD(iPts) = Intersect(this,area,struct('offset_y2',ptsy2(iPts)));
-            end
-            
-            if(nargin==5)
-                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
-                AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights,params);    
-            else
-                AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights);        
-                AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights);    
-            end
-            
-            t = toc;
-            disp([num2str(t),'s']);  
-        end        
-        
-        function [AD,AAD] = GetAverageDensities(this,area,weights)
-            %**********************************************************
-            %INPUT:
-            %   - area: an object with properties: ...
-            %   - weights: a list of functions which get a structure with 
-            %         two arrays [y1_kv,y2_kv] as input and returns one
-            %         array of same size. Here, [y1_kv,y2_kv] are in polar
-            %         coordinates, representing the radial and angular
-            %         component, respectively.
-            %
-            %OUTPUT:
-            %AD  - Average densities to get average densities
-            %AAD - average the average densities to compute free energy
-            %
-            %AD(i,:,l)*rho  = int(rho(r_i+rd)*weights{k}(rd), 
-            %            rd in area and (r_i + rd) in Halfspace)   
-            %           where r_i are the points defined in this.AD.Pts. 
-            %           This is the grid on which the weighted densities
-            %           are defined.
-            %
-            %AAD(j,:)*rho_AD = int(rho(r_j + rd)*weights{k}(rd),rd in area)
-            %           where r_j are the points defined in this.Pts. 
-            %           This is the grid on which the density
-            %           is defined.
-            %
-            %NOTE:             
-            %**********************************************************
-            AD   = ComputeConvolutionFiniteSupport(this,area,weights,this.AD.Pts);
-            AAD  = this.AD.ComputeConvolutionFiniteSupport(area,weights,this.Pts);
-        end   
+        AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
+        [AD,AAD] = GetAverageDensities(this,area,weights)
     end
     
     

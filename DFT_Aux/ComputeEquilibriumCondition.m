@@ -1,46 +1,80 @@
-function [x_ic] = ComputeEquilibriumCondition(params,misc)
+function [sol] = ComputeEquilibriumCondition(params,misc)
 
-
-    x_ig = misc.x_ig;
-    mark = misc.mark;
+    x_ig = misc.x_ig;    
     Vext = misc.Vext;
     VAdd = misc.VAdd;
     Conv = misc.Conv;
-    IntMatrFex = misc.IntMatrFex;
+    IntMatrFex = misc.IntMatrFex;    
+    nSpecies   = params.optsPhys.nSpecies;
     
-    kBT    = params.optsPhys.kBT;
-    mu_sat = params.optsPhys.mu_sat;    
-    Dmu    = params.optsPhys.Dmu;    
-    R      = params.optsPhys.sigmaS/2;     
+    if(~isfield(misc,'marc'))
+        mark = true(size(VAdd,1),1);
+    else
+        mark = misc.mark;
+    end
     
-	getFex    = str2func(['Fex_',misc.FexNum.Fex]);
+    kBT    = params.optsPhys.kBT;    
+    
+	getFex    = str2func(['Fex_',misc.FexNum.Fex]);    
+	R      = params.optsPhys.sigmaS/2;         
     
     fsolveOpts       = optimset('TolFun',1e-10,'TolX',1e-10);
     
-    %[x_ic,~,flag_fsolve]    = fsolve(@GetExcessChemPotential,x_ig(mark),fsolveOpts);
-    [x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
-    if(flag_fsolve~=1)
-        x_ic = 0;
+    if(isfield(params.optsPhys,'mu_sat') && isfield(params.optsPhys,'Dmu'))
+        mu                      = params.optsPhys.mu_sat + params.optsPhys.Dmu;
+        [x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
+    else        
+        Int                     = misc.Int;
+        nParticlesS             = params.optsPhys.nParticlesS;
+        [x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig([true;mark],:),fsolveOpts);
+        mu    = x_ic(1,:);
+        x_ic  = x_ic(2:end,:);        
     end
     
-    function mu_sRel = fs(xm)
-        mu_sRel = GetExcessChemPotential(xm)./exp((xm-Vext(mark))/kBT);
+    x_ic_full(mark,:)  = x_ic;
+    x_ic_full(~mark,:) = x_ig(~mark,:);
+    
+    rho = exp((x_ic_full-Vext)/kBT);
+
+    if(flag_fsolve~=1)
+        rho = 0;
     end
-    function mu_s = GetExcessChemPotential(xm)        
-        x(mark)  = xm;
-        x(~mark) = x_ig(~mark);
-        x        = x';
-        mu_s = GetExcessChemPotentialFull(x);
-        mu_s = mu_s(mark);
+    
+    sol = v2struct(rho,mu);    
+    
+    function mu_sRel = fs(xm)                
+        mu_sRel = GetExcessChemPotentialPart(xm,mu)./exp((xm-Vext(mark,:))/kBT);
+    end
+
+    function y = fs_canonical(x)
+        mu_s         = x(1,:);
+        x            = x(2:end,:);       
+        
+        y            = GetExcessChemPotentialPart(x,mu_s);%./exp((x-Vext(mark,:))/kBT);
+        
+        xf(mark,:)   = x;
+        xf(~mark,:)  = x_ig(~mark,:);        
+        rho_full     = exp((xf-Vext)/kBT);
+        y            = [Int*rho_full - nParticlesS';y];
+        y            = y(:);        
+    end
+
+    function mu_s = GetExcessChemPotentialPart(xm,mu)        
+        x(mark,:)  = xm;
+        x(~mark,:) = x_ig(~mark,:);        
+        mu_s       = GetExcessChemPotential(x,mu);
+        mu_s       = mu_s(mark,:);
     end   
-    function mu_s = GetExcessChemPotentialFull(x)                
+    function mu_s = GetExcessChemPotential(x,mu)
         rho_s    = exp((x-Vext)/kBT);
-        mu_s     = getFex(rho_s,IntMatrFex,kBT,R);
-                       
-%        for iSpecies=1:1%nSpecies
-%           mu_s(:,iSpecies) = mu_s(:,iSpecies) - (mu_sat + Dmu);
-        %end
-        mu_s = mu_s - (mu_sat + Dmu);
-        mu_s = mu_s + x + Conv*rho_s + VAdd;           
+        mu_s     = getFex(rho_s,IntMatrFex,kBT,R) + ...
+                                Fex_Meanfield(rho_s,Conv,kBT);
+        
+        for iSpecies=1:nSpecies
+           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu(iSpecies);
+        end
+
+        mu_s = mu_s + x + VAdd;
     end   
+
 end

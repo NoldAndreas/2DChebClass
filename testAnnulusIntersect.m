@@ -10,7 +10,7 @@ Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
 
 R = 0.5;
                
-IDC = HalfSpace_FMT(Phys_Area,R,1e-6);
+IDC = HalfSpace_FMT(Phys_Area,R);
     
 [Pts,Diff,Int,Ind,~] = IDC.ComputeAll(Plot_Area);
 

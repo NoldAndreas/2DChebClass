@@ -168,7 +168,7 @@ function ThreePhaseContactLine_FMT_HalfSpaceSkewed(CompCase,Case90)
     %(2) Numerical Integration, Differentiation
     optsHS       = PhysArea;
     optsHS.alpha = theta_CS;
-    HS                 = HalfSpaceSkewed_FMT(optsHS,diag(optsPhys.sigmaS)/2);
+    HS                 = HalfSpace_FMT(optsHS,diag(optsPhys.sigmaS)/2);
     [Pts,Diff,Int,Ind] = HS.ComputeAll();
     HS.InterpolationPlotCart(optsNum.PlotArea,true);
     PtsCart  = HS.GetCartPts();

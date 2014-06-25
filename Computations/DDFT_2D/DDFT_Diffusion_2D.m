@@ -23,8 +23,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     kBT         = optsPhys.kBT;
     nParticlesS = optsPhys.nParticlesS;
     nSpecies    =length(nParticlesS);
-      
-    mS = optsPhys.mS;
+
+    if(~isfield(optsPhys,'mS'))        
+        optsPhys.mS = 1;
+    end
+    mS     = optsPhys.mS;
+    if(~isfield(optsPhys,'gammaS'))        
+        optsPhys.gammaS = 1;
+    end    
     gammaS = optsPhys.gammaS;
     gamma  = bsxfun(@times,gammaS',ones(N1*N2,nSpecies));
     m  = bsxfun(@times,mS',ones(N1*N2,nSpecies));
@@ -67,7 +73,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     paramsFex.Pts     = IDC.Pts;
     paramsFex.nSpecies = nSpecies;   
     
-    FexFun         = str2func(['FexMatrices_',optsNum.FexNum.Fex]);    
+    FexFun         = str2func(['FexMatrices_',optsNum.FexNum.Fex]);
 	IntMatrFex     = DataStorage(['FexData' filesep class(IDC)],FexFun,paramsFex,IDC);   
         
     fprintf(1,'done.\n');
@@ -109,6 +115,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
         subArea       = subshapeClass(optsNum.SubArea);
         IP            = IDC.SubShapePts(subArea.Pts);
         Int_of_path   = subArea.IntFluxThroughDomain(100)*blkdiag(IP,IP);
+    else
+        Int_of_path   =  zeros(1,2*N1*N2);
     end
                                     
     %****************************************************************
@@ -172,8 +180,8 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
     
     fprintf(1,'Computing dynamics ...'); 
 
-    opts = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag(mM));
-    [~,X_t] =  ode15s(@dx_dt,plotTimes,x_ic,opts);
+    opts = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag([ones(nSpecies,1);mM]));    
+    [~,X_t] =  ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);   
         
     fprintf(1,'done.\n');
     
@@ -187,18 +195,15 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
 
     nPlots = length(plotTimes);
     
-    X_t = X_t';
+	accFlux   = X_t(:,1:nSpecies);
+    X_t       = X_t(:,nSpecies+1:end)';
     
     rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
     
     X_t       = reshape(X_t,N1*N2,nSpecies,nPlots);
     rho_t     = reshape(rho_t,N1*N2,nSpecies,nPlots);
     flux_t    = zeros(2*N1*N2,nSpecies,nPlots);
-    V_t       = zeros(N1*N2,nSpecies,nPlots);
-    
-    if(doSubArea)
-        accFlux   = zeros(nPlots,1);
-    end
+    V_t       = zeros(N1*N2,nSpecies,nPlots);   
     
     for i = 1:length(plotTimes)
         if(doHI)
@@ -207,9 +212,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
             flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
         end    
         V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
-        if(doSubArea)
-            accFlux(i) = Int_of_path*flux_t(:,:,i);
-        end
     end
                            
     data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
@@ -236,7 +238,6 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
         y            = [Int*rho_full - nParticlesS';y];
         y            = y(:);
     end
-
     function y0 = getInitialGuess(VAdd)
         
       if(~isfield(optsPhys,'HSBulk') && ~isfield(optsNum,'HSBulk'))
@@ -263,9 +264,9 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
       end
     
     end
-
     function dxdt = dx_dt(t,x)
         
+        x        = x(nSpecies+1:end);             
         x        = reshape(x,N1*N2,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
@@ -285,14 +286,13 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D(optsPhys,optsNum,o
             dxdt = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        flux_dir             = Diff.grad*mu_s;
+        flux_dir               = Diff.grad*mu_s;
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;
         dxdt(Ind.infinite,:)   = x(Ind.infinite,:) - x_ic(Ind.infinite,:);
 
         dxdt = D0.*dxdt;
-        
-        dxdt = dxdt(:);
-        
+                
+        dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
     end
     
     function mu_s = GetExcessChemPotential(x,t,mu_offset)

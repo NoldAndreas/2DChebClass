@@ -13,6 +13,10 @@ function err = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,cart)
         cprintf('magenta',str);
     end                       	
     
+    if(nargin < 5)
+        return;
+    end
+    
     if(isfield(Diff,'Dy1') && isfield(Vdiff,'dy1'))
         [err.dy1,err.dy1_i] = GetMaxAndPos(Diff.Dy1,Vdiff.dy1,'d/dy1');        
     end
