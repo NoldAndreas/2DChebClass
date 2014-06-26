@@ -11,10 +11,9 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfDisc_MF()
 
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D',...
+                     'V2Num',FexNum,...                     
                      'plotTimes',0:4/100:4);
-
+                 
     epsilonS=2*[ 1 1 1 ;
     1 1 1 ;
     1 1 1 ] ;
@@ -32,7 +31,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfDisc_MF()
             alpha13 alpha23 alpha3  ];
         
         
-    V1       = struct('V1DV1','V1_Rotating_Polar',...
+    V1       = struct('V1DV1','V1_Rotating_Cart',...%V1_Rotating_Polar
                       'V0',0.05,'V0r',1,'alphar',1,'tau',1,'rV',1); 
                            
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
@@ -43,11 +42,16 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfDisc_MF()
                  
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
-    optsPlot.doDDFTPlots=true;
-                  
+    optsPlot.doDDFTPlots=true;    
+    
+    
+    config = v2struct(optsPhys,optsNum);
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();        
 
 end                 
 

@@ -1,4 +1,4 @@
-function FMT = Fex_FMTRosenfeld(rho,IntMatrFex,kBT)
+function FMT = Fex_FMTRosenfeld(rho,IntMatrFex,kBT,R)
     % get number of species
     nSpecies=size(rho,2);
 

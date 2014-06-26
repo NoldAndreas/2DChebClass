@@ -11,8 +11,7 @@
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D',...
+                     'V2Num',FexNum,...                     
                      'plotTimes',0:7/100:7);
 
     epsilonS=2*[ 1 1 1 ;
@@ -45,9 +44,13 @@
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
 
+    config = v2struct(optsPhys,optsNum);
+    %****************************
+    AddPaths();
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics(); 
 end                 
 

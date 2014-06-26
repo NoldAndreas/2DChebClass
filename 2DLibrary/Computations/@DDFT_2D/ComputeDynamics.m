@@ -1,4 +1,15 @@
-function ComputeDynamics(this,rho_0,mu)
+function ComputeDynamics(this,x_ic,mu)
+
+%% Solves
+% 
+% $$\frac{\partial \varrho}{\partial t} = \nabla \cdot ( \varrho \nabla \mu )$$
+% 
+% in computational variable x: $\varrho = e^{(x-Vext)/(k_B T)}$
+% 
+% $$\frac{\partial x}{\partial t} = k_B T \Delta \mu + (\nabla x - \nabla V)\cdot \nabla \mu$$
+% 
+
+
 
     % Initialization
     optsPhys    = this.optsPhys;
@@ -20,6 +31,12 @@ function ComputeDynamics(this,rho_0,mu)
     Ind         = this.IDC.Ind;        
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;    
+    if(strcmp(this.IDC.polar,'polar'))
+        polarShape = true;
+    else
+        polarShape = false;
+    end
+    
     subArea     = this.subArea;
     
 	I           = eye(M);  
@@ -29,13 +46,13 @@ function ComputeDynamics(this,rho_0,mu)
 	y1S     = repmat(PtsCart.y1_kv,1,nSpecies); 
     y2S     = repmat(PtsCart.y2_kv,1,nSpecies);
 
+    ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
     
     if(nargin < 2)
-        rho_0 = this.rho_eq;
+        x_ic = this.x_eq;
         mu    = this.mu;
     end
-    
-    x_ic = -(kBT*log(rho_0) + this.Vext);
+        
     tic
     
     mM            = ones(M,1);
@@ -44,8 +61,11 @@ function ComputeDynamics(this,rho_0,mu)
     
     fprintf(1,'Computing dynamics ...'); 
 
+    if(isfield(optsNum,'PlotArea'))
+        optsNumT = rmfield(optsNum,'PlotArea');
+    end
     [X_t,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNum,optsPhys),[]); %true      
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
             
     fprintf(1,'done.\n');
     
@@ -98,7 +118,9 @@ function ComputeDynamics(this,rho_0,mu)
     
      function dxdt = dx_dt(t,x)
         
-        x        = x(nSpecies+1:end);             
+        % ignore first row of entries. This is mass in subsystem 
+        x        = x(nSpecies+1:end);              
+        
         x        = reshape(x,M,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);
@@ -110,12 +132,11 @@ function ComputeDynamics(this,rho_0,mu)
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         
         if(doHI)
-            rho_s = exp((x-Vext)/kBT);
-            rho_s = [rho_s;rho_s];
+            rho_s    = exp((x-Vext)/kBT);
+            rho_s    = [rho_s;rho_s];
             gradMu_s = Diff.grad*mu_s;
-            HI_s = ComputeHI(rho_s,gradMu_s,IntMatrHI);
-            
-            dxdt = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
+            HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
+            dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
         flux_dir               = Diff.grad*mu_s;
@@ -139,22 +160,14 @@ function ComputeDynamics(this,rho_0,mu)
         mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
     end   
     
-%     function mu_s = GetExcessChemPotential(x,t,mu_offset)
-%         rho_s = exp((x-Vext)/kBT);
-%         mu_s  = getFex(rho_s,IntMatrFex,kBT);
-%                        
-%         for iSpecies=1:nSpecies
-%            mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
-%         end
-% 
-%         mu_s = mu_s + x + HS_f(rho_s,kBT) + getVAdd(y1S,y2S,t,optsPhys.V1);
-%                    
-%     end
-
     function flux = GetFlux(x,t)
         rho_s = exp((x-Vext)/kBT);       
         mu_s  = GetExcessChemPotential(x,t,mu); 
         flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
+        if(polarShape)
+            %then transform to cartesian corrdinates
+            flux = GetCartesianFromPolarFlux(flux,ythS);
+        end
     end
 
 

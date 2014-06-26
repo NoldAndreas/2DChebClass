@@ -1,7 +1,7 @@
 function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_2()
 
     %Numerical Parameters    
-    Phys_Area = struct('shape','Box','y1Min',0,'y1Max',10,'N',[20,20],...
+    Phys_Area = struct('shape','Box','y1Min',0,'y1Max',10,'N',[30,30],...
                        'y2Min',0,'y2Max',10);
     
     Plot_Area = Phys_Area; 
@@ -14,8 +14,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_2()
         
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,'SubArea',Sub_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D',...                     
+                     'V2Num',FexNum,...                     
                      'plotTimes',0:0.2:3);                            
 
     V1 = struct('V1DV1','Vext_Cart_3','V0',0.02,'grav',2,'y10',5,'y20',5);
@@ -23,16 +22,20 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_2()
                  
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,...
-                     'HSBulk','MuCarnahanStarling',...                     
+                     'HSBulk','CarnahanStarling',...                     
                      'nParticlesS',40,'gammaS',1);
                  
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;                 
 
+    config = v2struct(optsPhys,optsNum);
+    %****************************
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    f(optsPhys,optsNum);                 
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();               
                  
 end                 
 

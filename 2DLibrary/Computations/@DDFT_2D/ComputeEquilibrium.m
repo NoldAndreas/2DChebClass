@@ -1,12 +1,18 @@
- function [rho,mu] = ComputeEquilibrium(this)
+ function [rho,mu] = ComputeEquilibrium(this,rho_ig)
     
     fprintf('Solving for equilibrium condition...\n');    
     
     %*****************************
     %Initialization
-    %*****************************	
-    PtsCart     = this.IDC.GetCartPts();  
-    x_ig        = getInitialGuess(this);
+    %*****************************	    
+    if(nargin < 2)
+        x_ig         = getInitialGuess(this);
+    else
+        if(isscalar(rho_ig))
+            rho_ig = rho_ig*ones(this.IDC.M,1);
+        end
+        x_ig         = this.optsPhys.kBT*log(rho_ig) + this.Vext;
+    end
     
     opts             = this.optsNum.PhysArea;
     opts.optsPhys    = this.optsPhys;    
@@ -43,15 +49,10 @@
     misc.FexNum     = this.optsNum.FexNum;
     misc.Int        = this.IDC.Int;
     
-    if(nargin == 1)
-        [sol,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
-                            @ComputeEquilibriumCondition,opts,misc); %true      
-    else
-        [sol,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
-                            @ComputeEquilibriumCondition,opts,misc,redo); %true      
-    end
+	[sol,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
+                            @ComputeEquilibriumCondition,opts,misc);
          
-    this.rho_eq = sol.rho;
+    this.x_eq   = sol.x;
     this.mu     = sol.mu;
     
 end

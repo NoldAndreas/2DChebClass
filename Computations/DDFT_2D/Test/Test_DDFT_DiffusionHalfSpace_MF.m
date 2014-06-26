@@ -13,8 +13,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_MF
 
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',Fex_Num,...
-                     'DDFTCode','DDFT_Diffusion_2D',...
+                     'V2Num',Fex_Num,...                    
                      'plotTimes',0:tMax/100:tMax);
 
 
@@ -28,10 +27,14 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_MF
                       'nParticlesS',50); 
                   
     optsPlot.doDDFTPlots=true;
-                  
+    
+    config = v2struct(optsPhys,optsNum);
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();    
 
 end                 
 

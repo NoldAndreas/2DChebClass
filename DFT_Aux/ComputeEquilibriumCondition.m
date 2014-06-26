@@ -8,7 +8,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     nSpecies   = params.optsPhys.nSpecies;
     
     if(~isfield(misc,'marc'))
-        mark = true(size(VAdd,1),1);
+        mark = true(size(Vext,1),1);
     else
         mark = misc.mark;
     end
@@ -40,7 +40,8 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         rho = 0;
     end
     
-    sol = v2struct(rho,mu);    
+    sol   = v2struct(rho,mu);    
+    sol.x = x_ic_full;
     
     function mu_sRel = fs(xm)                
         mu_sRel = GetExcessChemPotentialPart(xm,mu)./exp((xm-Vext(mark,:))/kBT);

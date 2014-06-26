@@ -20,7 +20,7 @@ function [VBack_S,VAdd_S]=V1_Triangle(y1S,y2S,t,optsPhys)
 
     %--------------------------------------------------------------------------
 
-    R = sqrt(y1S.^2 + y2S.^2);
+    R             = sqrt(y1S.^2 + y2S.^2);
     DRDy1         = y1S./R;
     DRDy1(y1S==0) = 0;
     DRDy2         = y2S./R;

@@ -11,9 +11,8 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace_MF()
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D',...
-                     'plotTimes',0:4/100:4);
+                     'V2Num',FexNum,...                     
+                     'plotTimes',0:4/100:4); 
 
     epsilonS=2*[ 1 1 1 ;
     1 1 1 ;
@@ -44,10 +43,13 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace_MF()
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
-                  
+      
+	config = v2struct(optsPhys,optsNum);
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
-
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();    
 end                 
 

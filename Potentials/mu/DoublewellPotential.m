@@ -1,5 +1,5 @@
 function [muSC,fnCS,dmuSC,ddmuSC] = DoublewellPotential(rho,Cn)
-%[muSC,fnCS] = MuCarnahanStarling(rho,kBT)
+
 % muSC  = d(rho*f(rho))/d(rho)
 % fnCS  = rho*f(rho)
 % dmuSC = d(muSC)/drho    

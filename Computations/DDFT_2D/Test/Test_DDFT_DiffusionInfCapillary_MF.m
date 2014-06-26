@@ -1,6 +1,6 @@
 function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF()
 
-    Phys_Area = struct('shape','InfCapillary','y1Min',-inf,'y1Max',inf,'L1',3,'N',[20;20],...
+    Phys_Area = struct('shape','InfCapillary','y1Min',-inf,'y1Max',inf,'L1',3,'N',[30;20],...
                        'y2Min',-2,'y2Max',2);
                    
 	Plot_Area = struct('y1Min',-5,'y1Max',5,'y2Min',-2,'y2Max',2, ...
@@ -15,8 +15,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,'SubArea',Sub_Area,...
-                     'FexNum',FexNum,...
-                     'DDFTCode','DDFT_Diffusion_2D', ...
+                     'V2Num',FexNum,...                     
                      'plotTimes',0:tMax/100:tMax);
                  
     V1 = struct('V1DV1','V1_InfCapillary','V0',0.1,'grav',1.0);
@@ -27,9 +26,14 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF
                  
     optsPlot.doDDFTPlots=true;
 
+
+    config = v2struct(optsPhys,optsNum);
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum);    
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();       
 
 
 end       

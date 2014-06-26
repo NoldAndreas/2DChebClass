@@ -1,11 +1,11 @@
-function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
+function Test_DDFT_DiffusionDisc_MF()
 
     Phys_Area = struct('shape','Disc','N',[20;20],'R',4);
     
-    Plot_Area = struct('y1Min',0,'y1Max',2,'N1',100,...
+    Plot_Area = struct('y1Min',0,'y1Max',4,'N1',100,...
                        'y2Min',0,'y2Max',2*pi,'N2',100);
                    
-    Sub_Area = struct('shape','Box','N',[20,20],...
+    Sub_Area = struct('shape','Box','N',[40,40],...
                       'y1Min',-1,'y1Max',1,...
                       'y2Min',-1,'y2Max',1);  
                    
@@ -16,7 +16,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
                      'SubArea',Sub_Area,...
-                     'V2Num',V2Num,...%'FexNum',FexNum,...%'DDFTCode','DDFT_Diffusion_2D',...                     
+                     'V2Num',V2Num,...
                      'plotTimes',0:7/100:7);
 
     epsilonS=2*[ 1 1 1 ;
@@ -38,7 +38,7 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
         
     V1 = struct('V1DV1','V1_Test_Disc_Cart','V0',0.5,'grav',1); 
                            
-    V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
+    V2 = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
     
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',1,'mS',1,'gammaS',1, ...
@@ -58,9 +58,5 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionDisc_MF()
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();
     
-    
-%    f = str2func(optsNum.DDFTCode);
-%    output = f(optsPhys,optsNum,optsPlot);                 
-
 end                 
 

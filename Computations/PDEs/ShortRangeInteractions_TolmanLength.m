@@ -22,7 +22,7 @@ function ShortRangeInteractions_TolmanLength()
     kBT      = 0.08;    
     
     V2       = struct('V2DV2',@PhiYukawa);
-    optsPhys = struct('V2',V2,'HSBulk','MuCarnahanStarling','kBT',kBT);
+    optsPhys = struct('V2',V2,'HSBulk','CarnahanStarling','kBT',kBT);
     
     N = 200;
     L = 40;
@@ -120,7 +120,7 @@ function ShortRangeInteractions_TolmanLength()
     end
 
     function [muHS,dmuHS,ddmuHS] = mu_HS(rho)  
-         [muHS,~,dmuHS,ddmuHS] = MuCarnahanStarling(rho,kBT);
+         [muHS,~,dmuHS,ddmuHS] = CarnahanStarling(rho,kBT);
          muHS   = muHS   + kBT*(log(rho));
          dmuHS  = dmuHS  + kBT./rho;
          ddmuHS = ddmuHS - kBT./(rho.^2);

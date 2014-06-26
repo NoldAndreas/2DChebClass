@@ -16,15 +16,12 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
-    tMax = 0.15;
-
-    DDFTCode = 'DDFT_Diffusion_2D';
+    tMax = 0.15;    
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',Fex_Num,...
-                     'DDFTCode',DDFTCode,...
-                     'plotTimes',0:tMax/100:tMax);
+                     'FexNum',Fex_Num,...                            
+                     'plotTimes',0:tMax/100:tMax);%'DDFTCode','DDFT_Diffusion_2D',...
 
     sigmaS  = 1;
     sigmaHS = 0.5;
@@ -32,7 +29,6 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
     V1       = struct('V1DV1','V1_Triangle',...
                       'V0',0.01,'V0add',3,'tau',0.1,'sigma1Add',0.5,'sigma2Add',0.5, ...
                        'y10',-1,'y20',-0.5,'y11',1,'y21',0,'y12',0,'y22',0.5);
-                  %    'y10',-1,'y20',-1,'y11',1,'y21',-1,'y12',0,'y22',0.5); 
                   
     V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);   
     
@@ -50,10 +46,14 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
     end
                   
     optsPlot.doDDFTPlots=true;
-                  
+
+    config = v2struct(optsPhys,optsNum);
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
+    EX     = DDFT_2D(config);
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();    
 
 end                 
 

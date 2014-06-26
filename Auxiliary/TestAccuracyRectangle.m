@@ -27,7 +27,7 @@ function TestAccuracyRectangle(abox,PhysArea,Conv,optsPhys,mu_sat,rhoLiq_sat,HS_
         optsPhysTest.epsilon_w = rhoLiq_sat*[1;1;1;1];
         optsPhysTest.V0        = 0;
         
-        Vext   = Vext_Cart_Capillary_Static(abox.Pts.y1_kv,abox.Pts.y2_kv,optsPhysTest);
+        Vext   = Vext_Cart_Capillary_Static(abox.Pts.y1_kv,abox.Pts.y2_kv,0,optsPhysTest);
         
         rho_ig = rhoLiq_sat*ones(size(abox.Pts.y1_kv));
         x_ig   = kBT*log(rho_ig);

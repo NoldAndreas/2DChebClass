@@ -15,7 +15,7 @@ function PlotDDFT(input,Bool_Record)
     
     if(isfield(data,'Subspace'))
         v2struct(Subspace);        
-        IP            = shape.SubShapePts(subArea.Pts);
+        IP            = shape.SubShapePtsCart(subArea.GetCartPts());
         Int_SubOnFull = subArea.ComputeIntegrationVector()*IP;
         bool_subSp = true;
     else
@@ -184,7 +184,7 @@ function PlotDDFT(input,Bool_Record)
             rho_diff = (rho(:,iSpecies)-rho_ic(:,iSpecies));
             plot(t,shape.Int*rho_diff,'o','Color',lineColour{iSpecies}); hold on;                                    
             if(bool_subSp)
-                plot(t,Int_SubOnFull*rho_diff+accFlux(i),'om');
+                plot(t,Int_SubOnFull*rho_diff+accFlux(i,iSpecies),'om');
                 legend('Full Domain','Subdomain');
             end
          end
