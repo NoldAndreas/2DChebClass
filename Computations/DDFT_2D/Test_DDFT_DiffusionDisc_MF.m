@@ -49,11 +49,8 @@ function Test_DDFT_DiffusionDisc_MF()
     optsPlot.doDDFTPlots=true;
                   
     
-    config = v2struct(optsPhys,optsNum);
-    
-    %****************************
     AddPaths();
-    EX     = DDFT_2D(config);
+    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();

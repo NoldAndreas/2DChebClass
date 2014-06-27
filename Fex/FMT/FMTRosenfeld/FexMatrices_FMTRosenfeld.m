@@ -2,8 +2,12 @@ function FMTMatricesFull = FexMatrices_FMTRosenfeld(Parameters,IDC)
 %function FMTMatrices = Polar_SpectralFourier_FMTMatrices(R,Pts,Maps,optsNum ,FFTMatrix)
     
     v2struct(Parameters); 
-    v2struct(FexNum);    
-    Rs  = diag(V2.sigmaS)/2;    
+    v2struct(FexNum);
+    if(exist('sigmaS','var'))
+        Rs  = diag(sigmaS)/2;    
+    else
+        Rs  = diag(V2.sigmaS)/2;    
+    end
     
     %****************************
     %******* Test ********

@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT(doHI)
+function Test_DDFT_DiffusionHalfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -18,29 +18,22 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT(d
     
     tMax = 10;
 
-    DDFTCode = 'DDFT_DiffusionHalfSpace_FMT';
-%     DDFTCode = 'DDFT_Diffusion_2D';    
-    
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',Fex_Num,...
-                     'DDFTCode',DDFTCode,...
-                     'plotTimes',0:tMax/100:tMax, ...
-                     'Accuracy_Averaging',1e-6);
+                     'FexNum',Fex_Num,...                    
+                     'plotTimes',0:tMax/100:tMax);
 
     sigmaS  = 1;
     sigmaHS = 0.5;
 
     V1       = struct('V1DV1','V1_HalfSpace_FMT','V0',0.1,'V0Add',1,'sigma1',1,'sigma2',1,...
-                        'tau',1,'y10',2,'y20',2);
-
-    V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);   
+                        'tau',1,'y10',2,'y20',2);    
 
     HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
     
-    optsPhys = struct('V1',V1,'V2',V2, ...                                            
+    optsPhys = struct('V1',V1, ...                                            
                       'kBT',1,'mS',1,'gammaS',1, ...
-                      'nParticlesS',10); 
+                      'nParticlesS',10,'sigmaS',sigmaS); 
 
     if(doHI)
         optsPhys.HI = HI;
@@ -48,10 +41,13 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT(d
     end
                   
     optsPlot.doDDFTPlots=true;
-                  
+
+    
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
-
+    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();
+    
+    
 end                 
-

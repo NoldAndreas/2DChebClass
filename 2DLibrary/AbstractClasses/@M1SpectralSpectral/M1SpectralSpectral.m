@@ -156,7 +156,7 @@ classdef (Abstract) M1SpectralSpectral < Shape
                  this.borderLeft.IntNormal + this.borderBottom.IntNormal;
         end        
         function PlotBorders(this)
-            this.borderRight.PlotPath(this.polar);
+            this.borderRight.PlotPath(this.polar); hold on;
             this.borderTop.PlotPath(this.polar);
             this.borderLeft.PlotPath(this.polar);
             this.borderBottom.PlotPath(this.polar);

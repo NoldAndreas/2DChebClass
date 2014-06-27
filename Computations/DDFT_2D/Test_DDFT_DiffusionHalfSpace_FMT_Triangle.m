@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -17,31 +17,24 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT_T
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
     tMax = 0.25;
-
-    DDFTCode = 'DDFT_DiffusionHalfSpace_FMT_skewed';
-%     DDFTCode = 'DDFT_Diffusion_2D';    
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
-                     'FexNum',Fex_Num,...
-                     'DDFTCode',DDFTCode,...
-                     'plotTimes',0:tMax/100:tMax, ...
-                     'Accuracy_Averaging',1e-6);
-
-    sigmaS  = 1;
+                     'FexNum',Fex_Num,...                    
+                     'plotTimes',0:tMax/100:tMax);
+    
+	sigmaS  = 1;
     sigmaHS = 0.5;
     
     V1       = struct('V1DV1','V1_Triangle',...
                       'V0',0.01,'V0add',3,'tau',0.1,'sigma1Add',0.5,'sigma2Add',0.5, ...
                       'y10',-1,'y20',1.5,'y11',1,'y21',2,'y12',0,'y22',2.5); 
 
-    V2       = struct('V2DV2','hardSphere','sigmaS',sigmaS);   
-
     HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
     
-    optsPhys = struct('V1',V1,'V2',V2, ...                                            
+    optsPhys = struct('V1',V1,  ...                                            
                       'kBT',1,'mS',1,'gammaS',1, ...
-                      'nParticlesS',10); 
+                      'nParticlesS',10,'sigmaS',sigmaS);
 
     if(doHI)
         optsPhys.HI = HI;
@@ -49,10 +42,13 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_FMT_T
     end
                   
     optsPlot.doDDFTPlots=true;
-                  
+                      
     AddPaths();
-    f = str2func(optsNum.DDFTCode);
-    output = f(optsPhys,optsNum,optsPlot);                 
+    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    EX.ComputeEquilibrium();
+    EX.ComputeDynamics();       
 
 end                 
+
 

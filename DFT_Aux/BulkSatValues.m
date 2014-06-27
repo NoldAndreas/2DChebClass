@@ -10,7 +10,7 @@ function [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys,intitialGuess
         else
             Phi_r = optsPhys.V2.V2DV2;
         end        
-        [h_1,h_2,alpha] = Phi_r(0);    
+        [h_1,h_2,alpha] = Phi_r(0,optsPhys.V2);    
     end
         
     HS_f  = str2func(optsPhys.HSBulk);

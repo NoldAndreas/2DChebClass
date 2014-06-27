@@ -17,14 +17,7 @@ function [optsNum,optsPhys,optsPlot,name] = Test_DDFT_FMT_InfCapillary()
                      'FexNum',Fex_Num,...
                      'DDFTCode','DDFT_FMT_InfCapillary',...
                      'plotTimes',0:7/100:7,...
-                     'name','default');
-                     
-    %FexMatrices = {'Polar_SpectralFourier_FMTMatricesFull', ...
-%               'Polar_SpectralFourier_FMTMatricesFull_Roth', ...
-%               'Polar_SpectralFourier_FMTMatricesFull_3D'};
-%    Fex         = {'Polar_SpectralFourier_FMT', ...
-%               'Polar_SpectralFourier_FMT_Roth', ...
-%               'Polar_SpectralFourier_FMT_3D'};                                  
+                     'name','default');                                                  
 
     sigmaS = [1];%   1.1 ;
               %1.1 1.2 ];        
@@ -49,14 +42,6 @@ function [optsNum,optsPhys,optsPlot,name] = Test_DDFT_FMT_InfCapillary()
     if(nargout == 0)
         f(optsPhys,optsNum,optsPlot);                 
     end
-%     for l2 = 5.0:0.5:6
-%         optsNum.PhysArea.L2 = l2;
-%         for n = 80:1:80
-%             optsNum.PhysArea.N(2) = n;
-%             name = ['HardWall_N=',num2str(n),'L2=',num2str(l2)];
-%             f(optsPhys,optsNum,optsPlot,name);                 
-%         end
-%     end
 
 end                 
 

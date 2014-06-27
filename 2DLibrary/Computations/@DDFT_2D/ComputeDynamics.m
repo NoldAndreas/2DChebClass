@@ -31,6 +31,8 @@ function ComputeDynamics(this,x_ic,mu)
     Ind         = this.IDC.Ind;        
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;    
+    
+    markVinf    = (Vext == inf);
     if(strcmp(this.IDC.polar,'polar'))
         polarShape = true;
     else
@@ -50,14 +52,10 @@ function ComputeDynamics(this,x_ic,mu)
     
     if(nargin < 2)
         x_ic = this.x_eq;
-        mu    = this.mu;
+        mu   = this.mu;
     end
         
-    tic
-    
-    mM            = ones(M,1);
-    mM(Ind.bound) = 0;
-    mM            = repmat(mM,nSpecies,1);
+    tic   
     
     fprintf(1,'Computing dynamics ...'); 
 
@@ -110,7 +108,12 @@ function ComputeDynamics(this,x_ic,mu)
         PlotDDFT(v2struct(optsPhys,optsNum,data));  
     end
     
-    function X_t = ComputeDDFTDynamics(params,misc)
+    function X_t = ComputeDDFTDynamics(params,misc)        
+        mM              = ones(M,1);        
+        mM(Ind.finite)  = 0; %| markVinf
+        mM              = repmat(mM,nSpecies,1);
+        mM(markVinf(:)) = 0;
+        
         opts    = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag([ones(nSpecies,1);mM]));    
         [~,X_t] = ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);   
     end
@@ -123,11 +126,11 @@ function ComputeDynamics(this,x_ic,mu)
         
         x        = reshape(x,M,nSpecies);
         
-        mu_s     = GetExcessChemPotential(x,t,mu);
-        mu_s(Ind.infinite,:) = 0;
+        mu_s     = GetExcessChemPotential(x,t,mu);        
+        mu_s(markVinf,:) = 0;
         
-        h_s      = Diff.grad*x - Vext_grad;
-        h_s([Ind.infinite;Ind.infinite],:) = 0;
+        h_s      = Diff.grad*x - Vext_grad;        
+        h_s([markVinf;markVinf],:) = 0;
         
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         
@@ -140,8 +143,8 @@ function ComputeDynamics(this,x_ic,mu)
         end
         
         flux_dir               = Diff.grad*mu_s;
-        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;
-        dxdt(Ind.infinite,:)   = x(Ind.infinite,:) - x_ic(Ind.infinite,:);
+        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
+        dxdt(markVinf,:)       = x(markVinf,:) - x_ic(markVinf,:);
 
         dxdt = D0.*dxdt;
                 

@@ -1,0 +1,46 @@
+function [optsNum,optsPhys] = DDFT_DiffusionHalfSpace_2Phase_Sat_2()
+    
+    Phys_Area = struct('shape','HalfSpace','N',[30,30],...
+                        'y2Min',0,'L1',4,'L2',10);
+    
+    Plot_Area = struct('y1Min',-10,'y1Max',10,'N1',100,'N2',100,...
+                       'y2Min',0,'y2Max',20);
+        
+    Sub_Area = struct('shape','Box','N',[20,20],...
+                      'y1Min',-1,'y1Max',1,...
+                      'y2Min',0,'y2Max',2);    
+                  
+	Conv      = struct('Fex','Meanfield','L',2,'L2',1,'N',[40,40]);
+        
+    optsNum = struct('PhysArea',Phys_Area,...
+                     'PlotArea',Plot_Area,...
+                     'SubArea',Sub_Area,...
+                     'plotTimes',0:0.1:6,...
+                     'V2Num',Conv);                                           
+
+    V1 = struct('V1DV1','Vext_Cart_7',...
+                      'V0',0.0,'y10',2,'y20',0,...
+                      'epsilon_w',1,'tau',1,'epsilon_w_end',0.0,...
+                      'L1',4,'epsilon_w1',0.2,'w1_steepness',1); 
+                  
+    V2 = struct('V2DV2','Phi2DLongRange','epsilon',1);
+                 
+    optsPhys = struct('V1',V1,'V2',V2,...
+                      'HSBulk','CarnahanStarling',...
+                      'kBT',0.7,...                      
+                      'Dmu',-0.03);
+
+    AddPaths();
+    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    
+	yPtsCheck          = [20 10 ; 0 2 ; 0 0 ; -10 0 ];
+    EX.IDC.TestConvolutionMatrix(yPtsCheck,@Phi2DLongRange);
+    
+    EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                 
+    
+    EX.IDC.doPlots(EX.GetRhoEq());
+
+    EX.ComputeDynamics();
+end                 
+

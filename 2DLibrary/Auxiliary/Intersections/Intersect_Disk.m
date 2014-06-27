@@ -52,6 +52,9 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
         dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
 
         [dataDisk.int,dataDisk.area] = area.ComputeIntegrationVector();
+        
+    elseif(isa(MainShape,'Box'))
+        
     else
         exc = MException('Intersect_Disk','case not implemented');
         throw(exc);                

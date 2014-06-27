@@ -21,7 +21,7 @@ classdef (Abstract) InfCapillaryGeneral < SpectralSpectral & ConvolutionPointwis
 
             InitializationPts(this);            
             
-            if(isfield(Geometry,'Conv'))
+            if(isfield(Geometry,'Conv') && ~isempty(Geometry.Conv))
                 this.L1Conv = Geometry.Conv.L1;
                 this.L2Conv = Geometry.Conv.L2;
                 this.ConvN  = Geometry.Conv.N;

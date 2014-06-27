@@ -18,10 +18,14 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
 	getFex    = str2func(['Fex_',misc.FexNum.Fex]);    
 	R      = params.optsPhys.sigmaS/2;         
     
-    fsolveOpts       = optimset('TolFun',1e-10,'TolX',1e-10);
+    fsolveOpts       = optimset('TolFun',1e-8,'TolX',1e-8);    
     
     if(isfield(params.optsPhys,'mu_sat') && isfield(params.optsPhys,'Dmu'))
-        mu                      = params.optsPhys.mu_sat + params.optsPhys.Dmu;
+       params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.mu.Dmu;       
+    end
+    
+    if(isfield(params.optsPhys,'mu'))   
+        mu                      = params.optsPhys.mu;
         [x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
     else        
         Int                     = misc.Int;
@@ -44,7 +48,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     sol.x = x_ic_full;
     
     function mu_sRel = fs(xm)                
-        mu_sRel = GetExcessChemPotentialPart(xm,mu)./exp((xm-Vext(mark,:))/kBT);
+        mu_sRel = GetExcessChemPotentialPart(xm,mu);%./exp((xm-Vext(mark,:))/kBT);
     end
 
     function y = fs_canonical(x)

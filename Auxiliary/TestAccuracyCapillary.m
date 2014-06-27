@@ -26,7 +26,7 @@ function TestAccuracyCapillary(PhysArea,Conv,Pts,Maps,Interp,Ind,optsPhys,mu_sat
 
         y2Inner = Pts.y2_kv(~Ind.left & ~Ind.right);
         
-        Vext   = Vext_Cart_Slit_Static(Pts.y2_kv,optsPhysTest);
+        Vext   = Vext_Cart_Slit_Static([],Pts.y2_kv,[],optsPhysTest);
         
         rho_ig = rhoLiq_sat*ones(size(y2Inner));
         rhoInf = rhoLiq_sat*ones(size(Pts.y1_kv(Ind.left)));        

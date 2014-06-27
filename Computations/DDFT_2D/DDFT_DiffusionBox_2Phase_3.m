@@ -37,7 +37,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_3()
     AddPaths();
     EX     = DDFT_2D(config);
     EX.Preprocess();
-    EX.ComputeEquilibrium();
+    EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();           
                  
 end                 

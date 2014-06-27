@@ -62,7 +62,8 @@ function [VBack_S,VAdd_S]=Vext_Cart_7(y1,y2,t,opts)
         w1_steepness = opts.epsilon_w1;
         L1           = opts.L1;
         VAdd    = VAdd + opts.epsilon_w1*(tanh((y1+opts.L1)/opts.w1_steepness)-tanh((y1-opts.L1)/opts.w1_steepness))/2;
-        dVAdd   = VAdd - opts.epsilon_w1*(1/2)*((cosh((y+L1)/w1_steepness)).^2-(cosh((-y+L1)/w1_steepness)).^2)./((cosh((y+L1)/w1_steepness)).^2*(cosh((-y+L1)/w1_steepness)).^2*w1_steepness);
+        %y = y1;
+        dVAdd   = [];%VAdd - opts.epsilon_w1*(1/2)*((cosh((y+L1)/w1_steepness)).^2-(cosh((-y+L1)/w1_steepness)).^2)./((cosh((y+L1)/w1_steepness)).^2.*(cosh((-y+L1)/w1_steepness)).^2*w1_steepness);
     end
     %VAdd    = VAdd + opts.epsilon_w1/4*exp(-(y1/opts.L1).^2);
     VAdd_S      = struct('V',VAdd);

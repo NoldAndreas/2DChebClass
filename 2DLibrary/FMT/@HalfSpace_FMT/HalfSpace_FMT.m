@@ -23,7 +23,10 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
                 Geometry.alpha = Geometry.alpha_deg*pi/180;                            
             elseif(isfield(Geometry,'alpha') && ~isfield(Geometry,'alpha_deg'))                
                 Geometry.alpha_deg = Geometry.alpha*180/pi;
-            end            
+            end                       
+            if(nargin < 2)
+                R    = Geometry.R;
+            end
             
             % multiply with factor to take into account skewed grid by
             % angle alpha
@@ -40,7 +43,7 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
             shapeHS.L2    = L2;
             
             this@HalfSpaceSkewed(shapeHS);
-            
+                        
             this.R        = R;
             this.y2wall   = Geometry.y2wall;            
             

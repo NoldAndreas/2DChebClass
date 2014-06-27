@@ -5,13 +5,10 @@
     %*****************************
     %Initialization
     %*****************************	    
-    if(nargin < 2)
-        x_ig         = getInitialGuess(this);
+    if(nargin >= 2)
+        x_ig         = getInitialGuess(this,rho_ig);
     else
-        if(isscalar(rho_ig))
-            rho_ig = rho_ig*ones(this.IDC.M,1);
-        end
-        x_ig         = this.optsPhys.kBT*log(rho_ig) + this.Vext;
+        x_ig         = getInitialGuess(this);
     end
     
     opts             = this.optsNum.PhysArea;

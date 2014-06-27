@@ -20,7 +20,7 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             if(isfield(Geometry,'y2Min'))
                 this.y2Min = Geometry.y2Min;
             end
-            if(isfield(Geometry,'Conv'))
+            if(isfield(Geometry,'Conv') && ~isempty(Geometry.Conv))
                 this.LConv = Geometry.Conv.L;
                 this.L2Conv = Geometry.Conv.L2;
                 this.ConvN  = Geometry.Conv.N;

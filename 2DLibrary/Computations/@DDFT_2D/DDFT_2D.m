@@ -14,7 +14,7 @@ classdef DDFT_2D < handle
         
         x_eq,mu
         
-        doHI,doSubArea
+        doHI,doSubArea,do2Phase
     end
     
     methods (Access = public)          
@@ -35,51 +35,116 @@ classdef DDFT_2D < handle
             optsNum  = this.optsNum;
             optsPhys = this.optsPhys;
             
-            shape        = optsNum.PhysArea;
+            shape    = optsNum.PhysArea;
             if(isfield(optsNum,'V2Num'))
                 shape.Conv = optsNum.V2Num;
             else                
-                shape.Conv = 0;
+                shape.Conv = [];
             end
             
+            % Special Case: HalfSpace_FMT
+            if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
+                shape.R = this.optsPhys.sigmaS/2;
+            end
+            
+            % Construct main object for geometry IDC
             shapeClass = str2func(optsNum.PhysArea.shape);
             this.IDC   = shapeClass(shape);            
+            this.IDC.ComputeAll(optsNum.PlotArea);             
+            
+            % Determine hard-sphere contribution to bulk free energy
+            if(~isfield(this.optsPhys,'HSBulk'))
+                if(isfield(this.optsPhys,'FexNum'))
+                    this.optsPhys.HSBulk = ['FexBulk_',this.optsPhys.FexNum.Fex];
+                else
+                    this.optsPhys.HSBulk = 'Fex_ZeroMap';
+                end
+            end
+            
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                this.do2Phase = true;
+            end
 
-            this.IDC.ComputeAll(optsNum.PlotArea); 
-            PtsCart                = this.IDC.GetCartPts();
-
+            % Determine number of species
             if(isfield(optsPhys,'nParticlesS'))
                 this.optsPhys.nSpecies = length(optsPhys.nParticlesS); 
             elseif(isfield(optsPhys,'Dmu'))
                 this.optsPhys.nSpecies = length(optsPhys.Dmu);
-                [this.optsPhys.rhoGas_sat,...
-                 this.optsPhys.rhoLiq_sat,...
-                 this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+            elseif(isfield(optsPhys,'mu'))
+                this.optsPhys.nSpecies = length(optsPhys.mu);
             end
+                                                             
+            Preprocess_HardSphereContribution(this);
+            Preprocess_MeanfieldContribution(this);
+            Preprocess_HIContribution(this);           
+            Preprocess_ExternalPotential(this);                        
+            Preprocess_SubArea(this);
             
-            if(~isfield(optsPhys,'sigmaS'))                
-                this.optsPhys.sigmaS = ones(this.optsPhys.nSpecies,1);
-            end
-                        
-            %************************************************
-            %****************  Preprocess  ****************
-            %************************************************  
+        end        
+        
+        function y0 = getInitialGuess(this,rho_ig)
+            
+          optsNum  = this.optsNum;
+          optsPhys = this.optsPhys;          
+          
+          if(nargin >= 2)
+                if(isscalar(rho_ig))
+                    rho_ig = rho_ig*ones(this.IDC.M,1);
+                end
+                y0 = this.optsPhys.kBT*log(rho_ig) + this.Vext;
+                if(~isfield(optsPhys,'Dmu'))   
+                    y0 = [zeros(1,optsPhys.nSpecies);y0];
+                end
+                return;
+          end
+            
+          %if(~isfield(optsPhys,'HSBulk') && ~isfield(optsNum,'HSBulk'))
+          if(~isfield(optsPhys,'Dmu') && ~isfield(optsPhys,'mu'))
+              
+            % initial guess for mu doesn't really matter
+            muInit = zeros(1,optsPhys.nSpecies);
 
+            % however, require relatively good guess for rho
+
+            % rho without interaction ie exp(-(VBack+VAdd )/kBT)
+            rhoInit = exp(-(this.Vext+this.VAdd)/optsPhys.kBT);
+
+            % inverse of normalization coefficient
+            normalization = repmat( this.IDC.Int*rhoInit./optsPhys.nParticlesS' , size(rhoInit,1) ,1);
+
+            y0 = -optsPhys.kBT*log(normalization) - this.VAdd;
+            y0 = [muInit; y0];
+          else
+             %y0 = -optsPhys.kBT*log(ones(this.IDC.M,1)) - this.Vext;             
+           %  rhoInit = exp(-(this.Vext+this.VAdd)/optsPhys.kBT);
+            % y0 = - this.VAdd;
+             
+             y0 = zeros(this.IDC.M,optsPhys.nSpecies);
+          end
+
+        end        
+        function rho = GetRhoEq(this)
+            rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
+        end
+        
+        function Preprocess_HardSphereContribution(this)      
             tic
-            
-            % Hard sphere contribution             
-            if(isfield(optsNum,'FexNum'))
+            if(isfield(this.optsNum,'FexNum'))
                 fprintf(1,'Computing FMT matrices ...');   
-                paramsFex.V2       = optsPhys.V2;
-                paramsFex.kBT      = optsPhys.kBT;            
+                paramsFex.sigmaS   = this.optsPhys.sigmaS;
+                paramsFex.kBT      = this.optsPhys.kBT;            
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
-                paramsFex.FexNum   = optsNum.FexNum;
+                paramsFex.FexNum   = this.optsNum.FexNum;
                 
-                FexFun             = str2func(['FexMatrices_',optsNum.FexNum.Fex]);    
+                FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
                 this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC)],FexFun,paramsFex,this.IDC);   
-            elseif(isfield(optsPhys,'HSBulk'))
-                this.optsNum.FexNum.Fex  = optsPhys.HSBulk;                                                               
+            elseif(isfield(this.optsPhys,'HSBulk'))
+                this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else
                 this.optsNum.FexNum.Fex  = 'ZeroMap';                           
             end
@@ -87,7 +152,11 @@ classdef DDFT_2D < handle
             fprintf(1,'done.\n');
             t_fex = toc;
             disp(['Fex computation time (sec): ', num2str(t_fex)]);
-                        
+        end            
+        function Preprocess_MeanfieldContribution(this)
+            optsNum  = this.optsNum;
+            optsPhys = this.optsPhys;
+            
             if(isfield(optsNum,'V2Num'))
                 fprintf(1,'Computing mean field convolution matrices ...');   
                 paramsFex.V2       = optsPhys.V2;
@@ -107,7 +176,11 @@ classdef DDFT_2D < handle
             else
                 this.IntMatrV2 = 0;
             end
-
+        end
+        function Preprocess_HIContribution(this)
+            optsNum  = this.optsNum;
+            optsPhys = this.optsPhys;
+            
             if(isfield(optsNum,'HINum') && ~isempty(optsNum.HINum))
                 this.doHI = true;
             else
@@ -127,10 +200,11 @@ classdef DDFT_2D < handle
                 t_HI = toc;
                 display(['HI computation time (sec): ', num2str(t_HI)]); 
             end
-            
-            % External Potential
-            y1S     = repmat(PtsCart.y1_kv,1,this.optsPhys.nSpecies); 
-            y2S     = repmat(PtsCart.y2_kv,1,this.optsPhys.nSpecies);
+        end
+        function Preprocess_ExternalPotential(this)
+            PtsCart  = this.IDC.GetCartPts();            
+            y1S      = repmat(PtsCart.y1_kv,1,this.optsPhys.nSpecies); 
+            y2S      = repmat(PtsCart.y2_kv,1,this.optsPhys.nSpecies);
             ythS     = repmat(this.IDC.Pts.y2_kv,1,this.optsPhys.nSpecies);
 
             [this.Vext,this.Vext_grad]  = getVBackDVBack(y1S,y2S,this.optsPhys.V1);                  
@@ -138,6 +212,11 @@ classdef DDFT_2D < handle
                 this.Vext_grad = GetCartesianFromPolarFlux(this.Vext_grad,ythS);
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
+        end
+        function Preprocess_SubArea(this)
+            
+            optsNum  = this.optsNum;
+            optsPhys = this.optsPhys;
 
             this.doSubArea = isfield(optsNum,'SubArea');
 
@@ -154,37 +233,6 @@ classdef DDFT_2D < handle
             else
                 this.Int_of_path   =  zeros(1,2*this.IDC.M);
             end
-            
-        end        
-        function y0 = getInitialGuess(this)
-            
-          optsNum  = this.optsNum;
-          optsPhys = this.optsPhys;          
-            
-          %if(~isfield(optsPhys,'HSBulk') && ~isfield(optsNum,'HSBulk'))
-          if(~isfield(optsPhys,'Dmu'))
-              
-            % initial guess for mu doesn't really matter
-            muInit=zeros(1,optsPhys.nSpecies);
-
-            % however, require relatively good guess for rho
-
-            % rho without interaction ie exp(-(VBack+VAdd )/kBT)
-            rhoInit = exp(-(this.Vext+this.VAdd)/optsPhys.kBT);
-
-            % inverse of normalization coefficient
-            normalization = repmat( this.IDC.Int*rhoInit./optsPhys.nParticlesS' , size(rhoInit,1) ,1);
-
-            y0 = -optsPhys.kBT*log(normalization) - this.VAdd;
-            y0 = [muInit; y0];
-          else
-             %y0 = -optsPhys.kBT*log(ones(this.IDC.M,1)) - this.Vext;             
-             y0 = zeros(this.IDC.M,optsPhys.nSpecies);
-          end
-
-        end        
-        function rho = GetRhoEq(this)
-            rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
         end
         
         ComputeEquilibrium(this,rho_ig)
