@@ -24,20 +24,32 @@ plot([right-R right-R],ylim(gca),'Color','r','LineWidth',2,'LineStyle','--')
 plot(xlim(gca),[top-R,top-R],'Color','r','LineWidth',2,'LineStyle','--')
 plot(xlim(gca),[bottom+R,bottom+R],'Color','r','LineWidth',2,'LineStyle','--')
 
+
 while(true)
 
-    [y10,y20] = ginput(1);
+[y10,y20] = ginput(1);
 
-    Origin = [y10,y20];
-    N      = [10,10];
-    DC     = Disc(v2struct(Origin,R,N));   
+scatter(y10,y20,'b');
+hold on
 
-    hold on
-    area = Intersect(BX,DC,[]);
 
-    if(~isempty(area))                       
-        scatter(area.pts.y1_kv,area.pts.y2_kv,'r');
-        %DC.PlotGrid();
-    end
+
+shapeC.N = 20;
+shapeC.R = R;
+lineC = Circle(shapeC);
+
+if(~isempty(line))
+    
+    dataCircle.pts = line.Pts;
+    
+    fullCircle.pts = Pol2CartPts(lineC.Pts);
+    fullCircle.pts.y1_kv = fullCircle.pts.y1_kv + y10;
+    fullCircle.pts.y2_kv = fullCircle.pts.y2_kv + y20;
+    
+    scatter(fullCircle.pts.y1_kv,fullCircle.pts.y2_kv,'b');
+    hold on;
+    scatter(dataCircle.pts.y1_kv,dataCircle.pts.y2_kv,'r');
+    
+end
 
 end

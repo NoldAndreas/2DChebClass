@@ -205,8 +205,7 @@ classdef (Abstract) Shape < handle
             else
                 streamline(y1M,y2M,fl_y1,fl_y2,startMask,startMask2);                       
             end
-        end
-        
+        end        
         function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c)
             global PersonalUserOutput
             if(~PersonalUserOutput)

@@ -170,34 +170,7 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
             if((nargin >= 5) && saveBool)
                 this.Interp = Interp;
             end
-        end        
-%         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
-%             
-%             N1 = this.N1;   N2 = this.N2;
-% 
-%             rs  = this.Pts.y1_kv; ts  = this.Pts.y2_kv;
-%             xs  = rs.*cos(ts);
-%             ys  = rs.*sin(ts);            
-% 
-%             M_conv = zeros(N1*N2,N1*N2);
-% 
-%             for i=1:(N1*N2)
-% 
-%                 xd  = xs(i)-xs;
-%                 yd  = ys(i)-ys;
-% 
-%                 [t_d,r_d] = cart2pol(xd,yd);
-% 
-%                 r_d((rs(i) == inf) | (rs ==inf)) = inf;
-%                 r_d((rs(i) == inf) & (rs ==inf) & (t_d == 0)) = 0;            
-% 
-%                 M_conv(i,:)  = this.Int.*f(r_d,t_d)';
-%             end   
-%             if((nargin== 3) && saveBool)
-%                 this.Conv = M_conv;
-%             end
-%                 
-%         end        
+        end            
 
        function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
             

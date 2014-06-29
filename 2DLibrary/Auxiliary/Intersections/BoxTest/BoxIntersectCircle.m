@@ -26,53 +26,6 @@ plot(xlim(gca),[top-R,top-R],'Color','b','LineWidth',2,'LineStyle','--')
 plot(xlim(gca),[bottom+R,bottom+R],'Color','b','LineWidth',2,'LineStyle','--')
 
 
-% SW
-% y10 = left - 0.32*R;
-% y20 = bottom - 0.5*R;
-
-% NW
-% y10 = left - 0.2*R;
-% y20 = top + 0.5*R;
-
-% NE
-% y10 = right + 0.17*R;
-% y20 = top + 0.4*R;
-
-% SE
-% y10 = right + 0.17*R;
-% y20 = bottom - 0.1*R;
-
-% SWin
-% y10 = left + 0.32*R;
-% y20 = bottom + 0.5*R;
-
-% NWin
-% y10 = left + 0.2*R;
-% y20 = top - 0.5*R;
-
-% NEin
-% y10 = right - 0.17*R;
-% y20 = top - 0.4*R;
-
-% SEin
-% y10 = right - 0.17*R;
-% y20 = bottom + 0.1*R;
-
-% SW double cut
-% y10 = left + 0.95*R;
-% y20 = bottom + 0.92*R;
-
-% NW double cut
-% y10 = left + 0.95*R;
-% y20 = top - 0.92*R;
-
-% NE double cut
-% y10 = right - 0.95*R;
-% y20 = top - 0.92*R;
-
-% SE double cut
-% y10 = right - 0.95*R;
-% y20 = bottom + 0.92*R;
 
 while(true)
 

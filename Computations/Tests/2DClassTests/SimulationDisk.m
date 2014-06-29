@@ -14,11 +14,12 @@ function data = SimulationDisk(N1,N2,L1,L2,vext)
         N1      = 20;
         N2      = 20;
         N       = [N1;N2];
+        Origin  = [3,-2];
     else
         R = L1;
     end
     
-    DC                 = Disc(v2struct(R,N));
+    DC                 = Disc(v2struct(R,N,Origin));
     [Pts,Diff,Int,Ind] = DC.ComputeAll();
     Interp = DC.ComputeInterpolationMatrix((0:0.02:1)',(0:0.02:1)',true,true);
 	Conv   = DC.ComputeConvolutionMatrix(@f2);        

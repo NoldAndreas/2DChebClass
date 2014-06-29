@@ -143,7 +143,7 @@ classdef DDFT_2D < handle
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
                 this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC)],FexFun,paramsFex,this.IDC);   
-            elseif(isfield(this.optsPhys,'HSBulk'))
+            elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else
                 this.optsNum.FexNum.Fex  = 'ZeroMap';                           

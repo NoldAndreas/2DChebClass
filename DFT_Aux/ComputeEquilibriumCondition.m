@@ -16,7 +16,11 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     kBT    = params.optsPhys.kBT;    
     
 	getFex    = str2func(['Fex_',misc.FexNum.Fex]);    
-	R      = params.optsPhys.sigmaS/2;         
+    if(isfield(params.optsPhys,'sigmaS'))        
+        R      = params.optsPhys.sigmaS/2;
+    else
+        R = [];
+    end
     
     fsolveOpts       = optimset('TolFun',1e-8,'TolX',1e-8);    
     

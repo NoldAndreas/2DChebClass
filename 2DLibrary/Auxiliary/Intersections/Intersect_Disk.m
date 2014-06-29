@@ -54,7 +54,14 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
         [dataDisk.int,dataDisk.area] = area.ComputeIntegrationVector();
         
     elseif(isa(MainShape,'Box'))
+        area         = Intersect_Disc_Box(diskShape,MainShape);        
+        dataDisk.pts = area.GetCartPts;
         
+        [dataDisk.ptsPolLoc.y2_kv,...
+         dataDisk.ptsPolLoc.y1_kv] = cart2pol(dataDisk.pts.y1_kv-diskShape.Origin(1),...
+                                              dataDisk.pts.y2_kv-diskShape.Origin(2));
+     
+        [dataDisk.int,dataDisk.area] = area.ComputeIntegrationVector();
     else
         exc = MException('Intersect_Disk','case not implemented');
         throw(exc);                
