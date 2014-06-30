@@ -88,8 +88,7 @@
         function [x1,x2] = CompSpace(this,y1,y2)
             exc = MException('Segment:CompSpace','not yet implemented');
             throw(exc);
-        end
-        
+        end        
         function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@M1SpectralSpectral(this);
             %Check Accuracy            
@@ -114,8 +113,7 @@
                                         num2str(1-sum(this.Int)/area)]);
                 end
             end
-        end
-        
+        end        
         function ShiftRotateSegment(this,h,th,yp)
             
             y1_kv = this.Pts.y1_kv;

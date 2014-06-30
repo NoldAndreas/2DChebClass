@@ -39,7 +39,7 @@
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',1,'mS',1,'gammaS',1, ...
                       'nParticlesS',[20;20;20]); 
-                 
+
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;

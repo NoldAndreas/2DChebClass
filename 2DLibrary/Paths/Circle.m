@@ -2,6 +2,7 @@
 classdef Circle < FourierPath
     properties 
         R
+        Origin = [0,0]
     end
     
     methods
@@ -9,6 +10,9 @@ classdef Circle < FourierPath
             this@FourierPath(Geometry.N,'polar');            
             this.R      = Geometry.R;       
             this.polar  = 'polar';
+            if(isfield(Geometry,'Origin'))
+                this.Origin = Geometry.Origin;
+            end
             InitializationPts(this);
         end
         
@@ -18,15 +22,13 @@ classdef Circle < FourierPath
         function [y1 ,y2 , dy1_dt , dy2_dt ]  = f_path(this,t)        
             y1      = this.R*ones(size(t));   y2      = 2*pi*t;
             dy1_dt  = zeros(size(t));         dy2_dt  = 2*pi*ones(size(t));
-        end
-        
+        end       
         function [int,length] = ComputeIntegrationVector(this)
             int    = ComputeIntegrationVector@FourierPath(this);
             length = 2*pi*this.R;
             disp(['Circle: Error of integration of length (ratio): ',...
                                     num2str(1-sum(this.IntSc)/length)]);
         end
-
         function [FFTMatrix,IFFTMatrix] = getFFTMatrices(this)
 
             N=this.N;
@@ -36,8 +38,7 @@ classdef Circle < FourierPath
 
             FFTMatrix = exp( -1i * 2*pi *n'*k /N);
             IFFTMatrix = 1/N * exp( 1i * 2*pi *n'*k /N);
-        end
-                
+        end              
         function Interp = ComputeInterpolationMatrix(this,interp)
             
             N = this.N;
@@ -65,7 +66,6 @@ classdef Circle < FourierPath
                 'N',this.N);                   
             
         end
-        
         function PlotFunction(this,f,NPlot)
 
             if(nargin<3)
@@ -97,6 +97,18 @@ classdef Circle < FourierPath
         end
         
 
+        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
+            
+            if(nargin < 3)
+                ptsCart  = GetCartPts@FourierPath(this);
+            else
+                ptsCart  = GetCartPts@FourierPath(this,pts_y1,pts_y2);                
+            end
+                        
+            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
+            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
+        end
+        
     end
    
 end

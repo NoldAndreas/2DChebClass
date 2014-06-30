@@ -13,6 +13,7 @@
             if(isfield(Geometry,'Origin'))              
                 this.Origin = Geometry.Origin;
             end
+            
             if(isfield(Geometry,'S'))
                 this.S = Geometry.S;
             elseif(~isfield(Geometry,'S') && Geometry.h<0)               

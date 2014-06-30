@@ -16,7 +16,11 @@ function ComputeDynamics(this,x_ic,mu)
     optsNum     = this.optsNum;
     
     kBT         = optsPhys.kBT;
-    R           = optsPhys.sigmaS/2;
+    if(isfield(optsPhys,'sigmaS'))    
+        R       = optsPhys.sigmaS/2;
+    else
+        R       = [];
+    end
     D0          = optsPhys.D0;
     Diff        = this.IDC.Diff;
     plotTimes   = this.optsNum.plotTimes;

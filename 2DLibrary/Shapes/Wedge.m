@@ -26,7 +26,7 @@ classdef Wedge < Polar_SpectralSpectral
                         this.R_in     = Geometry.R_in;
                 end
                 this.th1      = Geometry.th1;
-                this.th2      = Geometry.th2;  
+                this.th2      = Geometry.th1 + mod(Geometry.th2-Geometry.th1,2*pi);  
             end
 
             InitializationPts(this);  

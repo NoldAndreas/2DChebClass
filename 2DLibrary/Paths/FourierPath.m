@@ -19,8 +19,7 @@ classdef FourierPath < handle
             this.Pts.N   = N;
             this.N       = N;            
             this.polar   = polar;            
-        end
-        
+        end        
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
             
             if(nargin == 1)
@@ -37,8 +36,7 @@ classdef FourierPath < handle
                 throw(exc);                
             end
             
-        end   
-        
+        end           
         function InitializationPts(this)
             [this.Pts.y1_kv , this.Pts.y2_kv,dy1_dt,dy2_dt]  = f_path(this,this.Pts.t);    
             dy1_dt(dy1_dt == inf | dy1_dt == -inf) = 0;
@@ -68,20 +66,11 @@ classdef FourierPath < handle
             this.IntTang   =  this.IntSc*this.tang;                         
             
             int            =  this.IntSc;
-        end        
-        
+        end                
         function PlotPath(this,polar)
-            if(strcmp(polar,'polar'))
-                pts = Pol2CartPts(this.Pts);                
-            else
-                pts = this.Pts;
-            end
-            pts.y1_kv
-            pts.y2_kv
-            
+            pts = GetCartPts(this);                       
             plot([pts.y1_kv;pts.y1_kv(1)],[pts.y2_kv;pts.y2_kv(1)]);            
         end
-        
         
     end
         

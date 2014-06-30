@@ -126,21 +126,29 @@ function area = Intersect_Disc_Box(disc,box)
         shape.NW = [20;20];
         shape.NT = [10;10];
         shape.R  = R;
-        shape.Origin = [y10;y20];
+        shape.Origin = [y10;y20];                
         if(Sin)
-            shape.h = y20 - bottom;
-            shape.WallPos = 'S';
+            shape.Wall_Y = bottom;
+            shape.Wall_VertHor = 'horizontal';
+            %shape.h = y20 - bottom;
+            %shape.WallPos = 'S';
         elseif(Nin)
-            shape.h = top - y20;
-            shape.WallPos = 'N';
+            shape.Wall_Y       = top;
+            shape.Wall_VertHor = 'horizontal';
+            %shape.h = top - y20;
+            %shape.WallPos = 'N';
         elseif(Ein)
-            shape.h = right - y10;
-            shape.WallPos = 'E';
+            shape.Wall_Y       = right;
+            shape.Wall_VertHor = 'vertical';
+            %shape.h = right - y10;
+            %shape.WallPos = 'E';
         elseif(Win)
-            shape.h = y10 - left;
-            shape.WallPos = 'W';
+            shape.Wall_Y       = left;
+            shape.Wall_VertHor = 'vertical';
+            %shape.h = y10 - left;
+            %shape.WallPos = 'W';
         end
-        area = BigSegmentNSEW(shape); 
+        area = BigSegment(shape); 
 
     elseif(edgeOut)
         shape.N = [20;20];

@@ -112,14 +112,16 @@ classdef DoubleCutDisc < handle
         function ptsCart = GetCartPts(this)            
             ptsCart = this.Pts;
         end         
-        function int = ComputeIntegrationVector(this)           
+        function [int,area] = ComputeIntegrationVector(this)           
             
-            [T1int,~]  = this.T1.ComputeIntegrationVector(); 
-            [T2int,~]  = this.T2.ComputeIntegrationVector(); 
-            [W1int,~]  = this.W1.ComputeIntegrationVector();
-            [W2int,~]  = this.W2.ComputeIntegrationVector();
+            [T1int,area1]  = this.T1.ComputeIntegrationVector(); 
+            [T2int,area2]  = this.T2.ComputeIntegrationVector(); 
+            [W1int,area3]  = this.W1.ComputeIntegrationVector();
+            [W2int,area4]  = this.W2.ComputeIntegrationVector();
             
             int  = [T1int,T2int,W1int,W2int];
+            area = area1 + area2 + area3 + area4;
+            
             this.Int = int;
 
         end

@@ -1,6 +1,5 @@
-Test_DDFT_DiffusionBox_MF;
-
-Test_DDFT_DiffusionDisc_MF;
+%Test_DDFT_DiffusionBox_MF;
+%Test_DDFT_DiffusionDisc_MF;
 
 Test_DDFT_DiffusionInfDisc_MF;
 

@@ -1,5 +1,9 @@
 function data = Intersect(MainShape,SecondShape,opts)
 
+    if(nargin < 3)
+        opts = [];
+    end
+
     if(isa(SecondShape,'Disc'))
         data = Intersect_Disk(MainShape,SecondShape,opts);
     elseif(isa(SecondShape,'Ball'))

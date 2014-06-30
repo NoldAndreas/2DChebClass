@@ -1,4 +1,9 @@
-function [dataCircle] = Intersect_Circle(MainShape,y20,r,Ncircle)            
+function [dataCircle] = Intersect_Circle(MainShape,circle,opts)            
+
+    y20 = circle.Origin(2);
+    r   = circle.R;
+    Ncircle = circle.N;
+
 
     if(isa(MainShape,'HalfSpace'))
         
@@ -30,7 +35,16 @@ function [dataCircle] = Intersect_Circle(MainShape,y20,r,Ncircle)
         dataCircle.pts.y2_kv = dataCircle.pts.y2_kv + y20;
         dataCircle.ptsPolLoc = line.Pts;            
 
-        [dataCircle.int,dataCircle.area] = line.ComputeIntegrationVector();                                                                         
+        [dataCircle.int,dataCircle.length] = line.ComputeIntegrationVector();                                                                         
+    elseif(isa(MainShape,'Box'))
+        line           = Intersect_Circle_Box(circle,MainShape);        
+        dataCircle.pts = line.GetCartPts();
+        
+        [dataCircle.ptsPolLoc.y2_kv,...
+         dataCircle.ptsPolLoc.y1_kv] = cart2pol(dataCircle.pts.y1_kv-circle.Origin(1),...
+                                              dataCircle.pts.y2_kv-circle.Origin(2));
+     
+        [dataCircle.int,dataCircle.length] = line.ComputeIntegrationVector();        
         
 	else
         exc = MException('Intersect_Circle','case not implemented');

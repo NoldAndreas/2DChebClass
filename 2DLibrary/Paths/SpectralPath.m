@@ -76,13 +76,32 @@ classdef (Abstract) SpectralPath < handle
         end
         
         function PlotPath(this,polar)
-            if(strcmp(polar,'polar'))
+            if((nargin > 1) && strcmp(polar,'polar'))
                 pts = Pol2CartPts(this.Pts);                
             else
                 pts = this.Pts;
             end
             plot(pts.y1_kv,pts.y2_kv);            
         end
+        
+        
+        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
+            
+            if(nargin == 1)
+                pts_y1 = this.Pts.y1_kv;
+                pts_y2 = this.Pts.y2_kv;
+            end
+            
+            if(strcmp(this.polar,'polar'))
+                [ptsCart.y1_kv,ptsCart.y2_kv] = pol2cart(pts_y2,pts_y1);
+            elseif(strcmp(this.polar,'cart'))                
+                ptsCart.y1_kv = pts_y1;  ptsCart.y2_kv = pts_y2;
+            else
+                exc = MException('Shape:GetCartPts','select {polar,cart}');
+                throw(exc);                
+            end
+            
+        end 
                 
     end
         

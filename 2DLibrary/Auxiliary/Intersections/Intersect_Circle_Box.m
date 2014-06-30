@@ -1,4 +1,4 @@
-function area = Intersect_Circle_Box(circle,box)
+function line = Intersect_Circle_Box(circle,box)
     
     %Initialization
     y10      = circle.Origin(1);
@@ -71,11 +71,8 @@ function area = Intersect_Circle_Box(circle,box)
     if(central)
         shape.N = 20;
         shape.R = R;
+        shape.Origin = [y10,y20];
         line = Circle(shape);
-        line.Pts       = Pol2CartPts(line.Pts); 
-        line.Pts.y1_kv = line.Pts.y1_kv + y10;
-        line.Pts.y2_kv = line.Pts.y2_kv + y20;
-        line.polar = 'cart';
     elseif(corner)
         shape.N = 20;
         shape.Origin = [y10;y20];
@@ -95,7 +92,7 @@ function area = Intersect_Circle_Box(circle,box)
             shape.CornerPos = [right;bottom];
         end
 
-        line = CornerCircle(shape);
+        line = Arc(shape);
 
     elseif(doubleCut)
         shape.N = 20;
@@ -136,9 +133,10 @@ function area = Intersect_Circle_Box(circle,box)
             shape.WallPos = 'W';
         end
 
-        line = ArcNSEW(shape); 
+        line = Arc(shape); 
 
     else
 
         line = [];
     end
+end

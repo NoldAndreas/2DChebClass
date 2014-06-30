@@ -84,12 +84,13 @@ classdef DoubleCutCircle < handle
         function ptsCart = GetCartPts(this)            
             ptsCart = this.Pts;
         end         
-        function int = ComputeIntegrationVector(this)           
+        function [int,length] = ComputeIntegrationVector(this)           
             
-            [A1int,~]  = this.A1.ComputeIntegrationVector(); 
-            [A2int,~]  = this.A2.ComputeIntegrationVector(); 
+            [A1int,lengthA1]  = this.A1.ComputeIntegrationVector(); 
+            [A2int,lengthA2]  = this.A2.ComputeIntegrationVector(); 
             
-            int  = [A1int,A2int];
+            int      = [A1int,A2int];
+            length   = lengthA1 + lengthA2;
             this.Int = int;
 
         end

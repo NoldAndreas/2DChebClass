@@ -1,7 +1,7 @@
 classdef BigSegment < handle
    
     properties 
-        Origin = [0;0];
+        Origin = [0;0];        
         R,h
         W,T        
         Int
@@ -18,36 +18,40 @@ classdef BigSegment < handle
                 this.sphere    = Geometry.sphere;
                 wedgeSh.sphere = Geometry.sphere;
             end
-            this.R      = Geometry.R;            
+            this.R      = Geometry.R;   
             
-            if(~isfield(Geometry,'Top'))                                
-                this.h       = Geometry.h;
-                Geometry.Top = (Geometry.h>0);                
-            else
-                if(Geometry.Top)
-                    this.h   = abs(Geometry.h);
+            %input th1, th2 
+            if(isfield(Geometry,'Wall_Y'))        
+                if(strcmp(Geometry.Wall_VertHor,'horizontal'))
+                    h = Geometry.Wall_Y - Geometry.Origin(2);
+                    
+                    Geometry.th1 = pi - asin(h/this.R);              
+                    Geometry.th2 = asin(h/this.R);                    
                 else
-                    this.h   = -abs(Geometry.h);
-                end
-            end
-            th = acos(this.h/this.R);
+                    h = Geometry.Wall_Y - Geometry.Origin(1);
+                    
+                    Geometry.th1 = acos(h/this.R);              
+                    Geometry.th2 = -acos(h/this.R);                          
+                end                                                
+            end                        
             
-            if(Geometry.h>0)
-                wedgeSh.th1   = -pi/2+th;
-                wedgeSh.th2   = 3/2*pi-th;            
+            
+            r   = Geometry.R;                                        
+            
+            Geometry.th1 = mod(Geometry.th1,2*pi);
+            Geometry.th2 = mod(Geometry.th2,2*pi);
+            
+            if(mod(Geometry.th1 - Geometry.th2,2*pi) < pi)
+                th2 = Geometry.th2;
+                th1 = Geometry.th1;
             else
-                wedgeSh.th1   = 3/2*pi-th;            
-                wedgeSh.th2   = 3/2*pi+th;
+                th1 = Geometry.th2;
+                th2 = Geometry.th1;
             end
             
-            if(Geometry.Top)
-                wedgeSh.th1   = -pi/2+th;
-                wedgeSh.th2   = 3/2*pi-th;            
-            else
-                wedgeSh.th1   = 3/2*pi-th;            
-                wedgeSh.th2   = 3/2*pi+th;
-            end
             
+            wedgeSh.th1   = th1;
+            wedgeSh.th2   = th2;                          
             wedgeSh.R_out = this.R;
             wedgeSh.N     = Geometry.NW;
 
@@ -56,13 +60,16 @@ classdef BigSegment < handle
             
             %Compute points for triangle:
             Y = [this.Origin(1),this.Origin(2);
-                this.Origin(1)-sin(th)*this.R,this.Origin(2)-this.h;
-                this.Origin(1)+sin(th)*this.R,this.Origin(2)-this.h];
+                 this.Origin(1)+cos(th1)*r,this.Origin(2)+sin(th1)*r;
+                 this.Origin(1)+cos(th2)*r,this.Origin(2)+sin(th2)*r];
             
             this.T = Triangle(v2struct(Y),Geometry.NT);
             
             this.Pts  = struct('y1_kv',[y1c;this.T.Pts.y1_kv],...
                                'y2_kv',[y2c;this.T.Pts.y2_kv]);                            
+                           
+                           
+            this.h = r*abs(cos((th1-th2)/2));
         end        
         function ptsCart = GetCartPts(this)            
             ptsCart = this.Pts;

@@ -71,13 +71,14 @@ classdef CornerDisc < handle
         function ptsCart = GetCartPts(this)            
             ptsCart = this.Pts;
         end         
-        function int = ComputeIntegrationVector(this)           
+        function [int,area] = ComputeIntegrationVector(this)           
             
-            [Tint,~]  = this.T.ComputeIntegrationVector(); 
-            [Sint,~]  = this.S.ComputeIntegrationVector();
+            [Tint,areaT]  = this.T.ComputeIntegrationVector(); 
+            [Sint,areaS]  = this.S.ComputeIntegrationVector();
             
             int  = [Sint,Tint];
-            this.Int = int;
+            area = areaT + areaS;
+            this.Int = int;            
 
         end
         function ShiftRotateSegment(this,h,th,yp)
