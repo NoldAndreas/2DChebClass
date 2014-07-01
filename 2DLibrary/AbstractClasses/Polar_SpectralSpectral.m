@@ -4,6 +4,7 @@ classdef Polar_SpectralSpectral < SpectralSpectral
         
         function this = Polar_SpectralSpectral(N1,N2)
             this@SpectralSpectral(N1,N2);
+            this.polar       = 'polar';
         end
         function Int = ComputeIntegrationVector(this,t1Odd,t2Odd)
             if(nargin == 1)
@@ -16,8 +17,7 @@ classdef Polar_SpectralSpectral < SpectralSpectral
             Int             = this.Int.*this.Pts.y1_kv'; 
             Int(Int == inf) = 0; 
             Int(isnan(Int)) = 0;
-            this.Int = Int;
-            this.polar       = 'polar';
+            this.Int = Int;            
         end        
         
         function Diff = ComputeDifferentiationMatrix(this)

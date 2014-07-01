@@ -171,7 +171,6 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
                 this.Interp = Interp;
             end
         end            
-
        function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
             
             N1  = this.N1;  N2  = this.N2;

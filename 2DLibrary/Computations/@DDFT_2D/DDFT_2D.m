@@ -129,8 +129,7 @@ classdef DDFT_2D < handle
         end        
         function rho = GetRhoEq(this)
             rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
-        end
-        
+        end        
         function Preprocess_HardSphereContribution(this)      
             tic
             if(isfield(this.optsNum,'FexNum'))
@@ -209,7 +208,8 @@ classdef DDFT_2D < handle
 
             [this.Vext,this.Vext_grad]  = getVBackDVBack(y1S,y2S,this.optsPhys.V1);                  
             if(strcmp(this.IDC.polar,'polar'))
-                this.Vext_grad = GetCartesianFromPolarFlux(this.Vext_grad,ythS);
+                this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);
+                %this.Vext_grad = GetCartesianFromPolarFlux(this.Vext_grad,ythS);
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
         end

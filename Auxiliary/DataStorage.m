@@ -7,7 +7,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 
     %%*****************************
     %Check if there is a personal user!
-    global PersonalUserOutput
+    global PersonalUserOutput recomputeAll
     %*****************************
     %Trim numbers of parameters
     OriginalParameters = Parameters;
@@ -25,10 +25,11 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     DataFolder = [dirData filesep nameDir]; 	        
     index      = LoadIndexFiles(DataFolder);   
     
-	if(nargin == 4)
+	if((nargin == 4))
         %set default value
         recompute = true;
     end
+   
    
     %1st Step: Search for File and load if found
     if((nargin == 5) && (recompute == 2))        
@@ -80,7 +81,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 load([DataFolder filesep filename]);
                 disp(['Loading file ',DataFolder filesep filename,' ...']);
 
-                if((nargin == 4) && (~PersonalUserOutput))
+                if(recomputeAll)
+                    recompute = true;
+                elseif((nargin == 4) && (~PersonalUserOutput))
                     recompute = false;
                 elseif((nargin==4) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
                     no = fprintf('Do you want to recompute Data (press any key), or wait for 2 seconds.');        

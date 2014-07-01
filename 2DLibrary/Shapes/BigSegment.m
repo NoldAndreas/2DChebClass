@@ -54,9 +54,10 @@ classdef BigSegment < handle
             wedgeSh.th2   = th2;                          
             wedgeSh.R_out = this.R;
             wedgeSh.N     = Geometry.NW;
+            wedgeSh.Origin = this.Origin;
 
             this.W       = Wedge(wedgeSh);                   
-            [y1c,y2c]    = WedgeToCart(this);
+            wCartPts     = this.W.GetCartPts();
             
             %Compute points for triangle:
             Y = [this.Origin(1),this.Origin(2);
@@ -65,8 +66,8 @@ classdef BigSegment < handle
             
             this.T = Triangle(v2struct(Y),Geometry.NT);
             
-            this.Pts  = struct('y1_kv',[y1c;this.T.Pts.y1_kv],...
-                               'y2_kv',[y2c;this.T.Pts.y2_kv]);                            
+            this.Pts  = struct('y1_kv',[wCartPts.y1_kv;this.T.Pts.y1_kv],...
+                               'y2_kv',[wCartPts.y2_kv;this.T.Pts.y2_kv]);                            
                            
                            
             this.h = r*abs(cos((th1-th2)/2));
@@ -124,11 +125,10 @@ classdef BigSegment < handle
                                         num2str(area-sum(this.Int))]);   
             end
         end
-        function [y1c,y2c]= WedgeToCart(this)
-            [x,y] = pol2cart(this.W.Pts.y2_kv,this.W.Pts.y1_kv);
-            
-            y1c = x + this.Origin(1);
-            y2c = y + this.Origin(2);    
+        
+        function PlotGrid(this)
+            this.W.PlotGrid(); hold on;
+            this.T.PlotGrid();
         end
     end
     

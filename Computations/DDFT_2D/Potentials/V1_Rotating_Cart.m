@@ -15,6 +15,8 @@ function [VBack_S,VAdd_S]=V1_Rotating_Cart(y1S,y2S,t,optsPhys)
 
     DVBackDy1    = 2*V0.*y1S;
     DVBackDy2    = 2*V0.*y2S;
+    %DVBackDy1    = 2*V0.*sqrt(y1S.^2 + y2S.^2);
+    %DVBackDy2    = zeros(size(y2S));
 
     DVBackDy1(abs(y1S)==inf | abs(y2S)==inf) = 0;
     DVBackDy2(abs(y1S)==inf | abs(y2S)==inf) = 0;

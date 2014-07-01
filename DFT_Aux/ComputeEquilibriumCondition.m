@@ -25,7 +25,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     fsolveOpts       = optimset('TolFun',1e-8,'TolX',1e-8);    
     
     if(isfield(params.optsPhys,'mu_sat') && isfield(params.optsPhys,'Dmu'))
-       params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.mu.Dmu;       
+       params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.Dmu;       
     end
     
     if(isfield(params.optsPhys,'mu'))   

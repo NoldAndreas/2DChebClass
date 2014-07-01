@@ -34,8 +34,7 @@ classdef Disc < Polar_SpectralFourier
         end
         function xf = CompSpace2(this,th)
             xf = th/(2*pi);
-        end                
-        
+        end                        
         function [int,area] = ComputeIntegrationVector(this)            
             %Check Accuracy
             
@@ -55,8 +54,7 @@ classdef Disc < Polar_SpectralFourier
                 disp(['Disc: Error of integration of area (ratio): ',...
                                         num2str(1-sum(this.Int)/area)]);                
             end
-        end
-        
+        end        
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
             
             if(nargin < 3)

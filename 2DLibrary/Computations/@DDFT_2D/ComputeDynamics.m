@@ -131,10 +131,10 @@ function ComputeDynamics(this,x_ic,mu)
         x        = reshape(x,M,nSpecies);
         
         mu_s     = GetExcessChemPotential(x,t,mu);        
-        mu_s(markVinf,:) = 0;
+        mu_s(markVinf) = 0;
         
         h_s      = Diff.grad*x - Vext_grad;        
-        h_s([markVinf;markVinf],:) = 0;
+        h_s([markVinf;markVinf]) = 0;
         
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         
@@ -148,7 +148,7 @@ function ComputeDynamics(this,x_ic,mu)
         
         flux_dir               = Diff.grad*mu_s;
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
-        dxdt(markVinf,:)       = x(markVinf,:) - x_ic(markVinf,:);
+        dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
         dxdt = D0.*dxdt;
                 

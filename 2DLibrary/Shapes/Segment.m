@@ -1,6 +1,6 @@
  classdef Segment < M1SpectralSpectral
     properties 
-        h,R,S
+        h,R
         Origin = [0,0]
         sphere
     end
@@ -14,13 +14,6 @@
                 this.Origin = Geometry.Origin;
             end
             
-            if(isfield(Geometry,'S'))
-                this.S = Geometry.S;
-            elseif(~isfield(Geometry,'S') && Geometry.h<0)               
-                this.S = -1;
-            elseif(~isfield(Geometry,'S') && Geometry.h >= 0)
-                this.S = 1;            
-            end
             this.h = abs(Geometry.h);
             InitializationPts(this);            
             
@@ -33,21 +26,21 @@
         %   Mapping functions:
         %***************************************************************             
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
-            R = this.R;
-            S = this.S;
-            h = this.h;            
+            R      = this.R;            
+            h      = this.h;            
             Origin = this.Origin;
             
             n  = length(x1);
 
             C1      = sqrt(R^2-h^2);
-            y1_kv   = C1*x1 + Origin(1);
+            y1_kv   = C1*x1;
 
-            g       = S*(sqrt(R^2-y1_kv.^2)-h);
-            dgdx1   = -S*C1^2*x1./(sqrt(R^2-y1_kv.^2));
-            ddgddx1 = -S*C1^2*R^2./((R^2-y1_kv.^2).^(3/2));
+            g       = sqrt(R^2-y1_kv.^2)-h;
+            dgdx1   = -C1^2*x1./(sqrt(R^2-y1_kv.^2));
+            ddgddx1 = -C1^2*R^2./((R^2-y1_kv.^2).^(3/2));
 
-            y2_kv   = ((1+x2)/2).*g + Origin(2) + S*h;
+            y1_kv   = y1_kv + Origin(1);
+            y2_kv   = ((1+x2)/2).*g + h + Origin(2);
 
             if(nargout >= 3)
                 J        = zeros(n,2,2);

@@ -20,14 +20,18 @@ function [optsNum,optsPhys] = Test_DFT_EqInfCapillary_Slit()
                       
     optsPhys = struct('V1',V1,'V2',V2,...
                       'HSBulk','CarnahanStarling',...
-                      'kBT',0.7,'Dmu',0);
+                      'kBT',0.7,'nParticlesS',0);%'Dmu',0);
                       %'V2DV2_1D','Phi1DLongRange');                 
 
     AddPaths();
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
-    EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                 
-
+    
+    rL = EX.optsPhys.rhoLiq_sat;
+    rG = EX.optsPhys.rhoGas_sat;
+    rhoIG = (rL+rG)/2 + (rL-rG)/2*tanh(EX.IDC.GetCartPts.y1_kv);
+    
+    EX.ComputeEquilibrium(rhoIG);
     EX.IDC.doPlots(EX.GetRhoEq());
 end                 
 

@@ -1,6 +1,6 @@
 function data = SimulationSegment_Wall(N1,N2,vext)
 
-    disp('** Simulation Segment M1 **');
+    disp('** Simulation Segment **');
     AddPaths();
     
     close all;
@@ -11,7 +11,7 @@ function data = SimulationSegment_Wall(N1,N2,vext)
         vext  = @VTest;
         R     = 3;
         h     = -1; 
-        Origin = [0;0];
+        Origin = [1;0];
         N      = [N1;N2];
     end            
     

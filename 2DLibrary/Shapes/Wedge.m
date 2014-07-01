@@ -4,7 +4,7 @@ classdef Wedge < Polar_SpectralSpectral
         R_in = 0;
         R_out
         th1,th2                
-        Origin 
+        Origin = [0,0]
     end
     
     methods        
@@ -32,8 +32,9 @@ classdef Wedge < Polar_SpectralSpectral
             InitializationPts(this);  
             if(isfield(Geometry,'Origin'))
                 this.Origin = Geometry.Origin;
-                this.Pts    = shiftDisc(this.Pts,Geometry.r0,Geometry.t0);            
-            end            
+                %this.Pts    = shiftDisc(this.Pts,Geometry.r0,Geometry.t0);            
+            end       
+            
         end                         
     end
     
@@ -49,8 +50,7 @@ classdef Wedge < Polar_SpectralSpectral
         end
         function x2 = CompSpace2(this,y2)            
             x2 = InvLinearMap(y2,this.th1,this.th2);
-        end        
-        
+        end                
         function [int,area] = ComputeIntegrationVector(this,t1Odd,t2Odd)
             if(nargin == 1)
                 int  = ComputeIntegrationVector@Polar_SpectralSpectral(this);
@@ -70,6 +70,17 @@ classdef Wedge < Polar_SpectralSpectral
 %                int  = 2*int.*real(sqrt(this.R^2-y1s.^2-y2s.^2))';  
 %            elseif(t2Odd)
             end
+        end        
+        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
+            
+            if(nargin < 3)
+                pts_y1 = this.Pts.y1_kv;
+                pts_y2 = this.Pts.y2_kv;
+            end
+            
+            ptsCart       = GetCartPts@Shape(this,pts_y1,pts_y2);
+            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
+            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
         end
         
     end

@@ -6,6 +6,8 @@
     global PersonalUserOutput
     global MinimalOutput
     global CodeVersionsDir
+    
+    global recomputeAll
      
     if(exist('D:\','dir'))
         dirData    = 'D:\2DChebData';    
@@ -43,5 +45,7 @@
     MinimalOutput      = false;
     
     dirDataOrg = dirData;
+    
+    recomputeAll = false;
      
 end
