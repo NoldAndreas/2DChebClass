@@ -2,7 +2,7 @@ classdef InfDisc < Polar_SpectralFourier
 
     properties        
         L
-        Origin = [0;0];                        
+        %Origin = [0;0];                        
     end
     
     methods        
