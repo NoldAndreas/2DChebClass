@@ -35,8 +35,7 @@ while(true)
     hold on
     area = Intersect(BX,DC);
     
-    disp(['Area is: ',num2str(area.area)]);
-    disp(['Area from Int is: ',num2str(sum(area.int))]);
+    disp(['Area is: ',num2str(area.area), ' with error ',num2str(sum(area.int) - area.area)]);    
 
     if(~isempty(area))                       
         scatter(area.pts.y1_kv,area.pts.y2_kv,'r');

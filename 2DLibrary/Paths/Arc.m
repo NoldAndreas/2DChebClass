@@ -78,7 +78,7 @@ classdef Arc < SpectralPath
         end        
         function [int,length] = ComputeIntegrationVector(this)            
             int    = ComputeIntegrationVector@SpectralPath(this);
-            length = this.R*(this.th2-this.th1);
+            length = this.R*abs(this.th2-this.th1);
             if(length == 0)
                 disp(['Arc: Length is zero, Absolute error is: ',...
                                     num2str(length-sum(this.IntSc))]);

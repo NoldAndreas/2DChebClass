@@ -15,15 +15,15 @@ while(true)
     [y10,y20] = ginput(1);
 
     Origin = [y10,y20];
-    N      = [10,10];
-    sphere = false;
+    N      = [20,20];
+    sphere = true;
     DC     = Disc(v2struct(Origin,R,N,sphere));   
 
     hold on
     area = Intersect(HS,DC);
     
-    disp(['Area is: ',num2str(area.area)]);
-    disp(['Area from Int is: ',num2str(sum(area.int))]);
+    disp(['Area is: ',num2str(area.area),' with error from integration vector ',num2str(sum(area.int)-area.area)]);
+    %disp(['Area from Int is: ',num2str(sum(area.int))]);
 
     if(~isempty(area))                       
         scatter(area.pts.y1_kv,area.pts.y2_kv,'r');

@@ -1,14 +1,17 @@
 classdef InfDisc < Polar_SpectralFourier
 
     properties        
-        L
-        Origin = [0;0];                        
+        L        
     end
     
     methods        
         function this = InfDisc(Geometry)
             this@Polar_SpectralFourier(Geometry.N(1),Geometry.N(2));
             this.L = Geometry.L;            
+            
+            if(isfield(Geometry,'Origin'))
+                this.Origin = Geometry.Origin;
+            end
             
             InitializationPts(this);
         end                         

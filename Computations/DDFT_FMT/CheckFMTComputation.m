@@ -1,4 +1,4 @@
-function data = CheckFMTComputation(optsPhys,optsNum,optsPlot)
+  function CheckFMTComputation()
 %************************************************************************* 
 % define
 %   mu_s_i := kBT*log(rho_i) + sum( int(rho_j(r')*Phi2D(r-r'),dr') , 
@@ -8,51 +8,47 @@ function data = CheckFMTComputation(optsPhys,optsNum,optsPlot)
 %  (EQ i,2) int(rho_i) = NoParticles_i
 % Dynamics: 
 %*************************************************************************   
-    global PersonalUserOutput
-    if(nargin == 0)        
-        %Numerical Parameters    
-        Phys_Area = struct('N',[3;80],'L1',2,'L2',1.5,'y2wall',0.,...
-                           'N2bound',20,'h',1,'L2_AD',1.);
 
-        Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
-                           'y2Min',0.5,'y2Max',6,'N2',100);
+    %********************************************
+    %***************  Parameters ****************
+    %********************************************
+    disp('** CheckFMTComputationSkewed **');
+    %Numerical Parameters    
+    Phys_Area = struct('N',[3;60],'L1',2,'L2',2.,'y2wall',0.,...
+                       'N2bound',20,'h',1,'L2_AD',2.,...
+                       'alpha',pi/3);
 
-        Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                           'Ncircle',1,'N1disc',30,'N2disc',30);
+    Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
+                       'y2Min',0.5,'y2Max',6,'N2',100);
 
-        %Sub_Area  = Phys_Area;
-        optsNum = struct('PhysArea',Phys_Area,...
-                         'PlotArea',Plot_Area,...
-                         'FexNum',Fex_Num,...
-                         'DDFTCode','CheckFMTComputation',...
-                         'Tmax',7,'TN',50,...  
-                         'name','default',...
-                         'Accuracy_Averaging',1e-6);
+    Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
+                       'Ncircle',1,'N1disc',24,'N2disc',24);
 
-        V1       = struct('V1DV1','zeroPotential');              
-        V2       = struct('V2DV2','zeroPotential');
+    %Sub_Area  = Phys_Area;
+    optsNum = struct('PhysArea',Phys_Area,...
+                     'PlotArea',Plot_Area,...
+                     'FexNum',Fex_Num);
 
-        optsPhys = struct('V1',V1,'V2',V2,...                                            
-                          'kBT',1,'eta',0.4257,...%0.4783,...%0.4257,...
-                          'nParticlesS',10,'sigmaS',1); 
+    V1       = struct('V1DV1','zeroPotential');              
+    V2       = struct('V2DV2','zeroPotential');                                 
 
-        lineColourDDFT={{'r','b','g'}};            
-        optsPlot = struct('lineColourDDFT',lineColourDDFT);
-        optsPlot.doDDFTPlots=true;
-        
-        AddPaths();
-    end
-    saveFigs = false;
+    optsPhys = struct('V1',V1,'V2',V2,...                                            
+                      'kBT',1,'eta',0.4783,...
+                      'sigmaS',1);%0.4783,...%0.4257,...                      
 
+    lineColourDDFT={{'r','b','g'}};            
+    optsPlot = struct('lineColourDDFT',lineColourDDFT);
+    optsPlot.doDDFTPlots=true;
+
+    AddPaths();    
     close all;  
-    disp(['** ',optsNum.DDFTCode,' **']);
 
     %************************************************
     %***************  Initialization ****************
-    %************************************************    
+    %************************************************
     PhysArea  = optsNum.PhysArea;           
-    Rs        = diag(optsPhys.sigmaS)/2;    
-    HS        = HalfSpace_FMT(PhysArea,Rs,optsNum.Accuracy_Averaging);
+    Rs        = diag(optsPhys.sigmaS)/2;     
+    HS        = HalfSpace_FMT(PhysArea,Rs);
     
     %************************************************
     %****************  Preprocess  ******************
@@ -73,12 +69,9 @@ function data = CheckFMTComputation(optsPhys,optsNum,optsPlot)
     
     IntMatrFex_2D  = DataStorage(['HalfSpace_FMT' filesep func2str(func)],func,params,HS); %true 
     
-    %HS.CheckAverageDensities_Rosenfeld_3D(IntMatrFex_2D);
-    if(PersonalUserOutput)
-        CheckAverageDensities_Rosenfeld_3D(HS,IntMatrFex_2D);
-    end
+    CheckAverageDensities_Rosenfeld_3D(HS,IntMatrFex_2D);
     
-    optsPhys.rho_iguess = 0.1;
+    optsPhys.rho_iguess = optsPhys.eta*6/pi;
     FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum);        
 
 end

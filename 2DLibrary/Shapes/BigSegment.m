@@ -50,30 +50,30 @@ classdef BigSegment < handle
             end
             
             
-            wedgeSh.th1   = th1;
-            wedgeSh.th2   = th2;                          
-            wedgeSh.R_out = this.R;
-            wedgeSh.N     = Geometry.NW;
-            wedgeSh.Origin = this.Origin;
+            wedgeSh.th1    = th1;
+            wedgeSh.th2    = th2;                          
+            wedgeSh.R_out  = this.R;
+            wedgeSh.N      = Geometry.NW;            
 
-            this.W       = Wedge(wedgeSh);                   
-            wCartPts     = this.W.GetCartPts();
+            this.W         = Wedge(wedgeSh);                   
+            wCartPts       = this.W.GetCartPts();
             
             %Compute points for triangle:
-            Y = [this.Origin(1),this.Origin(2);
-                 this.Origin(1)+cos(th1)*r,this.Origin(2)+sin(th1)*r;
-                 this.Origin(1)+cos(th2)*r,this.Origin(2)+sin(th2)*r];
+            Y = [0,0;
+                 cos(th1)*r,sin(th1)*r;
+                 cos(th2)*r,sin(th2)*r];
             
             this.T = Triangle(v2struct(Y),Geometry.NT);
             
             this.Pts  = struct('y1_kv',[wCartPts.y1_kv;this.T.Pts.y1_kv],...
-                               'y2_kv',[wCartPts.y2_kv;this.T.Pts.y2_kv]);                            
-                           
+                               'y2_kv',[wCartPts.y2_kv;this.T.Pts.y2_kv]);   
                            
             this.h = r*abs(cos((th1-th2)/2));
         end        
         function ptsCart = GetCartPts(this)            
-            ptsCart = this.Pts;
+            ptsCart       = this.Pts;
+            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
+            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
         end         
         function [int,area] = ComputeIntegrationVector(this)           
             
@@ -83,8 +83,8 @@ classdef BigSegment < handle
                 [wint,h]  = this.W.ComputeIntegrationVector(true,false);
                 int       = [wint,Tint];            
                 
-                y1s  = this.Pts.y1_kv - this.Origin(1);                
-                y2s  = this.Pts.y2_kv - this.Origin(2);
+                y1s  = this.Pts.y1_kv;   
+                y2s  = this.Pts.y2_kv;
                 int  = 2*int.*real(sqrt(this.R^2-y1s.^2-y2s.^2))';  
                 this.Int = int;
                 

@@ -66,8 +66,8 @@
             int = ComputeIntegrationVector@M1SpectralSpectral(this);
             %Check Accuracy            
             if(this.sphere)
-                y1s  = this.Pts.y1_kv - this.Origin(1);
-                y2s  = this.Pts.y2_kv - this.Origin(2);
+                y1s  = this.Pts.y1_kv;
+                y2s  = this.Pts.y2_kv;
                 int  = 2*int.*real(sqrt(this.R^2-y1s.^2-y2s.^2))';  
                 this.Int = int;
                 

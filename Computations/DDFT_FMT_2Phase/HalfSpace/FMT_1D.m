@@ -15,7 +15,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     elseif(isfield(optsPhys,'eta'))
         eta       = optsPhys.eta;
         rhoBulk   = eta*6/pi;
-        mu        = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);
+        mu        = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);       
     end
     
     optsPhys.HSBulk = (['FexBulk_',FexNum.Fex]);

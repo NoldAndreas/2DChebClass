@@ -92,8 +92,8 @@ classdef ContactLine < handle
             PtsCart            = this.HS.GetCartPts();
 
             %(3) Numerical Convolution
-            opts.V2                 = this.optsPhys.V2;
-            opts.nSpecies           = this.optsPhys.nSpecies;
+            opts.V2                  = this.optsPhys.V2;
+            opts.nSpecies            = this.optsPhys.nSpecies;
             opts.optsNum.PhysArea.N  = this.optsNum.PhysArea.N;
             opts.optsNum.PhysArea.L1 = this.optsNum.PhysArea.L1;
             opts.optsNum.PhysArea.L2 = this.optsNum.PhysArea.L2;
