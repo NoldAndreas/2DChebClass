@@ -15,7 +15,7 @@ classdef Ball < SpectralEvenFourier
     
     properties 
         theta1,theta2,R
-        PtsCart
+        PtsCart    
     end
     
     %**********************************************
@@ -28,10 +28,12 @@ classdef Ball < SpectralEvenFourier
              this.theta1 = Geometry.theta1;
              this.theta2 = Geometry.theta2;
              this.R      = Geometry.R;
+             if(isfield(Geometry,'Origin'))
+                 this.Origin = Geometry.Origin;
+             end
              
              InitializationPts(this);             
-             this.polar = 'sphSurf';
-             
+             this.polar = 'sphSurf';             
         end      
     end
     
@@ -59,13 +61,11 @@ classdef Ball < SpectralEvenFourier
         function ComputeConvolutionMatrix(this)
             exc = MException('Segment2:ComputeConvolutionMatrix','case not implemented');
             throw(exc);           
-        end
-        
+        end       
         function Ind    = ComputeIndices(this)
             exc = MException('Segment2:ComputeIndices','case not implemented');
             throw(exc);           
-        end
-            
+        end           
         function Diff   = ComputeDifferentiationMatrix(this)
             exc = MException('Segment2:ComputeDifferentiationMatrix','case not implemented');
             throw(exc);           

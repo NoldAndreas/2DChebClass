@@ -1,13 +1,8 @@
-function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
+function dataDisk = Intersect_Disk(MainShape,diskShape)%y20,r,N,sphere)
     r   = diskShape.R;
     N   = [diskShape.N1,diskShape.N2];
-    
-	if((nargin > 2) && isfield(opts,'offset_y2'))        
-        y20 = diskShape.Origin(2) + opts.offset_y2;
-    else        
-        y20 = diskShape.Origin(2);
-    end
-    diskShape.Origin(2) = y20;
+    	
+	y20 = diskShape.Origin(2);    
     
     if(isa(MainShape,'HalfSpace'))
         %Cartesian shift
@@ -15,8 +10,8 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
         y2Min = MainShape.y2Min;
         if(isa(MainShape,'HalfSpaceSkewed'))   
             y2Min = y2Min*sin(MainShape.alpha);
-        end                
-        
+        end
+
         shape.N      = N;
         shape.R      = r;     
         shape.Origin = diskShape.Origin;
@@ -25,7 +20,10 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
         end
 
         %1. find points of disk in HalfSpace            
-        if(y20 >= y2Min + r)
+        if(y20 == inf)
+            shape.Origin(2) = 0;
+            area            = Disc(shape); 
+        elseif(y20 >= y2Min + r)
             %1a. if full disk is in HalfSpace                
             %shape.N         = GetPointNumber(shape,'Disc',this.Accuracy);  
             area            = Disc(shape);                                              
@@ -61,7 +59,9 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
         ptsLoc.y1_kv       = dataDisk.pts.y1_kv - area.Origin(1);
         ptsLoc.y2_kv       = dataDisk.pts.y2_kv - area.Origin(2);        
         dataDisk.ptsPolLoc = Cart2PolPts(ptsLoc);
-        %dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
+        if(y20 == inf)
+            dataDisk.pts.y2_kv = dataDisk.pts.y2_kv + y20;
+        end
 
         [dataDisk.int,dataDisk.area] = area.ComputeIntegrationVector();
         
@@ -77,5 +77,6 @@ function dataDisk = Intersect_Disk(MainShape,diskShape,opts)%y20,r,N,sphere)
     else
         exc = MException('Intersect_Disk','case not implemented');
         throw(exc);                
-    end
+    end    
+    
 end   

@@ -4,7 +4,6 @@ classdef Wedge < Polar_SpectralSpectral
         R_in = 0;
         R_out
         th1,th2                
-        Origin = [0,0]
     end
     
     methods        
@@ -71,17 +70,6 @@ classdef Wedge < Polar_SpectralSpectral
 %            elseif(t2Odd)
             end
         end        
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin < 3)
-                pts_y1 = this.Pts.y1_kv;
-                pts_y2 = this.Pts.y2_kv;
-            end
-            
-            ptsCart       = GetCartPts@Shape(this,pts_y1,pts_y2);
-            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-        end
         
     end
 end

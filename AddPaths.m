@@ -46,6 +46,6 @@
     
     dirDataOrg = dirData;
     
-    recomputeAll = false;
+    recomputeAll = true;
      
 end

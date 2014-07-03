@@ -2,8 +2,7 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
 
     properties        
         RMin
-        L
-        Origin = [0;0];
+        L        
     end
     
     methods        
@@ -21,18 +20,6 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
     end
     
     methods (Access = public)
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin == 1)
-                ptsCart = GetCartPts@Shape(this);
-            else
-                ptsCart = GetCartPts@Shape(this,pts_y1,pts_y2);
-            end
-            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-            
-        end
-
         
         function [r,dr,dx,ddx,dddx,ddddx] = PhysSpace1(this,x)
             [r,dr,dx,ddx,dddx,ddddx] = QuotientMap(x,this.L,this.RMin,inf);
@@ -72,8 +59,7 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
 %             disp(['InfAnnulus: Error of integration of exp(-r^2) sin^2(t)(ratio): ',...
 %                                     num2str(1-sum(this.Int*f3)/intF3)]);
             
-        end
-               
+        end               
         function Diff = ComputeDifferentiationMatrix(this)
             Diff = ComputeDifferentiationMatrix@Polar_SpectralFourierNoOrigin(this);
             
@@ -96,8 +82,7 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
             disp(['InfAnnulus: Max error of Laplacian of exp(-r^2)*sin(t): ',...
                                     num2str( max(Diff.Lap*f1 - Lapf1) ) ]); 
             
-        end
-        
+        end        
         function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
 
             if(nargin<2)

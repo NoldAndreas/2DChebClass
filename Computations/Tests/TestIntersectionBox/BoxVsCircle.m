@@ -36,7 +36,7 @@ while(true)
     hold on;
     CIRC.PlotPath();
 
-    line = Intersect(BX,CIRC,[]);    
+    line = Intersect(BX,CIRC);    
     
     disp(['Length is: ',num2str(line.length)]);
 

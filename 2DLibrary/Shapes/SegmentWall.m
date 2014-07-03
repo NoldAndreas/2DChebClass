@@ -30,17 +30,9 @@ classdef SegmentWall < Segment
             
         end
         function [y1_kv,y2_kv,J] = PhysSpace(this,x1,x2)        
-            
-            y10 = this.Origin(1);
-            y20 = this.Origin(2);
-            
             [y1_kv,y2_kv,J] = PhysSpace@Segment(this,x1,x2);
-
-            [y1R,y2R,JR] = RotateAroundOrigin(y1_kv - y10,...
-                                           y2_kv - y20,this.alpha);
-            y1_kv     = y1R + y10;
-            y2_kv     = y2R + y20;
-            J         = MultMatr(JR,J);
+            [y1_kv,y2_kv,JR]    = RotateAroundOrigin(y1_kv,y2_kv,this.alpha);
+            J               = MultMatr(JR,J);
         end
     end
     

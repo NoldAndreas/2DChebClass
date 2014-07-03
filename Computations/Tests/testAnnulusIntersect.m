@@ -44,7 +44,7 @@ xlim([-15,15]); ylim([-10,20]);
 annGeom.Origin = [x0;y0];
 
 fullArea       = InfAnnulus(annGeom);
-cutArea        = Intersect(IDC,fullArea,[]);
+cutArea        = Intersect(IDC,fullArea);
 
 hold on
 annPts         = fullArea.GetCartPts();

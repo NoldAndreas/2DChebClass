@@ -7,6 +7,7 @@ classdef (Abstract) Shape < handle
         Ind
         Interp
         Conv
+        Origin = [0,0]
         
         BoundaryPaths %vector with [Path_right; PathUpper ; PathLeft ; PathBottom]
         
@@ -37,11 +38,6 @@ classdef (Abstract) Shape < handle
     
     methods (Access = public)
         
-%         function SaveCartPts(this)
-%             PtsCart            = GetCartPts(this);
-%             this.Pts.y1Cart_kv = PtsCart.y1_kv;
-%             this.Pts.y2Cart_kv = PtsCart.y2_kv;            
-%         end        
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
             
             if(nargin == 1)
@@ -64,6 +60,9 @@ classdef (Abstract) Shape < handle
                 exc = MException('Shape:GetCartPts','select {polar,sphSurf,cart}');
                 throw(exc);                
             end
+            
+            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
+            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
             
         end   
         function pts = GetInvCartPts(this,ptsCart_y1,ptsCart_y2)

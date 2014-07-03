@@ -33,7 +33,7 @@ while(true)
     DC     = Disc(v2struct(Origin,R,N));   
 
     hold on
-    area = Intersect(BX,DC,[]);
+    area = Intersect(BX,DC);
     
     disp(['Area is: ',num2str(area.area)]);
     disp(['Area from Int is: ',num2str(sum(area.int))]);

@@ -1,8 +1,8 @@
-function dataBall = Intersect_Ball(MainShape,ballShape,opts)
+function dataBall = Intersect_Ball(MainShape,ballShape)
 %function dataBall = Intersect_Ball(MainShape,y20,r,N)
     r   = ballShape.R;
     N   = [ballShape.N1,ballShape.N2];
-    y20 = opts.offset_y2;
+	y20 = ballShape.Origin(2);       
     
     if(isa(MainShape,'HalfSpace'))   
         

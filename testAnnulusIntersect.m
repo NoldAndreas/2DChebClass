@@ -22,16 +22,15 @@ xlim([-15,15]); ylim([-10,20]);
 x0 = 0;
 y0 = 0.8848;
 
-opts.offset_y2 = y0;
 
 %% Annulus - 1
 annGeom.N      = [10;10];
 annGeom.RMin   = R;
 annGeom.L      = 2;
-%annGeom.Origin = [x0;y0];
+annGeom.Origin = [x0;y0];
 
 fullArea       = InfAnnulus(annGeom);
-cutArea        = Intersect(IDC,fullArea,opts);
+cutArea        = Intersect(IDC,fullArea);
 
 hold on
 annPts         = fullArea.GetCartPts();
@@ -51,7 +50,7 @@ xlim([-15,15]); ylim([-10,20]);
 annGeom.Origin = [x0;y0];
 
 fullArea       = InfAnnulus(annGeom);
-cutArea        = Intersect(IDC,fullArea,[]);
+cutArea        = Intersect(IDC,fullArea);
 
 hold on
 annPts         = fullArea.GetCartPts();
@@ -62,10 +61,10 @@ scatter(cutArea.pts.y1_kv,cutArea.pts.y2_kv,'r')
 %% Disc
 discGeom.N = [20;20];
 discGeom.R = R/2;
-%annGeom.Origin = [x0;y0];
+annGeom.Origin = [x0;y0];
 
 discArea    = Disc(discGeom);
-cutDiscArea = Intersect(IDC,discArea,opts);
+cutDiscArea = Intersect(IDC,discArea);
 
 discPts     = discArea.GetCartPts();
 scatter(discPts.y1_kv + x0,discPts.y2_kv+y0,'g')

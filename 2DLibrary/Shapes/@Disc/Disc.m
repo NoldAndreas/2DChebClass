@@ -3,8 +3,7 @@ classdef Disc < Polar_SpectralFourier
     properties        
         R        
         Ch 
-        sphere = false;
-        Origin = [0;0];
+        sphere = false;        
     end
     
     methods        
@@ -55,17 +54,6 @@ classdef Disc < Polar_SpectralFourier
                                         num2str(1-sum(this.Int)/area)]);                
             end
         end        
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin < 3)
-                pts_y1 = this.Pts.y1_kv;
-                pts_y2 = this.Pts.y2_kv;
-            end
-            
-            ptsCart       = GetCartPts@Shape(this,pts_y1,pts_y2);
-            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-        end
         
         acc = testIntegration(this,toCheck);
         c = testCount0(this,N) 

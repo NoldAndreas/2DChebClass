@@ -1,7 +1,6 @@
  classdef HalfStripMinusDisk < Polar_M1SpectralSpectral
     properties 
         R
-        Origin = [0,0]
         y2Wall
         L1        
         LeftRight
@@ -14,7 +13,7 @@
             
             this.L1         = Geometry.L1;
             this.R          = Geometry.R;
-            this.Origin = Geometry.Origin;
+            this.Origin     = Geometry.Origin;
             this.y2Wall     = Geometry.y2Wall;
             this.LeftRight  = Geometry.LeftRight;
             %this.Rmax       = Geometry.Rmax;
@@ -25,23 +24,6 @@
         %***************************************************************
         %   Mapping functions:
         %***************************************************************             
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin == 1)
-                pts_y1 = this.Pts.y1_kv;
-                pts_y2 = this.Pts.y2_kv;
-            end
-            
-            if(strcmp(this.polar,'polar'))
-                [ptsCart.y1_kv,ptsCart.y2_kv] = pol2cart(pts_y2,pts_y1);
-                ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-                ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-            else
-                exc = MException('Shape:GetCartPts','select {polar,sphSurf,cart}');
-                throw(exc);                
-            end
-            
-        end
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
             
             O = ones(size(x1));

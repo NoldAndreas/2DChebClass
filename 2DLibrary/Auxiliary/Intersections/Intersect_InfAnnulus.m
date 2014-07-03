@@ -1,4 +1,4 @@
-function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape,opts)
+function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape)
     %Input: 
     %opts: struct with offset_y2
     
@@ -6,9 +6,6 @@ function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape,opts)
     N   = [infAnnulusShape.N1,infAnnulusShape.N2];
     
     y20 = infAnnulusShape.Origin(2);
-    if(isfield(opts,'offset_y2'))
-        y20 = y20 + opts.offset_y2;
-    end
     
     if(isa(MainShape,'HalfSpace'))
         

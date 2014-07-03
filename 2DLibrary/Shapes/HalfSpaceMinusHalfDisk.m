@@ -1,7 +1,6 @@
  classdef HalfSpaceMinusHalfDisk < Polar_M1SpectralSpectral
     properties 
-        R
-        Origin = [0,0]
+        R        
         y2Wall
         L1                
         Rmax = Inf
@@ -26,17 +25,6 @@
         %***************************************************************
         %   Mapping functions:
         %***************************************************************             
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin == 1)
-                ptsCart = GetCartPts@Shape(this);
-            else
-                ptsCart = GetCartPts@Shape(this,pts_y1,pts_y2);
-            end
-            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-            
-        end
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
             
             O = ones(size(x1));            

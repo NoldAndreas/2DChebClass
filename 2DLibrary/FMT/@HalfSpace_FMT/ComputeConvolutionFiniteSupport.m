@@ -86,8 +86,10 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     ptsy2        = ptsStripCart.y2_kv;
 
     for iPts = 1:length(ptsy2)
-        dataAD(iPts) = Intersect(this,area,struct('offset_y2',ptsy2(iPts)));                                
+        area.Origin(2) = ptsy2(iPts);
+        dataAD(iPts)   = Intersect(this,area);
     end
+    area.Origin(2) = 0;
 
     %% Computation of convolution matrices
     %

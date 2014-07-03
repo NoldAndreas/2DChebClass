@@ -57,7 +57,6 @@ classdef (Abstract) SpectralEvenFourier < SpectralFourier
             IfftMatrix = 0;%kron(eye(N1),IfftMatrix);
 
         end        
-        %Maps
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)
            
             [y1_kv,dy1] = PhysSpace1(this,x1);

@@ -58,15 +58,17 @@ function SimulateSplitDisk_BarkerHenderson()
         shapeAnn.RMin = 1;
         shapeAnn.L    = L;
         shapeAnn.N    = N;%[30,30];
+        shapeAnn.Origin = [0,offset];
         annArea       = InfAnnulus(shapeAnn);
 
-        annPts        = Intersect(HS,annArea,struct('offset_y2',offset));
+        annPts        = Intersect(HS,annArea);
 
         shapeDisc.R   = 1;
         shapeDisc.N   = N;%[30,30];
+        shapeDisc.Origin = [0,offset];
         diskArea      = Disc(shapeDisc);    
 
-        diskPts       = Intersect(HS,diskArea,struct('offset_y2',offset));
+        diskPts       = Intersect(HS,diskArea);
         
 %        scatter(annPts.pts.y1_kv,annPts.pts.y2_kv); hold on;
 %        scatter(diskPts.pts.y1_kv,diskPts.pts.y2_kv);

@@ -1,7 +1,6 @@
  classdef Segment < M1SpectralSpectral
     properties 
         h,R
-        Origin = [0,0]
         sphere
     end
     
@@ -27,8 +26,7 @@
         %***************************************************************             
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
             R      = this.R;            
-            h      = this.h;            
-            Origin = this.Origin;
+            h      = this.h;                        
             
             n  = length(x1);
 
@@ -38,9 +36,8 @@
             g       = sqrt(R^2-y1_kv.^2)-h;
             dgdx1   = -C1^2*x1./(sqrt(R^2-y1_kv.^2));
             ddgddx1 = -C1^2*R^2./((R^2-y1_kv.^2).^(3/2));
-
-            y1_kv   = y1_kv + Origin(1);
-            y2_kv   = ((1+x2)/2).*g + h + Origin(2);
+            
+            y2_kv   = ((1+x2)/2).*g + h;
 
             if(nargout >= 3)
                 J        = zeros(n,2,2);
@@ -64,8 +61,7 @@
         function [x1,x2] = CompSpace(this,y1,y2)
             exc = MException('Segment:CompSpace','not yet implemented');
             throw(exc);
-        end
-        
+        end        
         function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@M1SpectralSpectral(this);
             %Check Accuracy            

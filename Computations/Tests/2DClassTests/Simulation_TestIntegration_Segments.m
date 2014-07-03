@@ -60,6 +60,11 @@ function Simulation_TestIntegration_Segments
         V_BSW = VTest3(BSW_CartPts.y1_kv - y10,BSW_CartPts.y2_kv - y20);
         [~,VInt]  = VTest3([],[]);
         disp(['Error for VTest3: ',num2str(SW.Int*V_SW + BSW.Int*V_BSW - VInt)]);
+        
+        V_SW  = VTest4(SW_CartPts.y1_kv - y10,SW_CartPts.y2_kv - y20);
+        V_BSW = VTest4(BSW_CartPts.y1_kv - y10,BSW_CartPts.y2_kv - y20);
+        [~,VInt]  = VTest4([],[]);
+        disp(['Error for VTest4: ',num2str(SW.Int*V_SW + BSW.Int*V_BSW - VInt)]);
     end
     
     
@@ -78,4 +83,10 @@ function Simulation_TestIntegration_Segments
         V       = y2.*sin(y1);
         VInt    = 0;
     end
+
+    function [V,VInt] = VTest4(y1,y2)
+        V       = y1;
+        VInt    = 0;
+    end
+
 end

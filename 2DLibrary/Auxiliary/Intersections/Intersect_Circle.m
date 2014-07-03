@@ -1,7 +1,7 @@
-function [dataCircle] = Intersect_Circle(MainShape,circle,opts)            
+function [dataCircle] = Intersect_Circle(MainShape,circle)            
 
-    y20 = circle.Origin(2);
-    r   = circle.R;
+    y20     = circle.Origin(2);
+    r       = circle.R;
     Ncircle = circle.N;
 
 
