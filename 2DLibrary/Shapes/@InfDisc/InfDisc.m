@@ -1,7 +1,7 @@
 classdef InfDisc < Polar_SpectralFourier
 
     properties        
-        L        
+        L
     end
     
     methods        
