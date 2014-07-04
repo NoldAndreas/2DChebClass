@@ -194,7 +194,11 @@ classdef DDFT_2D < handle
                 paramsHI.optsNum.Pts       = this.IDC.Pts;    
                 paramsHI.optsNum.Polar     = 'cart';
                 paramsHI.optsPhys.nSpecies = this.optsPhys.nSpecies;
-                this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices2D,paramsHI,this.IDC);      
+                if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
+                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);      
+                else
+                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices2D,paramsHI,this.IDC);      
+                end
                 fprintf(1,'done.\n');
                 t_HI = toc;
                 display(['HI computation time (sec): ', num2str(t_HI)]); 
