@@ -1,4 +1,4 @@
-function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -13,10 +13,10 @@ function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
                    
-    HI_Num    = struct('N',[10;10],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
+    HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
-    tMax = 0.25;
+    tMax = 0.15;
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
@@ -34,7 +34,7 @@ function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     
     optsPhys = struct('V1',V1,  ...                                            
                       'kBT',1,'mS',1,'gammaS',1, ...
-                      'nParticlesS',10,'sigmaS',sigmaS);
+                      'nParticlesS',20,'sigmaS',sigmaS);
 
     if(doHI)
         optsPhys.HI = HI;
@@ -42,14 +42,9 @@ function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     end
                   
     optsPlot.doDDFTPlots=true;
-                      
-    AddPaths();
-    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
-    EX.Preprocess();
-    EX.ComputeEquilibrium();
-    EX.ComputeDynamics();   
-    EX.PlotDynamics();
 
+    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    
 end                 
 
 

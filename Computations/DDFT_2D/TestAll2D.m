@@ -11,9 +11,9 @@ DDFT_DiffusionHalfSpace_2Phase_Sat_2
 Test_DDFT_DiffusionBox_MF;
 Test_DDFT_DiffusionDisc_MF;
 
-Test_DDFT_DiffusionHalfSpace_FMT
-Test_DDFT_DiffusionHalfSpace_FMT_Triangle
-Test_DDFT_DiffusionHalfSpace_MF
+Test_DDFT_DiffusionHalfSpace_FMT;
+Test_DDFT_DiffusionHalfSpace_FMT_Triangle;
+Test_DDFT_DiffusionHalfSpace_MF;
 
 Test_DDFT_DiffusionInfCapillary_MF;
 Test_DDFT_DiffusionInfDisc_MF;

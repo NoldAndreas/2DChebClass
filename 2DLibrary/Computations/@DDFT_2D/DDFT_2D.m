@@ -191,7 +191,7 @@ classdef DDFT_2D < handle
                 paramsHI.optsNum.Polar     = 'cart';
                 paramsHI.optsPhys.nSpecies = this.optsPhys.nSpecies;
                 if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
-                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);      
+                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);%,true);
                 else
                     this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices2D,paramsHI,this.IDC);      
                 end

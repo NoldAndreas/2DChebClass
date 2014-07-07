@@ -1,4 +1,4 @@
-function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace_MF()
+function EX = Test_DDFT_DiffusionInfSpace_MF()
 
     Phys_Area = struct('shape','InfSpace','N',[20;20], ...
                        'y1Min',-inf,'y1Max',inf,'L1',4,...
@@ -44,13 +44,6 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfSpace_MF()
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
       
-	config = v2struct(optsPhys,optsNum);
-    
-    AddPaths();
-    EX     = DDFT_2D(config);
-    EX.Preprocess();
-    EX.ComputeEquilibrium();
-    EX.ComputeDynamics();    
-    EX.PlotDynamics();
+    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
 end                 
 
