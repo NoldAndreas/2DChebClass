@@ -51,7 +51,8 @@ function [output,optsNum,optsPhys,optsPlot] = Test_DDFT_DiffusionInfDisc_MF()
     EX     = DDFT_2D(config);
     EX.Preprocess();
     EX.ComputeEquilibrium();
-    EX.ComputeDynamics();        
+    EX.ComputeDynamics();    
+    EX.PlotDynamics();
 
 end                 
 

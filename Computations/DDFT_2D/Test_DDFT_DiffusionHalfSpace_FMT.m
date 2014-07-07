@@ -48,6 +48,6 @@ function Test_DDFT_DiffusionHalfSpace_FMT(doHI)
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();
-    
+    EX.PlotDynamics();    
     
 end                 

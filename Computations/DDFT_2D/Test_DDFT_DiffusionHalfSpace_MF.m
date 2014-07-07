@@ -35,6 +35,6 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionHalfSpace_MF
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();    
-
+    EX.PlotDynamics();
 end                 
 

@@ -39,5 +39,5 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_3()
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();           
-                 
+    EX.PlotDynamics();                 
 end                 

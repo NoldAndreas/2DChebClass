@@ -54,6 +54,7 @@ function Test_DDFT_DiffusionDisc_MF()
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();
+    EX.PlotDynamics();
     
 end                 
 

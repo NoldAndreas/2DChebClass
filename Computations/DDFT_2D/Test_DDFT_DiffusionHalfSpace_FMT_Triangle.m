@@ -47,7 +47,8 @@ function Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium();
-    EX.ComputeDynamics();       
+    EX.ComputeDynamics();   
+    EX.PlotDynamics();
 
 end                 
 

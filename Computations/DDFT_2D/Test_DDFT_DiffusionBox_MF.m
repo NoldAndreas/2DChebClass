@@ -51,6 +51,7 @@
     EX     = DDFT_2D(config);
     EX.Preprocess();
     EX.ComputeEquilibrium();
-    EX.ComputeDynamics(); 
+    EX.ComputeDynamics();
+    EX.PlotDynamics();
 end                 
 

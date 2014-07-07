@@ -9,8 +9,6 @@ function ComputeDynamics(this,x_ic,mu)
 % $$\frac{\partial x}{\partial t} = k_B T \Delta \mu + (\nabla x - \nabla V)\cdot \nabla \mu$$
 % 
 
-
-
     % Initialization
     optsPhys    = this.optsPhys;
     optsNum     = this.optsNum;
@@ -59,71 +57,53 @@ function ComputeDynamics(this,x_ic,mu)
         mu   = this.mu;
     end
         
-    tic   
+    %tic   
     
     fprintf(1,'Computing dynamics ...'); 
 
     if(isfield(optsNum,'PlotArea'))
         optsNumT = rmfield(optsNum,'PlotArea');
     end
-    [X_t,recEq,paramsEq] = DataStorage('Dynamics',...
+    [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
-            
-    fprintf(1,'done.\n');
-    
-    t_dynSol = toc;
-    
-    disp(['Dynamics computation time (sec): ', num2str(t_dynSol)]);
-    
-    %************************************************
-    %****************  Postprocess  ****************
-    %************************************************        
-
-    nPlots    = length(plotTimes);
-    
-	accFlux   = X_t(:,1:nSpecies);
-    X_t       = X_t(:,nSpecies+1:end)';
-    
-    rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
-    
-    X_t       = reshape(X_t,M,nSpecies,nPlots);
-    rho_t     = reshape(rho_t,M,nSpecies,nPlots);
-    flux_t    = zeros(2*M,nSpecies,nPlots);
-    V_t       = zeros(M,nSpecies,nPlots);   
-    
-    for i = 1:length(plotTimes)
-        if(doHI)
-            flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
-        else
-            flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
-        end    
-        V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
-    end
-                           
-    data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
-    data.shape = this.IDC;
-    if(this.doSubArea) 
-        data.Subspace = v2struct(subArea,accFlux);
-    end
-    
-    if(~isfield(optsNum,'doPlots') ...
-            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-        figure
-        PlotDDFT(v2struct(optsPhys,optsNum,data));  
-    end
-    
-    function X_t = ComputeDDFTDynamics(params,misc)        
+                     
+    function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        
-        mM(Ind.finite)  = 0; %| markVinf
+        mM(Ind.finite)  = 0; 
         mM              = repmat(mM,nSpecies,1);
         mM(markVinf(:)) = 0;
         
         opts    = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag([ones(nSpecies,1);mM]));    
         [~,X_t] = ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);   
-    end
+                       
+        nPlots    = length(plotTimes);
 
-    
-     function dxdt = dx_dt(t,x)
+        accFlux   = X_t(:,1:nSpecies);
+        X_t       = X_t(:,nSpecies+1:end)';
+
+        rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
+
+        X_t       = reshape(X_t,M,nSpecies,nPlots);
+        rho_t     = reshape(rho_t,M,nSpecies,nPlots);
+        flux_t    = zeros(2*M,nSpecies,nPlots);
+        V_t       = zeros(M,nSpecies,nPlots);   
+
+        for i = 1:length(plotTimes)
+            if(doHI)
+                flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
+            else
+                flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
+            end    
+            V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
+        end
+
+        data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
+        data.shape = this.IDC;
+        if(this.doSubArea) 
+            data.Subspace = v2struct(subArea,accFlux);
+        end
+    end   
+    function dxdt = dx_dt(t,x)
         
         % ignore first row of entries. This is mass in subsystem 
         x        = x(nSpecies+1:end);              
@@ -153,9 +133,8 @@ function ComputeDynamics(this,x_ic,mu)
         dxdt = D0.*dxdt;
                 
         dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
-     end
-
-     function mu_s = GetExcessChemPotential(x,t,mu)
+    end
+    function mu_s = GetExcessChemPotential(x,t,mu)
         rho_s    = exp((x-Vext)/kBT);
         mu_s     = getFex(rho_s,IntMatrFex,kBT,R) + ...
                                 Fex_Meanfield(rho_s,Conv,kBT);
@@ -166,7 +145,6 @@ function ComputeDynamics(this,x_ic,mu)
 
         mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
     end   
-    
     function flux = GetFlux(x,t)
         rho_s = exp((x-Vext)/kBT);       
         mu_s  = GetExcessChemPotential(x,t,mu); 
@@ -176,8 +154,6 @@ function ComputeDynamics(this,x_ic,mu)
             flux = GetCartesianFromPolarFlux(flux,ythS);
         end
     end
-
-
     function flux = GetFlux_HI(x,t)
         rho_s = exp((x-Vext)/kBT);  
         rho_s = [rho_s;rho_s];

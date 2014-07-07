@@ -22,7 +22,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_2()
                  
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,...
-                     'HSBulk','CarnahanStarling',...                     
+                     'HSBulk','CarnahanStarling',... 
                      'nParticlesS',40,'gammaS',1);
                  
     lineColourDDFT={{'r','b','g'}};            
@@ -36,6 +36,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_2()
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();
+    EX.PlotDynamics();
                  
 end                 
 

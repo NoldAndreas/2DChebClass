@@ -12,7 +12,7 @@ function ComputeHardSphereMatrices(this)
         params.Polar    = 'cart';
         params.Comments = this.configName;
         func            = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);
-        [this.IntMatrFex,recFex] = DataStorage(['HalfSpace_FMT' filesep func2str(func)],func,params,this.HS,false); 
+        [this.IntMatrFex,recFex] = DataStorage(['HalfSpace_FMT' filesep func2str(func)],func,params,this.HS); 
 
         %Test
         if(recFex)

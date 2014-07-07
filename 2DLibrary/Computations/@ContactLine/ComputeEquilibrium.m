@@ -44,18 +44,19 @@ function sol = ComputeEquilibrium(this,redo)
     %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
     misc.mark = mark;       misc.Vext       = this.Vext; 
     misc.VAdd = this.VAdd;
-    misc.x_ig       = x_ig;
+    misc.x_ig = x_ig;
     misc.Conv = this.Conv;  misc.IntMatrFex = this.IntMatrFex; 
     misc.FexNum = this.optsNum.FexNum;
     
     if(nargin == 1)
-        [this.rho_eq,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
+        [sol,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
                             @ComputeEquilibriumCondition,opts,misc); %true      
     else
-        [this.rho_eq,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
+        [sol,recEq,paramsEq] = DataStorage('EquilibriumSolutions',...
                             @ComputeEquilibriumCondition,opts,misc,redo); %true      
     end
 
+    this.rho_eq      = sol.rho;
     this.FilenameEq  = paramsEq.Filename;
 	sol.Filename     = [dirData filesep 'EquilibriumSolutions' filesep paramsEq.Filename];
     

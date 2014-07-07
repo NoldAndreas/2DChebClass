@@ -13,6 +13,7 @@ classdef DDFT_2D < handle
         Vext,Vext_grad,VAdd
         
         x_eq,mu
+        dynamicsResult
         
         doHI,doSubArea,do2Phase
     end
@@ -153,23 +154,18 @@ classdef DDFT_2D < handle
             disp(['Fex computation time (sec): ', num2str(t_fex)]);
         end            
         function Preprocess_MeanfieldContribution(this)
-            optsNum  = this.optsNum;
-            optsPhys = this.optsPhys;
             
-            if(isfield(optsNum,'V2Num'))
+            if(isfield(this.optsNum,'V2Num'))
                 fprintf(1,'Computing mean field convolution matrices ...');   
-                paramsFex.V2       = optsPhys.V2;
-                paramsFex.kBT      = optsPhys.kBT;
-                paramsFex.FexNum   = optsNum.V2Num;
+                paramsFex.V2       = this.optsPhys.V2;
+                paramsFex.kBT      = this.optsPhys.kBT;
+                paramsFex.FexNum   = this.optsNum.V2Num;
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
 
-                FexFun             = str2func(['FexMatrices_',optsNum.V2Num.Fex]);    
+                FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
                 this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC)],FexFun,paramsFex,this.IDC);   
 
-                fprintf(1,'done.\n');
-                t_fex = toc;
-                disp(['Fex computation time (sec): ', num2str(t_fex)]);
             elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                
                 error('Define V2Num structure in optsNum')
             else
@@ -208,8 +204,7 @@ classdef DDFT_2D < handle
 
             [this.Vext,this.Vext_grad]  = getVBackDVBack(y1S,y2S,this.optsPhys.V1);                  
             if(strcmp(this.IDC.polar,'polar'))
-                this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);
-                %this.Vext_grad = GetCartesianFromPolarFlux(this.Vext_grad,ythS);
+                this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);                
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
         end
@@ -233,7 +228,15 @@ classdef DDFT_2D < handle
             else
                 this.Int_of_path   =  zeros(1,2*this.IDC.M);
             end
-        end
+        end        
+        function PlotDynamics(this)
+                plotData.optsPhys = this.optsPhys;
+                plotData.optsNum  = this.optsNum;
+                plotData.data     = this.dynamicsResult;
+                
+                figure('Position',[0 0 1000 1000]);
+                PlotDDFT(plotData);  
+        end    
         
         ComputeEquilibrium(this,rho_ig)
         ComputeDynamics(this)

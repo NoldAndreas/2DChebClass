@@ -52,6 +52,7 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();    
+    EX.PlotDynamics();
 
 end                 
 

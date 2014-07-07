@@ -100,7 +100,7 @@ classdef ContactLine < handle
             opts.optsNum.PhysArea.alpha_deg = this.optsNum.PhysArea.alpha_deg;
             opts.optsNum.PhysArea.Conv      = this.optsNum.PhysArea.Conv;
             opts.Comments           = ['ConfigFile: ',this.configName,'.txt'];
-            convStruct              = DataStorage(['HalfSpace_FMT' filesep 'FexMatrices_SplitDisk'],@FexMatrices_SplitDisk,opts,this.HS,false);
+            convStruct              = DataStorage(['HalfSpace_FMT' filesep 'FexMatrices_SplitDisk'],@FexMatrices_SplitDisk,opts,this.HS);
             this.Conv               = convStruct.Conv;
 
              %(3.1) Test Convolution    
@@ -153,9 +153,9 @@ classdef ContactLine < handle
             ComputeST(this);
         end         
         
-        ComputeHardSphereMatrices(this)
-        
+        ComputeHardSphereMatrices(this)        
         ComputeAdsorptionIsotherm(this,n)    
+        
         function [om,rho1D] = Compute1D(this,plotBool,WLWGLG)
             rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
             rhoGas_sat       = this.optsPhys.rhoGas_sat;

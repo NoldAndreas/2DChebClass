@@ -7,7 +7,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     IntMatrFex = misc.IntMatrFex;    
     nSpecies   = params.optsPhys.nSpecies;
     
-    if(~isfield(misc,'marc'))
+    if(~isfield(misc,'mark'))
         mark = true(size(Vext,1),1);
     else
         mark = misc.mark;

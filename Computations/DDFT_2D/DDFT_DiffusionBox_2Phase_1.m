@@ -39,5 +39,6 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_1()
     EX.Preprocess();
     EX.ComputeEquilibrium( EX.optsPhys.rhoGas_sat);
     EX.ComputeDynamics();    
+    EX.PlotDynamics();
 
 end                 

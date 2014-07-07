@@ -34,6 +34,6 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfCapillary_MF
     EX.Preprocess();
     EX.ComputeEquilibrium();
     EX.ComputeDynamics();       
-
+    EX.PlotDynamics();
 
 end       

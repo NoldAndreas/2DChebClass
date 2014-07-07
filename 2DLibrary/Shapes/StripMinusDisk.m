@@ -13,7 +13,7 @@
             
             this.L1         = Geometry.L1;
             this.R          = Geometry.R;
-            this.Origin = Geometry.Origin;
+            this.Origin     = Geometry.Origin;
             this.y2Wall     = Geometry.y2Wall;
             
             InitializationPts(this);                        
@@ -26,12 +26,14 @@
             
             O = ones(size(x1));
             
-            [y2_kv,dy2] = LinearMap(x2,pi,2*pi);
+            [y2_kv,dy2]   = LinearMap(x2,pi,2*pi);
             
-            rd          = abs((this.Origin(2)-this.y2Wall)./sin(y2_kv));
+            rd            = abs((this.Origin(2)-this.y2Wall)./sin(y2_kv));
+            rd((y2_kv==pi)|(y2_kv==2*pi)) =  inf;
+            
             L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);
             L1_r(rd==inf) = this.L1;
-            [y1_kv,dy1] = QuotientMap(x1,L1_r,O*this.R,rd);                        
+            [y1_kv,dy1]   = QuotientMap(x1,L1_r,O*this.R,rd);                        
             
              n = this.N1*this.N2;
              if(nargout >= 3)
