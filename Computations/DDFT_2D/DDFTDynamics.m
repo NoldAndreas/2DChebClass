@@ -4,7 +4,12 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium();
-    EX.ComputeDynamics();
+    
+    if(EX.doHIWall)
+        EX.ComputeDynamicsWallHI();
+    else
+        EX.ComputeDynamics();
+    end
     
     if(optsPlot.doDDFTPlots)
         EX.PlotDynamics();
