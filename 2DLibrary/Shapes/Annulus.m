@@ -3,7 +3,7 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
     properties        
         RMin
         RMax
-        Origin = [0;0];
+        %Origin = [0;0];
     end
     
     methods        
@@ -13,9 +13,9 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
             this.RMin   = Geometry.RMin; 
             this.RMax   = Geometry.RMax; 
             
-            if(isfield(Geometry,'Origin'))
-                this.Origin = Geometry.Origin;
-            end
+%             if(isfield(Geometry,'Origin'))
+%                 this.Origin = Geometry.Origin;
+%             end
             
             InitializationPts(this);                                    
         end                         
