@@ -7,6 +7,8 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
     
     if(EX.doHIWall)
         EX.ComputeDynamicsWallHI();
+    elseif(isfield(optsPhys,'Inertial') && optsPhys.Inertial)
+        EX.ComputeDynamicsInertia();
     else
         EX.ComputeDynamics();
     end

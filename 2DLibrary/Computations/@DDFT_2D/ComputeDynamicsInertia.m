@@ -21,6 +21,7 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     end
     gammaS      = optsPhys.gammaS;
     mS          = optsPhys.mS;
+    mInv        = mS.^(-1);
     Diff        = this.IDC.Diff;
     plotTimes   = this.optsNum.plotTimes;
     nSpecies    = this.optsPhys.nSpecies;
@@ -34,7 +35,6 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     Ind         = this.IDC.Ind;        
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;
-    
     markVinf    = (Vext == inf);
     if(strcmp(this.IDC.polar,'polar'))
         polarShape = true;
@@ -69,21 +69,15 @@ function ComputeDynamicsInertia(this,x_ic,mu)
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
                      
     function data = ComputeDDFTDynamics(params,misc)        
-        
-        finite1 = (Ind.normalFinite*[ones(M,1);zeros(M,1)]~=0);
-        finite2 = (Ind.normalFinite*[zeros(M,1);ones(M,1)]~=0);
-
-        mMx              = ones(M,1);        
-        mMx(markVinf(:,1)) = 0;  % assumes infinite potential same for each species
-        mMuv              = ones(2*M,1);
-        %mMuv([Ind.finite;Ind.finite]) = 0;
-        mMuv([finite1;Ind.finite]) = 0;
-        
+       
+        mMx              = ones(M,nSpecies);        
+        mMx(markVinf)    = 0;
+        mMuv             = ones(2*M,nSpecies);
+        mMuv([Ind.finite1;Ind.finite2],:) = 0;
         mM = [mMx;mMuv];
-        
-        mM = repmat(mM,nSpecies,1);
+        mM = mM(:);
 
-        x_ic = [x_ic;zeros(2*M,nSpecies)]; % padd with zero velocity
+        x_ic = [x_ic;zeros(2*M,nSpecies)]; % pad with zero velocity
         
         opts    = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag([ones(nSpecies,1);mM]));    
         [~,X_t] = ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);   
@@ -92,23 +86,22 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 
         accFlux   = X_t(:,1:nSpecies);
         X_t       = X_t(:,nSpecies+1:end)';
-
-        Y_t       = X_t(1:M,:);
-        UV_t      = X_t(M+1:3*M,:);
+        X_t       = reshape(X_t,3*M,nSpecies,nPlots);
         
-        rho_t     = exp((Y_t-Vext(:)*ones(1,nPlots))/kBT);
-
-        X_t       = reshape(Y_t,M,nSpecies,nPlots);
-        UV_t      = reshape(UV_t,M,nSpecies,nPlots);
-        rho_t     = reshape(rho_t,M,nSpecies,nPlots);
+        Y_t       = X_t(1:M,:,:);
+        UV_t      = X_t(M+1:3*M,:,:);
+        X_t = Y_t;
+         
+        rho_t     = zeros(M,nSpecies,nPlots);
         flux_t    = zeros(2*M,nSpecies,nPlots);
         V_t       = zeros(M,nSpecies,nPlots);   
 
         for i = 1:length(plotTimes)
-            flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));           
+            rho_t(:,:,i)  = exp((Y_t(:,:,i)-Vext)/kBT);
+            flux_t(:,:,i) = GetFlux([X_t(:,:,i);UV_t(:,:,i)],plotTimes(i));           
             V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
         end
-
+       
         data       = v2struct(IntMatrFex,X_t,UV_t,rho_t,mu,flux_t,V_t);
         data.shape = this.IDC;
         if(this.doSubArea) 
@@ -128,19 +121,26 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         uv = x(M+1:3*M,:);
         
         % convective term; C = v.grad
-        C        = sparse(1:m,1:m,u)*Diff.Dy1 + sparse(1:m,1:m,v)*Diff.Dy2;
+        C  = zeros(M,M,nSpecies);
+        Cu = zeros(M,nSpecies);
+        Cv = zeros(M,nSpecies);
+        for iSpecies = 1:nSpecies
+            C(:,:,iSpecies)  = sparse(1:M,1:M,u(:,iSpecies))*Diff.Dy1 + sparse(1:M,1:M,v(:,iSpecies))*Diff.Dy2;
+            Cu(:,iSpecies) = C(:,:,iSpecies)*u(:,iSpecies);
+            Cv(:,iSpecies) = C(:,:,iSpecies)*v(:,iSpecies);
+        end
         
-        mu_s     = GetExcessChemPotential(x,t,mu);        
+        mu_s     = GetExcessChemPotential(y,t,mu);        
         mu_s(markVinf) = 0;
         
-        h_s1    = Diff.Dy1*y - Vext_grad(1:m);
-        h_s2    = Diff.Dy2*y - Vext_grad(1+m:end);
+        h_s1    = Diff.Dy1*y - Vext_grad(1:M,:);
+        h_s2    = Diff.Dy2*y - Vext_grad(1+M:end,:);
                 
         h_s1(markVinf)  = 0; 
         h_s2(markVinf)  = 0; 
         
-        dydt = -kBT*(Diff.div*uv) - (u.*h_s1  + v.*h_s2);
-        duvdt    = - [C*u;C*v] - optsPhys.gamma*uv - Diff.grad*mu_s;
+        dydt     = -kBT*(Diff.div*uv) - (u.*h_s1  + v.*h_s2);
+        duvdt    = - [Cu;Cv] - gammaS*uv - mInv.*(Diff.grad*mu_s);
   
         if(doHI)
             error('HI not implemented yet');
@@ -151,11 +151,10 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 %             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
+        duvdt(Ind.finite1,:)     = Ind.normalFinite1*u;
+        duvdt(Ind.finite2,:)     = Ind.normalFinite2*v;
         
-        % need to think about this
-        duvdt(Ind.finite,:)     = Ind.normalFinite*uv;       
-        
-        dydt(markVinf)         = x(markVinf) - x_ic(markVinf);
+        dydt(markVinf)         = y(markVinf) - x_ic(markVinf);
 
         dxdt = [dydt;duvdt];
         
