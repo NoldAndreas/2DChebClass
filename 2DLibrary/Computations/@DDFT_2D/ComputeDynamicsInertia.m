@@ -151,8 +151,8 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 %             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        duvdt(Ind.finite1,:)     = Ind.normalFinite1*u;
-        duvdt(Ind.finite2,:)     = Ind.normalFinite2*v;
+        duvdt([Ind.finite1 ; false(M,1)],:)      = Ind.normalFinite1*u;
+        duvdt([false(M,1)  ; Ind.finite2],:)     = Ind.normalFinite2*v;
         
         dydt(markVinf)         = y(markVinf) - x_ic(markVinf);
 
