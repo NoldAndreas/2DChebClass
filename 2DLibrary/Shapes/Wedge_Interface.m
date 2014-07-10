@@ -3,8 +3,7 @@ classdef Wedge_Interface < Polar_M1SpectralSpectral
     properties   
         R_in = 0;
         R_out
-        th1,th2                
-        Origin 
+        th1,th2                         
         sphere
     end
     
@@ -34,8 +33,7 @@ classdef Wedge_Interface < Polar_M1SpectralSpectral
             
             InitializationPts(this);  
             if(isfield(Geometry,'Origin'))
-                this.Origin = Geometry.Origin;
-                this.Pts    = shiftDisc(this.Pts,Geometry.r0,Geometry.t0);            
+                this.Origin = Geometry.Origin;                
             end            
             if(isfield(Geometry,'sphere'))
                 this.sphere = Geometry.sphere;

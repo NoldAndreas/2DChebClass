@@ -3,8 +3,7 @@ classdef InfWedge < Polar_SpectralSpectral
     properties   
         R_in
         LR
-        th1,th2                
-        Origin %Origin has to be given in Polar coordinates!!
+        th1,th2                       
     end
     
     methods        
@@ -18,8 +17,7 @@ classdef InfWedge < Polar_SpectralSpectral
             
             InitializationPts(this);            
             if(isfield(Geometry,'Origin'))
-                this.Origin = Geometry.Origin;               
-                this.Pts = shiftDisc(this.Pts,Geometry.r0,Geometry.t0);            
+                this.Origin = Geometry.Origin;                               
             end
         end                         
     end

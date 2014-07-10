@@ -13,7 +13,7 @@ function rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum)
     %**************** Initialization   **********
     %********************************************
     
-    saveFigs  = false;
+    saveFigs  = true;
     eta       = optsPhys.eta;    
     
     markComp  = (HS.Pts.y1_kv==inf);    
@@ -71,15 +71,17 @@ function rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum)
     plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
     plot(Interp1D.ptsCart.y2_kv,Interp1D.InterPol*rho_ic1D,'linewidth',1.5);
     xlim([0.5 3.]);   ylim(yl);
-    h = xlabel('$y$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-	h = ylabel('$\rho$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+    h = xlabel('$y/\sigma$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+	h = ylabel('$n \sigma^3$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
 	pbaspect([1 1 1]);                
 	set(gca,'fontsize',20);                        
     set(gca,'linewidth',1.5);        
     ax=get(f1,'Position');    
     hold off;
-   % print2eps(['Density_eta',strEta],gcf);
-   % save2pdf(['Density_eta_',num2str(eta),'.pdf'],gcf);
+    if(saveFigs)
+        print2eps(['Density_eta',strEta],gcf);
+        save2pdf(['Density_eta_',num2str(eta),'.pdf'],gcf);
+    end
 
     %**************** Plot Density - Zoom in Close to Wall ****************
 	f2 = figure;
@@ -96,8 +98,8 @@ function rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum)
 
 	plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
     plot(Interp1D.ptsCart.y2_kv,Interp1D.InterPol*rho_ic1D,'linewidth',1.5);  %Interp1D.pts2
-    h = xlabel('$y$');  set(h,'Interpreter','Latex'); set(h,'fontsize',15);
-	h = ylabel('$\rho$');  set(h,'Interpreter','Latex'); set(h,'fontsize',15);
+    h = xlabel('$y/\sigma$');  set(h,'Interpreter','Latex'); set(h,'fontsize',15);
+	h = ylabel('$n/\sigma^3$');  set(h,'Interpreter','Latex'); set(h,'fontsize',15);
 	pbaspect([1 1 1]);                
 	set(gca,'fontsize',15);                        
     set(gca,'linewidth',1.5);                

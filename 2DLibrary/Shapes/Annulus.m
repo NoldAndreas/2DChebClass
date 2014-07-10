@@ -1,9 +1,7 @@
 classdef Annulus < Polar_SpectralFourierNoOrigin
 
     properties        
-        RMin
-        RMax
-        Origin = [0;0];
+        RMin,RMax        
     end
     
     methods        
@@ -21,19 +19,7 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
         end                         
     end
     
-    methods (Access = public)
-        function ptsCart = GetCartPts(this,pts_y1,pts_y2)
-            
-            if(nargin == 1)
-                ptsCart = GetCartPts@Shape(this);
-            else
-                ptsCart = GetCartPts@Shape(this,pts_y1,pts_y2);
-            end
-            ptsCart.y1_kv = ptsCart.y1_kv + this.Origin(1);
-            ptsCart.y2_kv = ptsCart.y2_kv + this.Origin(2);
-            
-        end
-
+    methods (Access = public)        
         
         function [r,dr,dx,ddx,dddx,ddddx] = PhysSpace1(this,x)
             [r,dr,dx,ddx,dddx,ddddx] = LinearMap(x,this.RMin,this.RMax);
@@ -46,8 +32,7 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
         end
         function xf = CompSpace2(this,th)
             xf = th/(2*pi);
-        end                
-        
+        end                      
         function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@Polar_SpectralFourierNoOrigin(this);
             
@@ -81,8 +66,7 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
             disp(['Annulus: Error of integration of exp(-r^2) (ratio): ',...
                                     num2str(1-sum(this.Int*f4)/intF4)]); 
             
-        end
-        
+        end        
         function Diff = ComputeDifferentiationMatrix(this)
             Diff = ComputeDifferentiationMatrix@Polar_SpectralFourierNoOrigin(this);
             
@@ -126,7 +110,6 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
                                     num2str( max(Diff.Lap*f3 - Lapf3) ) ]); 
             
         end
-        
         function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
 
             if(nargin<2)
@@ -177,7 +160,6 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
                    
                    
         end  
-        
         function PlotBorders(this)
             ComputeIndices(this);
              
@@ -196,7 +178,6 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
             cIn.PlotFunction;
             cOut.PlotFunction;
            
-        end
-        
+        end 
     end
 end

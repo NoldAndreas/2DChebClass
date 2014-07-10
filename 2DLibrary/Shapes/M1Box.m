@@ -1,8 +1,7 @@
 classdef M1Box < M1SpectralSpectral
 
     properties        
-        L1,L2        
-        Origin = [0;0] %Bottom left corner
+        L1,L2                
     end
     
     methods        

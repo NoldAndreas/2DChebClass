@@ -1,6 +1,6 @@
 classdef BigSegmentAlternative < M1SpectralSpectral
     properties
-        R,h,Origin,sphere
+        R,h,sphere
     end
     
     methods
@@ -10,19 +10,20 @@ classdef BigSegmentAlternative < M1SpectralSpectral
             this.Origin = Geometry.Origin;
             this.R      = Geometry.R;
             this.h      = Geometry.h;
-            
+            this.polar  = 'cart';
             InitializationPts(this);
             if(isfield(Geometry,'sphere'))
                 this.sphere = Geometry.sphere;
             end
+            
         end
         
         function [int,area] = ComputeIntegrationVector(this)           
             int = ComputeIntegrationVector@M1SpectralSpectral(this);
             
             if(this.sphere)
-                y1s  = this.Pts.y1_kv - this.Origin(1);
-                y2s  = this.Pts.y2_kv - this.Origin(2);
+                y1s  = this.Pts.y1_kv;
+                y2s  = this.Pts.y2_kv;
                 int  = 2*int.*real(sqrt(this.R^2-y1s.^2-y2s.^2))';  
                 this.Int = int;
                 
@@ -55,7 +56,7 @@ classdef BigSegmentAlternative < M1SpectralSpectral
             C1      = (this.R+this.h)/2;
 
             y2H_kv  = (1+x2)*C1 - this.h;
-            y2_kv   = this.Origin(2) + y2H_kv;
+            y2_kv   = y2H_kv;
 
             g       = sqrt(this.R^2-y2H_kv.^2);
 
@@ -63,7 +64,7 @@ classdef BigSegmentAlternative < M1SpectralSpectral
             dgdx2(isinf(dgdx2)) = 0;
             ddgddx2 = -C1^2*this.R^2./((this.R^2-y2H_kv.^2).^(3/2));
 
-            y1_kv   = this.Origin(1) + x1.*g;
+            y1_kv   = x1.*g;
 
             if(nargout >= 3)
                 J        = zeros(n,2,2);

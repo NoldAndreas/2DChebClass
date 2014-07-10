@@ -18,9 +18,8 @@ function data = SimulationSegment(N1,N2,vext)
     
     SG                 = Segment(v2struct(Origin,R,h,N));
     [Pts,Diff,Int,Ind] = SG.ComputeAll();
-    Interp             = SG.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
-        
-    [V,Vdiff,VInt]   = vext(Pts.y1_kv,Pts.y2_kv);
+    Interp             = SG.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);	
+    [V,Vdiff,VInt]   = vext(SG.GetCartPts.y1_kv,SG.GetCartPts.y2_kv);
     [VP]             = vext(Interp.pts1,Interp.pts2);
            
     %Check Differentiation
@@ -67,7 +66,9 @@ function data = SimulationSegment(N1,N2,vext)
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         
-    function [V,VDiff,VInt] = VTest(y1,y2)       
+    function [V,VDiff,VInt] = VTest(y1,y2)    
+            [y2,y1] = cart2pol(y1,y2);
+        
             V           = ones(size(y1))+y2.*cos(y1);  
             dVy1        = -y2.*sin(y1);
             dVy2        = cos(y1);  

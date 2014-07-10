@@ -1,4 +1,4 @@
-function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhaseDiagram(optsPhys,filename)        
+function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhaseDiagram(optsPhys,filename)
     
     [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,[],false);
         
@@ -38,20 +38,25 @@ function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhase
     fontS = 20;    
     
     subplot(1,3,1); PlotRho_T();    
-	str = ['$T_{crit}$ = ',num2str(kBT_crit,3),', $\rho_{crit}$ = ',num2str(rho_crit,3)];
+    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
+        str = ['$T_{crit}$ = ',num2str(kBT_crit,3),', $\rho_{crit}$ = ',num2str(rho_crit,3)];
+        title(str,'Interpreter','Latex','fontsize',fontS);
+    end
 	%h = text(rho_crit-0.05,kBT_crit+0.02,['$T_{crit}$ = ',num2str(kBT_crit,3),', $\rho_{crit}$ = ',num2str(rho_crit,3)]);  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);
-	title(str,'Interpreter','Latex','fontsize',fontS);
-    
+	    
     subplot(1,3,2); Plot_T_ChemPot(); 
-	str = ['$T_{crit}$ = ',num2str(kBT_crit,3),', $\mu_{crit}$ = ',num2str(mu_crit,3)];    
-	%h = text(kBT_crit-0.1,mu_crit,str,'HorizontalAlignment','right');  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);
-    title(str,'Interpreter','Latex','fontsize',fontS);
+    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
+        str = ['$\mu_{crit}$ = ',num2str(mu_crit,3)];    
+        title(str,'Interpreter','Latex','fontsize',fontS);
+    end
+	%h = text(kBT_crit-0.1,mu_crit,str,'HorizontalAlignment','right');  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);    
     
     subplot(1,3,3); Plot_T_P();
-	str = ['$T_{crit}$ = ',num2str(kBT_crit,3),', $\mu_{crit}$ = ',num2str(mu_crit,3)];
+    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
+        str = ['$p_{crit}$ = ',num2str(p_crit,3)];
+        title(str,'Interpreter','Latex','fontsize',fontS);
+    end
 	%h = text(kBT_crit-0.1,mu_crit,str,'HorizontalAlignment','right');  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);
-	title(str,'Interpreter','Latex','fontsize',fontS);
-
     
     %Save Data     
     
@@ -102,6 +107,7 @@ function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhase
         xlabel('$k_BT$','Interpreter','Latex','fontsize',fontS);
         ylabel('$\mu_{sat}$','Interpreter','Latex','fontsize',fontS);
         pbaspect([1 1 1]);   
+        xlim([min(kBT),max(kBT)+0.06])
         %set(gca,'ytick',-2.8:0.1:-2.5);
         %ylim([-2.85 -2.45]);
         set(gca,'fontsize',fontS);                        
@@ -117,6 +123,7 @@ function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhase
         xlabel('$k_BT$','Interpreter','Latex','fontsize',fontS);
         ylabel('$p_{sat}$','Interpreter','Latex','fontsize',fontS);
         pbaspect([1 1 1]);   
+        xlim([min(kBT),max(kBT)+0.06])
         %set(gca,'ytick',-2.8:0.1:-2.5);
         %ylim([-2.85 -2.45]);
         set(gca,'fontsize',fontS);                        

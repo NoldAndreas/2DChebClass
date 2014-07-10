@@ -14,15 +14,15 @@
     %********************************************
     disp('** CheckFMTComputationSkewed **');
     %Numerical Parameters    
-    Phys_Area = struct('N',[3;60],'L1',2,'L2',2.,'y2wall',0.,...
-                       'N2bound',20,'h',1,'L2_AD',2.,...
-                       'alpha',pi/3);
+    Phys_Area = struct('N',[1;150],'L1',2,'L2',2.,'y2wall',0.,...
+                       'N2bound',30,'h',1,'L2_AD',2.,...
+                       'alpha',pi/2);
 
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
                        'y2Min',0.5,'y2Max',6,'N2',100);
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',24,'N2disc',24);
+                       'Ncircle',1,'N1disc',30,'N2disc',30);
 
     %Sub_Area  = Phys_Area;
     optsNum = struct('PhysArea',Phys_Area,...
@@ -33,7 +33,7 @@
     V2       = struct('V2DV2','zeroPotential');                                 
 
     optsPhys = struct('V1',V1,'V2',V2,...                                            
-                      'kBT',1,'eta',0.4783,...
+                      'kBT',1,'eta',0.4257,...
                       'sigmaS',1);%0.4783,...%0.4257,...                      
 
     lineColourDDFT={{'r','b','g'}};            
@@ -72,6 +72,8 @@
     CheckAverageDensities_Rosenfeld_3D(HS,IntMatrFex_2D);
     
     optsPhys.rho_iguess = optsPhys.eta*6/pi;
-    FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum);        
+    rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum);        
+    
+    
 
 end
