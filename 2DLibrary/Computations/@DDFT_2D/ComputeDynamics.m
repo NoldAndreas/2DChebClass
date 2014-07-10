@@ -116,8 +116,9 @@ function ComputeDynamics(this,x_ic,mu)
         h_s      = Diff.grad*x - Vext_grad;        
         h_s([markVinf;markVinf]) = 0;
         
-        %dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
-        dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        % less accurate:
+        %dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
         
         if(doHI)
             rho_s    = exp((x-Vext)/kBT);

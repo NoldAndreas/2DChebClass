@@ -1,4 +1,4 @@
-function D = DiffusionCoefficientWall(x,y,optsPhys)
+function [D,DD] = DiffusionCoefficientWall(x,y,optsPhys)
 
     a = optsPhys.sigmaHS/2;
     
@@ -10,8 +10,13 @@ function D = DiffusionCoefficientWall(x,y,optsPhys)
     % no slip, keeping factor of D0 for main code
     % Lauga & Squires, PoF 17, 103102 (2005)
     
-    Dy = (1-9/8*a*hInv);
     Dx = (1-9/16*a*hInv);
+    Dy = (1-9/8*a*hInv);
     
-    D = [Dx;Dy];
+    Dx_x = zeros(size(x));
+    Dy_y = 9/8*a*(hInv).^2;
+    
+    D  = [Dx;Dy];
+    DD = [Dx_x;Dy_y]; 
+
 end

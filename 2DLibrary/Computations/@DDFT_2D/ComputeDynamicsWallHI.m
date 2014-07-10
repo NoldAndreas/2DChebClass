@@ -21,6 +21,7 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
     end
     D0          = optsPhys.D0;
     DWall       = this.DWall;
+    DDWall      = this.DDWall;
     Diff        = this.IDC.Diff;
     plotTimes   = this.optsNum.plotTimes;
     nSpecies    = this.optsPhys.nSpecies;
@@ -35,7 +36,7 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;
     doHIWall    = this.doHIWall;
-    
+
     markVinf    = (Vext == inf);
     if(strcmp(this.IDC.polar,'polar'))
         polarShape = true;
@@ -67,7 +68,7 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         optsNumT = rmfield(optsNum,'PlotArea');
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]);
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        
@@ -118,14 +119,17 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         h_s      = Diff.grad*x - Vext_grad;        
         h_s([markVinf;markVinf]) = 0;
         
-        DgradMu_s = DWall.*(Diff.grad*mu_s);
+        gradMu_s = Diff.grad*mu_s;
+        DgradMu_s = DWall.*gradMu_s;
+        %dxdt     = kBT*Diff.div*DgradMu_s + eyes*(h_s.*DgradMu_s);  
         
-        dxdt     = kBT*Diff.div*DgradMu_s + eyes*(h_s.*DgradMu_s);  
+        dxdt   = eyes*(kBT* DWall.*[Diff.DDy1*mu_s;Diff.DDy2*mu_s] ...
+                 + kBT * DDWall.*gradMu_s + h_s.*DgradMu_s);
         
         if(doHI)
             rho_s    = exp((x-Vext)/kBT);
             rho_s    = [rho_s;rho_s];
-            gradMu_s = Diff.grad*mu_s;
+            %gradMu_s = Diff.grad*mu_s;
             HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end

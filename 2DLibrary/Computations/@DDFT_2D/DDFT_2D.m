@@ -7,6 +7,7 @@ classdef DDFT_2D < handle
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
         DWall      % modification tensor for D0 in presence of wall
+        DDWall     % derivative of modification tensor for D0 in presence of wall
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions
         Int_of_path
         IP
@@ -214,11 +215,12 @@ classdef DDFT_2D < handle
                 end
                 tic;
                 wallHIfn = str2func(optsNum.HINum.Wall);
-                this.DWall = wallHIfn(PtsCart.y1_kv,PtsCart.y2_kv,optsPhys.HI);
+                [this.DWall,this.DDWall] = wallHIfn(PtsCart.y1_kv,PtsCart.y2_kv,optsPhys.HI);
                 t_HIWall = toc;
                 display(['HI wall computation time (sec): ', num2str(t_HIWall)]);
             else
-                this.DWall = ones(size([PtsCart.y1_kv;PtsCart.y2_kv]));
+                this.DWall  = ones(size([PtsCart.y1_kv;PtsCart.y2_kv]));
+                this.DDWall = zeros(size([PtsCart.y1_kv;PtsCart.y2_kv]));
             end
             
         end
