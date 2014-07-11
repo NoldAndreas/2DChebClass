@@ -41,8 +41,8 @@ function Seppecher_M1Inf()
     eps = 10^(-5);        
     DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
     
-    for j = 1:10             
-
+    for j = 1:20             
+        close all;
         %*** 1st step ***
         D_B    = DI.SetD_B(theta,rho,D_B);               
         
@@ -59,26 +59,28 @@ function Seppecher_M1Inf()
         plot([0 2*L_ana],[muP(1) muP(1)],'k:');
 
         %*** 3rd step ***        
-        for i=1:2
+        for i=1:4
             rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
-      %      [rho,uv] = DI.SolveFull([D_B;rho;uv]);
+            
             theta = DI.FindInterfaceAngle(rho);                
-%                 IPUpdate  = UpdateInterfaceAndMap();
-%                 rho = IPUpdate*rho;   mu  = IPUpdate*mu;
+            
             IP    = DI.ResetOrigin(rho);
+            
             rho = IP*rho;
             mu  = IP*mu;
+            uv  = blkdiag(IP,IP)*uv;
             
+            figure;
+            subplot(1,2,1); DI.IC.doPlots(rho,'contour');
+            subplot(1,2,2); DI.IC.doPlots(mu,'contour');
 
         end
 
     end
-    
   
     %***************************************************************
     %   Physical Auxiliary functions:
-    %***************************************************************                            
-   
+    %***************************************************************                               
     function [h2,dh2,ddh2] = Interface(y)
         
         InterpIF   = Spectral_Interpolation(y,PtsIFY2,MapsIF);        
@@ -133,7 +135,6 @@ function Seppecher_M1Inf()
     %***************************************************************
     %Auxiliary functions:
     %***************************************************************    
-
     function [y1 , y2 , dy1_dt , dy2_dt ] = f_pathUpperLimit(t) 
         [y1,y2,J]   = Comp_to_Phys(-t,ones(size(t)));        
         dy1_dt      = -J(:,1,1);
@@ -143,8 +144,7 @@ function Seppecher_M1Inf()
         [y1,y2,J]   = Comp_to_Phys(t,-ones(size(t)));        
         dy1_dt      = J(:,1,1);
         dy2_dt      = J(:,2,1);                
-    end    
-    
+    end        
     function [InterpPlotUV,PtsPlotSepp] = GetUVInterpPlotting()%y1Int,y2Int,n1,n2)
         
         n1 = PlotArea.N1Vecs;  n2 = PlotArea.N2Vecs;

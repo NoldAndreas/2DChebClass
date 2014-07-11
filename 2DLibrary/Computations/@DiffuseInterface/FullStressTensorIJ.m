@@ -2,7 +2,7 @@ function [A,b] = FullStressTensorIJ(this,rho,i,j)
     % get matrices for
     % T = Cak*( eta*(grad(u) + grad(u)^T) + (zeta - 2/3*eta) div(u)*I ) +...
     %           + (W(rho) + Cn/2*|grad(rho)|^2 - mu*(rho+rho_m))*I - Cn*(grad(rho) X grad(rho))
-    %   = A(rho)*[mu;uv] + b(rho)
+    %   = A*[mu;uv] + b
 
     Cn    = this.optsPhys.Cn;
     Cak   = this.optsPhys.Cak;

@@ -26,16 +26,13 @@ classdef (Abstract) Shape < handle
          Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool);           
          Int    = ComputeIntegrationVector(this);
          M_conv = ComputeConvolutionMatrix(this,f,saveBool);
-    end
-    
-    
+    end        
 	methods 
         function this = Shape(N1,N2)
             this.N1 = N1;
             this.N2 = N2;             
         end
-    end
-    
+    end  
     methods (Access = public)
         
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
@@ -597,8 +594,7 @@ classdef (Abstract) Shape < handle
                 ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
                 title(['Values on line from ',ptsStr]);                                                                                        
             end                        
-        end             
-        
+        end                     
     end    
 end
 

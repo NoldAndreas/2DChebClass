@@ -2,7 +2,7 @@ function [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
     %Continuitiy: div(rho*uv) = 0
     %Momentum: - (rho+rho_m)*grad(mu) +
     %          ... +grad(rho)*(W'(rho) - mu - Cn*Lap(rho) )
-    %          + Cak*(eta*Lap(uv) + (zeta + eta/3)*grad(div(uv)) ) +...
+    %          + Cak*(eta*Lap(uv) + (zeta + eta/3)*grad(div(uv)) )
 
     %
     % A*[mu;uv] = b corresponds to momentum and continuity Eq. for given rho               

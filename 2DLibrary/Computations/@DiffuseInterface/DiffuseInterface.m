@@ -15,7 +15,19 @@ classdef DiffuseInterface < handle
         end       
         function Preprocess(this)                        
             this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
-            this.IC.ComputeAll(this.optsNum.PlotArea);               
+            
+            this.IC.ComputeIndices();
+            this.IC.ComputeDifferentiationMatrix();
+            this.IC.ComputeIntegrationVector();
+            this.IC.InterpolationPlot(this.optsNum.PlotArea,true);                          
+            
+            Sel = {'Dy1' ;'DDy1' ; 'Dy2'; 'DDy2';...
+                   'DDDy2';'DDDy1';...
+                   'Dy1Dy2'; 'DDy1Dy2'; 'Dy1DDy2';...
+                   'Lap' ;'grad' ;'div'; ...
+                   'gradLap' ;'gradDiv'; 'LapVec';'LapDiv'};
+            this.IC.ComputeDifferentiationMatrix(Sel);
+            
             this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
 
             bxArea          = this.optsNum.PlotArea;
@@ -80,13 +92,10 @@ classdef DiffuseInterface < handle
             end    
         end
                        
-        %**************************************
-        %Plot Functions
-        %**************************************
         function PlotMu_and_U(this,mu,uv)                        
             figure('Position',[0 0 1800 600],'color','white');
             subplot(1,2,1); this.IC.doPlots(mu);
-            subplot(1,2,2); PlotU(this,uv);
+            subplot(1,2,2); PlotU(this,uv); hold on; this.IC.doPlots(mu,'contour');
         end        
         function PlotSeppecherSolution(this,D_B,theta,rho)            
             UWall   = this.optsPhys.UWall;
@@ -128,10 +137,7 @@ classdef DiffuseInterface < handle
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
         end
-           
-        %**********************************
-        %External files:
-        %**********************************
+                   
         [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
         D_B = SetD_B(this,theta,rho,initialGuessDB)
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
