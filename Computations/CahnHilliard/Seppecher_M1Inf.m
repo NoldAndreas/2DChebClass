@@ -45,13 +45,12 @@ function Seppecher_M1Inf()
 
         %*** 1st step ***
         D_B    = DI.SetD_B(theta,rho,D_B);               
-        DI.PlotSeppecherSolution(D_B,theta,rho);
-
+        
         %*** 2nd step ***
         [mu,uv] = DI.GetVelocityAndChemPot(rho,D_B,theta);
-                
-        
-        DI.PlotMu_and_U(mu,uv);            
+                       
+        DI.PlotMu_and_U(mu,uv); hold on;
+        DI.PlotSeppecherSolution(D_B,theta,rho);
         figure; L_ana = 40;
         DI.IC.doPlotFLine([-L_ana L_ana],...
                          [PhysArea.y2Max,PhysArea.y2Max],mu,'CART'); hold on;
@@ -66,6 +65,10 @@ function Seppecher_M1Inf()
             theta = DI.FindInterfaceAngle(rho);                
 %                 IPUpdate  = UpdateInterfaceAndMap();
 %                 rho = IPUpdate*rho;   mu  = IPUpdate*mu;
+            IP    = DI.ResetOrigin(rho);
+            rho = IP*rho;
+            mu  = IP*mu;
+            
 
         end
 

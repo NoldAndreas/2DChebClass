@@ -20,6 +20,7 @@ function [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
     
     disp(['Delta mu = ',num2str(muDelta)]);
     
+    %
 	
     function [mu_s,J] = GetExcessChemPotential(rho_s,mu_offset)    
         [dW,~,ddW]    = DoublewellPotential(rho_s,Cn);
