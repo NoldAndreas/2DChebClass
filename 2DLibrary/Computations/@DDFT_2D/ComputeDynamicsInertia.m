@@ -177,7 +177,7 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         uv = x(M+1:3*M,:);
         
         rho_s = exp((y-Vext)/kBT);       
-        flux  = -[rho_s;rho_s].*uv;                              
+        flux  = [rho_s;rho_s].*uv;                              
         if(polarShape)
             %then transform to cartesian corrdinates
             flux = GetCartesianFromPolarFlux(flux,ythS);

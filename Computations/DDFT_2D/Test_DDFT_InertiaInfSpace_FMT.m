@@ -1,7 +1,7 @@
-function EX = Test_DDFT_DiffusionInfSpace_FMT(doHI)
+function EX = Test_DDFT_InertiaInfSpace_FMT(doHI)
 
     if(nargin==0)
-        doHI = true;
+        doHI = false;
     end
 
     Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
@@ -16,7 +16,9 @@ function EX = Test_DDFT_DiffusionInfSpace_FMT(doHI)
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
-    tMax = 0.25;    
+    gamma = 20;
+                  
+    tMax = 0.25*gamma;    
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
@@ -32,8 +34,8 @@ function EX = Test_DDFT_DiffusionInfSpace_FMT(doHI)
     
     HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
     
-    optsPhys = struct('V1',V1,...                                            
-                      'kBT',1,'mS',1,'gammaS',1,'sigmaS',sigmaS,...
+    optsPhys = struct('Inertial',false,'V1',V1,...                                            
+                      'kBT',1,'mS',1,'gammaS',gamma,'sigmaS',sigmaS,...
                       'nParticlesS',20); 
 
     optsPlot.lineColourDDFT  = {'r'};
