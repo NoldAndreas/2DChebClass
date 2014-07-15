@@ -117,6 +117,7 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
         
         AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
         [AD,AAD] = GetAverageDensities(this,area,weights)
+        M_int  = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,convolution)
     end
     
     

@@ -193,7 +193,11 @@ classdef DDFT_2D < handle
                 paramsHI.optsNum.Polar     = 'cart';
                 paramsHI.optsPhys.nSpecies = this.optsPhys.nSpecies;
                 if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
-                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);%,true);
+                    if(isfield(optsNum.HINum,'HIWallFull') && optsNum.HINum.HIWallFull)
+                        this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace_Wall,paramsHI,this.IDC);%,true);
+                    else
+                        this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);%,true);
+                    end
                 else
                     this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices2D,paramsHI,this.IDC);      
                 end

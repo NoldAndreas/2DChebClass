@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -13,10 +13,14 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
                    
+%     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D_noConv', ...
+%                       'HIPreprocess', 'RotnePragerPreprocess2D',...
+%                       'HIWallFull',true,'doConv',false);  
+
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
-                      'HIWallFull',false);  
-    
+                      'HIWallFull',true,'doConv',true); 
+
     tMax = 0.15;
     
     optsNum = struct('PhysArea',Phys_Area,...
