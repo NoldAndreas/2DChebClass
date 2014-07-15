@@ -2,7 +2,7 @@ function Seppecher_M1Inf()
 
     close all;
     %% Parameters    
-    PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',20,'L1',12,... %80,50
+    PhysArea = struct('N',[60,30],'y2Min',0,'y2Max',20,'L1',10,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...

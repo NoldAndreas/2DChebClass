@@ -137,15 +137,34 @@ classdef DiffuseInterface < handle
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
         end
+        
+        
+        function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
+            Cn     = this.optsPhys.Cn;
+            rho_m  = this.optsPhys.rho_m;
+            %for bulk
+            % 0 = W' - m
+            % p = - W + mu*(rho + rho_m)
+            
+            rho   = fsolve(@f,rho_ig);
+            [~,W] = DoublewellPotential(rho,Cn);
+            p     = - W + mu*(rho+rho_m);
+            
+            function y = f(rho)
+                y = DoublewellPotential(rho,Cn) - mu;
+            end
+            
+        end
                    
         [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
-        D_B = SetD_B(this,theta,rho,initialGuessDB)
+        D_B         = SetD_B(this,theta,rho,initialGuessDB)
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
-        [A,b] = ContMom_DiffuseInterfaceSingleFluid(this,rho)
-        [A,b] = Div_FullStressTensor(this,rho)
-        [A,b] = FullStressTensorIJ(this,rho,i,j)   
-        [rho,uv] = SolveFull(this,ic)
-                
+        [A,b]       = ContMom_DiffuseInterfaceSingleFluid(this,rho)
+        [A,b]       = Div_FullStressTensor(this,rho)
+        [A,b]       = FullStressTensorIJ(this,rho,i,j)   
+        [rho,uv]    = SolveFull(this,ic)
+        
+        
    end
     
 end

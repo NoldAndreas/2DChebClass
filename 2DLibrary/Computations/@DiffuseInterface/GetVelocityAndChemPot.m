@@ -39,6 +39,14 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     T       = true(M,1);     TT      = true(2*M,1);
     A       = eye(3*M);  
     b       = zeros(3*M,1);        
+    
+    OR                 = ones(sum(Ind.right),1);        
+    IntPathUpLow       = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
+    [Tt11,Tb11]        = FullStressTensorIJ(this,rho,1,1);
+    [Tt12,Tb12]        = FullStressTensorIJ(this,rho,1,2);            
+    [Tt22,Tb22]        = FullStressTensorIJ(this,rho,2,2);
+    [~,WFull]          = DoublewellPotential(rho,Cn);
+    
         
     %% Continuity and Momentum Equation
     [Af,bf]                  = ContMom_DiffuseInterfaceSingleFluid(this,rho);
@@ -64,37 +72,55 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
 
     A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
     b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
-%    A([Ind.bottom;FF],:)  = C(Ind.bottom,:);                        
-%    b([Ind.bottom;FF])    = Diff.div(Ind.bottom,:)*bBound;
     
-    
-    % BC3' [cos(theta),sin(theta)]^T  grad(mu) = 0
-%     E               = eye(M);
-% 	ETop            = E(Ind.top,:);
-% 	topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
-% 	A([Ind.top;FF],[T;FF]) = topDirection*Diff.grad; 
-    
+%     nV = (Diff.Dy1(Ind.top|Ind.bottom,:)*rho).^2 + (Diff.Dy2(Ind.top|Ind.bottom,:)*rho).^2;
+%     A([Ind.top|Ind.bottom;FF],[T;FF])  = (diag((Diff.Dy1(Ind.top|Ind.bottom,:)*rho)./nV)*Diff.Dy2(Ind.top|Ind.bottom,:)...
+%                                         - diag((Diff.Dy2(Ind.top|Ind.bottom,:)*rho)./nV)*Diff.Dy1(Ind.top|Ind.bottom,:));
+%     b([Ind.top|Ind.bottom;FF])    = 0;
+        
     %% BC4
-    A([Ind.left;FF],:)             = 0;        
-    A([Ind.left;FF],[Ind.left;FF])  = eye(sum(Ind.left)); 
-    A([Ind.left;FF],[Ind.right;FF]) = eye(sum(Ind.right)); 
-    %A([Ind.left;FF],[Ind.left;FF]) = eye(sum(Ind.left)); 
-    %b([Ind.left;FF])               = DoublewellPotential(rho(Ind.left),Cn) - Cn*Diff.DDy2(Ind.left,:)*rho;
-
-    %% BC5
-    OR                 = ones(sum(Ind.right),1);        
-    IntPathUpLow       = this.IC.borderTop.IntNormal + this.IC.borderBottom.IntNormal; %?? => to check!!
-    [Tt11,Tb11]        = FullStressTensorIJ(this,rho,1,1);
-    [Tt12,Tb12]        = FullStressTensorIJ(this,rho,1,2);            
-    TtHor              = [Tt11;Tt12];        
-    TbHor              = [Tb11;Tb12];        
-
-    A([Ind.right;FF],:)                = (OR*IntPathUpLow)*TtHor;
-    A([Ind.right;FF],[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) ...
-                                         - diag(rho(Ind.right)+rho_m)*y2Max;
-    A([Ind.right;FF],[Ind.left;FF])   = A(Ind.right,[Ind.left;FF])  ...
-                                        + diag(rho(Ind.left)+rho_m)*y2Max;
-    b([Ind.right;FF])                 = -IntPathUpLow*TbHor;
+    A([Ind.left;FF],[T;FF]) = Diff.Dy2(Ind.left,:);
+    
+    A([Ind.left&Ind.top;FF],:)                      = 0;        
+    A([Ind.left&Ind.top;FF],[Ind.left&Ind.top;FF])  = eye(sum(Ind.left&Ind.top)); 
+    A([Ind.left&Ind.top;FF],[Ind.right&Ind.top;FF]) = eye(sum(Ind.right&Ind.top)); 
+    %b(Ind.left&Ind.top) = 0;
+    
+    %A([Ind.left&Ind.top;FF],:) = 0;
+    %A([Ind.left&Ind.top;FF],:) = IntPathUpLow*Tt22;
+    %b([Ind.left&Ind.top;FF])   = -IntPathUpLow*Tb22;    
+    
+    %% BC5    
+    [~,WL] = DoublewellPotential(rho(Ind.left&Ind.top),Cn);
+    [~,WR] = DoublewellPotential(rho(Ind.right&Ind.top),Cn);
+    
+    indBC5 = Ind.right & Ind.top;
+    
+    A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
+        
+    A([Ind.right&Ind.top;FF],[T;FF]) = 0;
+    A([indBC5;FF],:)                = IntPathUpLow*Tt12;
+    A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF]) ...
+                                        - this.IC.borderRight.IntSc*diag(rho+rho_m);
+    A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF])  ...
+                                        + this.IC.borderLeft.IntSc*diag(rho+rho_m);
+    b([indBC5;FF])                  = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
+        
+%     
+%    [~,WL] = DoublewellPotential(rho(Ind.left),Cn);
+%    [~,WR] = DoublewellPotential(rho(Ind.right),Cn);    
+%
+%     A([Ind.right;FF],:)                = (OR*IntPathUpLow)*Tt12;
+%     A([Ind.right;FF],[Ind.right;FF])   = A(Ind.right,[Ind.right;FF]) ...
+%                                          - diag(rho(Ind.right)+rho_m)*y2Max;
+%     A([Ind.right;FF],[Ind.left;FF])   = A(Ind.right,[Ind.left;FF])  ...
+%                                         + diag(rho(Ind.left)+rho_m)*y2Max;
+%     b([Ind.right;FF])                 = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
+    
+    %% BC6                
+    %A([Ind.left;FF],:)                = (OR*IntPathUpLow)*Tt22;
+    %b([Ind.left;FF])                  = -IntPathUpLow*Tb22;    
+    
         
     %% Solve Equation
     x               = A\b;
@@ -105,6 +131,21 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     uv              = x(1+M:end);
 
     [At,bt] = Div_FullStressTensor(this,rho);
-    disp(['Error of divergence of stress tensor: ',num2str(max(abs(At*[mu;uv] + bt)))]);       
+    [maxError,j] = max(abs(At*[mu;uv] + bt));
+    j = mod(j,M);
+    disp(['Error of divergence of stress tensor: ',num2str(maxError),...
+                ' at y_1 = ',num2str(this.IC.GetCartPts.y1_kv(j)),...
+                ' at y_2 = ',num2str(this.IC.GetCartPts.y2_kv(j))]);
+    
+    %Accuracy of force balance normal to the substrate:
+    errorNormal = IntPathUpLow*Tt22*[mu;uv] + IntPathUpLow*Tb22;
+    disp(['Error of force balance normal to substate: ',num2str(errorNormal)])    
 
+    
+    %Accuracy of force balance normal to the substrate:    
+    h         = WFull - (rho+rho_m).*mu;
+    
+    errorParallel = IntPathUpLow*Tt12*[mu;uv] + IntPathUpLow*Tb12 + (this.IC.borderRight.IntSc - this.IC.borderLeft.IntSc)*h;
+    disp(['Error of force balance parallel to substate: ',num2str(errorParallel)])    
+    
 end
