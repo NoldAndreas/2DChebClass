@@ -23,7 +23,11 @@ function M_int = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,conv
     M_int = zeros([nPts,nPts,fDim(2:end)]);
     Mmask = repmat({':'},[1,fDim]);
 
+    hw = waitbar(0,'Computing Integration Matrix...');
+    
     for iPt = 1:nPts
+        waitbar(iPt/nPts,hw);
+        
         areaGeom.Origin = [this.Pts.y1_kv(iPt) ; this.Pts.y2_kv(iPt)];
         area       = shapeClass(areaGeom);
 
@@ -74,5 +78,6 @@ function M_int = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,conv
 
     end
 
+    delete(hw);
 
 end
