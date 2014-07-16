@@ -13,7 +13,7 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
 % (BC2) uv = U_Seppecher(D_B,theta) for Ind.top
 % (BC3) mu = div(div(m)) 
 %          = (zeta + 4/3*eta)*Lap(div(uv))  
-%            - Lap( (rho+rho_m)*grad(mu)) 
+%            - Lap( (rho+rho_m)*mu) 
 %            + div((W'(rho) - Cn*Lap(rho))*grad(rho))  for Ind.top | Ind.bottom
 % (BC4) mu = 0 for Ind.left
 % (BC5) int( m_{1,2} ,y_1=-inf..inf,y2=y2Max) 
@@ -72,7 +72,7 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
 
     A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
     b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
-    
+        
 %     nV = (Diff.Dy1(Ind.top|Ind.bottom,:)*rho).^2 + (Diff.Dy2(Ind.top|Ind.bottom,:)*rho).^2;
 %     A([Ind.top|Ind.bottom;FF],[T;FF])  = (diag((Diff.Dy1(Ind.top|Ind.bottom,:)*rho)./nV)*Diff.Dy2(Ind.top|Ind.bottom,:)...
 %                                         - diag((Diff.Dy2(Ind.top|Ind.bottom,:)*rho)./nV)*Diff.Dy1(Ind.top|Ind.bottom,:));

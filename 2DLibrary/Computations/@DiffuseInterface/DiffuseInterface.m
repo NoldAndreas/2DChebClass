@@ -156,7 +156,9 @@ classdef DiffuseInterface < handle
             
         end
                    
-        [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
+        [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)        
+        [rho,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,rho,ptC)         
+         
         D_B         = SetD_B(this,theta,rho,initialGuessDB)
         [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
         [A,b]       = ContMom_DiffuseInterfaceSingleFluid(this,rho)

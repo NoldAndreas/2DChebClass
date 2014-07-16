@@ -13,11 +13,13 @@ function Seppecher_M1Inf()
     optsPhys = struct('theta',pi/2,'g',0,...
                         'D_A',0,...
                         'zeta',10+2/3,'eta',1,...
-                        'Cak',0.02,'Cn',4/3,...
+                        'Cak',0.05,'Cn',4/3,...
                         'UWall',-1,...
                         'rho_m',2);
                     
     config = v2struct(optsPhys,optsNum);   
+    
+    surfaceTension = 4/3;
         
     %************************************************
     %****************  Preprocess  ******************
@@ -34,7 +36,7 @@ function Seppecher_M1Inf()
     D_B        = 0;       
     
     rho       = DI.InitialGuessRho();    
-    theta     = DI.FindInterfaceAngle(rho);    
+    theta     = DI.FindInterfaceAngle(rho);
     uv        = zeros(3*DI.IC.M,1);
     rho       = DI.GetEquilibriumDensity(0,theta,nParticles,uv,rho);
     
@@ -49,18 +51,36 @@ function Seppecher_M1Inf()
         %*** 2nd step ***
         [mu,uv] = DI.GetVelocityAndChemPot(rho,D_B,theta);
                        
-        DI.PlotMu_and_U(mu,uv); hold on;
+        DI.PlotMu_and_U(mu,uv); hold on;        
         DI.PlotSeppecherSolution(D_B,theta,rho);
+        DI.IC.doPlots(rho,'contour');
+        
         figure; L_ana = 40;
         DI.IC.doPlotFLine([-L_ana L_ana],...
                          [PhysArea.y2Max,PhysArea.y2Max],mu,'CART'); hold on;
-        muM = mu(DI.IC.Ind.left);   muP = mu(DI.IC.Ind.right);
-        plot([0 2*L_ana],[muM(1) muM(1)],'k:');
-        plot([0 2*L_ana],[muP(1) muP(1)],'k:');
+        DI.IC.doPlotFLine([-L_ana L_ana],...
+                         [PhysArea.y2Max,PhysArea.y2Max]/2,mu,'CART'); hold on;
+        muM = mean(mu(DI.IC.Ind.left));   
+        muP = mean(mu(DI.IC.Ind.right));
+        plot([0 2*L_ana],[muM muM],'k:');
+        plot([0 2*L_ana],[muP muP],'k:');
+        
+        % 2a
+        % get pressure difference between +/- infinty
+        % compute origin
+        pM = DI.GetPressure_from_ChemPotential(muM,-1);
+        pP = DI.GetPressure_from_ChemPotential(muP,1);
+        
+        R = surfaceTension/(pM-pP);
+        
+        ptC.y1 = PhysArea.y2Max/tan(theta) - sin(theta)*R;
+        ptC.y2 = PhysArea.y2Max + cos(theta)*R;
+        
 
         %*** 3rd step ***        
-        for i=1:4
-            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
+        for i=1:3
+            %rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
+            rho   = DI.GetEquilibriumDensityR(mu,theta,nParticles,rho,ptC);
             
             theta = DI.FindInterfaceAngle(rho);                
             
