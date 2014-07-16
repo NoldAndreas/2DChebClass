@@ -1,22 +1,27 @@
-function HI = Oseen_2D_noConv(x,y,optsPhys)
+function HI = TwoOseen_2D_noConv(x,y,optsPhys)
 
     sigmaH = optsPhys.sigmaHS;
 
     x0 = optsPhys.pts.x0;
     y0 = optsPhys.pts.y0;
     
-%     x = x - x0;
-%     y = y - y0;
-
-    x = x0 - x;
-    y = y0 - ;
-
+    x = x - x0;
+    yTemp = y;
+    y  = y0 - yTemp;
+    yp = y0 + yTemp; 
+    
     N = length(x);
     id = IoxI(N);
+    
     rr = roxr(x,y);
     rInv = rInverse(x,y);
-
-    HI = 3/8*sigmaH*rInv.*(id + rr);
+    Oseen1 = 3/8*sigmaH*rInv.*(id + rr);
+    
+    rrp   = roxr(x,yp);
+    rpInv = rInverse(x,yp);
+    Oseen2 = 3/8*sigmaH*rpInv.*(id + rrp);
+    
+    HI = Oseen1 - Oseen2;
 
     HI(isnan(rInv) | rInv == 0)=0;
 
