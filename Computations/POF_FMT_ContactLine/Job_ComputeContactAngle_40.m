@@ -30,9 +30,8 @@ function Job_ComputeContactAngle_40()
     %***********************************************************        
     filename   = [dirData,filesep,'Job40_DisjoiningPressure_',getTimeStr(),'.txt'];       
     Struct2File(filename,config,['Computed at ',datestr(now)]);
-        
+
   %  ConvergenceSurfaceTensions(config);
-        
     close all;
     ChangeDirData();                
 	

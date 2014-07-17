@@ -13,6 +13,9 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
     
     if(nargin <7)
         yShift = 0;
+    end    
+    if(nargin < 6)
+        BoolPlot = true;
     end
     
     if(isfield(optsPhys,'Dmu') && isfield(optsPhys,'mu_sat'))

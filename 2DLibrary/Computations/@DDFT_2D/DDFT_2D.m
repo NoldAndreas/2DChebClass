@@ -67,6 +67,8 @@ classdef DDFT_2D < handle
                 [this.optsPhys.rhoGas_sat,...
                      this.optsPhys.rhoLiq_sat,...
                     this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
             end
 
@@ -241,6 +243,19 @@ classdef DDFT_2D < handle
                 figure('Position',[0 0 1000 1000]);
                 PlotDDFT(plotData);  
         end    
+        
+        function ResetTemperature(this,T)
+            this.optsPhys.kBT = T;
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
+                this.do2Phase = true;
+            end
+        end
         
         ComputeEquilibrium(this,rho_ig)
         ComputeDynamics(this)

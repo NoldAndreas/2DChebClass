@@ -2,6 +2,9 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     global PersonalUserOutput dirData MinimalOutput
             
     saveFigs = true;
+    if(nargin < 6)
+        BoolPlot = true;
+    end
 
     %************************************************
     %***************  Initialization ****************
