@@ -69,7 +69,7 @@ classdef ContactLine < handle
             %************************************************                               
             global MinimalOutput
             GotoSubDir(this);
-            
+                        
             N1 = this.optsNum.PhysArea.N(1);
             N2 = this.optsNum.PhysArea.N(2);            
             R   = this.optsPhys.sigmaS/2;     

@@ -9,9 +9,14 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     nParams    = length(paramNames);
     
     shapeAnn.RMin = params.LJsigma;
-    shapeAnn.L = optsPhys.optsNum.PhysArea.Conv.L;
-    shapeAnn.N = optsPhys.optsNum.PhysArea.Conv.N;
-    area       = InfAnnulus(shapeAnn);
+    if(isfield(optsPhys,'FexNum'))
+        shapeAnn.L    = optsPhys.FexNum.L;
+        shapeAnn.N    = optsPhys.FexNum.N;
+    else    
+        shapeAnn.L    = optsPhys.optsNum.PhysArea.Conv.L;
+        shapeAnn.N    = optsPhys.optsNum.PhysArea.Conv.N;
+    end
+    area          = InfAnnulus(shapeAnn);
 
     shapeDisc.R = params.LJsigma;
     shapeDisc.N = shapeAnn.N;
