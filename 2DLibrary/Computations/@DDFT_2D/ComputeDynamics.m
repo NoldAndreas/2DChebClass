@@ -65,7 +65,7 @@ function ComputeDynamics(this,x_ic,mu)
         optsNumT = rmfield(optsNum,'PlotArea');
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[],true); %true      
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        

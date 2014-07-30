@@ -5,11 +5,8 @@ function HI = Oseen_2D_noConv(x,y,optsPhys)
     x0 = optsPhys.pts.x0;
     y0 = optsPhys.pts.y0;
     
-%     x = x - x0;
-%     y = y - y0;
-
     x = x0 - x;
-    y = y0 - ;
+    y = y0 - y;
 
     N = length(x);
     id = IoxI(N);
@@ -18,8 +15,8 @@ function HI = Oseen_2D_noConv(x,y,optsPhys)
 
     HI = 3/8*sigmaH*rInv.*(id + rr);
 
-    HI(isnan(rInv) | rInv == 0)=0;
-
+    HI(~isfinite(HI)) = 0;
+    
     function rr = roxr(x,y)
         % x and y are the kron products
         rr = zeros([size(x,1),2,2]);

@@ -47,6 +47,6 @@ function AddPaths()
     
     dirDataOrg = dirData;
     
-    recomputeAll = true;
+    recomputeAll = false;
      
 end

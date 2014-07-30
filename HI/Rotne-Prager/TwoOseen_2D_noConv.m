@@ -5,25 +5,19 @@ function HI = TwoOseen_2D_noConv(x,y,optsPhys)
     x0 = optsPhys.pts.x0;
     y0 = optsPhys.pts.y0;
     
-    x = x - x0;
-    yTemp = y;
-    y  = y0 - yTemp;
-    yp = y0 + yTemp; 
+    x   = x0 - x;
+    y1  = y0 - y;
+    y2  = y0 + y; 
     
     N = length(x);
     id = IoxI(N);
-    
-    rr = roxr(x,y);
-    rInv = rInverse(x,y);
-    Oseen1 = 3/8*sigmaH*rInv.*(id + rr);
-    
-    rrp   = roxr(x,yp);
-    rpInv = rInverse(x,yp);
-    Oseen2 = 3/8*sigmaH*rpInv.*(id + rrp);
-    
+
+    Oseen1 = oseen(x,y1,sigmaH);
+    Oseen2 = oseen(x,y2,sigmaH);
+
     HI = Oseen1 - Oseen2;
 
-    HI(isnan(rInv) | rInv == 0)=0;
+    HI(~isfinite(HI)) = 0;
 
     function rr = roxr(x,y)
         % x and y are the kron products
@@ -46,5 +40,10 @@ function HI = TwoOseen_2D_noConv(x,y,optsPhys)
         rInv = reshape(rInv,[],2,2);
     end
 
+   function Oseen = oseen(x,y,sigmaH)
+        rr = roxr(x,y);
+        rInv = rInverse(x,y);
+        Oseen = 3/8*sigmaH*rInv.*(id + rr);
+    end
 
 end

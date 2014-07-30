@@ -8,19 +8,21 @@ function HI = FullWallHI_2D_noConv(x,y,optsPhys)
     x0 = optsPhys.pts.x0;
     y0 = optsPhys.pts.y0;
     
-    x = x - x0;
+    xShift = x0 - x;
     
     % second coordinate is the one over which we integrate, i.e. x and y
     
-    y1  = y0 - y;
-    y2 = y0  + y; % mirrored y
+    y1 = y0 - y;
+    y2 = y0 + y; % mirrored y
     
-    Oseen1 = oseen(x,y1,sigmaH);
-    Oseen2 = oseen(x,y2,sigmaH);
+    Oseen1 = oseen(xShift,y1,sigmaH);
+    Oseen2 = oseen(xShift,y2,sigmaH);
     DeltaT = deltaT(x0,y0,x,y,sigmaH);
     
     HI = Oseen1 - Oseen2 + DeltaT;
-
+   
+    HI(~isfinite(HI)) = 0;
+    
     function rr = roxr(x,y)
         % x and y are the kron products
         rr = zeros([size(x,1),2,2]);
@@ -46,12 +48,12 @@ function HI = FullWallHI_2D_noConv(x,y,optsPhys)
         rr = roxr(x,y);
         rInv = rInverse(x,y);
         Oseen = 3/8*sigmaH*rInv.*(id + rr);
-        Oseen(isnan(rInv) | rInv == 0) = 0;
+        %Oseen(isnan(rInv) | rInv == 0) = 0;
     end
 
     function dT = deltaT(x1,y1,x2,y2,sigmaH)
         dT = zeros([N,2,2]);
-        sInv  = ((x1-x2).^2  + (y1-y2)).^(-1/2);
+        sInv  = ((x1-x2).^2  + (y1+y2).^2).^(-1/2); % distance with reflected point
         sInv3 = sInv.^3;
         sInv5 = sInv.^5;
         dT(:,1,1) = -2*y1.*y2.*(sInv3 - 3*(x1-x2).^2.*sInv5);
