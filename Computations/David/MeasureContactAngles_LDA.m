@@ -5,7 +5,7 @@ function [optsNum,optsPhys] = MeasureContactAngles_LDA()
     AddPaths(); 
 
     %Numerical Parameters    
-    Phys_Area = struct('shape','HalfSpace_FMT','N',[1,40],...
+    Phys_Area = struct('shape','HalfSpace_FMT','N',[1,20],...
                        'L1',4,'L2',5,'L2_AD',2.,...
                        'y2wall',0.,...
                        'N2bound',24,'h',1);
@@ -16,7 +16,7 @@ function [optsNum,optsPhys] = MeasureContactAngles_LDA()
     Sub_Area = struct('shape','Box','y1Min',-1,'y1Max',1,'N',[20,20],...
                       'y2Min',0,'y2Max',2);
                                                         
-	V2Num   = struct('Fex','SplitDisk','L',2,'L2',1.,'N',[40,40]);
+	V2Num   = struct('Fex','SplitDisk','L',2,'L2',1.,'N',[20,20]);
         
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,'SubArea',Sub_Area,...
@@ -33,15 +33,16 @@ function [optsNum,optsPhys] = MeasureContactAngles_LDA()
                       'Dmu',0.0,...
                       'sigmaS',1);
                   
-    T   = 0.6:0.05:0.85;
-    epw = 1.5:0.02:3.2;
-    c = {'k','r','b','m','g','y','k--'};
+    T   = 0.7;%0.6:0.05:0.85;
+    epw = 1.5:0.2:3.2;
+    c = {'k','r','b','m','g','y','k'};
     
     res = DataStorage([],@ComputeContactAngleVsEpsilon,v2struct(T,epw),[]);          
     
     f1 = figure('color','white','Position',[0 0 800 800]);
     for k = 1:length(T)
         plot(epw,res.theta(k,:)'*180/pi,c{k},'linewidth',1.5); hold on;
+        plot(epw,res.theta_DWSI(k,:)'*180/pi,[c{k},'--'],'linewidth',1.5); hold on;
     end
     xlabel('$\varepsilon_w/\varepsilon$','Interpreter','Latex','fontsize',20);
     ylabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',20);
@@ -78,7 +79,9 @@ function [optsNum,optsPhys] = MeasureContactAngles_LDA()
         T   = params.T;
         epw = params.epw;
         
-        theta = zeros(length(T),length(epw));
+        theta     = zeros(length(T),length(epw));
+        thetaDWSI = zeros(length(T),length(epw));
+        
         om_wg = zeros(length(T),length(epw));
         om_wl = zeros(length(T),length(epw));        
         om_lg = zeros(length(T),1);    
@@ -106,20 +109,31 @@ function [optsNum,optsPhys] = MeasureContactAngles_LDA()
                 om_wg(j,i) = EX.Compute1D('WG');
                 om_wl(j,i) = EX.Compute1D('WL');                
 
-                theta(j,i) = ComputeContactAngle(om_wg(j,i),om_wl(j,i),om_lg(j));
+                theta(j,i)     = ComputeContactAngle(om_wg(j,i),om_wl(j,i),om_lg(j));
+                thetaDWSI(j,i) = DryWallSI(T(j),epw(i),...
+                                           EX.optsPhys.rhoLiq_sat,...
+                                           EX.optsPhys.rhoGas_sat);
+                
 
                 close all;                
                 if(theta(j,i)==0)
                     break;
                 end
             end
-        end    
-        res.theta = theta;
-        res.om_lg = om_lg;
-        res.om_wg = om_wg;
-        res.om_wl = om_wl;
+        end
+        
+        res.theta      = theta;
+        res.theta_DWSI = thetaDWSI;
+        res.om_lg      = om_lg;
+        res.om_wg      = om_wg;
+        res.om_wl      = om_wl;
+        
     end
     
     
-end                 
+end        
+
+function theta = DryWallSI(T,epw,nliq,ngas)
+    theta = acos( 58/135*T*epw/(nliq-ngas) + (ngas^2-nliq^2)/(nliq-ngas)^2 );
+end
 
