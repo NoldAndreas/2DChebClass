@@ -74,7 +74,7 @@ function PlotMultipleDDFTs2D(struct)
             %Plot densities
             for iSpecies=1:struct(iDDFT).nSpecies
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
-                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),'SC'); 
+                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),'SC',struct(iDDFT).optsPlot); 
                 hold on;     
             end
             if(iDDFT==nDDFT)

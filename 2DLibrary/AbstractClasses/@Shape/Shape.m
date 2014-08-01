@@ -360,8 +360,14 @@ classdef (Abstract) Shape < handle
                     end
                     % hh = clabel(C,h,'fontsize',20);
                 else
-                    surf(y1M,y2M,reshape(VI,...
+                    h = surf(y1M,y2M,reshape(VI,...
                                   this.Interp.Nplot2,this.Interp.Nplot1)); %mesh
+                    if(nargin>3)
+                        if(isfield(optDetails,'linecolor'))
+                            set(h,'FaceColor',optDetails.linecolor);
+                            set(h,'FaceAlpha',0.5);
+                        end
+                    end
                 end
                 hold on;
                 

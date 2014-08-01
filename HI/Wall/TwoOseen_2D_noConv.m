@@ -1,20 +1,23 @@
-function HI = WallHI(x,y,optsPhys)
-% see Jones and Kutteh, Phys Chem Chem Phys, 1, 2131, 1999
+function HI = TwoOseen_2D_noConv(x,y,optsPhys)
 
     sigmaH = optsPhys.sigmaHS;
 
-    Oseen = oseen(x,y,sigmaH);
-    OseenWall = oseen(x,-y,sigmaH);
-
+    x0 = optsPhys.pts.x0;
+    y0 = optsPhys.pts.y0;
     
-    function HI = oseen(x,y,sigmaH)
-        N = length(x);
-        id = IoxI(N);
-        rr = roxr(x,y);
-        rInv = rInverse(x,y);
-        HI = 3/8*sigmaH*rInv.*(id + rr);
-        HI(isnan(rInv) | rInv == 0)=0;
-    end
+    x   = x0 - x;
+    y1  = y0 - y;
+    y2  = y0 + y; 
+    
+    N = length(x);
+    id = IoxI(N);
+
+    Oseen1 = oseen(x,y1,sigmaH);
+    Oseen2 = oseen(x,y2,sigmaH);
+
+    HI = Oseen1 - Oseen2;
+
+%     HI(~isfinite(HI)) = 0;
 
     function rr = roxr(x,y)
         % x and y are the kron products
@@ -37,5 +40,11 @@ function HI = WallHI(x,y,optsPhys)
         rInv = reshape(rInv,[],2,2);
     end
 
+   function Oseen = oseen(x,y,sigmaH)
+        rr = roxr(x,y);
+        rInv = rInverse(x,y);
+        Oseen = 3/8*sigmaH*rInv.*(id + rr);
+        Oseen(~isfinite(Oseen)) = 0;
+    end
 
 end

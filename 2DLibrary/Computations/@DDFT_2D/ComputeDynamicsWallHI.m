@@ -35,7 +35,6 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
     Ind         = this.IDC.Ind;        
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;
-    doHIWall    = this.doHIWall;
 
     markVinf    = (Vext == inf);
     if(strcmp(this.IDC.polar,'polar'))
@@ -129,7 +128,6 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         if(doHI)
             rho_s    = exp((x-Vext)/kBT);
             rho_s    = [rho_s;rho_s];
-            %gradMu_s = Diff.grad*mu_s;
             HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end

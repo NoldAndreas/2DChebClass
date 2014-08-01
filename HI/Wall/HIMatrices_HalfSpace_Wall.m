@@ -11,7 +11,7 @@ function HIStruct = HIMatrices_HalfSpace_Wall(opts,IDC)
 
     params = optsPhys.HI;
     optsNum = optsNum.HINum;
-    
+
     if(isfield(optsNum,'HIPreprocess'))
         fPreprocess = str2func(optsNum.HIPreprocess);
         params = fPreprocess(params);

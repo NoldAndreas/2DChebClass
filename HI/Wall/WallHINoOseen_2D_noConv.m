@@ -1,4 +1,4 @@
-function HI = FullWallHI_2D_noConv(x,y,optsPhys)
+function HI = WallHINoOseen_2D_noConv(x,y,optsPhys)
 
     N = length(x);
     id = IoxI(N);
@@ -15,13 +15,14 @@ function HI = FullWallHI_2D_noConv(x,y,optsPhys)
     y1 = y0 - y;
     y2 = y0 + y; % mirrored y
     
-    Oseen1 = oseen(xShift,y1,sigmaH);
+    %Oseen1 = oseen(xShift,y1,sigmaH);
     Oseen2 = oseen(xShift,y2,sigmaH);
     DeltaT = deltaT(x0,y0,x,y,sigmaH);
     
-    HI = Oseen1 - Oseen2 + DeltaT;
+    %HI = Oseen1 - Oseen2 + DeltaT;
    
-    HI(~isfinite(HI)) = 0;
+    HI = - Oseen2 + DeltaT;
+%    HI(~isfinite(HI)) = 0;
     
     function rr = roxr(x,y)
         % x and y are the kron products
@@ -48,7 +49,7 @@ function HI = FullWallHI_2D_noConv(x,y,optsPhys)
         rr = roxr(x,y);
         rInv = rInverse(x,y);
         Oseen = 3/8*sigmaH*rInv.*(id + rr);
-        %Oseen(isnan(rInv) | rInv == 0) = 0;
+        Oseen(~isfinite(Oseen)) = 0;
     end
 
     function dT = deltaT(x1,y1,x2,y2,sigmaH)
@@ -61,6 +62,7 @@ function HI = FullWallHI_2D_noConv(x,y,optsPhys)
         dT(:,1,2) =  2*(x1-x2).*(y2.*sInv3 - 3*y1.*y2.*(y1+y2).*sInv5);
         dT(:,2,1) =  2*(x1-x2).*(y2.*sInv3 + 3*y1.*y2.*(y1+y2).*sInv5);
         dT =  3/8*sigmaH*dT;
+        dT(~isfinite(dT)) = 0;
     end
 
 

@@ -4,7 +4,7 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium();
-   
+
     if(EX.doHIWall)
         EX.ComputeDynamicsWallHI();
     elseif(isfield(optsPhys,'Inertial') && optsPhys.Inertial)

@@ -194,6 +194,12 @@ classdef DDFT_2D < handle
                 paramsHI.optsPhys.nSpecies = this.optsPhys.nSpecies;
                 if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
                     if(isfield(optsNum.HINum,'HIWallFull') && optsNum.HINum.HIWallFull)
+                        
+                        % remove 1-body wall contribution
+                        if(isfield(paramsHI.optsNum.HINum,'Wall'))
+                            paramsHI.optsNum.HINum = rmfield(paramsHI.optsNum.HINum,'Wall');
+                        end
+                        
                         this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace_Wall,paramsHI,this.IDC);%,true);
                     else
                         this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);%,true);
