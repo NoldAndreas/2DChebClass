@@ -29,12 +29,12 @@ output(3).optsPlot.lineColourDDFT = {'g'};
 
 % 
 % % Oseen + diffusion coefficient
-% DDFT = Test_DDFT_WallHI_Full('Oseen');
-% 
-% output(4).optsPhys = DDFT.optsPhys;
-% output(4).optsNum  = DDFT.optsNum;
-% output(4).data     = DDFT.dynamicsResult;
-% 
-% output(4).optsPlot.lineColourDDFT = {'m'};
+DDFT = Test_DDFT_WallHI_Full('Oseen');
+
+output(4).optsPhys = DDFT.optsPhys;
+output(4).optsNum  = DDFT.optsNum;
+output(4).data     = DDFT.dynamicsResult;
+
+output(4).optsPlot.lineColourDDFT = {'m'};
 
 PlotMultipleDDFTs2D(output);

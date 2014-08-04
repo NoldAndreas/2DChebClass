@@ -133,6 +133,9 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         end
         
         flux_dir               = DgradMu_s;
+        if(doHI)
+            flux_dir           = flux_dir + HI_s;
+        end
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
@@ -153,8 +156,11 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
     end   
     function flux = GetFlux(x,t)
         rho_s = exp((x-Vext)/kBT);       
+        rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
-        flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
+        gradMu_s = Diff.grad*mu_s;
+        DgradMu_s = DWall.*gradMu_s;
+        flux  = -rho_s.*DgradMu_s;                                
         if(polarShape)
             %then transform to cartesian corrdinates
             flux = GetCartesianFromPolarFlux(flux,ythS);
@@ -165,8 +171,9 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
         gradMu_s = Diff.grad*mu_s;
+        DgradMu_s = DWall.*gradMu_s;
         HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
-        flux  = -rho_s.*(gradMu_s + HI_s);                                  
+        flux  = -rho_s.*(DgradMu_s + HI_s);                                  
     end
 
 end

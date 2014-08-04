@@ -129,6 +129,9 @@ function ComputeDynamics(this,x_ic,mu)
         end
         
         flux_dir               = Diff.grad*mu_s;
+        if(doHI)
+            flux_dir           = flux_dir + HI_s;
+        end
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
@@ -148,9 +151,10 @@ function ComputeDynamics(this,x_ic,mu)
         mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
     end   
     function flux = GetFlux(x,t)
-        rho_s = exp((x-Vext)/kBT);       
+        rho_s = exp((x-Vext)/kBT);  
+        rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
-        flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
+        flux  = -rho_s.*(Diff.grad*mu_s);                                
         if(polarShape)
             %then transform to cartesian corrdinates
             flux = GetCartesianFromPolarFlux(flux,ythS);
