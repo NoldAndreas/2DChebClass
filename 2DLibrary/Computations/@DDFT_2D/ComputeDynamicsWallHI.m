@@ -20,8 +20,8 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         R       = [];
     end
     D0          = optsPhys.D0;
-    DWall       = this.DWall;
-    DDWall      = this.DDWall;
+    DWall       = this.IntMatrHI.DWall;
+    DDWall      = this.IntMatrHI.DDWall;
     Diff        = this.IDC.Diff;
     plotTimes   = this.optsNum.plotTimes;
     nSpecies    = this.optsPhys.nSpecies;

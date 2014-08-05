@@ -12,8 +12,8 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
     else
         EX.ComputeDynamics();
     end
-    
-    if(optsPlot.doDDFTPlots)
+   
+    if(isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots)
         EX.PlotDynamics();
     end
 end

@@ -118,9 +118,10 @@ if(optsStruct.anyDDFT)
         end
         
         % add var with value varS
-        addVarText=cat(2,addVarText, [comma '''' vars{iVar} ''',optsStruct.'  vars{iVar} 'S']);
+        %addVarText=cat(2,addVarText, [comma '''' vars{iVar} ''',optsStruct.'  vars{iVar} 'S']);
         % add varS with value varS
-        addVarText=cat(2,addVarText, [',''' vars{iVar} 'S'',optsStruct.'  vars{iVar} 'S']);
+        %addVarText=cat(2,addVarText, [',''' vars{iVar} 'S'',optsStruct.'  vars{iVar} 'S']);
+        addVarText=cat(2,addVarText, [comma '''' vars{iVar} 'S'',optsStruct.'  vars{iVar} 'S']);
     end
     
     HIParamsCmd=['optsStruct.HIParamsDDFT = struct(' addVarText ');'];

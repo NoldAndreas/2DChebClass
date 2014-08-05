@@ -60,7 +60,7 @@ function saveFileList(inputFile,potNames,stocStruct,DDFTStruct)
     end
     
     for iDDFT = 1:nDDFT
-        fprintf(fid,['%%' DDFTStruct(iDDFT).Filename '\n']);
+        fprintf(fid,['%%' DDFTStruct(iDDFT).optsNum.Filename '\n']);
     end
     
     fclose(fid);

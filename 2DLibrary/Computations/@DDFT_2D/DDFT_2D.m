@@ -6,8 +6,8 @@ classdef DDFT_2D < handle
         IDC,subArea
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
-        DWall      % modification tensor for D0 in presence of wall
-        DDWall     % derivative of modification tensor for D0 in presence of wall
+%         DWall      % modification tensor for D0 in presence of wall
+%         DDWall     % derivative of modification tensor for D0 in presence of wall
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions
         Int_of_path
         IP
@@ -44,7 +44,11 @@ classdef DDFT_2D < handle
             else                
                 shape.Conv = [];
             end
-            
+
+            if(~isfield(this.optsPhys,'sigmaS') && isfield(this.optsPhys.V2,'sigmaS'))
+                this.optsPhys.sigmaS = this.optsPhys.V2.sigmaS;
+            end
+                
             % Special Case: HalfSpace_FMT
             if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
                 shape.R = this.optsPhys.sigmaS/2;
@@ -80,7 +84,7 @@ classdef DDFT_2D < handle
             elseif(isfield(optsPhys,'mu'))
                 this.optsPhys.nSpecies = length(optsPhys.mu);
             end
-                                                             
+
             Preprocess_HardSphereContribution(this);
             Preprocess_MeanfieldContribution(this);
             Preprocess_HIContribution(this);           
@@ -156,8 +160,8 @@ classdef DDFT_2D < handle
             disp(['Fex computation time (sec): ', num2str(t_fex)]);
         end            
         function Preprocess_MeanfieldContribution(this)
-            
-            if(isfield(this.optsNum,'V2Num'))
+               
+            if(isfield(this.optsNum,'V2Num') && ~isempty(this.optsNum.V2Num))
                 fprintf(1,'Computing mean field convolution matrices ...');   
                 paramsFex.V2       = this.optsPhys.V2;
                 paramsFex.kBT      = this.optsPhys.kBT;
@@ -225,12 +229,12 @@ classdef DDFT_2D < handle
                 end
                 tic;
                 wallHIfn = str2func(optsNum.HINum.Wall);
-                [this.DWall,this.DDWall] = wallHIfn(PtsCart.y1_kv,PtsCart.y2_kv,optsPhys.HI);
+                [this.IntMatrHI.DWall,this.IntMatrHI.DDWall] = wallHIfn(PtsCart.y1_kv,PtsCart.y2_kv,optsPhys.HI);
                 t_HIWall = toc;
                 display(['HI wall computation time (sec): ', num2str(t_HIWall)]);
             else
-                this.DWall  = ones(size([PtsCart.y1_kv;PtsCart.y2_kv]));
-                this.DDWall = zeros(size([PtsCart.y1_kv;PtsCart.y2_kv]));
+                this.IntMatrHI.DWall  = ones(size([PtsCart.y1_kv;PtsCart.y2_kv]));
+                this.IntMatrHI.DDWall = zeros(size([PtsCart.y1_kv;PtsCart.y2_kv]));
             end
             
         end

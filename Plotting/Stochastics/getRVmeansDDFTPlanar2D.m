@@ -19,10 +19,10 @@ function [meanR,meanV]=getRVmeansDDFTPlanar2D(ddft)
 % if the code doesn't compute the means, do it here
 
 % assign relevant data
-rho_t=ddft.rho_t;
-y1=ddft.shape.Pts.y1_kv;
-y2=ddft.shape.Pts.y2_kv;
-Int=ddft.shape.Int;
+rho_t=ddft.dynamicsResult.rho_t;
+y1=ddft.IDC.Pts.y1_kv;
+y2=ddft.IDC.Pts.y2_kv;
+Int=ddft.IDC.Int;
 
 if(ndims(rho_t)==2)
     temp=zeros(size(rho_t,1),1,size(rho_t,2));

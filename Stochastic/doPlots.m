@@ -182,16 +182,33 @@ if(~isempty(DDFTStruct))
     nDDFT = length(DDFTStruct);
     
     for iDDFT = 1:nDDFT
-        
-        rhoI = DDFTStruct(iDDFT).rho_t(:,:,1);
-        rhoF = DDFTStruct(iDDFT).rho_t(:,:,end);
-        
-        DDFTStruct(iDDFT).rhoI = rhoI;
-        DDFTStruct(iDDFT).rhoF = rhoF;
-        
-        DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
-        DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
-        DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+                
+        if(isa(DDFTStruct(1),'DDFT_2D'))
+
+            rhoI = DDFTStruct(iDDFT).dynamicsResult.rho_t(:,:,1);
+            rhoF = DDFTStruct(iDDFT).dynamicsResult.rho_t(:,:,end);
+
+            DDFTStruct(iDDFT).dynamicsResult.rhoI = rhoI;
+            DDFTStruct(iDDFT).dynamicsResult.rhoF = rhoF;
+
+            DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT).dynamicsResult);
+            DDFTStruct(iDDFT).dynamicsResult.rMean    = DDFTAveragesStruct.rMean;
+            DDFTStruct(iDDFT).dynamicsResult.fluxMean = DDFTAveragesStruct.fluxMean;
+            
+        else
+
+            rhoI = DDFTStruct(iDDFT).rho_t(:,:,1);
+            rhoF = DDFTStruct(iDDFT).rho_t(:,:,end);
+
+            DDFTStruct(iDDFT).rhoI = rhoI;
+            DDFTStruct(iDDFT).rhoF = rhoF;
+
+            DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
+            DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
+            DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+            
+        end
+          
     end
     
     DDFTPlotStruct = DDFTStruct;

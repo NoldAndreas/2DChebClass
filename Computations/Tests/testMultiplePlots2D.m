@@ -27,8 +27,7 @@ output(3).data     = DDFT.dynamicsResult;
 
 output(3).optsPlot.lineColourDDFT = {'g'};
 
-% 
-% % Oseen + diffusion coefficient
+% Oseen + wall diffusion coefficient
 DDFT = Test_DDFT_WallHI_Full('Oseen');
 
 output(4).optsPhys = DDFT.optsPhys;

@@ -13,6 +13,13 @@ AddPaths();
 inputFile='APS12HS50';
 %inputFile='APS12G50';
 
+%inputFile = 'HIWallTest';
+
+
+
+
+
+
 %inputFile = 'HITest';
 %inputFile = 'HITest_2Species';
 

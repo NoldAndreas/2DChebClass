@@ -189,7 +189,7 @@ for iPlot=1:2
     for iDDFT=1:nDDFT
         
         % get rho, v and r values
-        rho=ddft(iDDFT).rho_t;
+        rho=ddft(iDDFT).dynamicsResult.rho_t;
         
         optsPlot.type=DDFTType{iDDFT};
           
@@ -200,7 +200,7 @@ for iPlot=1:2
             v=ddft(iDDFT).v_IP;
             vt=v(:,:,plotPos(iPlot));
         else
-            v=ddft(iDDFT).flux_t;
+            v=ddft(iDDFT).dynamicsResult.flux_t;
             fluxNorm = 0.1*max(max(max(v)));
             optsPlot.fluxNorm=fluxNorm;
             
@@ -210,7 +210,8 @@ for iPlot=1:2
         optsPlot.faceColour=lineColourDDFT{iDDFT};
         
         % plot the distributions
-        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
+        %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
+        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
 
         hold(hRa,'on');
         hold(hPa,'on');

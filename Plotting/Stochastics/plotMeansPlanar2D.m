@@ -245,7 +245,7 @@ end
 % modify position plot
 for iDim=1:dim
     %fixPlot(hMRa{iDim},tMin,tMax,RMMin,RMMax,'$t$','$\bar r  \;\;$',[],legPos,legTextR)    
-    fixPlot(hMRa{iDim},tMin,tMax,RMMin{iDim},RMMax{iDim},'$t$',yLabelsR{iDim},[],legPos,legTextR)
+    fixPlot(hMRa{iDim},tMin,tMax,RMMin(iDim),RMMax(iDim),'$t$',yLabelsR{iDim},[],legPos,legTextR)
 end
 
 % only modify momentum axis if we've plotted anything there
@@ -256,7 +256,7 @@ if(~isempty(legTextP))
     %modify momentum plot
     for iDim=1:dim
         %fixPlot(hMPa{iDim},tMin,tMax,PMMin,PMMax,'$t$','$\bar p  \;\;$',[],legPos,legTextP)
-        fixPlot(hMPa{iDim},tMin,tMax,PMMin{iDim},PMMax{iDim},'$t$',yLabelsP{iDim},[],legPos,legTextP)
+        fixPlot(hMPa{iDim},tMin,tMax,PMMin(iDim),PMMax(iDim),'$t$',yLabelsP{iDim},[],legPos,legTextP)
     end
     % remove tick marks and label from position plot
     set(hMRa,'XTickLabel',[]);
@@ -280,8 +280,9 @@ end
 if(nDDFT>0)
 %   addEqLinesDDFT([],handlesM,ddft,optsPlot,true,true);
 end
-% NEED TO FIX OUTPUTFILE
 
-save2pdf(pdfFile,hRPf);
+outputFile = optsPlot.meansFile;
+
+save2pdf(outputFile,hRPf);
 
 fprintf(1,'Finished\n');

@@ -81,11 +81,15 @@ for iDDFT=1:nDDFT
     DDFTdir = [potNames filesep 'DDFT' filesep optsDDFT.DDFTCode];            
     
     [DDFTStruct,~,Parameters] = DataStorage(DDFTdir,@DDFTwrapper,opts,optsPlot,~loadDDFT);
-
-    DDFTStruct.Filename = [dirData filesep DDFTdir filesep Parameters.Filename];
+    
+    DDFTStruct.optsNum.Filename = [dirData filesep DDFTdir filesep Parameters.Filename];
     
     % save to full structure
-    DDFTStructFull(iDDFT)=orderfields(DDFTStruct);  %#ok
+    if(isstruct(DDFTStruct))  % 1D
+        DDFTStructFull(iDDFT)=orderfields(DDFTStruct);  %#ok
+    else % 2D: is of type DDFT_2D
+        DDFTStructFull(iDDFT) = DDFTStruct;  %#ok
+    end
     
     fprintf(1,'Finished\n');
 end
