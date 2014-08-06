@@ -31,8 +31,8 @@ tauS       = 0.1;
 sigma1AddS = 0.5;
 sigma2AddS = 0.5;
 y10S       = 0;
-y20S       = 2;
-gS         = 1;
+y20S       = 1;
+gS         = -1;
 gcutS      = 10; 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -53,7 +53,7 @@ potParams2Names={'sigma'};
 % HI parameters
 %--------------------------------------------------------------------------
 
-sigmaHS = 1;
+sigmaHS = 0.5;
 
 HIParamsNames={'sigmaH'};
 

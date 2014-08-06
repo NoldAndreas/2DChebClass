@@ -6,8 +6,6 @@ classdef DDFT_2D < handle
         IDC,subArea
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
-%         DWall      % modification tensor for D0 in presence of wall
-%         DDWall     % derivative of modification tensor for D0 in presence of wall
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions
         Int_of_path
         IP

@@ -53,7 +53,7 @@ potParams2Names={'sigma'};
 % HI parameters
 %--------------------------------------------------------------------------
 
-sigmaHS = 1;
+sigmaHS = 0.5;
 
 HIParamsNames={'sigmaH'};
 
