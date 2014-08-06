@@ -10,7 +10,7 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=20;
+nParticlesS=30;
 
 kBT=1;          % temperature
 mS=1;
@@ -26,10 +26,14 @@ V1DV1='V1_Well_gravity';
 
 % appropriate physical parameters for potentials in V1DV1
 V0S        = 0.01;
-V0addS     = 3;
+V0addS     = 2;
 tauS       = 0.1;
-sigma1AddS = 0.5;
-sigma2AddS = 0.5;
+%sigma1AddS = 0.5;
+%sigma2AddS = 0.5;
+
+sigma1AddS = 4;
+sigma2AddS = 1;
+
 y10S       = 0;
 y20S       = 2;
 gS         = 1;
@@ -62,7 +66,7 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.3;
+tMax=0.2;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -142,15 +146,15 @@ HINum    = {[], ...
             struct('N',[30;30],'L',2,'HI11','noHI_2D','HI12','FullWallHI_2D_noConv', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
-                      'Wall','SelfWallTerm'), ...
+                      'Wall','SelfWallTermJK'), ...
             struct('N',[30;30],'L',2,'HI11','noHI_2D','HI12','noHI_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
-                      'Wall','SelfWallTerm'), ...
+                      'Wall','SelfWallTermJK'), ...
             struct('N',[30;30],'L',2,'HI11','noHI_2D','HI12','Oseen_2D_noConv', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
-                      'Wall','SelfWallTerm'), ...
+                      'Wall','SelfWallTermJK'), ...
            };
 
 DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
@@ -171,7 +175,7 @@ DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,false};
+doDDFT={true,true,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
@@ -211,7 +215,7 @@ nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = true;          % .gif movie
+doMovieGif     = false;          % .gif movie
 doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;

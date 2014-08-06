@@ -10,7 +10,7 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=20;
+nParticlesS=50;
 
 kBT=1;          % temperature
 mS=1;
@@ -28,10 +28,15 @@ V1DV1='V1_Well_gravity';
 V0S        = 0.01;
 V0addS     = 3;
 tauS       = 0.1;
-sigma1AddS = 0.5;
-sigma2AddS = 0.5;
+%sigma1AddS = 0.5;
+%sigma2AddS = 0.5;
+
+%sigma1AddS = 4;
+sigma1AddS = 2;
+sigma2AddS = 1;
+
 y10S       = 0;
-y20S       = 1;
+y20S       = 0;
 gS         = -1;
 gcutS      = 10; 
 % form into structure to make it easy to pass arbitrary parameters to
@@ -171,7 +176,7 @@ DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,false};
+doDDFT={true,true,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
@@ -195,7 +200,7 @@ pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.4;
+RMax=0.7;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -212,7 +217,7 @@ nBins=[20;20];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = true;          % .gif movie
-doInitialFinal = true;
+doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
 

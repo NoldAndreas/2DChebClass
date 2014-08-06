@@ -24,6 +24,9 @@
     if(isfield(opts.optsPhys,'D0'))
         opts.optsPhys    = rmfield(opts.optsPhys,'D0');
     end
+    if(isfield(opts.optsPhys,'D0S'))
+        opts.optsPhys    = rmfield(opts.optsPhys,'D0S');
+    end
     if(isfield(opts.optsPhys,'Inertial'))
         opts.optsPhys    = rmfield(opts.optsPhys,'Inertial');
     end    
@@ -33,10 +36,10 @@
     if(isfield(opts.optsPhys,'tMax'))
         opts.optsPhys    = rmfield(opts.optsPhys,'tMax');
     end
-    if(isfield(opts.optsPhys,'D0S'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'D0S');
+    if(isfield(opts.optsPhys,'nParticles'))
+        opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
-    
+
     if(isfield(opts.optsPhys.V1,'epsilon_w_end'))
         opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'epsilon_w_end');
     elseif(isfield(opts.optsPhys.V1,'epsilon_w_Amplitude'))

@@ -13,8 +13,10 @@ AddPaths();
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
 
-inputFile = 'HIWallTestTowards';
+%inputFile = 'HIWallTestTowards';
 %inputFile = 'HIWallTestAway';
+
+inputFile = 'InertiaTest';
 
 
 
