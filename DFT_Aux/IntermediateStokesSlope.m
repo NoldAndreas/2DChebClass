@@ -1,15 +1,16 @@
-function theta =IntermediateStokesSlope(z,lambda,thetam)
+function theta =IntermediateStokesSlope(z,lambda)
     if(nargin == 0)
         z      = (0.01:0.02:0.2)';
-        lambda = 1;
+        lambda = 1;        
         boolPlot = true;
+        Ca      = 0.05;
     else
         boolPlot = false;
-    end
-        
-    N          = 100;
+    end        
+    
+    N          = 150;
     shape      = struct('N',N,'yMin',0,'yMax',pi);    
-    plotShape  = struct('yMin',0,'yMax',pi,'N',200);
+    plotShape  = struct('yMin',0,'yMax',pi,'N',400);
 
     SL  = SpectralLine(shape);    
     SL.ComputeAll(plotShape);
@@ -26,19 +27,36 @@ function theta =IntermediateStokesSlope(z,lambda,thetam)
     
     f     = OneOverf(y);    
     
-    IP_m  = SL.ComputeInterpolationMatrix(SL.CompSpace(thetam));
-    z     = z + IP_m.InterPol*f;
     theta = fsolve(@f_interp,(9*z).^(1/3));
     
     if(boolPlot)
-        subplot(1,2,1); SL.doPlots(f); hold on; SL.doPlots(y.^2/3);
-        subplot(1,2,2); SL.doPlots(IntM*f);  hold on; SL.doPlots(y.^3/9); 
+        
+        plotOpts = struct('plain',true,'linecolor','b','linewidth',2,'linestyle','-');
+        
+        figure('color','white','Position',[0 0 800 800]);
+        SL.doPlots(IntM*f,plotOpts); hold on; 
+        plotOpts.linestyle = ':';
+        SL.doPlots(y.^3/9,plotOpts); 
 
         ylim([0 max(IntM*f)]);
-        xlabel('$\theta$','Interpreter','Latex');
-        ylabel('$G(\theta)$','Interpreter','Latex');
-
-        subplot(1,2,2); plot(theta,z,'ko','markersize',6,'MarkerFaceColor','r');
+        xlabel('$\theta [rad]$','Interpreter','Latex','fontsize',20);
+        ylabel('$G(\theta)$','Interpreter','Latex','fontsize',20);
+        set(gca,'fontsize',15);
+        
+        print2eps('theta_G',gcf);  
+        saveas(gcf,'theta_G.fig');    
+        
+        figure('color','white','Position',[0 0 800 800]);
+        plot(exp(IntM*f/Ca),y*180/pi,'b','linewidth',2); hold on;
+        plot(exp(y.^3/9/Ca),y*180/pi,'b:','linewidth',2);
+        xlim([1 max(exp(IntM*f/Ca))])        
+        xlabel('$r/\hat L$','Interpreter','Latex','fontsize',20);
+        ylabel('$\theta(r)[^\circ]$','Interpreter','Latex','fontsize',20);
+        set(gca,'fontsize',15);
+        
+        print2eps('r_theta',gcf);
+        saveas(gcf,'r_theta.fig');
+        %subplot(1,2,2); plot(theta,z,'ko','markersize',6,'MarkerFaceColor','r');
     end
  
     function f = OneOverf(t)
