@@ -10,7 +10,7 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=50;
+nParticlesS=20;
 
 kBT=1;          % temperature
 mS=1;
@@ -32,7 +32,7 @@ tauS       = 0.1;
 %sigma2AddS = 0.5;
 
 %sigma1AddS = 4;
-sigma1AddS = 2;
+sigma1AddS = 1;
 sigma2AddS = 1;
 
 y10S       = 0;
@@ -67,7 +67,7 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.3;
+tMax=0.25;
 
 %--------------------------------------------------------------------------
 % Stochastic setup

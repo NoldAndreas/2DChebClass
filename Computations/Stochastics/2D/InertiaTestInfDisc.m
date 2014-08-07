@@ -122,14 +122,14 @@ plotType = 'surf';
 viewPoint = [-56;7];
 
 % x axis for position and velocity plots
-rMin=[-5;-5];
+rMin=[0;-5];
 rMax=[5;5];
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.01;
+RMax=0.004;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -145,7 +145,7 @@ nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = false;          % .gif movie
+doMovieGif     = true;          % .gif movie
 doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;
