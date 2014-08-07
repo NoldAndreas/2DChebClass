@@ -16,11 +16,8 @@ AddPaths();
 %inputFile = 'HIWallTestTowards';
 %inputFile = 'HIWallTestAway';
 
-inputFile = 'InertiaTest';
-
-
-
-
+%inputFile = 'InertiaTest';
+inputFile = 'InertiaTestInfDisc';
 
 %inputFile = 'HITest';
 %inputFile = 'HITest_2Species';

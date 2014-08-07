@@ -155,10 +155,10 @@ function ComputeDynamics(this,x_ic,mu)
         rho_s = [rho_s;rho_s];
         mu_s  = GetExcessChemPotential(x,t,mu); 
         flux  = -rho_s.*(Diff.grad*mu_s);                                
-        if(polarShape)
-            %then transform to cartesian corrdinates
-            flux = GetCartesianFromPolarFlux(flux,ythS);
-        end
+%         if(polarShape)
+%             %then transform to cartesian corrdinates
+%             flux = GetCartesianFromPolarFlux(flux,ythS);
+%         end
     end
     function flux = GetFlux_HI(x,t)
         rho_s = exp((x-Vext)/kBT);  
@@ -167,10 +167,10 @@ function ComputeDynamics(this,x_ic,mu)
         gradMu_s = Diff.grad*mu_s;
         HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
         flux  = -rho_s.*(gradMu_s + HI_s);
-        if(polarShape)
-            %then transform to cartesian corrdinates
-            flux = GetCartesianFromPolarFlux(flux,ythS);
-        end
+%         if(polarShape)
+%             %then transform to cartesian corrdinates
+%             flux = GetCartesianFromPolarFlux(flux,ythS);
+%         end
     end
 
 end
