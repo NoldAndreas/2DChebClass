@@ -51,7 +51,7 @@ function Seppecher_M1Inf()
         %*** 2nd step ***
         [mu,uv] = DI.GetVelocityAndChemPot(rho,D_B,theta);
                        
-        DI.PlotMu_and_U(mu,uv); hold on;        
+        DI.PlotMu_and_U(mu,uv); hold on;
         DI.PlotSeppecherSolution(D_B,theta,rho);
         DI.IC.doPlots(rho,'contour');
         
