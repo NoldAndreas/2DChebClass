@@ -137,7 +137,7 @@ classdef DiffuseInterface < handle
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
         end
-        
+                
         
         function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
             Cn     = this.optsPhys.Cn;

@@ -23,7 +23,7 @@ function Job_ComputeExactAdsorptionIsotherm()
                      'maxComp_y2',-1,...
                      'y1Shift',0);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.375);%1.25);
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.7);%1.375);%1.25);
     V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
