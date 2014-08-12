@@ -39,7 +39,12 @@ function Job_ComputeContactAngle_120()
     CLT.Preprocess();
     CLT.ComputeEquilibrium();  
 
-    CLT.InitAnalysisGrid([-5 30],[0.5 18]);
+    CLT.InitInterpolation([],struct('y1Min',-15,'y1Max',10,...
+                                    'y2Min',0.5,'y2Max',15,...
+                                    'N1',100,'N2',100));
+	CLT.PlotEquilibriumResults;
+    
+    CLT.InitAnalysisGrid([-15 10],[0.5 25]);
     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
     CLT.PostProcess_2DDisjoiningPressure();
     

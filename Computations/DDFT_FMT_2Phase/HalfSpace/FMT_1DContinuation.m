@@ -44,13 +44,6 @@
         mu        = optsPhys.mu_sat + optsPhys.Dmu;
         par_start = optsPhys.V1.epsilon_w;
     end
-%    fBulk     = str2func(['FexBulk_',FexNum.OmEx]);      
-%      if(isfield(optsPhys,'Dmu') && isfield(optsPhys,'mu_sat'))
-%          par_min    = optsPhys.mu_sat + optsPhys.Dmu;          
-%      elseif(isfield(optsPhys,'eta'))
-%          rhoBulk   = optsPhys.eta_min*6/pi;
-%          par_min    = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);
-%      end
         
     getFex        = str2func(['Fex_',FexNum.Fex]);    
     markComp      = (HS.Pts.y1_kv==inf);   
@@ -63,6 +56,7 @@
     ptsCart = HS.GetCartPts(y1S,y2S);    
     [VAdd,dVAdd] = getVAdd(ptsCart.y1_kv,ptsCart.y2_kv,0,optsPhys.V1);    
     [rhoGas_sat,rhoLiq_sat,mu_sat,p] = BulkSatValues(optsPhys);
+    
     %************************************************
     %****************  Preprocess  ******************
     %************************************************
@@ -91,7 +85,19 @@
     
 	[h1,h2,Int_1D]     = HS.ComputeIntegrationVector();
     [h1,h2,Int_1D_AD]  = HS.AD.ComputeIntegrationVector();
-
+    
+    
+    opts_h                   = optsPhys;        
+	if(strcmp(optsPhys.drying,'drying'))        
+        opts_h.rho_iguess        = 'WL';
+        optsPhys.thetaDirection  = -1;
+    else        
+        opts_h.rho_iguess        = 'WG';                        
+        optsPhys.thetaDirection  = 1;
+    end
+    optsPhys.rho_iguess      = FMT_1D(HS,IntMatrFex_2D,opts_h,FexNum,Conv,false);    
+   
+    
     %****************************************************************
     %**************** Solve for equilibrium 1D condition   **********
     %****************************************************************        
@@ -110,9 +116,9 @@
     fprintf(1,'Computing continuation ...');    
        
     if(strcmp(parCont,'mu'))
-         x_cont  = IterativeContinuation(@f,NComps,0.01,[par_start;y0],optsPhys,@US_ScalarProduct,@X_to_rho);
+         x_cont  = IterativeContinuation(@f,NComps,optsPhys.thetaDirection*0.01,[par_start;y0],optsPhys,@US_ScalarProduct,@X_to_rho);
     elseif(strcmp(parCont,'epw'))
-        x_cont  = IterativeContinuation(@f_epw,NComps,0.01,[par_start;y0],optsPhys,@US_ScalarProduct);
+        x_cont  = IterativeContinuation(@f_epw,NComps,optsPhys.thetaDirection*0.01,[par_start;y0],optsPhys,@US_ScalarProduct);
     end    
     
     %x_cont = BasicContinutation(@f,mu,y0);
@@ -366,13 +372,22 @@
             % - (mu - mu_sat) Delta(n) = (n(0,h) - n(0,infty)) - int( (n(z,h)  - n(z,infty))*dVext/dz  ,zt = 0 ... infty)
             optss              = optsPhys;
             optss.Dmu          = par_h(j)- mu_sat;
-            optss.rho_iguess   = 'WL';
-            [rho_wl,postParms] = FMT_1D(HS,IntMatrFex_2D,optss,FexNum,Conv,false);
+            
+            %Decide whether its wetting or drying    
+            if(strcmp(optsPhys.drying,'drying'))
+                optss.rho_iguess   = 'WG';
+                deltaRho           = -(rhoLiq_eq-rhoGas_eq);
+            else
+                optss.rho_iguess   = 'WL';
+                deltaRho           = (rhoLiq_eq-rhoGas_eq);
+            end
+            
+            [rho_l_inf,postParms] = FMT_1D(HS,IntMatrFex_2D,optss,FexNum,Conv,false);
 
             %optss.rho_iguess  = 'WG';
             %[rho_wg,postParms] = FMT_1D(HS,IntMatrFex_2D,optss,FexNum,Conv,false);                        
 
-            res.dmuCheck(j) = -(kBT*(rho_i(1) - rho_wl(1)) - Int_1D*( (rho_i - rho_wl).*dVAdd.dy2))/(rhoLiq_eq-rhoGas_eq);
+            res.dmuCheck(j) = -(kBT*(rho_i(1) - rho_l_inf(1)) - Int_1D*( (rho_i - rho_l_inf).*dVAdd.dy2))/deltaRho;
           %  end
         end   
      end

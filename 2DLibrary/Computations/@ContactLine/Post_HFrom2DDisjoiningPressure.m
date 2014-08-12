@@ -1,6 +1,5 @@
 function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
 
-    global dirData
     %*************************************
     %Initialization
     y1   = this.y1;
@@ -11,6 +10,13 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
     rhoGas_sat     = this.optsPhys.rhoGas_sat;
     planarDisjoiningPressure = -(this.AdsorptionIsotherm_Mu-mu_sat)*(rhoLiq_sat-rhoGas_sat);
     %*************************************
+    
+    if(this.optsNum.PhysArea.alpha_deg > 90)
+        drying = true;
+        DP     = flip(DP,1);
+    else 
+        drying = false;
+    end
     
     %solves Eq. (17) from Henderson (2010)    
     %sets ell_2DDisjoiningPressure
@@ -26,9 +32,13 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
         h           = y1(i) - y1(i-1);
         vh([i-1,i]) = vh([i-1,i]) + h/2;
         IntMY1(i,:)   = vh;
+    end        
+    
+	hP   = -tan(asin(IntMY1*DP/ST));
+	h_2D = fsolve(@f3,zeros(size(y1)));      
+    if(drying)
+        h_2D     = flip(h_2D,1);
     end
-    hP = -tan(asin(IntMY1*DP/ST));
-    h_2D = fsolve(@f3,zeros(size(y1)));      
     this.ell_2DDisjoiningPressure   = h_2D;
     
     
@@ -39,7 +49,7 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
     %a) Compute Interface Potential from Disjoining Pressure
     
     %Film thickness   
-    fT = this.AdsorptionIsotherm_FT;
+    fT   = this.AdsorptionIsotherm_FT;
 	IntM = zeros(length(fT));
 	vh   = zeros(1,length(fT));
     for i = 2:length(fT)        
@@ -47,6 +57,9 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
         h           = fT(i) - fT(i-1);
         vh([i-1,i]) = vh([i-1,i]) + h/2;
         IntM(i,:)   = vh;
+    end    
+    if(drying)
+        fT = -fT;
     end
     
     %Interface Potential
@@ -70,8 +83,8 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
         z = (x+1)/2*L -L+max(y1);
     end
     DPhys.Dx  = CompDiff.Dx*(2/L);    
-    ST_LG = this.ST_1D.om_LiqGas;
-    h  = fsolve(@f6,hmax*ones(size(z)));%exp(-z));%ell_h);
+    ST_LG     = this.ST_1D.om_LiqGas;
+    h         = fsolve(@f6,hmax*ones(size(z)));%exp(-z));%ell_h);
     
     %this.ell_1DDisjoiningPressure   = h; 
     
@@ -100,19 +113,19 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
 	%**********************
     %this.optsNum.PlotArea.y1Min = min(this.y1);
 	%this.optsNum.PlotArea.y1Max = max(this.y1);
-    this.optsNum.PlotArea.y1Min = -5;%min(this.y1);
-	this.optsNum.PlotArea.y1Max = 30;%max(this.y1);
-    this.optsNum.PlotArea.y2Min = 0.5;
-    this.optsNum.PlotArea.y2Max = 25.5;%max(this.filmThickness)+2;
+    %this.optsNum.PlotArea.y1Min = -5;%min(this.y1);
+	%this.optsNum.PlotArea.y1Max = 30;%max(this.y1);
+    %this.optsNum.PlotArea.y2Min = 0.5;
+    %this.optsNum.PlotArea.y2Max = 25.5;%max(this.filmThickness)+2;
         
-	this.optsNum.PlotArea.N1    = 130;
-	this.optsNum.PlotArea.N2    = 130;
+	%this.optsNum.PlotArea.N1    = 130;
+	%this.optsNum.PlotArea.N2    = 130;
     
-	InitInterpolation(this,true);
+	%InitInterpolation(this,true);
     
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
 	rhoGas_sat    = this.optsPhys.rhoGas_sat;
-    h0 = min(this.filmThickness);
+    h0            = min(abs(this.filmThickness));
     
     ratio_y_x =  (this.optsNum.PlotArea.y2Max- this.optsNum.PlotArea.y2Min)/...
                     (this.optsNum.PlotArea.y1Max- this.optsNum.PlotArea.y1Min);
@@ -216,22 +229,21 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
         y(end) = h(end) - hmax;
     end
 
-
     function dP1D = disjoiningPressure1D(ell) 
         
-        ellAD = min(this.AdsorptionIsotherm_FT)+ell;
-        IP    = barychebevalMatrix(this.AdsorptionIsotherm_FT,ellAD);
+        ellAD = min(fT)+ell;
+        IP    = barychebevalMatrix(fT,ellAD);
         dP1D  = IP*planarDisjoiningPressure;
-        dP1D(ellAD<min(this.AdsorptionIsotherm_FT)) = 0;
-        dP1D(ellAD>max(this.AdsorptionIsotherm_FT)) = 0;
+        dP1D(ellAD<min(fT)) = 0;
+        dP1D(ellAD>max(fT)) = 0;
     end
 
     function dP1D = interfacePotential(ell) 
         
-        ellAD = min(this.AdsorptionIsotherm_FT)+ell;
-        IP    = barychebevalMatrix(this.AdsorptionIsotherm_FT,ellAD);
+        ellAD = min(fT)+ell;
+        IP    = barychebevalMatrix(fT,ellAD);
         dP1D  = IP*IntPot;
-        dP1D(ellAD<min(this.AdsorptionIsotherm_FT)) = 0;
+        dP1D(ellAD<min(fT)) = 0;
      %   dP1D(ellAD>max(this.AdsorptionIsotherm_FT)) = 0;
     end
 
