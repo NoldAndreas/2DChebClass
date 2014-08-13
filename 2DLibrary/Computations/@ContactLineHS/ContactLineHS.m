@@ -2,8 +2,7 @@ classdef ContactLineHS < DDFT_2D
     
     properties (Access = public)                   
         configName
-        
-        %Computational Results:
+                
         %(1) 1D Results
         rho1D_lg,rho1D_wl,rho1D_wg,alpha_YCA  
         ST_1D  %1D surface tensions
@@ -17,8 +16,9 @@ classdef ContactLineHS < DDFT_2D
         filmThickness = [],IsolineInterface = []
         ell_2DDisjoiningPressure=[]
                
-        AdsorptionIsotherm_FT,AdsorptionIsotherm_Mu,AdsorptionIsotherm_rho,AdsorptionIsotherm_OmEx,AdsorptionIsotherm_dmuCheck,AdsorptionIsotherm_Coeff
-        AdsorptionIsotherm_Pts
+        %structure with information of the adsorption isotherm        
+        AdsorptionIsotherm 
+        
         grandPot,grandPot2
         disjoiningPressure,disjoiningPressureCheck
         
@@ -29,7 +29,8 @@ classdef ContactLineHS < DDFT_2D
     end
     
     methods (Access = public)          
-        function this = ContactLineHS(configuration)
+        function this = ContactLineHS(configuration)             
+             configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';
              this@DDFT_2D(configuration);
             
              global dirData
@@ -44,15 +45,20 @@ classdef ContactLineHS < DDFT_2D
                                                     
         end                
         
+        %Preprocessing and testing of results
         function Preprocess(this)
+            global dirDataOrg
+            ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
             Preprocess@DDFT_2D(this);     
-            TestPreprocess(this);
+            TestPreprocess(this);        
+            
+            %
+            ComputeST(this);
         end        
         function TestPreprocess(this)                          
             
              M = this.IDC.M;
-             R = this.IDC.R;
-             GotoSubDir(this);
+             R = this.IDC.R;             
                                     
              %(3.1) Test Convolution at infinity
              fMF       = str2func(this.optsPhys.V2.V2DV2);
@@ -98,9 +104,8 @@ classdef ContactLineHS < DDFT_2D
             PrintErrorPos(Inth*testF-a^2*pi/2,['Integration of exp(-(r/',num2str(a),')^2)']);
                                     
         end         
-        
-        ComputeAdsorptionIsotherm(this,n)    
-        
+                
+        %1D surface tensions
         function [om,rho1D] = Compute1D(this,WLWGLG)
             rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
             rhoGas_sat       = this.optsPhys.rhoGas_sat;
@@ -133,9 +138,7 @@ classdef ContactLineHS < DDFT_2D
             om  = params.Fex;                                  
             fprintf(['Surface tension ',WLWGLG,' = ',num2str(om),'\n']);
         end                
-        function alpha_YCA = ComputeST(this)
-            
-            GotoSubDir(this);            
+        function alpha_YCA = ComputeST(this)                        
             
             Compute1D(this,'WL');            
             Compute1D(this,'WG');
@@ -149,10 +152,7 @@ classdef ContactLineHS < DDFT_2D
             this.alpha_YCA = alpha_YCA;
         end        
         
-        function GotoSubDir(this)
-            global dirDataOrg
-            ChangeDirData([dirDataOrg filesep 'deg',num2str(this.IDC.alpha*180/pi,3)]);
-        end        
+        % Initialization
         function InitInterpolation(this,Nodefault,PlotArea)
             
             if((nargin == 1) || ~Nodefault)
@@ -173,7 +173,7 @@ classdef ContactLineHS < DDFT_2D
                                       'N1',100,'N2',100);        
                 end    
                 this.optsNum.PlotArea = PlotArea;
-                this.HS.InterpolationPlotCart(PlotArea,true);
+                this.IDC.InterpolationPlotCart(PlotArea,true);
             else
                 if(nargin > 2)
                     if(~isfield(this.optsNum,'PlotArea') || ~isequal(this.optsNum.PlotArea,PlotArea))
@@ -190,14 +190,35 @@ classdef ContactLineHS < DDFT_2D
             this.optsPhys.V1.epsilon_w = epw;
             PtsCart                    = this.HS.GetCartPts();
             this.VAdd                  = getVAdd(PtsCart.y1_kv,PtsCart.y2_kv,0,this.optsPhys.V1);
-        end
+        end       
+        function InitAnalysisGrid(this,y1Int,y2Int)
+            if(~isempty(y1Int))
+                [this.y1,this.Int_y1,this.DiffY1,this.DiffYY1] = InitAnalysisGridY(this,y1Int,100,'CHEB');        
+            end
+            if(~isempty(y2Int))
+                [this.y2,this.Int_y2,this.DiffY2] = InitAnalysisGridY(this,y2Int,100);                      
+            end
+        end        
         
-        sol = Compute(this)
-        %ComputeEquilibrium(this,redo)
+        %Plot functions
+        [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFigs)
+        PlotDisjoiningPressureAnalysis(this)    
+        PlotInterfaceAnalysisY1(this)
+        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
+        
+        PlotDensitySlices(this);
+        PlotDensitySlicesMovie(this);       
+        
+        %Adsorption Isotherm
+        ComputeAdsorptionIsotherm(this,n,drying)
+        FittingAdsorptionIsotherm(this,FT_Int,n)
+        SumRule_AdsorptionIsotherm(this,ST_LG)
+        
+        %Compute functions                
+        sol = Compute(this)        
         ComputeDynamics(this)        
                         
-        %Postprocess functions
-        InitAnalysisGrid(this,y1Int,y2Int)
+        %Postprocess functions        
         [f,y1]   = PostProcess(this,y1Int)
         PostProcess_2DDisjoiningPressure(this,y1Int)
         PostProcess_FilmThickness(this,y1Int)
@@ -205,16 +226,8 @@ classdef ContactLineHS < DDFT_2D
         [y2Cart]          = ComputeInterfaceContour(this,level)
         [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
-        FittingAdsorptionIsotherm(this,FT_Int,n)
         
-        [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFigs)
-        PlotDisjoiningPressureAnalysis(this)    
-        PlotInterfaceAnalysisY1(this)
-        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
-        
-        PlotDensitySlices(this);
-        PlotDensitySlicesMovie(this);
-                
+                        
         I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
         SumRule_DisjoiningPotential(this,ST_LG)
         

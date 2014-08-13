@@ -1,10 +1,8 @@
 function Job_ComputeExactAdsorptionIsotherm()
 
     AddPaths();   
-    global dirData
-    
+    global dirData    
     ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
-    %FMT_CLEq_BH_40X40_epw
 
     PhysArea = struct('N',[1,250],...
                       'L1',5,'L2',4,'L2_AD',4.,...
@@ -12,14 +10,14 @@ function Job_ComputeExactAdsorptionIsotherm()
                       'N2bound',24,'h',1,...
                       'alpha_deg',90);
 
-    PhysArea.Conv  = struct('L',1,'L2',[],'N',[34,34]);
+    V2Num   = struct('Fex','SplitDisk','L',1,'L2',[],'N',[34,34]);
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
-%   Fex_Num   = struct('Fex','CarnahanStarling');
  
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',Fex_Num,...
+                     'V2Num',V2Num,...
                      'maxComp_y2',-1,...
                      'y1Shift',0);
 
@@ -33,13 +31,14 @@ function Job_ComputeExactAdsorptionIsotherm()
 
     config = v2struct(optsNum,optsPhys);                        
     
-    %***********************************************************
-    %Check convergence of surface tensions and errors of conact density
     
     config.optsPhys.V1.epsilon_w = 0.7;%1.25;%375;%25; %375;%47;%1.25;
     
-    CL = ContactLine(config); %CL with normal high resolution
-	CL.Preprocess();     
+    CL = ContactLineHS(config);
+	CL.Preprocess();    
     CL.ComputeAdsorptionIsotherm(300,'drying');    
     CL.FittingAdsorptionIsotherm([10 14],1)
+    if(optsPhys.kBT == 0.75)
+        CL.SumRule_AdsorptionIsotherm(0.3463);
+    end
 end

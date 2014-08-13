@@ -1,13 +1,15 @@
 function FittingAdsorptionIsotherm(this,FT_Int,n)
 
     global dirData
+    
+    absFT = abs(this.AdsorptionIsotherm.FT);
 
     LogPlotInt = [5 FT_Int(2)];
     
-    mark = ((this.AdsorptionIsotherm_FT <= FT_Int(2)) & (this.AdsorptionIsotherm_FT >= FT_Int(1))); %choose range
+    mark = ((absFT <= FT_Int(2)) & (absFT >= FT_Int(1))); %choose range
     
-    ft = this.AdsorptionIsotherm_FT(mark);
-    mu = this.AdsorptionIsotherm_Mu(mark)- this.optsPhys.mu_sat;    
+    ft = absFT(mark);
+    mu = this.AdsorptionIsotherm.mu(mark)- this.optsPhys.mu_sat;    
             
     X = zeros(length(ft),n);
     
@@ -16,9 +18,8 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     end
         
     a = (X'*X)\(X'*mu);
-    this.AdsorptionIsotherm_Coeff = a;
-    a
-    
+    this.AdsorptionIsotherm.Coeff = a;        
+    disp(['coefficient = ',num2str(a)]);
     
     fft = LogPlotInt(1) + (0:0.01:1)'*(LogPlotInt(2)-LogPlotInt(1));
     fftX = zeros(length(fft),n);
@@ -31,27 +32,28 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     %Plot result
     f1 = figure('Color','white','Position',[0 0 800 800]);
     
-    plot(this.AdsorptionIsotherm_Mu- this.optsPhys.mu_sat,...
-                    this.AdsorptionIsotherm_FT,'k','linewidth',1.5); hold on;    
-	plot(this.AdsorptionIsotherm_dmuCheck,...
-                    this.AdsorptionIsotherm_FT,'k:','linewidth',1.5); hold on;    
-	plot([0 0],[0 max(this.AdsorptionIsotherm_FT)],'k--','linewidth',1.5);
+    plot(this.AdsorptionIsotherm.mu- this.optsPhys.mu_sat,...
+                    absFT,'k','linewidth',1.5); hold on;    
+	plot(this.AdsorptionIsotherm.dmuCheck,...
+                    absFT,'k:','linewidth',1.5); hold on;    
+	plot([0 0],[0 max(absFT)],'k--','linewidth',1.5);
     set(gca,'fontsize',20);
     xlabel('$\Delta \mu/\varepsilon$','Interpreter','Latex','fontsize',25);
     ylabel('$\ell/\sigma$','Interpreter','Latex','fontsize',25);    
-    ylim([0 max(this.AdsorptionIsotherm_FT)]);
+    ylim([0 max(absFT)]);    
     ylim([0 15]);
-    xlim([-0.02 0.1]);
+    xlim([min(this.AdsorptionIsotherm.dmuCheck)-0.02,max(this.AdsorptionIsotherm.dmuCheck)+0.02]);
+    %xlim([-0.02 0.1]);
     
     f2 = figure('Color','white','Position',[0 0 800 800]); 
     set(gca,'YTickMode','manual')
-    y = (abs(this.AdsorptionIsotherm_Mu - this.optsPhys.mu_sat));
+    y = (abs(this.AdsorptionIsotherm.mu - this.optsPhys.mu_sat));
     
-    markk = (this.AdsorptionIsotherm_FT < LogPlotInt(2)) & (this.AdsorptionIsotherm_FT > LogPlotInt(1)); 
-    loglog((this.AdsorptionIsotherm_FT(markk)),y(markk),'ko');  hold on;
+    markk = (absFT < LogPlotInt(2)) & (absFT > LogPlotInt(1)); 
+    loglog((absFT(markk)),y(markk),'ko');  hold on;
         
-    loglog(this.AdsorptionIsotherm_FT(markk),...
-                abs(this.AdsorptionIsotherm_dmuCheck(markk)),'k:','linewidth',1.5); hold on;    	
+    loglog(absFT(markk),...
+                abs(this.AdsorptionIsotherm.dmuCheck(markk)),'k:','linewidth',1.5); hold on;    	
     
     hold on;
     loglog((fft),(abs(mufft)),'k--','linewidth',1.5);
@@ -67,11 +69,21 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     set(gca, 'YTickLabel', num2str(get(gca, 'YTick').'));
     set(gca,'fontsize',20);
     
-    inset2(f1,f2,0.45,[0.5,0.5]);
+    if(min(this.AdsorptionIsotherm.FT)<0)
+        inset2(f1,f2,0.45,[0.35,0.5]);
+    else
+        inset2(f1,f2,0.45,[0.5,0.5]);
+    end
     close(f2);            
+        
+    folder = [dirData filesep 'EquilibriumSolutions'];    
+    if(~exist(folder,'dir'))
+                disp('Folder not found. Creating new path..');            
+                mkdir(folder);
+	end
     
-    print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_AdsorptionIsotherm'],f1);
-    saveas(f1,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_AdsorptionIsotherm.fig']);
+    print2eps([folder filesep this.FilenameEq 'AdsorptionIsotherm'],f1);
+    saveas(f1,[folder filesep this.FilenameEq 'AdsorptionIsotherm.fig']);
   
     
 end
