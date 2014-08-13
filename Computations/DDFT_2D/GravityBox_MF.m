@@ -1,11 +1,15 @@
- function EX = Test_DDFT_DiffusionBox_MF()
+ function EX = GravityBox_MF(theta)
 
+    if(nargin==0)
+        theta = 0;
+    end
+ 
     Phys_Area = struct('shape','Box','N',[20;20], ...
                        'y1Min',0,'y1Max',10,...
-                       'y2Min',0,'y2Max',10);
+                       'y2Min',0,'y2Max',20);
     
     Plot_Area = struct('y1Min',0,'y1Max',10,'N1',100,...
-                       'y2Min',0,'y2Max',10,'N2',100);
+                       'y2Min',0,'y2Max',20,'N2',100);
                    
     FexNum = struct('Fex','Meanfield','N',[20,20],'L',1);
     
@@ -14,31 +18,17 @@
                      'V2Num',FexNum,...                     
                      'plotTimes',0:7/100:7);
 
-    epsilonS=2*[ 1 1 1 ;
-                 1 1 1 ;
-                 1 1 1 ] ;
+    epsilonS = 0;
 
-    alpha1 = 0.5;
-    alpha2 = 1;
-    alpha3 = 1.5;
-
-    alpha12=(alpha1+alpha2)/2;
-    alpha13=(alpha1+alpha3)/2;
-    alpha23=(alpha2+alpha3)/2;
-
-    alphaS=[alpha1  alpha12 alpha13 ; 
-            alpha12 alpha2  alpha23 ;
-            alpha13 alpha23 alpha3  ];
+    alphaS = 1;    
         
-        
-    V1       = struct('V1DV1','V1_Test_Box',...
-                      'V0',2,'y10',7,'y20',6,'tau',10); 
+    V1       = struct('V1DV1','gravity','g',1,'theta',theta); 
                            
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
     
-    optsPhys = struct('V1',V1,'V2',V2,...
+    optsPhys = struct('Inertial',false,'V1',V1,'V2',V2,...
                       'kBT',1,'mS',1,'gammaS',1, ...
-                      'nParticlesS',[20;20;20]); 
+                      'nParticlesS',20); 
 
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);

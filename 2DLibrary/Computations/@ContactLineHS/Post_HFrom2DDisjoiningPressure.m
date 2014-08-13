@@ -108,7 +108,7 @@ function [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)
 	this.optsNum.PlotArea.N1    = 130;
 	this.optsNum.PlotArea.N2    = 130;
     
-	InitInterpolation(this,true);
+	InitInterpolation(this);
     
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
 	rhoGas_sat    = this.optsPhys.rhoGas_sat;

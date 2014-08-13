@@ -1,4 +1,4 @@
-function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(doHI)
+function EX = Test_DDFT_DiffusionInfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = true;
@@ -44,15 +44,8 @@ function [output,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionInfSpace_FMT(do
     end
                   
     optsPlot.doDDFTPlots=true;
-
-    config = v2struct(optsPhys,optsNum);
     
-    AddPaths();
-    EX     = DDFT_2D(config);
-    EX.Preprocess();
-    EX.ComputeEquilibrium();
-    EX.ComputeDynamics();    
-    EX.PlotDynamics();
+    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
 
 end                 
 

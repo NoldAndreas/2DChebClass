@@ -23,7 +23,7 @@ function [error,ind] = PrintErrorPos(error,text,Pts1,Pts2)
 
     [error,ind] = max(abs(error));
     fprintf(['Error of ',text,': ']);
-    str2 = num2str(error,'%10.2e');
+    str2 = num2str(error,'%10.2e');     
   
      if(error > 10^-1)
          cprintf('*red',str2);
@@ -31,7 +31,8 @@ function [error,ind] = PrintErrorPos(error,text,Pts1,Pts2)
          cprintf('*blue',str2);
      else
          cprintf('*magenta',str2);
-     end                
+     end
+     pause(0.01) %this is because otherwise, the colors are mixed (I dont know why, but this seems to do the job).
      if(nargin == 3)         
          if(isstruct(Pts1))
             fprintf([' , max at (y1,y2) = (',num2str(Pts1.y1_kv(ind)),...
@@ -43,7 +44,8 @@ function [error,ind] = PrintErrorPos(error,text,Pts1,Pts2)
          fprintf([' , max at (y1,y2) = (',num2str(Pts1(ind)),...
                                  ' , ',num2str(Pts2(ind)),')\n']);    
      else
-         fprintf('.\n');
+         fprintf('.');
+         fprintf('\n');
      end
 
 end

@@ -15,7 +15,7 @@ function PlotDensitySlices(this)
     this.optsNum.PlotArea = struct('y1Min',y1Min,'y1Max',y1Max,...
                                    'y2Min',0.5,'y2Max',y2Max,...
                                    'N1',100,'N2',100);
-    InitInterpolation(this,true);
+    InitInterpolation(this);
 
     str = {'r','b','m','g','c'};
     

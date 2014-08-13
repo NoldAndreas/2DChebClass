@@ -13,7 +13,7 @@ function PlotDensitySlicesMovie(this)
     this.optsNum.PlotArea = struct('y1Min',y1Min,'y1Max',y1Max,...
                                    'y2Min',0.5,'y2Max',y2Max,...
                                    'N1',100,'N2',100);
-    InitInterpolation(this,true);
+    InitInterpolation(this);
 
 
     k = 1; fileNames = [];

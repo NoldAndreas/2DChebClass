@@ -1,7 +1,10 @@
-function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function EX = Test_DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
 
-    if(nargin==0)
-        doHI = false;
+    if(nargin<1)
+        doHI     = false;
+        doHIWall = false
+    elseif(nargin<2)
+        doHIWall = false;
     end
 
     Phys_Area = struct('shape','HalfSpace_FMT','N',[20;20],'L1',2,'L2',2, ...
@@ -30,15 +33,22 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
                       'V0',0.01,'V0add',3,'tau',0.1,'sigma1Add',0.5,'sigma2Add',0.5, ...
                       'y10',-1,'y20',1.5,'y11',1,'y21',2,'y12',0,'y22',2.5); 
 
-    HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
+    HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS,'wallPos',Phys_Area.y2wall);
     
     optsPhys = struct('V1',V1,  ...                                            
                       'kBT',1,'mS',1,'gammaS',1, ...
                       'nParticlesS',20,'sigmaS',sigmaS);
 
-    if(doHI)
+    if(doHI || doHIWall)
         optsPhys.HI = HI;
+    end
+    
+    if(doHI)
         optsNum.HINum = HI_Num;
+    end
+    
+    if(doHIWall)
+        optsNum.HINum.Wall = 'DiffusionCoefficientWall';
     end
                   
     optsPlot.doDDFTPlots=true;

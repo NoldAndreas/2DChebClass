@@ -210,9 +210,9 @@ classdef ContactLine < handle
             global dirDataOrg
             ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
         end        
-        function InitInterpolation(this,Nodefault,PlotArea)
+        function InitInterpolation(this,PlotArea)
             
-            if((nargin == 1) || ( (nargin == 2) && ~Nodefault))
+            if((nargin == 1) || ( (ischar(PlotArea) == 2) && strcmp(PlotArea,'newDefault')))
                 if(abs(this.optsNum.PhysArea.alpha_deg - 90) < 20)
                     PlotArea = struct('y1Min',-5,'y1Max',5,'y2Min',0.5,'y2Max',10,'N1',80,'N2',80);
                     %PlotArea = struct('y1Min',-8,'y1Max',8,...

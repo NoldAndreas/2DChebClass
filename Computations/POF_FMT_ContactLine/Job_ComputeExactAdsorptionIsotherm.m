@@ -1,7 +1,7 @@
 function Job_ComputeExactAdsorptionIsotherm()
 
+    AddPaths();   
     global dirData
-    AddPaths();    
     
     ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
     %FMT_CLEq_BH_40X40_epw

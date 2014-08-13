@@ -6,6 +6,7 @@ classdef DDFT_2D < handle
         IDC,subArea
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
+        DWall      % modification tensor for D0 in presence of wall
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions
         Int_of_path
         IP
@@ -15,7 +16,7 @@ classdef DDFT_2D < handle
         x_eq,mu
         dynamicsResult
         
-        doHI,doSubArea,do2Phase
+        doHI,doHIWall,doSubArea,do2Phase
     end
     
     methods (Access = public)          
@@ -178,7 +179,7 @@ classdef DDFT_2D < handle
             optsNum  = this.optsNum;
             optsPhys = this.optsPhys;
             
-            if(isfield(optsNum,'HINum') && ~isempty(optsNum.HINum))
+            if(isfield(optsNum,'HINum') && isfield(optsNum.HINum,'HI11'))
                 this.doHI = true;
             else
                 this.doHI = false;
@@ -193,7 +194,7 @@ classdef DDFT_2D < handle
                 paramsHI.optsNum.Polar     = 'cart';
                 paramsHI.optsPhys.nSpecies = this.optsPhys.nSpecies;
                 if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
-                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);      
+                    this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices_HalfSpace,paramsHI,this.IDC);%,true);
                 else
                     this.IntMatrHI     = DataStorage(['HIData' filesep class(this.IDC)],@HIMatrices2D,paramsHI,this.IDC);      
                 end
@@ -201,6 +202,27 @@ classdef DDFT_2D < handle
                 t_HI = toc;
                 display(['HI computation time (sec): ', num2str(t_HI)]); 
             end
+            
+            if(isfield(optsNum,'HINum') && isfield(optsNum.HINum,'Wall'))
+                this.doHIWall = true;
+            else
+                this.doHIWall = false;
+            end
+            
+            PtsCart  = this.IDC.GetCartPts();
+            if(this.doHIWall)
+                if(optsPhys.nSpecies>1)
+                    error('HI with wall only implemented for one species');
+                end
+                tic;
+                wallHIfn = str2func(optsNum.HINum.Wall);
+                this.DWall = wallHIfn(PtsCart.y1_kv,PtsCart.y2_kv,optsPhys.HI);
+                t_HIWall = toc;
+                display(['HI wall computation time (sec): ', num2str(t_HIWall)]);
+            else
+                this.DWall = ones(size([PtsCart.y1_kv;PtsCart.y2_kv]));
+            end
+            
         end
         function Preprocess_ExternalPotential(this)
             PtsCart  = this.IDC.GetCartPts();            

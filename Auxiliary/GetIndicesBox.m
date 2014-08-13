@@ -35,6 +35,9 @@ function I  = GetIndicesBox(this)
         finite = ( (leftFinite & left) | (rightFinite & right) ...
                    | (topFinite & top) | (bottomFinite & bottom) );
         
+        finite1 = ( (leftFinite & left) | (rightFinite & right) );
+        finite2 = ( (topFinite & top) | (bottomFinite & bottom) );
+               
         infinite = ( (~leftFinite & left) | (~rightFinite & right) ...
                    | (~topFinite & top) | (~bottomFinite & bottom) );
                               
@@ -56,6 +59,10 @@ function I  = GetIndicesBox(this)
         
         normalFinite = sparse( [(leftFinite*nx1Left(finite,:) + rightFinite*nx1Right(finite,:)) ...
                         (topFinite*nx2Top(finite,:) + bottomFinite*nx2Bottom(finite,:))] );
+                    
+        normalFinite1 = sparse( (leftFinite*nx1Left(finite1,:) + rightFinite*nx1Right(finite1,:)) );
+        normalFinite2 = sparse( (topFinite*nx2Top(finite2,:) + bottomFinite*nx2Bottom(finite2,:)) );
+                    
         normalInfinite = sparse( [((~leftFinite)*nx1Left(infinite,:) + (~rightFinite)*nx1Right(infinite,:)) ...
                         ((~topFinite)*nx2Top(infinite,:) + (~bottomFinite)*nx2Bottom(infinite,:))] );
         
@@ -68,6 +75,8 @@ function I  = GetIndicesBox(this)
             'normal',sparse( [(nx1Left(bound,:)+nx1Right(bound,:)) (nx2Top(bound,:) + nx2Bottom(bound,:))] ),...
             'corners',corners, ...
             'finite',finite,'infinite',infinite, ...
-            'normalFinite',normalFinite,'normalInfinite',normalInfinite);
+            'normalFinite',normalFinite,'normalInfinite',normalInfinite,...
+            'finite1',finite1,'finite2',finite2,...
+            'normalFinite1',normalFinite1,'normalFinite2',normalFinite2);
         
     end

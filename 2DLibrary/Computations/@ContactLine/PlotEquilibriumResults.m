@@ -19,7 +19,7 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         PlotArea.N1    = 100;
         PlotArea.N2    = 100;
         
-        InitInterpolation(this,true,PlotArea);
+        InitInterpolation(this,PlotArea);
     elseif(isempty(this.HS.Interp))
         InitInterpolation(this);
     end

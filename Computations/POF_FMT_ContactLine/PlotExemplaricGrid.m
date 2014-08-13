@@ -45,7 +45,7 @@ function PlotExemplaricGrid()
     
     f1 = figure('color','white','Position',[0 0 800 500]);            
         
-    CLT.InitInterpolation(true);
+    CLT.InitInterpolation();
         
 	optDetails.y2CartShift = -0.5;
     optDetails.clabel      = false;  

@@ -1,4 +1,4 @@
-function Test_DDFT_DiffusionDisc_MF()
+function EX = Test_DDFT_DiffusionDisc_MF()
 
     Phys_Area = struct('shape','Disc','N',[20;20],'R',4);
     
@@ -48,13 +48,7 @@ function Test_DDFT_DiffusionDisc_MF()
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    
-    AddPaths();
-    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
-    EX.Preprocess();
-    EX.ComputeEquilibrium();
-    EX.ComputeDynamics();
-    EX.PlotDynamics();
+    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
     
 end                 
 

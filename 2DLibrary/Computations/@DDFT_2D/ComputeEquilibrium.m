@@ -18,9 +18,19 @@
     if(isfield(opts.optsPhys,'gamma'))
         opts.optsPhys    = rmfield(opts.optsPhys,'gamma');
     end
+    if(isfield(opts.optsPhys,'gammaS'))
+        opts.optsPhys    = rmfield(opts.optsPhys,'gammaS');
+    end
+    if(isfield(opts.optsPhys,'D0'))
+        opts.optsPhys    = rmfield(opts.optsPhys,'D0');
+    end
     if(isfield(opts.optsPhys,'Inertial'))
         opts.optsPhys    = rmfield(opts.optsPhys,'Inertial');
     end    
+    if(isfield(opts.optsPhys,'HI'))
+        opts.optsPhys    = rmfield(opts.optsPhys,'HI');
+    end
+
     if(isfield(opts.optsPhys.V1,'epsilon_w_end'))
         opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'epsilon_w_end');
     elseif(isfield(opts.optsPhys.V1,'epsilon_w_Amplitude'))
@@ -31,7 +41,7 @@
     if(isfield(opts.optsPhys.V1,'tau'))
         opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'tau');
     end
-
+    
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
 %    opts.Comments    = this.configName;    
     %mark             = (PtsCart.y2_kv <= this.optsNum.maxComp_y2);     

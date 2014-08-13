@@ -1,4 +1,4 @@
-function Test_DDFT_DiffusionHalfSpace_FMT(doHI)
+function EX = Test_DDFT_DiffusionHalfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -41,13 +41,7 @@ function Test_DDFT_DiffusionHalfSpace_FMT(doHI)
     end
                   
     optsPlot.doDDFTPlots=true;
-
     
-    AddPaths();
-    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
-    EX.Preprocess();
-    EX.ComputeEquilibrium();
-    EX.ComputeDynamics();
-    EX.PlotDynamics();    
+    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
     
 end                 

@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function EX = Test_DDFT_InertiaHalfSpace_FMT_Triangle(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -16,7 +16,8 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D');  
     
-    tMax = 0.15;
+    %tMax = 0.15;
+    tMax = 1;
     
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
@@ -32,8 +33,8 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
 
     HI       = struct('sigmaS',sigmaS,'sigmaHS',sigmaHS);
     
-    optsPhys = struct('V1',V1,  ...                                            
-                      'kBT',1,'mS',1,'gammaS',1, ...
+    optsPhys = struct('Inertial',true,'V1',V1,  ...                                            
+                      'kBT',1,'mS',1,'gammaS',5, ...
                       'nParticlesS',20,'sigmaS',sigmaS);
 
     if(doHI)

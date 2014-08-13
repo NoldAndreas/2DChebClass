@@ -69,7 +69,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     PtsADCart = HS.AD.GetCartPts();
     Int_1D_AD(PtsADCart.y2_kv(mark)>y2MaxInt) = 0;
     if(~MinimalOutput)
-        cprintf('-red',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);
+        cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);
     end
         
     %****************************************************************

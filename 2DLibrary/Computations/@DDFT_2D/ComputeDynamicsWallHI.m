@@ -1,4 +1,4 @@
-function ComputeDynamics(this,x_ic,mu)
+function ComputeDynamicsWallHI(this,x_ic,mu)
 
 %% Solves
 % 
@@ -20,6 +20,7 @@ function ComputeDynamics(this,x_ic,mu)
         R       = [];
     end
     D0          = optsPhys.D0;
+    DWall       = this.DWall;
     Diff        = this.IDC.Diff;
     plotTimes   = this.optsNum.plotTimes;
     nSpecies    = this.optsPhys.nSpecies;
@@ -33,6 +34,7 @@ function ComputeDynamics(this,x_ic,mu)
     Ind         = this.IDC.Ind;        
     getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
     doHI        = this.doHI;
+    doHIWall    = this.doHIWall;
     
     markVinf    = (Vext == inf);
     if(strcmp(this.IDC.polar,'polar'))
@@ -116,8 +118,9 @@ function ComputeDynamics(this,x_ic,mu)
         h_s      = Diff.grad*x - Vext_grad;        
         h_s([markVinf;markVinf]) = 0;
         
-        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
-        %dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
+        DgradMu_s = DWall.*(Diff.grad*mu_s);
+        
+        dxdt     = kBT*Diff.div*DgradMu_s + eyes*(h_s.*DgradMu_s);  
         
         if(doHI)
             rho_s    = exp((x-Vext)/kBT);
@@ -127,7 +130,7 @@ function ComputeDynamics(this,x_ic,mu)
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        flux_dir               = Diff.grad*mu_s;
+        flux_dir               = DgradMu_s;
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
@@ -161,11 +164,7 @@ function ComputeDynamics(this,x_ic,mu)
         mu_s  = GetExcessChemPotential(x,t,mu); 
         gradMu_s = Diff.grad*mu_s;
         HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
-        flux  = -rho_s.*(gradMu_s + HI_s);
-        if(polarShape)
-            %then transform to cartesian corrdinates
-            flux = GetCartesianFromPolarFlux(flux,ythS);
-        end
+        flux  = -rho_s.*(gradMu_s + HI_s);                                  
     end
 
 end

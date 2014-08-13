@@ -77,6 +77,8 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
             
             infBoundary = any(~isfinite(this.Pts.y1_kv));
             finite   = (~infBoundary & outR) | inR;
+            finite1  = finite;
+            finite2  = false(size(x_kv));
             infinite =  infBoundary & outR;
             
             Z                   = zeros(this.N1*this.N2);        
@@ -84,12 +86,15 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
             nRin                = Z;
 
             nRout(outR,outR)    = speye(sum(outR));
-            nRin(inR,inR)       = speye(sum(inR));
+            nRin(inR,inR)       = -speye(sum(inR));
 
             normalOutR = sparse( [nRout(outR,:)  Z(outR,:)]);
             normalInR  = sparse( [nRin(inR,:)  Z(inR,:)]);
             
             normalFinite   = sparse( [ (~infBoundary*nRout(finite,:) + nRin(finite,:) )  Z(finite,:)]);
+            normalFinite1  = sparse( (~infBoundary*nRout(finite,:) + nRin(finite,:) ) );
+            normalFinite2  = sparse( zeros(0,length(x_kv)) );
+            
             normalInfinite = sparse( [ infBoundary*nRout(infinite,:)  Z(infinite,:)]);
             
             Ind = struct('outR',outR,...
@@ -99,7 +104,9 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
                        'bound', (outR | inR),...
                        'corners',false(this.N1*this.N2,1), ...
                        'finite',finite,'infinite',infinite, ...
-                       'normalFinite',normalFinite,'normalInfinite',normalInfinite);
+                       'normalFinite',normalFinite,'normalInfinite',normalInfinite,...
+                       'finite1',finite1,'finite2',finite2,...
+                       'normalFinite1',normalFinite1,'normalFinite2',normalFinite2);
                    
             this.Ind = Ind;
         end

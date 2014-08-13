@@ -73,7 +73,14 @@ function M_conv  = ComputeConvolutionMatrix_Pointwise(this,f)
             [y2D,dy2D]     = PhysSpace2_Sub(this,y10,y20,x2,x2,@fy2);
             y2             = y2D + y20;
             xx2            = CompSpace2(this,y2);
-            Interp2        = barychebevalMatrix(Pts.x2,xx2);  
+            Interp2 = barychebevalMatrix(Pts.x2,xx2);  
+            
+            if(sum(isnan(y2D)) > 0)            
+                %result will be ignored with all other Nan numbers
+                disp(['Convolution at (y10,y20) = ',...
+                                num2str(y10),' , ',...
+                                num2str(y20),' set to zero.']);
+            end
 %            dy2D    = dy2D.*dx2Tee;
         else
             y2         = y20*ones(size(y2D));

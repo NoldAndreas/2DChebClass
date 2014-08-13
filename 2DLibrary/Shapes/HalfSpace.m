@@ -93,7 +93,7 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             elseif(y20>L2Conv)            
                 ep       = sqrt(1+(y20/L2Conv)^2) - (y20/L2Conv);                    
                 d        = 0;                    
-                if(nargin == 6)
+                if(nargin >= 6)
                     %1st Step: Analyze using intuitive guess
                     [x1,dx1] = Tref(xCheb,d,ep); %x1 = x; dx1 = ones(size(x1));                
                     [y2,dy2] = QuotientMap(x1,y20-y2Min,y2Min,inf);
