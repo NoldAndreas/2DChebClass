@@ -7,20 +7,19 @@ classdef ContactLineHS < DDFT_2D
         rho1D_lg,rho1D_wl,rho1D_wg,alpha_YCA  
         ST_1D  %1D surface tensions
         
-        %(2) 2D Results
-        FilenameEq
+        y1_SpectralLine        
+        hII = [], hIII = [],hContour = []
+        disjoiningPressure_II
         
         y2=[],Int_y2=[],DiffY2=[]
-        IsolineInterfaceY2=[]
-        y1=[],Int_y1=[],DiffY1=[],DiffYY1=[]
-        filmThickness = [],IsolineInterface = []
-        ell_2DDisjoiningPressure=[]
+        
+        IsolineInterfaceY2=[]        
                
         %structure with information of the adsorption isotherm        
         AdsorptionIsotherm 
         
         grandPot,grandPot2
-        disjoiningPressure,disjoiningPressureCheck
+        disjoiningPressureCheck
         
         wIntLoc,wIntHS,f_loc,f_hs
         CA_deg_measured,CA_deg_measured_error
@@ -53,18 +52,27 @@ classdef ContactLineHS < DDFT_2D
             TestPreprocess(this);        
             
             %
+            shapeSL = struct('yMin',this.optsNum.PlotAreaCart.y1Min,...
+                             'yMax',this.optsNum.PlotAreaCart.y1Max,...
+                             'N',100);                       
+            this.y1_SpectralLine = SpectralLine(shapeSL);
+            this.y1_SpectralLine.ComputeAll();
+            %
             ComputeST(this);
         end        
         function TestPreprocess(this)                          
             
              M = this.IDC.M;
              R = this.IDC.R;             
+             
+             disp('*** Test preprocessed matrices ***');
                                     
-             %(3.1) Test Convolution at infinity
+             disp('*** Test convolution matrix ***');
+             %Test Convolution at infinity             
              fMF       = str2func(this.optsPhys.V2.V2DV2);
              [h1,h2,a] = fMF(1,this.optsPhys.V2);
              marky2Inf = (this.IDC.Pts.y2_kv == inf);
-             PrintErrorPos(this.IntMatrV2.Conv(marky2Inf,:)*ones(M,1)- 2*a,'Error for convolution at y2 = infinity',this.IDC.Pts.y1_kv(marky2Inf));          
+             PrintErrorPos(this.IntMatrV2.Conv(marky2Inf,:)*ones(M,1)- 2*a,'convolution at y2 = infinity',this.IDC.Pts.y1_kv(marky2Inf));          
 
              %Convolution profile
              if(strcmp(this.optsPhys.V2.V2DV2,'Phi2DLongRange'))
@@ -72,7 +80,7 @@ classdef ContactLineHS < DDFT_2D
                  h = this.optsPhys.V2.epsilon*(- pi^2/2 + ...
                                           + pi*atan(-y0R)+...
                                           - pi*(y0R)./(1+y0R.^2));
-                 PrintErrorPos(h-this.IntMatrV2.Conv*ones(M,1),'Error of Phi2DLongRange*1',this.IDC.GetCartPts);
+                 PrintErrorPos(h-this.IntMatrV2.Conv*ones(M,1),'Phi2DLongRange*1',this.IDC.GetCartPts);
              elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHenderson_2D'))                 
                  conv = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
                  y2_h = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - R;                          
@@ -80,15 +88,17 @@ classdef ContactLineHS < DDFT_2D
                  Psi(y2_h >= 1) = 4*pi*(1./(45*y2_h(y2_h >= 1).^9) - 1./(6*y2_h(y2_h >= 1).^3));
                  check          = 2*a-this.optsPhys.V2.epsilon*Psi;
                  
-                 PrintErrorPos(conv*ones(M,1) - check','Error for convolution at y1 = infinity',y2_h);                 
+                 PrintErrorPos(conv*ones(M,1) - check','convolution at y1 = infinity',y2_h);                 
              end     
             
             %(4) Test FMT Matrices            
+            disp('*** Test FMT matrices ***');
             if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
                 CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);
             end
-            
+                        
             %(3) Test Integration
+            disp('*** Test integration vector ***');
             a = 2;
             %(a) Integration in HalfSpace
             pts   = this.IDC.GetCartPts();
@@ -102,6 +112,7 @@ classdef ContactLineHS < DDFT_2D
             testF = exp(-(r/a).^2);
             Inth  = this.IDC.AD.ComputeIntegrationVector();
             PrintErrorPos(Inth*testF-a^2*pi/2,['Integration of exp(-(r/',num2str(a),')^2)']);
+            disp('*****');
                                     
         end         
                 
@@ -153,59 +164,41 @@ classdef ContactLineHS < DDFT_2D
         end        
         
         % Initialization
-        function InitInterpolation(this,Nodefault,PlotArea)
-            
-            if((nargin == 1) || ~Nodefault)
-                if(abs(this.optsNum.PhysArea.alpha_deg - 90) < 20)
-                    PlotArea = struct('y1Min',-5,'y1Max',5,'y2Min',0.5,'y2Max',10,'N1',80,'N2',80);
-                    %PlotArea = struct('y1Min',-8,'y1Max',8,...
-                    %                  'y2Min',0.5,'y2Max',this.optsNum.maxComp_y2+5,...
-                    %                  'N1',80,'N2',80);
-                elseif(this.optsNum.PhysArea.alpha_deg <= 70)
-                    if(isempty(this.optsNum.maxComp_y2))
-                        y2MaxPlot = 10;
-                    else
-                        y2MaxPlot = this.optsNum.maxComp_y2+5;
-                    end
-                    PlotArea = struct('y1Min',-2,...
-                                      'y1Max',y2MaxPlot/tan(this.optsNum.PhysArea.alpha_deg*pi/180),...
-                                      'y2Min',0.5,'y2Max',y2MaxPlot,...
-                                      'N1',100,'N2',100);        
-                end    
-                this.optsNum.PlotArea = PlotArea;
-                this.IDC.InterpolationPlotCart(PlotArea,true);
-            else
-                if(nargin > 2)
-                    if(~isfield(this.optsNum,'PlotArea') || ~isequal(this.optsNum.PlotArea,PlotArea))
-                        this.optsNum.PlotArea = PlotArea;
-                        this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);
-                    end
-                else
-                    this.HS.InterpolationPlotCart(this.optsNum.PlotArea,true);                    
-                end                
-            end
-                        
-        end                
+        function InitInterpolation(this,bounds1,bounds2)
+            PlotAreaCart = struct('y1Min',bounds1(1),'y1Max',bounds1(2),...
+                      'y2Min',bounds2(1),'y2Max',bounds2(2),...
+                      'N1',100,'N2',100);
+            this.IDC.InterpolationPlotCart(PlotAreaCart,true);                  
+        end              
         function SetV1(this,epw)
             this.optsPhys.V1.epsilon_w = epw;
-            PtsCart                    = this.HS.GetCartPts();
+            PtsCart                    = this.IDC.GetCartPts();
             this.VAdd                  = getVAdd(PtsCart.y1_kv,PtsCart.y2_kv,0,this.optsPhys.V1);
         end       
-        function InitAnalysisGrid(this,y1Int,y2Int)
-            if(~isempty(y1Int))
-                [this.y1,this.Int_y1,this.DiffY1,this.DiffYY1] = InitAnalysisGridY(this,y1Int,100,'CHEB');        
-            end
+        function InitAnalysisGrid(this,y2Int)
+            
+
             if(~isempty(y2Int))
                 [this.y2,this.Int_y2,this.DiffY2] = InitAnalysisGridY(this,y2Int,100);                      
             end
         end        
+        function y0  = getInitialGuess(this,rho_ig)
+                    
+        	rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
+            rhoGas_sat    = this.optsPhys.rhoGas_sat;
+            kBT           = this.optsPhys.kBT;            
+            
+            p         = (this.rho1D_lg-rhoGas_sat)/(rhoLiq_sat-rhoGas_sat);    
+            rho_ig    = kron(p,this.rho1D_wl) + kron(1-p,this.rho1D_wg);         
+            y0        = kBT*log(rho_ig)+this.Vext;
+        end
         
         %Plot functions
-        [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFigs)
+        [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
+        
         PlotDisjoiningPressureAnalysis(this)    
         PlotInterfaceAnalysisY1(this)
-        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
-        
+        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)        
         PlotDensitySlices(this);
         PlotDensitySlicesMovie(this);       
         
@@ -214,16 +207,30 @@ classdef ContactLineHS < DDFT_2D
         FittingAdsorptionIsotherm(this,FT_Int,n)
         SumRule_AdsorptionIsotherm(this,ST_LG)
         
-        %Compute functions                
+        %Compute functions 
+        function ComputeEquilibrium(this)
+            optsIn.maxComp_y2 = this.optsNum.maxComp_y2;
+            miscIn.mark       = (this.IDC.GetCartPts.y2_kv <= ...
+                                        this.optsNum.maxComp_y2);
+            ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
+        end
         sol = Compute(this)        
         ComputeDynamics(this)        
-                        
+        
+        %Compute disjoining pressure
+        Compute_DisjoiningPressure_II(this,y1Int)
+        
+        %Compute height profiles
+        Compute_hI(this)
+        Compute_hII(this)
+        Compute_hIII(this)
+        [y2Cart] = Compute_hContour(this,level)        
+        
         %Postprocess functions        
-        [f,y1]   = PostProcess(this,y1Int)
-        PostProcess_2DDisjoiningPressure(this,y1Int)
-        PostProcess_FilmThickness(this,y1Int)
-        [f1,f2]           = Post_HFrom2DDisjoiningPressure(this,f1)
-        [y2Cart]          = ComputeInterfaceContour(this,level)
+        [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)        
+        [f,y1]  = PostProcess(this,y1Int)        
+        
+        
         [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
         

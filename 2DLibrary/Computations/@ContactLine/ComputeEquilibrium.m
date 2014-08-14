@@ -9,7 +9,7 @@ function sol = ComputeEquilibrium(this,redo)
 	rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
 	rhoGas_sat    = this.optsPhys.rhoGas_sat;
     kBT           = this.optsPhys.kBT;
-    PtsCart     = this.HS.GetCartPts();  
+    PtsCart       = this.HS.GetCartPts();  
      
     %*****************************
     p         = (this.rho1D_lg-rhoGas_sat)/(rhoLiq_sat-rhoGas_sat);    
@@ -42,7 +42,8 @@ function sol = ComputeEquilibrium(this,redo)
     mark             = (PtsCart.y2_kv <= this.optsNum.maxComp_y2);     
             
     %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
-    misc.mark = mark;       misc.Vext       = this.Vext; 
+    misc.mark = mark;       
+    misc.Vext = this.Vext; 
     misc.VAdd = this.VAdd;
     misc.x_ig = x_ig;
     misc.Conv = this.Conv;  misc.IntMatrFex = this.IntMatrFex; 

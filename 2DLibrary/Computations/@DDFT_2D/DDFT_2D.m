@@ -13,7 +13,7 @@ classdef DDFT_2D < handle
         
         Vext,Vext_grad,VAdd
         
-        x_eq,mu
+        x_eq,mu,FilenameEq
         dynamicsResult
         
         doHI,doHIWall,doSubArea,do2Phase
@@ -54,6 +54,9 @@ classdef DDFT_2D < handle
             this.IDC   = shapeClass(shape);
             if(isfield(optsNum,'PlotArea'))
                 this.IDC.ComputeAll(optsNum.PlotArea);             
+            elseif(isfield(optsNum,'PlotAreaCart'))
+                this.IDC.ComputeAll();
+                this.IDC.InterpolationPlotCart(optsNum.PlotAreaCart,true);
             else
                 this.IDC.ComputeAll();
             end
@@ -285,7 +288,7 @@ classdef DDFT_2D < handle
             end
         end
         
-        ComputeEquilibrium(this,rho_ig)
+        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
         ComputeDynamics(this)        
         
     end

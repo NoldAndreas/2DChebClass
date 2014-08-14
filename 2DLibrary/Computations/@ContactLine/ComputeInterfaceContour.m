@@ -1,7 +1,6 @@
 function ComputeInterfaceContour(this,level)
 
-    f            = this.rho_eq;
-    
+    f            = this.rho_eq;    
     drho         = (this.optsPhys.rhoLiq_sat - this.optsPhys.rhoGas_sat);
     
     if((nargin < 2) || isempty(level))

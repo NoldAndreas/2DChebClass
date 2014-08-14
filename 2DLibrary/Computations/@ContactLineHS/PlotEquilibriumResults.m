@@ -1,4 +1,4 @@
-function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFigs)
+function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
     %Compute contact angle from density profile
   %  [alphaM,pt1,pt2] = MeasureContactAngle();    
     
@@ -10,30 +10,32 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     
     global dirData    
     
-    if((nargin>2) && ~isempty(bounds1))                        
-        PlotArea.y1Min = bounds1(1);
-        PlotArea.y1Max = bounds1(2);
-        PlotArea.y2Min = bounds2(1);
-        PlotArea.y2Max = bounds2(2);
-        
-        PlotArea.N1    = 100;
-        PlotArea.N2    = 100;
-        
-        InitInterpolation(this,PlotArea);
-    elseif(isempty(this.HS.Interp))
-        InitInterpolation(this);
-    end
+%     if((nargin>2) && ~isempty(bounds1))                        
+%         PlotArea.y1Min = bounds1(1);
+%         PlotArea.y1Max = bounds1(2);
+%         PlotArea.y2Min = bounds2(1);
+%         PlotArea.y2Max = bounds2(2);
+%         
+%         PlotArea.N1    = 100;
+%         PlotArea.N2    = 100;
+%         
+%         InitInterpolation(this,PlotArea);
+%     elseif(isempty(this.IDC.Interp))
+%         InitInterpolation(this);
+%     end
     
+    %PlotArea = this.optsNum.PlotArea;
     
-    PlotArea.y1Min = min(this.HS.Interp.pts1);
-    PlotArea.y1Max = max(this.HS.Interp.pts1);
-    PlotArea.y2Min = min(this.HS.Interp.pts2);
-    PlotArea.y2Max = max(this.HS.Interp.pts2);
+    %PlotArea.y1Min = min(this.IDC.Interp.pts1);
+    %PlotArea.y1Max = max(this.IDC.Interp.pts1);
+    %PlotArea.y2Min = min(this.IDC.Interp.pts2);
+    %PlotArea.y2Max = max(this.IDC.Interp.pts2);
     
-    rho           = this.rho_eq;
+    rho           = GetRhoEq(this);
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
 	rhoGas_sat    = this.optsPhys.rhoGas_sat;
     R             = this.optsPhys.sigmaS/2;        
+    y1            = this.y1_SpectralLine.Pts.y;
             
 	%*******************************************************
     % ******************** Contour Plot ********************
@@ -46,11 +48,11 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         optDetails.clabel = true;        
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         optDetails.nContours = [0.1,0.3,0.5,0.6,0.7];        
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
         
         %Plot Young Contact Angle     
-        y1MaxP = max(this.HS.Interp.pts1);
-        y2MaxP = max(this.HS.Interp.pts2);
+        y1MaxP = max(this.IDC.Interp.pts1);
+        y2MaxP = max(this.IDC.Interp.pts2);
 
         theta_CS  = this.optsNum.PhysArea.alpha_deg*pi/180;
         alphaYoungIn = this.alpha_YCA;
@@ -68,8 +70,8 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         
      	%**********************************************************
         % Add Isoline Thickness plot   
-        if(~isempty(this.IsolineInterface))
-            plot(this.y1,this.IsolineInterface,'b-.','linewidth',2.5);
+        if(~isempty(this.hContour))
+            plot(y1,this.hContour,'b-.','linewidth',2.5);
         end
         
         if(~isempty(this.IsolineInterfaceY2))
@@ -86,15 +88,15 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
         optDetails.nContours = rhoGas_sat + 0.1*drho;
         optDetails.linecolor = 'b';
         optDetails.linestyle = '--';
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
         
         optDetails.nContours = rhoGas_sat + 0.5*drho;
         optDetails.linecolor = [0 0.75 0];
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
         
         optDetails.nContours = rhoGas_sat + 0.9*drho;
         optDetails.linecolor = 'r';
-        this.HS.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
         
         xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
         ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
@@ -108,20 +110,20 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
 %     shapeBox.y2Max = this.optsNum.PlotArea.y2Max + 4;
 %     shapeBox.N     = [40,120];
 %     BX             = Box(shapeBox);
-%     IP_BX          = this.HS.SubShapePtsCart(BX.Pts);
+%     IP_BX          = this.IDC.SubShapePtsCart(BX.Pts);
 %     [h1s,h2s,Int2] = BX.ComputeIntegrationVector();
 %     Int2BX         = kronecker(eye(shapeBox.N(1)),Int2);
 % 
 %     %rho_wg_ref     = kronecker(ones(N1,1),rho1D_wg); 
 %     adsorption     = Int2BX*IP_BX*(rho - rhoGas_sat);%rho_wg_ref);
-%     hold on; 
+%     hold on;     
    
-    if(~isempty(this.filmThickness) && ~plain)
-        plot(this.y1,this.filmThickness+R,'k-.','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)
+    if(~isempty(this.hIII) && ((nargin == 1) || ~plain))
+        plot(y1,this.hIII+R,'k-.','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)
     end
     
-    if(~isempty(this.ell_2DDisjoiningPressure) && ~plain)
-        plot(this.y1,this.ell_2DDisjoiningPressure+R,'k--','linewidth',2.5);
+    if(~isempty(this.hII) && ((nargin == 1) || ~plain))
+        plot(y1,this.hII+R,'k--','linewidth',2.5);
     else
 
  %   pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 1]);
@@ -138,10 +140,11 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     % ******************** 3D Plot ********************
     %*******************************************************
     figure('Color','white','Position',[0 0 1200 800]);
-    this.HS.doPlots(rho,'SC');
+    this.IDC.doPlots(rho,'SC');
     zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
     colormap(hsv);
     set(gca, 'CLim', [0, 1.0]);
+    PlotArea = this.optsNum.PlotAreaCart;
     pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
     view([-10 5 3]);
 
@@ -154,19 +157,19 @@ function [fContour] =  PlotEquilibriumResults(this,bounds1,bounds2,plain,saveFig
     %*******************************************************
     figure('Color','white','Position',[0 0 800 1000],'name','1D Interface Plots');
     subplot(3,1,1);
-    this.HS.do1DPlotParallel(this.rho1D_lg); 
+    this.IDC.do1DPlotParallel(this.rho1D_lg); 
     title('Liquid-Gas Interface');
     ylabel('$\varrho$','Interpreter','Latex'); 
     xlabel('$y_1$','Interpreter','Latex');
 
     subplot(3,1,2);
-    this.HS.do1DPlotNormal(this.rho1D_wg);
+    this.IDC.do1DPlotNormal(this.rho1D_wg);
     title('Wall-Gas Interface');
     ylabel('$\varrho$','Interpreter','Latex');  
     xlabel('$y_2$','Interpreter','Latex');
 
     subplot(3,1,3);
-    this.HS.do1DPlotNormal(this.rho1D_wl);
+    this.IDC.do1DPlotNormal(this.rho1D_wl);
     title('Wall-Liquid Interface');
     ylabel('$\varrho$','Interpreter','Latex'); 
     xlabel('$y_2$','Interpreter','Latex');

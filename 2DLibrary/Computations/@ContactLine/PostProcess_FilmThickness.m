@@ -1,4 +1,4 @@
-function PostProcess_FilmThickness(this)
+function Compute_h(this)
 
 %     if(nargin >1)
 %         m       = 200;

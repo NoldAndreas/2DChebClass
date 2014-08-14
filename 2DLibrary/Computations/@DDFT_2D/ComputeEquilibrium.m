@@ -1,17 +1,23 @@
- function [rho,mu] = ComputeEquilibrium(this,rho_ig)
+ function ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
     
     fprintf('Solving for equilibrium condition...\n');    
     
     %*****************************
     %Initialization
     %*****************************	    
-    if(nargin >= 2)
-        x_ig         = getInitialGuess(this,rho_ig);
-    else
+    if((nargin == 1) || isempty(rho_ig))
         x_ig         = getInitialGuess(this);
+    else
+        x_ig         = getInitialGuess(this,rho_ig);
+    end
+    if(nargin>2)
+        opts = optsIn;
+    end
+    if(nargin>3)
+        misc = miscIn;
     end
     
-    opts             = this.optsNum.PhysArea;
+    opts.PhysArea    = this.optsNum.PhysArea;
     opts.optsPhys    = this.optsPhys;    
     
     % Clean optsPhys from unnecessary information
@@ -47,7 +53,7 @@
     %mark             = (PtsCart.y2_kv <= this.optsNum.maxComp_y2);     
             
     %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
-    %misc.mark = mark;       
+    %misc.mark = mark;           
     misc.Vext       = this.Vext; 
     misc.VAdd       = this.VAdd;
     misc.x_ig       = x_ig;
@@ -61,5 +67,6 @@
          
     this.x_eq   = sol.x;
     this.mu     = sol.mu;
+    this.FilenameEq  = paramsEq.Filename;
     
 end
