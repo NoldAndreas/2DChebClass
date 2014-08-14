@@ -46,6 +46,7 @@ function Job_ComputeContactAngle(alpha_deg,epw,bounds1,bounds2)
     CLT.ComputeEquilibrium();          	    
     
     %Load and compute disjoining pressures
+    CLT.ComputeAdsorptionIsotherm('load');
     CLT.Compute_DisjoiningPressure_II();
     
     %Compute height profiles
@@ -54,6 +55,7 @@ function Job_ComputeContactAngle(alpha_deg,epw,bounds1,bounds2)
     CLT.Compute_hContour(0.05);
     CLT.PlotEquilibriumResults();
 
+    CLT.PlotDisjoiningPressures();
 %     CLT.InitAnalysisGrid([-15 10],[0.5 25]);
 %     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
 %     CLT.PostProcess_2DDisjoiningPressure();

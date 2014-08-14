@@ -10,6 +10,7 @@ classdef ContactLineHS < DDFT_2D
         y1_SpectralLine        
         hII = [], hIII = [],hContour = []
         disjoiningPressure_II
+        y1_I = [], hI = []
         
         y2=[],Int_y2=[],DiffY2=[]
         
@@ -196,6 +197,8 @@ classdef ContactLineHS < DDFT_2D
         %Plot functions
         [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
         
+        PlotDisjoiningPressures(this)
+        
         PlotDisjoiningPressureAnalysis(this)    
         PlotInterfaceAnalysisY1(this)
         [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)        
@@ -226,18 +229,17 @@ classdef ContactLineHS < DDFT_2D
         Compute_hIII(this)
         [y2Cart] = Compute_hContour(this,level)        
         
-        %Postprocess functions        
-        [f1,f2] = Post_HFrom2DDisjoiningPressure(this,f1)        
-        [f,y1]  = PostProcess(this,y1Int)        
-        
-        
-        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)
+        %Postprocess
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
+        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)        
+        
+        %to delete      
+        Post_HFrom2DDisjoiningPressure(this,f1)        
+        [f,y1]  = PostProcess(this,y1Int)                                
         
                         
         I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
-        SumRule_DisjoiningPotential(this,ST_LG)
-        
+        SumRule_DisjoiningPotential(this,ST_LG)        
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);
     end
 end
