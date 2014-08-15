@@ -7,29 +7,7 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
     
     %**************************************
     %Initialization
-    
-    global dirData    
-    
-%     if((nargin>2) && ~isempty(bounds1))                        
-%         PlotArea.y1Min = bounds1(1);
-%         PlotArea.y1Max = bounds1(2);
-%         PlotArea.y2Min = bounds2(1);
-%         PlotArea.y2Max = bounds2(2);
-%         
-%         PlotArea.N1    = 100;
-%         PlotArea.N2    = 100;
-%         
-%         InitInterpolation(this,PlotArea);
-%     elseif(isempty(this.IDC.Interp))
-%         InitInterpolation(this);
-%     end
-    
-    %PlotArea = this.optsNum.PlotArea;
-    
-    %PlotArea.y1Min = min(this.IDC.Interp.pts1);
-    %PlotArea.y1Max = max(this.IDC.Interp.pts1);
-    %PlotArea.y2Min = min(this.IDC.Interp.pts2);
-    %PlotArea.y2Max = max(this.IDC.Interp.pts2);
+    global dirData        
     
     rho           = GetRhoEq(this);
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
@@ -40,11 +18,11 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
 	%*******************************************************
     % ******************** Contour Plot ********************
     %*******************************************************
-    if((nargin < 5) || (saveFigs))
+    if((nargin <= 2) || (saveFigs))
         fContour = figure('Color','white','Position',[0 0 1200 800]);
     end
     
-    if((nargin < 5) || ~plain)
+    if((nargin == 1) || ~plain)
         optDetails.clabel = true;        
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         optDetails.nContours = [0.1,0.3,0.5,0.6,0.7];        
@@ -117,15 +95,25 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
 %     %rho_wg_ref     = kronecker(ones(N1,1),rho1D_wg); 
 %     adsorption     = Int2BX*IP_BX*(rho - rhoGas_sat);%rho_wg_ref);
 %     hold on;     
-   
-    if(~isempty(this.hIII) && ((nargin == 1) || ~plain))
-        plot(y1,this.hIII+R,'k-.','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)
+    if(~isempty(this.hIII))% && ((nargin == 1) || ~plain))
+        plot(y1,this.hIII+R,'k','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)
+        h0 = min(this.hIII);
+    else
+        h0 = 0;
+    end
+
+    if(~isempty(this.hI))% && ((nargin == 1) || ~plain))
+        [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
+        plot(this.y1_I+DeltaY1_II,this.hI+R+h0,'k-.','linewidth',2.5); 
+        plot(this.y1_I+DeltaY1_III,this.hI+R+h0,'k-.','linewidth',2.5); 
     end
     
-    if(~isempty(this.hII) && ((nargin == 1) || ~plain))
-        plot(y1,this.hII+R,'k--','linewidth',2.5);
-    else
+    if(~isempty(this.hII))% && ((nargin == 1) || ~plain))
+        plot(y1,this.hII+R+h0,'k--','linewidth',2.5);
+    end  
 
+    
+    
  %   pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 1]);
     if((nargin < 5) || saveFigs)      
         print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour'],gcf);

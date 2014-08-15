@@ -1,4 +1,12 @@
-function Job_ComputeContactAngle(alpha_deg,epw,bounds1,bounds2)
+function Job_ComputeContactAngle(alpha_deg,epw,...
+                                 bounds1,bounds2)
+
+    if(nargin == 0)
+        alpha_deg = 120;
+        epw       = 0.7;
+        bounds1   = [-10 10];
+        bounds2   = [0.5 18];        
+    end
 
     global dirData
     AddPaths();    
@@ -45,19 +53,20 @@ function Job_ComputeContactAngle(alpha_deg,epw,bounds1,bounds2)
     CLT.Preprocess();
     CLT.ComputeEquilibrium();          	    
     
-    %Load and compute disjoining pressures
-    CLT.ComputeAdsorptionIsotherm('load');
-    CLT.Compute_DisjoiningPressure_II();
-    
-    %Compute height profiles
-    CLT.Compute_hII();
-    CLT.Compute_hIII();
-    CLT.Compute_hContour(0.05);
-    CLT.PlotEquilibriumResults();
+%     %Load and compute disjoining pressures    
+%     CLT.ComputeAdsorptionIsotherm('load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
+%     CLT.Compute_DisjoiningPressure_II();
+%     
+%     %Compute height profiles    
+%     CLT.Compute_hII();
+%     CLT.Compute_hIII();
+%     CLT.Compute_hI();
+%     CLT.Compute_hContour(0.5);
+%     
+%     CLT.PlotEquilibriumResults();
+%     CLT.PlotDisjoiningPressures();
 
-    CLT.PlotDisjoiningPressures();
-%     CLT.InitAnalysisGrid([-15 10],[0.5 25]);
-%     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
+    %     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
 %     CLT.PostProcess_2DDisjoiningPressure();
 %     
 % 	%f1 = figure('Color','white','Position',[0 0 1000 600]);

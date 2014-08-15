@@ -53,11 +53,13 @@ classdef ContactLineHS < DDFT_2D
             TestPreprocess(this);        
             
             %
-            shapeSL = struct('yMin',this.optsNum.PlotAreaCart.y1Min,...
-                             'yMax',this.optsNum.PlotAreaCart.y1Max,...
-                             'N',100);                       
-            this.y1_SpectralLine = SpectralLine(shapeSL);
-            this.y1_SpectralLine.ComputeAll();
+            if(isfield(this.optsNum,'PlotAreaCart'))
+                shapeSL = struct('yMin',this.optsNum.PlotAreaCart.y1Min,...
+                                 'yMax',this.optsNum.PlotAreaCart.y1Max,...
+                                 'N',100);                       
+                this.y1_SpectralLine = SpectralLine(shapeSL);
+                this.y1_SpectralLine.ComputeAll();
+            end
             %
             ComputeST(this);
         end        
@@ -195,20 +197,39 @@ classdef ContactLineHS < DDFT_2D
         end
         
         %Plot functions
-        [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
-        
+        [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)        
         PlotDisjoiningPressures(this)
-        
-        PlotDisjoiningPressureAnalysis(this)    
-        PlotInterfaceAnalysisY1(this)
-        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)        
-        PlotDensitySlices(this);
-        PlotDensitySlicesMovie(this);       
-        
+        PlotDensitySlices(this)
+                
         %Adsorption Isotherm
         ComputeAdsorptionIsotherm(this,n,drying)
         FittingAdsorptionIsotherm(this,FT_Int,n)
         SumRule_AdsorptionIsotherm(this,ST_LG)
+        function [Pi_I,V_I] = GetDisjoiningPressure_I(this)
+            rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
+            rhoGas_sat     = this.optsPhys.rhoGas_sat;    
+            mu_sat         = this.optsPhys.mu_sat;
+            
+            if(IsDrying(this)) %drying
+                Pi_I = (this.AdsorptionIsotherm.mu-mu_sat)*(rhoLiq_sat-rhoGas_sat);
+            else %wetting
+                Pi_I = -(this.AdsorptionIsotherm.mu-mu_sat)*(rhoLiq_sat-rhoGas_sat);
+            end
+            
+            fT   = abs(this.AdsorptionIsotherm.FT);
+            IntM = zeros(length(fT));
+            vh   = zeros(1,length(fT));
+            for i = 2:length(fT)        
+                %Matrix for integral int(v(y),y=y1..Y)
+                h           = fT(i) - fT(i-1);
+                vh([i-1,i]) = vh([i-1,i]) + h/2;
+                IntM(i,:)   = vh;
+            end                            
+            V_I = -IntM*Pi_I;                
+        end
+        function drying = IsDrying(this)
+            drying = (min(this.AdsorptionIsotherm.FT) < 0);
+        end
         
         %Compute functions 
         function ComputeEquilibrium(this)
@@ -222,24 +243,102 @@ classdef ContactLineHS < DDFT_2D
         
         %Compute disjoining pressure
         Compute_DisjoiningPressure_II(this,y1Int)
+        function SumRule_DisjoiningPressure_II(this,ST_LG)
+
+            if(nargin < 2)
+                ST_LG = this.ST_1D.om_LiqGas;
+            end
+
+            %******************************************
+            %Check sum rule Eq. (11) in Henderson (2005)    
+            %Integrate along y1, and check sum rule
+            % - Int(DisjoiningPressure(y),y=-inf..inf) = \gammaLV*sin(theta)            
+            
+            Int_y1  = this.y1_SpectralLine.Int;
+            sinGamm = sin(this.alpha_YCA)*ST_LG;
+            err     = (Int_y1*this.disjoiningPressure_II + sinGamm)/sinGamm*100;
+            disp(['Normal force balance, error: ',num2str(err),' percent']);
+
+            h              = (-Int_y1*this.disjoiningPressure_II)/ST_LG;
+            estTheta       = asin(h)*180/pi;
+            if(IsDrying(this))
+                estTheta = 180 - estTheta;
+            end
+            error_estTheta = 180/pi*sum(Int_y1)*max(abs(this.disjoiningPressure_II(1)),abs(this.disjoiningPressure_II(end)))/ST_LG*(1/sqrt(1+h^2));
+            disp(['Theta from Sum rule = ',num2str(estTheta),' [deg] /+- ',num2str(error_estTheta),' [deg]']);    
+
+            %PrintErrorPos(180/pi*(estTheta-this.alpha_YCA),'Estimated contact angle through sum rule integrating disjoining pressure [percent]');
+        end        
         
         %Compute height profiles
         Compute_hI(this)
         Compute_hII(this)
         Compute_hIII(this)
-        [y2Cart] = Compute_hContour(this,level)        
+        function Compute_hContour(this,level)
+            rho_eq       = this.GetRhoEq(); 
+            N            = this.y1_SpectralLine.N;
+            drho         = (this.optsPhys.rhoLiq_sat - this.optsPhys.rhoGas_sat);
+
+            if((nargin < 2) || isempty(level))
+                level = 0.5;
+            end
+            rhoV         = this.optsPhys.rhoGas_sat + level*drho;
+
+            fsolveOpts   = optimset('Display','off');
+            y2Cart       = zeros(N,1);
+
+            y2I = 10;
+            for i = 1:N
+                pt.y1_kv  = this.y1_SpectralLine.Pts.y(i);        
+                y2Cart(i) = fsolve(@rhoX2,y2I,fsolveOpts);                    
+                %y2I       = max(y2Cart(i),4);        
+                y2I       = y2Cart(i);
+            end
+
+            this.hContour = y2Cart;
+
+            function z = rhoX2(y2)
+                pt.y2_kv = y2;
+                IP = this.IDC.SubShapePtsCart(pt);
+                z  = IP*rho_eq-rhoV;
+            end    
+
+        end
+        function [DeltaY1_II,DeltaY1_III] = ComputeDeltaFit(this)
+            
+            hS           = max(this.hI);
+            h0           = min(this.hIII);
+
+            fsolveOpts   = optimset('Display','off');            
+            f            = this.hIII-h0;
+            DeltaY1_III  = fsolve(@fX,0,fsolveOpts);
+            
+            f            = this.hII;
+            DeltaY1_II   = fsolve(@fX,0,fsolveOpts);
+            
+            
+            function z = fX(y1)                
+                IP = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1);
+                z  = IP*f-hS;
+            end    
+
+            
+        end
         
         %Postprocess
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
-        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)        
+        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)               
         
-        %to delete      
-        Post_HFrom2DDisjoiningPressure(this,f1)        
+        %to delete                   
         [f,y1]  = PostProcess(this,y1Int)                                
-        
-                        
-        I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
-        SumRule_DisjoiningPotential(this,ST_LG)        
+                                
+        I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)        
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);
+        
+        PlotDisjoiningPressureAnalysis(this)    
+        PlotInterfaceAnalysisY1(this)
+        [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)                
+        PlotDensitySlicesMovie(this);       
+
     end
 end

@@ -11,9 +11,11 @@ function Compute_hII(this)
         drying = false;
     end
     
-    %solves Eq. (17) from Henderson (2010)    
-    %sets ell_2DDisjoiningPressure
-    %uses disjoiningPressure,y1,Int_y1
+    %solves Eq. (17) from Henderson (2010), (29) from Nold et.al. (2014)
+    % 
+    % h_II'(x) = -tan( asin ( 1/gamma \int[ Pi_II(x'),x'=-infinity..x] ))
+    % 
+    
     
     Diff = barychebdiff(y1,2);    
     

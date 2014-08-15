@@ -1,9 +1,5 @@
  function ComputeAdsorptionIsotherm(this,n,drying)   
 
-    if(isempty(this.IDC.Interp))
-        InitInterpolation(this);
-    end
-
 	optss              = this.optsPhys;   
     
     if((nargin > 2) && strcmp(drying,'drying'))
