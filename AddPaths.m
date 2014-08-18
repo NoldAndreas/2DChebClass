@@ -1,4 +1,3 @@
-
 function AddPaths()   
 
     global dirData
@@ -47,6 +46,9 @@ function AddPaths()
     
     dirDataOrg = dirData;
     
-    recomputeAll = true;
-     
+    recomputeAll = false;
+    
+    if(recomputeAll)
+        cprintf('*m','!!! No precomputed data will be used. recomputeAll = true !!!\n');
+    end
 end

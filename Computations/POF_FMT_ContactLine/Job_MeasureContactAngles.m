@@ -10,24 +10,23 @@ function Job_MeasureContactAngles()
                       'y2wall',0.,...
                       'N2bound',24,'h',1,...
                       'alpha_deg',90);
-
-    PhysArea.Conv  = struct('L',1,'L2',[],'N',[34,34]);
-
+    
+    V2Num   = struct('Fex','SplitDisk','L',1,'L2',[],'N',[34,34]);    
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
-%   Fex_Num   = struct('Fex','CarnahanStarling');
  
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',Fex_Num,...
                      'maxComp_y2',10,...
-                     'y1Shift',0);
+                     'V2Num',V2Num);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.49);
     V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
                       'kBT',0.75,...                                                    
-                      'Dmu',0.0,'nSpecies',1,...
+                      'Dmu',0.0,...
+                      'nSpecies',1,...
                       'sigmaS',1);      
 
     config = v2struct(optsNum,optsPhys);                        
@@ -45,14 +44,34 @@ function Job_MeasureContactAngles()
     %filename    = [dirData filesep subDir filesep 'Job__12_11_13_ComputeContactAngles_epw.txt'];
     Struct2File(filename,config,['Computed at ',datestr(now)]);
     
-	opts.epw_YCA = 0.7:0.005:1.6;
+	%opts.epw_YCA = 0.7:0.005:1.6;
+    opts.epw_YCA = 0.5:0.05:1.35;
     opts.config  = config;
-    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
+    res1 = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
+    
+    opts.epw_YCA = 1.35:0.005:1.51;
+    opts.config  = config;
+    res2 = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
+    
+	f1 = figure('Color','white','Position',[0 0 800 800]);
+    plot(res1.epw,180/pi*res1.theta_CA,'k','linewidth',1.5); hold on;    
+    plot(res2.epw,180/pi*res2.theta_CA,'k','linewidth',1.5); hold on;    
+    xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
+    ylabel('$\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25); 
+    set(gca,'fontsize',20); 
+    xlim([0.5 1.52]);
+    
+    print2eps([dirData filesep 'ContactAngleMeasurements90'],gcf);
+    saveas(gcf,[dirData filesep 'ContactAngleMeasurements90.fig']);   
     
     %opts.epw_YCA = 1.50:0.001:1.54;
     %opts.config  = config;
     %resG = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
-   
+    
+    %***********************************************************************
+    %***********************************************************************
+    %***********************************************************************
+    
     close all;    
 
     opts90_a.config                            = config;    
@@ -206,7 +225,7 @@ function Job_MeasureContactAngles()
         
         configM = opts.config;               
         
-        CL = ContactLine(configM);
+        CL = ContactLineHS(configM);
         CL.Preprocess();
         
         for i = 1:length(epw)
@@ -242,13 +261,13 @@ function Job_MeasureContactAngles()
         confP = opts.config;
         confP.optsNum.PhysArea.N2bound = 3;
         confP.optsNum.PhysArea.N = [60;3];
-        CLP = ContactLine(confP);
+        CLP = ContactLineHS(confP);
         CLP.Preprocess();     
         omLG = CLP.ST_1D.om_LiqGas;            
         
         
         opts.config.optsNum.PhysArea.N = [1;100];
-        CLN = ContactLine(opts.config);
+        CLN = ContactLineHS(opts.config);
         CLN.Preprocess();     
         
         for j = 1:length(epw_YCA)                  

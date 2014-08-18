@@ -1,7 +1,6 @@
 function Compute_hI(this)
     
-    fT             = abs(this.AdsorptionIsotherm.FT);
-    y1             = this.y1_SpectralLine.Pts.y;
+    fT             = abs(this.AdsorptionIsotherm.FT);    
     ST_LG          = this.ST_1D.om_LiqGas;      
     Dx  = 0;    
     N   = 100;    
@@ -9,29 +8,26 @@ function Compute_hI(this)
            
     [~,IntPot] = GetDisjoiningPressure_I(this);    
     
-%     if(~isempty(this.hIII))
-%         [hmax,iM] = max(this.hIII);
-%         hmax      = hmax - min(this.hIII);
-%         y10       = y1(iM);    
-%     else
-        hmax = 15; y10 = 0;
-%    end
+	hmax = min(max(this.hII),max(this.hIII))-2;
     
     yN = 0; hN = hmax;    
     yC = []; hC = [];
     
-    while(max(abs(imag(hN))) == 0)
+    while(( max(abs(imag(hN))) == 0) && ...
+      (yN(1) > -(this.optsNum.PlotAreaCart.y1Max- this.optsNum.PlotAreaCart.y1Min)))
+  
         yC = [yN;yC];
         hC = [hN;hC];
         [yN,hN] = Compute_hI_Interval([yC(1)-L,yC(1)],hC(1));
+        
     end
         
     this.hI   = hC;   
     
     if(IsDrying(this))        
-        this.y1_I = y10 - yC;
+        this.y1_I = - yC;
     else
-        this.y1_I = y10 + yC;
+        this.y1_I = yC;
     end
     
     %    checkSumRule = this.ST_1D.om_LiqGas*(1-cos(this.alpha_YCA));
