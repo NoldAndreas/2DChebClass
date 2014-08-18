@@ -22,8 +22,7 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
             Int = Int.*r;
 
             this.Int = Int;
-        end
-        
+        end  
         function Diff = ComputeDifferentiationMatrix(this)            
             
             Diff = ComputeDifferentiationMatrix@SpectralFourier...
@@ -32,14 +31,10 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
             Diff   = PolarDiffOperators(Diff,this.Pts); 
             
             this.Diff = Diff;
+        end                
+        function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)            
+            Interp = ComputeInterpolationMatrix@SpectralFourier(this,interp1,interp2,fullInterpGrid,saveBool);            
         end        
-        
-        function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
-            
-            Interp = ComputeInterpolationMatrix@SpectralFourier(this,interp1,interp2,fullInterpGrid,saveBool);
-            
-        end  
-        
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
             
             N1 = this.N1;   N2 = this.N2;
@@ -67,8 +62,6 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
             end
                 
         end
-        
-     
         function Ind = ComputeIndices(this)
 
             x_kv    = kron(this.Pts.x1,ones(size(this.Pts.x2)));
@@ -110,9 +103,6 @@ classdef (Abstract) Polar_SpectralFourierNoOrigin < SpectralFourier
                    
             this.Ind = Ind;
         end
-             
-        
-        
     end
        
 end

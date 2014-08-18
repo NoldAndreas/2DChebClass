@@ -1,5 +1,6 @@
 function [optsNum,optsPhys] = Default1_DDFT_DiffusionPolarDisk()        
 
+
     Phys_Area = struct('y1Min',0,'y1Max',2,'L1',1,'N1',20,...
                        'y2Min',0,'y2Max',2*pi,'N2',20);
 
