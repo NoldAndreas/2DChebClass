@@ -10,7 +10,7 @@ function LubricationForcedWettingInnerFinite
     delta   = 0.3;
     N       = 300;
     
-    IntM    = 0;
+    IntM    = 0;    
     Dy = 0; DDy = 0;
     
     SolveInnerL(10);
@@ -18,6 +18,7 @@ function LubricationForcedWettingInnerFinite
     SolveInnerL(50);
     SolveInnerL(100);
     SolveInnerL(500);
+    SolveInnerL(5000);    
     
     function [y,hP] = SolveInnerL(L)
         shape      = struct('N',N,'yMin',0,'yMax',L);    
@@ -42,6 +43,10 @@ function LubricationForcedWettingInnerFinite
         hP  = fsolve(@ODE,ones(N,1));
         SL.doPlots(hP);
     end
+
+    hold on;
+    y = (1:0.01:5000)';
+    plot(y,(3*delta*log(y)+1+3*delta).^(1/3));
     
     function y = ODE(hP)
         

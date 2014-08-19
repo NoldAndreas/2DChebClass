@@ -81,11 +81,15 @@ function Job_MeasureContactAngles()
     opts90_a.config.optsNum.PhysArea.L1        = 4; 
     opts90_a.config.optsNum.PhysArea.N2bound   = 14; 
     opts90_a.epw                               = 1.:0.02:1.08;
-    resM90_a = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_a,[]);    
+   % resM90_a = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_a,[]);    
     
     opts90_b     = opts90_a;
     opts90_b.epw = 1.1:0.02:1.16;
-    resM90_b = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_b,[]);    
+   % resM90_b = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_b,[]);    
+    
+    opts90_c     = opts90_a;
+    opts90_c.epw = 0.55:0.05:1.;
+    resM90_c = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_c,[]);
         
     opts90 = opts90_a;
     %opts90.config                            = config;
@@ -271,8 +275,9 @@ function Job_MeasureContactAngles()
         CLN.Preprocess();     
         
         for j = 1:length(epw_YCA)                  
-            CLN.optsPhys.V1.epsilon_w = epw_YCA(j);                        
-            CLN.ComputeST(false);
+            CLN.optsPhys.V1.epsilon_w = epw_YCA(j);      
+            CLN.Compute1D('WL');            
+            CLN.Compute1D('WG');
             
             omWG(j) = CLN.ST_1D.om_wallGas;
             omWL(j) = CLN.ST_1D.om_wallLiq;
