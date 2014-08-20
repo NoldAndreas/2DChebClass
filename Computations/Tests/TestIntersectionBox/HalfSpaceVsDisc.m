@@ -1,21 +1,27 @@
 clear all; close all;
 
-R      = 2;
-bottom = 2;
+R      = 1;
+bottom = 0;
 
+figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'N',[10,10],'L1',1,'L2',2);
 HS    = HalfSpace(shape);
-plot([-6,6],[bottom,bottom],'r--','LineWidth',2);
+plot([-10,10],[bottom,bottom],'b--','LineWidth',2);
 
-while(true)
-    xlim([-3,3])
-    ylim([bottom-R,bottom+3*R])
-    axis equal
+xlim([-5,5])
+ylim([-1.3 2])
+ylim([bottom-R,bottom+3*R])
+xlabel('$x$','Interpreter','Latex','fontsize',20);
+ylabel('$y$','Interpreter','Latex','fontsize',20);
+axis equal
+set(gca,'fontsize',20);
 
-    [y10,y20] = ginput(1);
 
+[y10,y20] = ginput(1);   
+while(y20 > bottom - R)
+    
     Origin = [y10,y20];
-    N      = [20,20];
+    N      = [10,10];
     sphere = true;
     DC     = Disc(v2struct(Origin,R,N,sphere));   
 
@@ -29,5 +35,17 @@ while(true)
         scatter(area.pts.y1_kv,area.pts.y2_kv,'r');
         %DC.PlotGrid();
     end
+    
+	xlim([-5,5])
+    ylim([-1.3 2])
+    ylim([bottom-R,bottom+3*R])
+    xlabel('$x$','Interpreter','Latex','fontsize',20);
+    ylabel('$y$','Interpreter','Latex','fontsize',20);
+    set(gca,'fontsize',20);
+    axis equal
 
+    [y10,y20] = ginput(1);   
 end
+ylim([-1 3]);
+print2eps(['HalfSpaceVsDisc_CollocationPoints'],gcf);        
+saveas(gcf,['HalfSpaceVsDisc_CollocationPoints.fig']);   

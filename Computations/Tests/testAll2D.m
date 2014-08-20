@@ -1,15 +1,15 @@
 function testAll2D
 
-    AddPaths();            
-    
+    AddPaths();                
+  
     testSimulations();
-    
     testDiffusion();
     test2PhaseDDFT();        
-    testDDFT();       
-    testNSpeciesDDFT();    
-       
-    testFMT();
+    
+%    testDDFT();       
+%    testNSpeciesDDFT();           
+%    testFMT();    
+  
     %testDDFTInertia();
     %testCahnHilliard();    
 end
@@ -78,7 +78,7 @@ function testSimulations()
     SimulationInfinityWedge();
 
 
-    SimulationBoxFD();
+ %   SimulationBoxFD();
     
     SimulationPolarInfinity();
     
@@ -87,7 +87,7 @@ function testSimulations()
 end
 function testDiffusion()
 
-    DiffusionClosedBoxFD();
+  %  DiffusionClosedBoxFD();
 
     %Diffusion Equations    
     DiffusionClosedBox();

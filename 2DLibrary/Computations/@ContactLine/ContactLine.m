@@ -69,7 +69,7 @@ classdef ContactLine < handle
             %************************************************                               
             global MinimalOutput
             GotoSubDir(this);
-            
+                        
             N1 = this.optsNum.PhysArea.N(1);
             N2 = this.optsNum.PhysArea.N(2);            
             R   = this.optsPhys.sigmaS/2;     
@@ -154,7 +154,7 @@ classdef ContactLine < handle
         end         
         
         ComputeHardSphereMatrices(this)        
-        ComputeAdsorptionIsotherm(this,n)    
+        ComputeAdsorptionIsotherm(this,n,drying)    
         
         function [om,rho1D] = Compute1D(this,plotBool,WLWGLG)
             rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
@@ -210,24 +210,30 @@ classdef ContactLine < handle
             global dirDataOrg
             ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
         end        
-        function InitInterpolation(this,Nodefault,PlotArea)
+        function InitInterpolation(this,PlotArea)
             
-            if((nargin == 1) || ~Nodefault)
+            if((nargin == 1) || ( (ischar(PlotArea) == 2) && strcmp(PlotArea,'newDefault')))
                 if(abs(this.optsNum.PhysArea.alpha_deg - 90) < 20)
                     PlotArea = struct('y1Min',-5,'y1Max',5,'y2Min',0.5,'y2Max',10,'N1',80,'N2',80);
                     %PlotArea = struct('y1Min',-8,'y1Max',8,...
                     %                  'y2Min',0.5,'y2Max',this.optsNum.maxComp_y2+5,...
                     %                  'N1',80,'N2',80);
-                elseif(this.optsNum.PhysArea.alpha_deg <= 70)
+                elseif((this.optsNum.PhysArea.alpha_deg -90) > 20)
                     if(isempty(this.optsNum.maxComp_y2))
                         y2MaxPlot = 10;
                     else
                         y2MaxPlot = this.optsNum.maxComp_y2+5;
-                    end
-                    PlotArea = struct('y1Min',-2,...
-                                      'y1Max',y2MaxPlot/tan(this.optsNum.PhysArea.alpha_deg*pi/180),...
-                                      'y2Min',0.5,'y2Max',y2MaxPlot,...
+                    end                    
+                    PlotArea = struct('y2Min',0.5,'y2Max',y2MaxPlot,...
                                       'N1',100,'N2',100);        
+                    if(this.optsNum.PhysArea.alpha_deg < 90)
+                        PlotArea.y1Min = -2;
+                        PlotArea.y1Max = y2MaxPlot/tan(this.optsNum.PhysArea.alpha_deg*pi/180);
+                    else
+                        PlotArea.y1Min = y2MaxPlot/tan(this.optsNum.PhysArea.alpha_deg*pi/180);
+                        PlotArea.y1Max = 10;
+                    end
+                                  
                 end    
                 this.optsNum.PlotArea = PlotArea;
                 this.HS.InterpolationPlotCart(PlotArea,true);

@@ -18,8 +18,8 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     %Check Spectral/Spectral map in 2D:
     WI     = Wedge_Interface(v2struct(R,th1,th2,N));
     [Pts,Diff,Int,Ind] = WI.ComputeAll();
-    Interp             = WI.ComputeInterpolationMatrix((-1:0.005:1)',...
-                                (-1:0.02:1)',true,true);                    
+    Interp             = WI.ComputeInterpolationMatrix((-1:0.05:1)',...
+                                (-1:0.05:1)',true,true);                    
        
     
 % %     Interp_r2   = M1SpectralSpectral_Interpolation(Pts.x1(2),x2Plot,Pts,Maps);     
@@ -63,37 +63,37 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     
    
 %    legend('r=0',['r=',num2str(Interp_r1.pts1(1))],['r=',num2str(Interp_r4.pts1(1))]);
-    doPlots_SC_Polar(Interp,Pts,V);
+    WI.doPlots(V);
     
-    subplot(2,2,1); doPlots_SC_Polar(Interp,Pts,Vdiff.dy1);
-    subplot(2,2,2); doPlots_SC_Polar(Interp,Pts,Diff.Dy1*V);
-    subplot(2,2,3); doPlots_SC_Polar(Interp,Pts,(Diff.Dy1*V-Vdiff.dy1));
+    subplot(2,2,1); WI.doPlots(Vdiff.dy1);
+    subplot(2,2,2); WI.doPlots(Diff.Dy1*V);
+    subplot(2,2,3); WI.doPlots((Diff.Dy1*V-Vdiff.dy1));
     
     figure    
     
-    subplot(2,2,1); doPlots_SC_Polar(Interp,Pts,Vdiff.ddy1);
-    subplot(2,2,2); doPlots_SC_Polar(Interp,Pts,Diff.DDy1*V);
-    subplot(2,2,3); doPlots_SC_Polar(Interp,Pts,(Diff.DDy1*V-Vdiff.ddy1));
+    subplot(2,2,1); WI.doPlots(Vdiff.ddy1);
+    subplot(2,2,2); WI.doPlots(Diff.DDy1*V);
+    subplot(2,2,3); WI.doPlots((Diff.DDy1*V-Vdiff.ddy1));
     
     figure
 
-    subplot(2,2,1); doPlots_SC_Polar(Interp,Pts,Vdiff.dy1dy2);
-    subplot(2,2,2); doPlots_SC_Polar(Interp,Pts,Diff.Dy1Dy2*V);
-    subplot(2,2,3); doPlots_SC_Polar(Interp,Pts,(Diff.Dy1Dy2*V-Vdiff.dy1dy2));
+    subplot(2,2,1); WI.doPlots(Vdiff.dy1dy2);
+    subplot(2,2,2); WI.doPlots(Diff.Dy1Dy2*V);
+    subplot(2,2,3); WI.doPlots((Diff.Dy1Dy2*V-Vdiff.dy1dy2));
 
     rM0 = 1./Pts.y1_kv;
     rM0(rM0 == inf) = 0;   
     
     figure
         
-    subplot(2,2,1); doPlots_SC_Polar(Interp,Pts,Vdiff.ddy2);
-    subplot(2,2,2); doPlots_SC_Polar(Interp,Pts,Diff.DDy2*V);
-    subplot(2,2,3); doPlots_SC_Polar(Interp,Pts,(Diff.DDy2*V-Vdiff.ddy2));
+    subplot(2,2,1); WI.doPlots(Vdiff.ddy2);
+    subplot(2,2,2); WI.doPlots(Diff.DDy2*V);
+    subplot(2,2,3); WI.doPlots((Diff.DDy2*V-Vdiff.ddy2));
 
     figure
-    subplot(2,2,1); doPlots_SC_Polar(Interp,Pts,Vdiff.Lap);
-    subplot(2,2,2); doPlots_SC_Polar(Interp,Pts,Diff.Lap*V);
-    subplot(2,2,3); doPlots_SC_Polar(Interp,Pts,Diff.Lap*V-Vdiff.Lap);
+    subplot(2,2,1); WI.doPlots(Vdiff.Lap);
+    subplot(2,2,2); WI.doPlots(Diff.Lap*V);
+    subplot(2,2,3); WI.doPlots(Diff.Lap*V-Vdiff.Lap);
 
     %Check Integration
     data.Int = abs(Int*V-VInt);
@@ -123,7 +123,7 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     set(gcf,'Color','white'); %Set background color    
     
     
-    doPlots_SC_Polar(Interp,Pts,V); 
+    WI.doPlots(V); 
     title('Interpolation');    
     pbaspect([1 1 1]);        
 

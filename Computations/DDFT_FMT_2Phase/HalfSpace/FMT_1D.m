@@ -2,6 +2,9 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     global PersonalUserOutput dirData MinimalOutput
             
     saveFigs = true;
+    if(nargin < 6)
+        BoolPlot = true;
+    end
 
     %************************************************
     %***************  Initialization ****************
@@ -66,7 +69,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     PtsADCart = HS.AD.GetCartPts();
     Int_1D_AD(PtsADCart.y2_kv(mark)>y2MaxInt) = 0;
     if(~MinimalOutput)
-        cprintf('-red',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);
+        cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);
     end
         
     %****************************************************************
@@ -127,7 +130,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             f2 = figure('Color','white');
             set(f2, 'Position', [0 0 400 400]);
             do1Dplot(nStruct.n2*rho_ic1D,false); 
-            hh = title('$\rho_2$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            hh = title('$n_2\sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
             pbaspect([1 1 1]);            
             xlim([0 4]);
             set(gca,'Xtick',[0 4]);
@@ -137,7 +140,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             f2 = figure('Color','white');
             set(f2, 'Position', [0 0 400 400]);
             do1Dplot(nStruct.n3*rho_ic1D,false); 
-            hh = title('$\rho_3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            hh = title('$n_3 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
             pbaspect([1 1 1]);            
             xlim([0 4]);
             set(gca,'Xtick',[0 4]);
@@ -147,7 +150,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             f2 = figure('Color','white');
             set(f2, 'Position', [0 0 400 400]);
             do1Dplot(nStruct.n2_v_2*rho_ic1D,false); 
-            hh = title('$\rho_3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            hh = title('$n_3 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
             pbaspect([1 1 1]);            
             xlim([0 4]);
             set(gca,'Xtick',[0 4]);
@@ -195,7 +198,6 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         end        
         mu_s = mu_s + x + Conv*rho_s + VAdd;
     end
-
     function Fex = GetExcessGrandPotential(rho)
         %Compute excess grand potential
         f_id       = kBT*rho.*(log(rho)-1);
@@ -245,17 +247,20 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         
         subplot(1,3,1);            
         do1Dplot(nStruct.n2*rho); 
-        hh = title('$n_2$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+        hh = title('$n_2 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);        
+        xlabel('$y_2/\sigma$','Interpreter','Latex');
         pbaspect([1 1 1]);
 
         subplot(1,3,2);
         do1Dplot(nStruct.n3*rho);  
-        hh = title('$n_3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+        hh = title('$n_3 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+        xlabel('$y_2/\sigma$','Interpreter','Latex');
         pbaspect([1 1 1]);
 
         subplot(1,3,3);
         do1Dplot(nStruct.n2_v_2*rho);  
-        hh = title('${\bf n}_{2,y}$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);  
+        hh = title('${\bf n}_{2,y} \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);  
+        xlabel('$y_2/\sigma$','Interpreter','Latex');
         pbaspect([1 1 1]);
 
     end

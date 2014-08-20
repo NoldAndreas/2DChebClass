@@ -193,7 +193,7 @@
                 return;
             end
             %V: Vector of length N2
-            y2Max       = 10;
+            y2Max       = 5;
             mark        = (this.Pts.y1_kv == inf);            
             y2IP        = (0:0.1:y2Max)';
             [h_1,IP]      = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));

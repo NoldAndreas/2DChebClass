@@ -26,16 +26,13 @@ classdef (Abstract) Shape < handle
          Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool);           
          Int    = ComputeIntegrationVector(this);
          M_conv = ComputeConvolutionMatrix(this,f,saveBool);
-    end
-    
-    
+    end        
 	methods 
         function this = Shape(N1,N2)
             this.N1 = N1;
             this.N2 = N2;             
         end
-    end
-    
+    end  
     methods (Access = public)
         
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
@@ -176,8 +173,7 @@ classdef (Abstract) Shape < handle
             else
                 IP = ComputeInterpolationMatrix(this,y1Plot,y2Plot,true,false);           
             end
-        end           
-        
+        end                   
         function doPlotsStreamlines(this,flux,startMask,startMask2)
             mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
                                (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
@@ -205,7 +201,7 @@ classdef (Abstract) Shape < handle
                 streamline(y1M,y2M,fl_y1,fl_y2,startMask,startMask2);                       
             end
         end        
-        function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c)
+        function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -267,7 +263,7 @@ classdef (Abstract) Shape < handle
                 %    subplot(nRows,nCol,iSpecies);
                 %end
 
-                if(exist('lw','var') && exist('c','var')) 
+                if(exist('lw','var') && exist('c','var') && ~isempty(lw)) 
                     if(nSpecies == 1)
                         quiver(y1_s,y2_s,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
                     else
@@ -279,13 +275,15 @@ classdef (Abstract) Shape < handle
 
                 hold on;
                 
-                xlim(xl); ylim(yl);                    
-                h = xlabel('$y_1$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-                h = ylabel('$y_2$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-                pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
-                title(['Species ' num2str(iSpecies)]);
-                set(gca,'fontsize',20);                        
-                set(gca,'linewidth',1.5);                                                             
+                if(nargin < 7 || ~strcmp(plain,'plain'))
+                    xlim(xl); ylim(yl);                    
+                    h = xlabel('$y_1$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+                    h = ylabel('$y_2$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+                    pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
+                    title(['Species ' num2str(iSpecies)]);
+                    set(gca,'fontsize',20);                        
+                    set(gca,'linewidth',1.5);                                                             
+                end
             end                            
             hold off;   
                                             
@@ -328,8 +326,10 @@ classdef (Abstract) Shape < handle
                     subplot(nRows,nCol,iSpecies);
                 end
 
-                if( (size(V,1) == length(this.Interp.pts1)) && (length(this.Interp.pts1) ~= length(this.Pts.y1_kv)) )
-                    VI = V(:,iSpecies);
+                if((nargin >= 3) && strcmp(options,'flux')) %if its a flux
+                    VI = blkdiag(this.Interp.InterPol,this.Interp.InterPol)*V(:,iSpecies);
+                elseif( (size(V,1) == length(this.Interp.pts1)) && (length(this.Interp.pts1) ~= length(this.Pts.y1_kv)) )
+                    VI = V(:,iSpecies);                
                 else
                     VI = this.Interp.InterPol*V(:,iSpecies);
                 end
@@ -359,6 +359,27 @@ classdef (Abstract) Shape < handle
                                   'linewidth',lw);  
                     end
                     % hh = clabel(C,h,'fontsize',20);
+                elseif((nargin >= 3) && strcmp(options,'flux'))
+                    fl_y1     = VI(1:end/2,iSpecies);
+                    fl_y2     = VI(end/2+1:end,iSpecies);
+
+                    if(strcmp(this.polar,'polar'))
+                        [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
+                    end                
+                    
+%                     if(exist('fl_norm','var') && ~isempty(fl_norm))
+%                         O = ones(1,size(fl_y1,2));
+%                         fl_y1 = [fl_norm*O;fl_y1];
+%                         fl_y2 = [0*O;fl_y2];
+%                     end       
+                    %quiver(y1_s,y2_s,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
+                    if((nargin >= 4) && isfield(optDetails,'linecolor'))
+                        c = optDetails.linecolor;
+                    else
+                        c = 'k';
+                    end
+                    
+                    quiver(yCart.y1_kv,yCart.y2_kv,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
                 else
                     h = surf(y1M,y2M,reshape(VI,...
                                   this.Interp.Nplot2,this.Interp.Nplot1)); %mesh
@@ -386,16 +407,18 @@ classdef (Abstract) Shape < handle
                     set(h,'MarkerEdgeColor','k','MarkerFaceColor','g');
                 end
                 
-                xlim(xl); ylim(yl);                    
-                xlabel('$y_1$','Interpreter','Latex','fontsize',25);
-                ylabel('$y_2$','Interpreter','Latex','fontsize',25);
-                pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
-                if(nSpecies > 1)
-                    title(['Species ' num2str(iSpecies)]);
+                if((nargin < 4) || ~isfield(optDetails,'reshape') || optDetails.reshape)
+                    xlim(xl); ylim(yl);                    
+                    xlabel('$y_1$','Interpreter','Latex','fontsize',25);
+                    ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                    pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
+                    if(nSpecies > 1)
+                        title(['Species ' num2str(iSpecies)]);
+                    end
+                    set(gca,'fontsize',20);                        
+                    set(gca,'linewidth',1.5);                        
+                    hold off;
                 end
-                set(gca,'fontsize',20);                        
-                set(gca,'linewidth',1.5);                        
-                hold off;
             end            
         end            
         function PlotGrid(this,InitFig)    
@@ -577,8 +600,7 @@ classdef (Abstract) Shape < handle
                 ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
                 title(['Values on line from ',ptsStr]);                                                                                        
             end                        
-        end             
-        
+        end                     
     end    
 end
 

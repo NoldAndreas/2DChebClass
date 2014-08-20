@@ -12,7 +12,7 @@ classdef DDFT_2D < handle
         
         Vext,Vext_grad,VAdd
         
-        x_eq,mu
+        x_eq,mu,FilenameEq
         dynamicsResult
         
         doHI,doHIWall,doSubArea,do2Phase
@@ -54,13 +54,20 @@ classdef DDFT_2D < handle
             
             % Construct main object for geometry IDC
             shapeClass = str2func(optsNum.PhysArea.shape);
-            this.IDC   = shapeClass(shape);            
-            this.IDC.ComputeAll(optsNum.PlotArea);             
+            this.IDC   = shapeClass(shape);
+            if(isfield(optsNum,'PlotArea'))
+                this.IDC.ComputeAll(optsNum.PlotArea);             
+            elseif(isfield(optsNum,'PlotAreaCart'))
+                this.IDC.ComputeAll();
+                this.IDC.InterpolationPlotCart(optsNum.PlotAreaCart,true);
+            else
+                this.IDC.ComputeAll();
+            end
             
             % Determine hard-sphere contribution to bulk free energy
             if(~isfield(this.optsPhys,'HSBulk'))
-                if(isfield(this.optsPhys,'FexNum'))
-                    this.optsPhys.HSBulk = ['FexBulk_',this.optsPhys.FexNum.Fex];
+                if(isfield(this.optsNum,'FexNum'))
+                    this.optsPhys.HSBulk = ['FexBulk_',this.optsNum.FexNum.Fex];
                 else
                     this.optsPhys.HSBulk = 'Fex_ZeroMap';
                 end
@@ -71,6 +78,8 @@ classdef DDFT_2D < handle
                 [this.optsPhys.rhoGas_sat,...
                      this.optsPhys.rhoLiq_sat,...
                     this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
             end
 
@@ -89,9 +98,8 @@ classdef DDFT_2D < handle
             Preprocess_ExternalPotential(this);                        
             Preprocess_SubArea(this);
             
-        end        
-        
-        function y0 = getInitialGuess(this,rho_ig)
+        end                
+        function y0  = getInitialGuess(this,rho_ig)
             
           optsNum  = this.optsNum;
           optsPhys = this.optsPhys;          
@@ -146,7 +154,7 @@ classdef DDFT_2D < handle
                 paramsFex.FexNum   = this.optsNum.FexNum;
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
-                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC)],FexFun,paramsFex,this.IDC);   
+                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   
             elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else
@@ -168,7 +176,7 @@ classdef DDFT_2D < handle
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
-                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC)],FexFun,paramsFex,this.IDC);   
+                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   
 
             elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                
                 error('Define V2Num structure in optsNum')
@@ -269,6 +277,7 @@ classdef DDFT_2D < handle
                 this.Int_of_path   =  zeros(1,2*this.IDC.M);
             end
         end        
+        
         function PlotDynamics(this)
                 plotData.optsPhys = this.optsPhys;
                 plotData.optsNum  = this.optsNum;
@@ -278,9 +287,23 @@ classdef DDFT_2D < handle
                 PlotDDFT(plotData);  
         end    
         
-        ComputeEquilibrium(this,rho_ig)
-        ComputeDynamics(this)
+        function ResetTemperature(this,T)
+            if(nargin > 1)
+                this.optsPhys.kBT = T;
+            end
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
+                this.do2Phase = true;
+            end
+        end
         
+        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
+        ComputeDynamics(this)        
         
     end
 end

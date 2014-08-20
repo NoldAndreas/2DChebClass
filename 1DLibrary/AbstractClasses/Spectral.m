@@ -42,7 +42,7 @@ classdef (Abstract) Spectral < Interval
                             'N',this.N,...
                             'pts',PhysSpace(this,interp));
 
-            if((nargin >= 2) && saveBool)
+            if((nargin >= 3) && saveBool)
                 this.Interp = Interp;
             end  
         end      

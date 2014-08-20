@@ -20,6 +20,7 @@ function [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
     
     disp(['Delta mu = ',num2str(muDelta)]);
     
+    %
 	
     function [mu_s,J] = GetExcessChemPotential(rho_s,mu_offset)    
         [dW,~,ddW]    = DoublewellPotential(rho_s,Cn);
@@ -44,12 +45,16 @@ function [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
         %% Boundary condition for the density at y2max
         % 
         % $$(\cos(\theta),\sin \theta)^T \cdot {\nabla \rho} = 0$$
-        % 
+        %         
          E               = eye(M);
-         ETop            = E(Ind.top,:);
+         ETop            = E(Ind.top,:);         
          topDirection    = [cos(theta)*ETop,sin(theta)*ETop];
          y(Ind.top)      = topDirection*(Diff.grad*rho_s); 
-         J(Ind.top,:)    = [zeros(sum(Ind.top),1),topDirection*Diff.grad];                
+         J(Ind.top,:)    = [zeros(sum(Ind.top),1),topDirection*Diff.grad];                                  
+%         topDirection    = [diag(this.IC.GetCartPts.y1_kv(Ind.top)),...
+%                            diag(this.IC.GetCartPts.y2_kv(Ind.top))];
+         %y(Ind.top)      = topDirection*(Diff.grad([Ind.top;Ind.top],:)*rho_s);         
+         %J(Ind.top,:)    = [zeros(sum(Ind.top),1),topDirection*Diff.grad([Ind.top;Ind.top],:)];                
         
 %         ys             = DoublewellPotential(rho_s,Cn) - Cn*Diff.Lap*rho_s;
 %         y(Ind.top)     = - Diff.Lap(Ind.top,:)*((rho + rho_m).*mu_s) ...

@@ -8,17 +8,20 @@ function SimulationAnnulus()
     N1 =  20;   N2 = 20;        
     RMin     = 1;
     RMax     = 3;
-    Origin  = [2;3];
+    Origin  = [-2;3];
     N       = [N1;N2];    
 
-    AS                = Annulus(v2struct(Origin,RMin,RMax,N));
+    AS                 = Annulus(v2struct(Origin,RMin,RMax,N));
     [Pts,Diff,Int,Ind] = AS.ComputeAll();    
     Interp             = AS.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
     
     AS.PlotGridLines();  hold on;
     AS.PlotGrid();
+ 
+    Origin = [2;3];
+    AS.Origin = Origin;
     
-    PtsCart = AS.GetCartPts();
+    PtsCart = AS.GetCartPts();    
         
     [V,VInt]   = VTest(PtsCart.y1_kv,PtsCart.y2_kv);
     VP         = VTest(Interp.pts1,Interp.pts2);

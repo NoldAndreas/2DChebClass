@@ -1,7 +1,6 @@
  classdef PolarSegment < Polar_M1SpectralSpectral
     properties 
-        h,R,S
-        Origin = [0,0]
+        h,R,S        
         sphere
     end
     
@@ -33,8 +32,7 @@
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
             R = this.R;
             S = this.S;
-            h = this.h;            
-            Origin = this.Origin;
+            h = this.h;                        
             
             n  = length(x1);
             

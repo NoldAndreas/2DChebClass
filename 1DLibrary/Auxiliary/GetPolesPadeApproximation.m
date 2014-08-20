@@ -20,7 +20,7 @@ function [d,e] = GetPolesPadeApproximation(fx,npoles)
     e     = abs(imag(poles(1:2:npoles)));% IMAGINARY PARTS OF POLES
     
     if(e == 0)
-        disp('Imaginary part of pole = 0.');
+        disp('GetPolesPadeApproximation: Imaginary part of pole = 0.');
     end
     
 end

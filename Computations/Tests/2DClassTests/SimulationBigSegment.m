@@ -37,8 +37,7 @@ function data = SimulationBigSegment(N1,N2,vext)
 	%***************************************************************
     %*** Simulate Arc ***
     %***************************************************************
-    ArcShape       = v2struct(R,th1,th2,Origin,N);
-    %ArcShape.InOut = 'Out';
+    ArcShape       = v2struct(R,th1,th2,Origin,N);    
     
     anarc = Arc(ArcShape);
     anarc.ComputeIntegrationVector();
@@ -63,10 +62,8 @@ function data = SimulationBigSegment(N1,N2,vext)
     shape.N = [N1T,N2T];
     BSA     = BigSegmentAlternative(shape);
     BSA.ComputeIntegrationVector();
-    IP      = abox.SubShapePts(BSA.Pts);    
-    Int     = BSA.Int*IP;
-    %[PtsS,InterpSP,IntS,DiffS,~,InterpS] = SubShape(Pts,Maps,Shape,[N1T;N2T],x1Plot,x2Plot);
-        
+    IP      = abox.SubShapePts(BSA.GetCartPts);    
+    Int     = BSA.Int*IP;            
     V                = vext(Pts.y1_kv,Pts.y2_kv);   
     [VPS,Vdiff,VInt] = vext(BSA.Pts.y1_kv,BSA.Pts.y2_kv);
            
@@ -81,35 +78,27 @@ function data = SimulationBigSegment(N1,N2,vext)
     data.N1 = N1; data.N2 = N2;
     
     figure;
-    scatter(BSA.Pts.y1_kv,BSA.Pts.y2_kv,'.'); title('Alternative Map');
+    BSA.PlotGrid();    title('Alternative Map');
 
-    %******** Plotting **********
-    %figure
-    %set(gcf,'Color','white'); %Set background color                
-    %doPlots_SC(InterpS,Pts,V); 
-    %title('Interpolation');    
-    %pbaspect([1 1 1]);          
-    
 
     %*************************************
     %*** Check Alternative Integration ***
     %*************************************    
-    N1T = 10; N2T = 10;
-	shape   = v2struct(Origin,R,h);
-    shape.h   = h;
-    shape.Top = false;
+    N1T = 20; N2T = 20;
+    Wall_Y       = 1;
+    Wall_VertHor = 'horizontal';
+	shape        = v2struct(Origin,R,Wall_Y,Wall_VertHor);
     shape.NW = [4*N1T,N2T];   
     shape.NT = [N1T,N2T];   
-    shape.sphere = true;
-    %shape.R = 0.5; shape.h = -0.38; shape.N = [10;10]; shape.InOut = 'Out'; shape.sphere = 1;
+    shape.sphere = false;    
     BS      = BigSegment(shape);    
-    IP      = abox.SubShapePts(BS.Pts);    
+    IP      = abox.SubShapePts(BS.GetCartPts);
     IntA    = BS.ComputeIntegrationVector()*IP;
     
     data.IntA     = abs(IntA*V-VInt);
     display([' Error in Integration: ', num2str(data.IntA)]);
-    figure;    
-    scatter(BS.Pts.y1_kv,BS.Pts.y2_kv,'.'); title('Composed Map');
+    figure;
+    BS.PlotGrid(); title('Composed Map');
 
 %     %******************************************
 %     %Test Case for Sphere

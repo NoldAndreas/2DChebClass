@@ -44,6 +44,7 @@ function DiffOut = PhysicalDerivatives(a_shape,Pts,Sel,CompDiff1,CompDiff2,order
     Diff.DDDy1   = kron(Diff1.DDDy,eye(n2));
     Diff.DDDy2   = kron(eye(n1),Diff2.DDDy);
     Diff.gradLap = [Diff.DDDy1 + Diff.Dy1DDy2 ; Diff.DDy1Dy2 + Diff.DDDy2];
+    Diff.LapDiv  = [Diff.DDDy1 + Diff.Dy1DDy2 , Diff.DDy1Dy2 + Diff.DDDy2];
     
     if (order == 3)        
         CopyFields(); 

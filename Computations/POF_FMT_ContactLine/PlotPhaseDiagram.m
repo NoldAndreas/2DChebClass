@@ -90,17 +90,18 @@ function PlotPhaseDiagram()
     set(gca,'linewidth',1.5);  
 
         
-    fid = fopen('Data/MichelsNGasNLiq.txt');
+    fid = fopen('D://Data/MichelsNGasNLiq.txt');
     x = textscan(fid,'%f %f %f','headerlines',3); %[T, rhoG, rhoL]
     fclose(fid); 
     plot(x{2},x{1},'kd','MarkerFaceColor','k','MarkerSize',10);
     plot(x{3},x{1},'kd','MarkerFaceColor','k','MarkerSize',10);
-    hold on;
+    hold on;	
     
-    fid = fopen('Data/TrokhymchukNGas.txt');
+    fid = fopen('D://Data/TrokhymchukNGas.txt');
     xGas = textscan(fid,'%f %f %f','headerlines',4); %[T, rhoG, rhoL]
     fclose(fid);
-    fid = fopen('Data/TrokhymchukNLiq.txt');
+    
+    fid = fopen('D://Data/TrokhymchukNLiq.txt');
     xLiq = textscan(fid,'%f %f %f','headerlines',3); %[T, rhoG, rhoL]
     fclose(fid);    
     plot(xGas{3},xGas{1},'ks','MarkerFaceColor','k','MarkerSize',10);
@@ -122,7 +123,7 @@ function PlotPhaseDiagram()
 %     
 %     fid = fopen('Data/MichelsPressure.txt');
 %     x = textscan(fid,'%f %f','headerlines',4); %[T, p]
-%     fclose(fid);
+     %fclose(fid);
 %     subplot(2,2,4) 
 %     plot(x{1},x{2},'o b');
 %     hold on;

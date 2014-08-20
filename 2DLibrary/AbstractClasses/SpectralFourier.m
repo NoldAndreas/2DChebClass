@@ -30,13 +30,6 @@ classdef (Abstract) SpectralFourier < Shape
     %************   Initializations    *************
     %**********************************************
     methods (Access = public) 
-        function this = InitializationPts(this)
-            [y1,dy1]        = this.PhysSpace1(this.Pts.x1);
-            [y2,dy2]        = this.PhysSpace2(this.Pts.x2); 
-            this.Pts.y1_kv  = kron(y1,ones(size(y2)));
-            this.Pts.y2_kv  = kron(ones(size(y1)),y2);
-            this.M          = length(this.Pts.y1_kv);
-        end
         function int = ComputeIntegrationVector(this)
             [h1,dy1]        = this.PhysSpace1(this.Pts.x1);
             [h1,dy2]        = this.PhysSpace2(this.Pts.x2);             
@@ -118,7 +111,7 @@ classdef (Abstract) SpectralFourier < Shape
             end                        
         end        
         function Ind = ComputeIndices(this)
-            Ind      = GetIndicesBox(this.Pts.x1,this.Pts.x2);
+            Ind      = GetIndicesBox(this);
             this.Ind = Ind;
         end    
         function M_conv = ComputeConvolutionMatrix(this,f,saveBool)
@@ -136,8 +129,7 @@ classdef (Abstract) SpectralFourier < Shape
                 this.Conv = M_conv;
             end
             
-        end
-        
+        end        
         function [FFTMatrix,IFFTMatrix] = getFFTMatrices(this,N1,N2)
 
             n = (1:N2) -1;
@@ -149,8 +141,7 @@ classdef (Abstract) SpectralFourier < Shape
             FFTMatrix = kron(eye(N1),FFTMatrix);
             IFFTMatrix = kron(eye(N1),IFFTMatrix);
 
-        end
-        
+        end        
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)
            
             [y1_kv,dy1] = PhysSpace1(this,x1);

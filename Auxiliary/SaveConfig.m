@@ -24,10 +24,9 @@ function configName = SaveConfig(configuration,configDir)
     if(resave)
         save([configDirFull filesep configName '.mat'],'configuration');
         config_Flat.Filename = [configName,'.mat'];
-        
-        codename = GetCodeVersionName();
+                
         Struct2File([configDirFull filesep configName '.txt'],config_Flat,...
-            ['Configuration ', configName, ' , latest saved Code Version: ',codename]);
+            ['Configuration ', configName]);
         disp(['Configuration saved in ' configDirFull filesep configName '.txt']);
     end
 

@@ -1,11 +1,4 @@
 function x = IterativeContinuation(func,Nosteps,theta,xInitial,params,user_scalarProduct,userXTransform)    
-
-    thetaMin    = theta/32;    
-    thetaMax    = theta*32;
-    maxDistance = theta*5;
-    MaxLoopsWithoutProblems = 10;
-    
-    LoopsWithoutProblems = 0;
     
     if((nargin < 6) || isempty(user_scalarProduct))
         user_scalarProduct = @times;
@@ -18,9 +11,18 @@ function x = IterativeContinuation(func,Nosteps,theta,xInitial,params,user_scala
         opts     = optimset('Display','off');   
     end
     
-    xTTangent = 0*xInitial';    
-    xTTangent(1) = 1;
-    xTLast    = userXTransform(xInitial);    
+    xTTangent    = 0*xInitial';    
+    xTTangent(1) = sign(theta);
+    xTLast       = userXTransform(xInitial);    
+    
+    
+    theta       = abs(theta);
+    thetaMin    = theta/32;    
+    thetaMax    = theta*32;
+    maxDistance = theta*5;
+    MaxLoopsWithoutProblems = 10;
+    
+    LoopsWithoutProblems = 0;
     
     dirname = strrep(['IterativeContinuation',func2str(func)], '/','_');    
     x       = DataStorageLoop(dirname,@SolveIterativeStep,params,xInitial,[],Nosteps);            

@@ -1,9 +1,9 @@
 function [sol] = ComputeEquilibriumCondition(params,misc)
 
-    x_ig = misc.x_ig;    
-    Vext = misc.Vext;
-    VAdd = misc.VAdd;
-    Conv = misc.Conv;
+    x_ig       = misc.x_ig;    
+    Vext       = misc.Vext;
+    VAdd       = misc.VAdd;
+    Conv       = misc.Conv;
     IntMatrFex = misc.IntMatrFex;    
     nSpecies   = params.optsPhys.nSpecies;
     
