@@ -65,7 +65,7 @@ function ComputeDynamics(this,x_ic,mu)
         optsNumT = rmfield(optsNum,'PlotArea');
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]);%,true);
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        
@@ -117,6 +117,7 @@ function ComputeDynamics(this,x_ic,mu)
         h_s([markVinf;markVinf]) = 0;
         
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        %dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
         
         if(doHI)
             rho_s    = exp((x-Vext)/kBT);
@@ -127,9 +128,6 @@ function ComputeDynamics(this,x_ic,mu)
         end
         
         flux_dir               = Diff.grad*mu_s;
-        if(doHI)
-            flux_dir           = flux_dir + HI_s;
-        end
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
@@ -149,10 +147,9 @@ function ComputeDynamics(this,x_ic,mu)
         mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
     end   
     function flux = GetFlux(x,t)
-        rho_s = exp((x-Vext)/kBT);  
-        rho_s = [rho_s;rho_s];
+        rho_s = exp((x-Vext)/kBT);       
         mu_s  = GetExcessChemPotential(x,t,mu); 
-        flux  = -rho_s.*(Diff.grad*mu_s);                                
+        flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
         if(polarShape)
             %then transform to cartesian corrdinates
             flux = GetCartesianFromPolarFlux(flux,ythS);
