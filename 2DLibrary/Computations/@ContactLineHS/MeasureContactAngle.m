@@ -52,7 +52,7 @@ function  [CA_measured,err] = MeasureContactAngle(this,type,yInt) %,pt1,pt2]
             %average slope in a certain interval from the wall
             
             if(nargin>2)
-                InitAnalysisGrid(this,[],yInt);
+                [this.y2,this.Int_y2,this.DiffY2] = InitAnalysisGridY(this,yInt,100);                   
                 ComputeInterfaceContourY2(this,0.5);
             end
             

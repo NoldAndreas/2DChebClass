@@ -178,13 +178,6 @@ classdef ContactLineHS < DDFT_2D
             PtsCart                    = this.IDC.GetCartPts();
             this.VAdd                  = getVAdd(PtsCart.y1_kv,PtsCart.y2_kv,0,this.optsPhys.V1);
         end       
-        function InitAnalysisGrid(this,y2Int)
-            
-
-            if(~isempty(y2Int))
-                [this.y2,this.Int_y2,this.DiffY2] = InitAnalysisGridY(this,y2Int,100);                      
-            end
-        end        
         function y0  = getInitialGuess(this,rho_ig)
                     
         	rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
