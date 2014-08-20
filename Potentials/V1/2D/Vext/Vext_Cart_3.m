@@ -5,8 +5,14 @@ function [VBack_S,VAdd_S]=Vext_Cart_3(y1,y2,t,optsPhys)
 
 
     V0   = optsPhys.V0;
-    y10  = optsPhys.y10;
-    y20  = optsPhys.y20;
+    
+    if(isfield(optsPhys,'y10') && isfield(optsPhys,'y20'))
+        y10  = optsPhys.y10;
+        y20  = optsPhys.y20;
+    else
+        y10 = 0;
+        y20 = 0;
+    end
     grav = optsPhys.grav;
 
 
