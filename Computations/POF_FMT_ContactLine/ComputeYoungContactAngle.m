@@ -1,4 +1,4 @@
-function ComputeYoungContactAngle(config)
+function [res,f1] = ComputeYoungContactAngle(config,epw)
     %Check convergence of surface tensions and errors of conact density
    % ConvergenceSurfaceTensions(config);
     
@@ -12,19 +12,14 @@ function ComputeYoungContactAngle(config)
     
     %filename    = [dirData filesep subDir filesep 'Job__12_11_13_ComputeContactAngles_epw.txt'];
     Struct2File(filename,config,['Computed at ',datestr(now)]);
-    
-	%opts.epw_YCA = 0.7:0.005:1.6;
-    opts.epw_YCA = 0.5:0.05:1.35;
+    	
+    opts.epw_YCA = epw;
     opts.config  = config;
-    res1 = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
+    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
     
-    opts.epw_YCA = 1.35:0.005:1.51;
-    opts.config  = config;
-    res2 = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
     
 	f1 = figure('Color','white','Position',[0 0 800 800]);
-    plot(res1.epw,180/pi*res1.theta_CA,'k','linewidth',1.5); hold on;    
-    plot(res2.epw,180/pi*res2.theta_CA,'k','linewidth',1.5); hold on;    
+    plot(res.epw,180/pi*res.theta_CA,'k','linewidth',1.5); hold on;        
     xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
     ylabel('$\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25); 
     set(gca,'fontsize',20); 

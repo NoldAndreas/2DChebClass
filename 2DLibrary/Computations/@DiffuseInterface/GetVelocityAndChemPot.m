@@ -56,9 +56,10 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     %% BC1 and BC2
     uwall                                    = [UWall*ones(M,1) ; zeros(M,1);];
     uvBound(repmat(Ind.bound &~Ind.top,2,1)) =  uwall(repmat(Ind.bound &~Ind.top,2,1));                       
-    uvBound([Ind.top;Ind.top]) = GetSeppecherSolutionCart(...
-                                        [PtsCart.y1_kv(Ind.top),...
-                                         PtsCart.y2_kv(Ind.top)],UWall,D_A,D_B,theta);
+    %uvBound([Ind.top;Ind.top]) = GetSeppecherSolutionCart(...
+%                                        [PtsCart.y1_kv(Ind.top),...
+%                                         PtsCart.y2_kv(Ind.top)],UWall,D_A,D_B,theta);                                     
+    uvBound([Ind.top;Ind.top]) = CorrectVelocityProfile(this,theta,rho);
     b([F;IBB])                 = uvBound(IBB);           
 
     %% BC3

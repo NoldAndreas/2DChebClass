@@ -2,7 +2,7 @@ function Seppecher_M1Inf_Intermediate()
 
     close all;
     %% Parameters    
-    PhysArea = struct('N',[60,30],'y2Min',0,'y2Max',20,'L1',10,... %12,80,50
+    PhysArea = struct('N',[60,30],'y2Min',0,'y2Max',15,'L1',10,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
@@ -46,7 +46,7 @@ function Seppecher_M1Inf_Intermediate()
         close all;
         %*** 1st step ***
         %D_B    = DI.SetD_B(theta,rho,D_B);               
-        DI.ResetOrigin_MassFlux(theta,rho);
+       % DI.ResetOrigin_MassFlux(theta,rho);
         
         %*** 2nd step ***
         [mu,uv] = DI.GetVelocityAndChemPot(rho,0,theta);
@@ -79,16 +79,17 @@ function Seppecher_M1Inf_Intermediate()
 
         %*** 3rd step ***        
         for i=1:3
-            %rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
-            rho   = DI.GetEquilibriumDensityR(mu,theta,nParticles,rho,ptC);
+            nParticles = cos(theta)*(PhysArea.y2Max)^2;
+            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
+            %rho   = DI.GetEquilibriumDensityR(mu,theta,nParticles,rho,ptC);
             
             theta = DI.FindInterfaceAngle(rho);                
             
-            IP    = DI.ResetOrigin(rho);
+           % IP    = DI.ResetOrigin(rho);
             
-            rho = IP*rho;
-            mu  = IP*mu;
-            uv  = blkdiag(IP,IP)*uv;
+            %rho = IP*rho;
+            %mu  = IP*mu;
+            %uv  = blkdiag(IP,IP)*uv;
             
             figure;
             subplot(1,2,1); DI.IC.doPlots(rho,'contour');

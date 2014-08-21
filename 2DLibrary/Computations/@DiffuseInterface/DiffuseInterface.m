@@ -136,8 +136,7 @@ classdef DiffuseInterface < handle
                              y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
-        end
-                
+        end                
         
         function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
             Cn     = this.optsPhys.Cn;
@@ -165,7 +164,39 @@ classdef DiffuseInterface < handle
         [A,b]       = Div_FullStressTensor(this,rho)
         [A,b]       = FullStressTensorIJ(this,rho,i,j)   
         [rho,uv]    = SolveFull(this,ic)
-        
+      
+        function uvBound_Corr = CorrectVelocityProfile(this,theta,rho)
+            InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
+            IntNormal_Path   = this.IC.borderTop.IntNormal_Path;   
+            ptsBorderTop     = this.IC.borderTop.Pts;
+            UWall            = this.optsPhys.UWall;
+            rho_m            = this.optsPhys.rho_m;
+            y2Max            = this.optsNum.PhysArea.y2Max;
+            PtsCart          = this.IC.GetCartPts();
+            Ind              = this.IC.Ind;
+            rhoL             = rho(Ind.top & Ind.left);
+            rhoR             = rho(Ind.top & Ind.right);
+            
+            u_flow     = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                        
+            rhoBorder  = InterpOntoBorder*rho;
+            rhoBorder2 = repmat(rhoBorder,2,1);
+                        
+            massFlux   = ((rhoR+rho_m)-(rhoL+rho_m))*(y2Max-0)*UWall;      %due to mapping to infinity
+            
+            a          = fsolve(@massInflux,0);            
+            
+            u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv(Ind.top),...
+                                         PtsCart.y2_kv(Ind.top)],UWall,0,0,theta);          
+            rhoBorder2 = repmat(rho(Ind.top),2,1);
+                                     
+            uvBound_Corr = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
+
+            function m = massInflux(a)
+                 u_corrected = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
+                 m          = IntNormal_Path*(u_corrected.*(rhoBorder2+rho_m)) + massFlux;    
+            end
+                        
+        end
         
    end
     

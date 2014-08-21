@@ -5,8 +5,10 @@ function [fContour] =  PlotContourResults(this,plain)
     rho           = GetRhoEq(this);
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
 	rhoGas_sat    = this.optsPhys.rhoGas_sat;
-    R             = this.optsPhys.sigmaS/2;        
-    y1            = this.y1_SpectralLine.Pts.y;
+    R             = this.optsPhys.sigmaS/2;            
+    if(~isempty(this.y1_SpectralLine))
+        y1  = this.y1_SpectralLine.Pts.y;
+    end
             
 	%*******************************************************
     % ******************** Contour Plot ********************
@@ -41,7 +43,7 @@ function [fContour] =  PlotContourResults(this,plain)
         
      	%**********************************************************
         % Add Isoline Thickness plot   
-        if(~isempty(this.hContour))
+        if(~isempty(this.hContour))            
             plot(y1,this.hContour,'b-.','linewidth',2.5);
         end
         

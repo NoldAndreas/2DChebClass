@@ -14,13 +14,14 @@ function LubricationForcedWetting()
     delta   = 0.3;
     lambda  = 1e-5;
     theta   = 1;           
-    N       = 1000;
+    N       = 1000; %1000
+    L       = 1;
     
     %% Initialization
     %     
     % # for computation of similarity solution
     % # for 2D area for plotting of streamfunction
-    shape      = struct('N',N,'L',1);    
+    shape      = struct('N',N,'L',L);    
     plotShape  = struct('yMin',0,'yMax',4,'N',N);
 
     HIS            = HalfInfSpectralLine(shape);    

@@ -6,7 +6,17 @@ function [rho,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
     Ind    = this.IC.Ind;    
     Diff   = this.IC.Diff;
     Int    = this.IC.Int;
-    IntSubArea  = this.IntSubArea;   
+    
+    IntSubArea  = this.IntSubArea;          
+%     Dy1 = this.optsNum.PhysArea.y2Max*cos(theta);
+% 	bxArea          = struct('y1Min',-10+Dy1,'y1Max',10+Dy1,'N1',100,...
+%                              'y2Min',this.optsNum.PhysArea.y2Max-5,...
+%                              'y2Max',this.optsNum.PhysArea.y2Max,'N2',100);  
+%     bxArea.N        = [100,100];
+%     BX              = Box(bxArea);
+%     IntBx           = BX.ComputeIntegrationVector();
+%     IntSubArea = IntBx*this.IC.SubShapePts(BX.GetCartPts());
+    
     
     if(isscalar(mu))
         mu = mu*ones(M,1);

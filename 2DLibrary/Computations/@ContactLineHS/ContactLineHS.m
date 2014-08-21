@@ -189,8 +189,7 @@ classdef ContactLineHS < DDFT_2D
             y0        = kBT*log(rho_ig)+this.Vext;
         end
         
-        %Plot functions
-        [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)        
+        %Plot functions        
         PlotContourResults(this,plain)
         function PlotDensityResult(this)                        
             rho           = GetRhoEq(this);
