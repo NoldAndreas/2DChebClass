@@ -84,7 +84,8 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     
     A([Ind.left&Ind.top;FF],:)                      = 0;        
     A([Ind.left&Ind.top;FF],[Ind.left&Ind.top;FF])  = eye(sum(Ind.left&Ind.top)); 
-    A([Ind.left&Ind.top;FF],[Ind.right&Ind.top;FF]) = eye(sum(Ind.right&Ind.top)); 
+    %A([Ind.left&Ind.top;FF],[Ind.right&Ind.top;FF]) = eye(sum(Ind.right&Ind.top)); 
+    
     %b(Ind.left&Ind.top) = 0;
     
     %A([Ind.left&Ind.top;FF],:) = 0;
@@ -99,13 +100,14 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     
     A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
         
-    A([Ind.right&Ind.top;FF],[T;FF]) = 0;
-    A([indBC5;FF],:)                = IntPathUpLow*Tt12;
-    A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF]) ...
-                                        - this.IC.borderRight.IntSc*diag(rho+rho_m);
-    A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF])  ...
-                                        + this.IC.borderLeft.IntSc*diag(rho+rho_m);
-    b([indBC5;FF])                  = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
+    
+     A([indBC5;FF],[T;FF]) = 0;
+     A([indBC5;FF],:)                = IntPathUpLow*Tt12;
+     A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF]) ...
+                                         - this.IC.borderRight.IntSc*diag(rho+rho_m);
+     A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF])  ...
+                                         + this.IC.borderLeft.IntSc*diag(rho+rho_m);
+     b([indBC5;FF])                  = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
         
 %     
 %    [~,WL] = DoublewellPotential(rho(Ind.left),Cn);

@@ -2,7 +2,7 @@ function Seppecher_M1Inf_Intermediate()
 
     close all;
     %% Parameters    
-    PhysArea = struct('N',[60,30],'y2Min',0,'y2Max',15,'L1',10,... %12,80,50
+    PhysArea = struct('N',[80,30],'y2Min',0,'y2Max',15,'L1',10,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
@@ -13,9 +13,9 @@ function Seppecher_M1Inf_Intermediate()
     optsPhys = struct('theta',pi/2,'g',0,...
                         'D_A',0,...
                         'zeta',10+2/3,'eta',1,...
-                        'Cak',0.05,'Cn',4/3,...
-                        'UWall',-1,...
-                        'rho_m',2);
+                        'Cak',0.1,'Cn',4/3,...
+                        'UWall',1,...
+                        'rho_m',5);
                     
     config = v2struct(optsPhys,optsNum);   
     
@@ -32,30 +32,31 @@ function Seppecher_M1Inf_Intermediate()
     %******** Start iterative procedure ************
     %***********************************************    
     
-    nParticles = 0;     
+    %nParticles = 0;     
     
+    Cn        = optsPhys.Cn;    
     rho       = DI.InitialGuessRho();    
-    theta     = DI.FindInterfaceAngle(rho);
+    theta     = 90*pi/180;%DI.FindInterfaceAngle(rho);    
+    nParticles = 30;%-cos(theta)*(PhysArea.y2Max)^2;
     uv        = zeros(3*DI.IC.M,1);
-    rho       = DI.GetEquilibriumDensity(0,theta,nParticles,uv,rho);
+    mu        = 0;
     
-    eps = 10^(-5);        
-    DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
+    
+    %eps = 10^(-5);        
+    %DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
     
     for j = 1:20             
-        close all;
-        %*** 1st step ***
-        %D_B    = DI.SetD_B(theta,rho,D_B);               
-       % DI.ResetOrigin_MassFlux(theta,rho);
+        close all;        
+        [rho,theta]  = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);            
+        [mu,uv] = DI.GetVelocityAndChemPot(rho,0,theta);        
         
-        %*** 2nd step ***
-        [mu,uv] = DI.GetVelocityAndChemPot(rho,0,theta);
+  %      mu      = DoublewellPotential(rho,Cn) - Cn*(DI.IC.Diff.Lap*rho);
                        
         DI.PlotMu_and_U(mu,uv); hold on;
         DI.PlotSeppecherSolution(0,theta,rho);
         DI.IC.doPlots(rho,'contour');
         
-        figure; L_ana = 40;
+        figure; L_ana = 10;
         DI.IC.doPlotFLine([-L_ana L_ana],...
                          [PhysArea.y2Max,PhysArea.y2Max],mu,'CART'); hold on;
         DI.IC.doPlotFLine([-L_ana L_ana],...
@@ -64,6 +65,7 @@ function Seppecher_M1Inf_Intermediate()
         muP = mean(mu(DI.IC.Ind.right));
         plot([0 2*L_ana],[muM muM],'k:');
         plot([0 2*L_ana],[muP muP],'k:');
+                
         
         % 2a
         % get pressure difference between +/- infinty
@@ -75,15 +77,17 @@ function Seppecher_M1Inf_Intermediate()
         
         ptC.y1 = PhysArea.y2Max/tan(theta) - sin(theta)*R;
         ptC.y2 = PhysArea.y2Max + cos(theta)*R;
+                
         
-
+        DI.DisplayFullError(rho,uv);
+        
         %*** 3rd step ***        
-        for i=1:3
-            nParticles = cos(theta)*(PhysArea.y2Max)^2;
-            rho   = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);
+        %for i=1:1
+           % nParticles = cos(theta)*(PhysArea.y2Max)^2;
+         
             %rho   = DI.GetEquilibriumDensityR(mu,theta,nParticles,rho,ptC);
             
-            theta = DI.FindInterfaceAngle(rho);                
+          %  theta = DI.FindInterfaceAngle(rho);                
             
            % IP    = DI.ResetOrigin(rho);
             
@@ -91,12 +95,13 @@ function Seppecher_M1Inf_Intermediate()
             %mu  = IP*mu;
             %uv  = blkdiag(IP,IP)*uv;
             
-            figure;
-            subplot(1,2,1); DI.IC.doPlots(rho,'contour');
-            subplot(1,2,2); DI.IC.doPlots(mu,'contour');
+           %figure;
+           %subplot(1,2,1); DI.IC.doPlots(rho,'contour');
+           %subplot(1,2,2); DI.IC.doPlots(mu,'contour');
 
-        end
+        %end
 
+        
     end
   
     %***************************************************************

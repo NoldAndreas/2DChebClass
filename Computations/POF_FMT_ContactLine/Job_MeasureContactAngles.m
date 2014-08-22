@@ -35,10 +35,10 @@ function Job_MeasureContactAngles()
     f2 = figure('Color','white','Position',[0 0 800 800]);    	
     thetaYCA = 180/pi*res.theta_CA;    
     
-    ComputeAndPlot(0.55:0.02:1.25,90,15,'o','k');    
-    %ComputeAndPlot(0.55:0.05:1.,90,15,'o','k');    
-    ComputeAndPlot(1.2:0.02:1.4,60,15,'s','k'); % N = [45,90]??        
-    ComputeAndPlot(1.3:0.02:1.44,40,15,'o','k');    
+    %ComputeAndPlot(0.55:0.02:1.25,90,15,'o','k');    
+    ComputeAndPlot(0.55:0.05:1.25,90,15,'o','k');    
+    ComputeAndPlot(1.2:0.05:1.4,60,15,'s','k'); % N = [45,90]??        
+    ComputeAndPlot(1.3:0.05:1.44,40,15,'o','k');    
     
     xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
     ylabel('$\theta -\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25);

@@ -51,7 +51,7 @@ classdef DiffuseInterface < handle
             PtsCart    = this.IC.GetCartPts();
             Cn         = this.optsPhys.Cn;
             
-            rho        = - tanh(PtsCart.y1_kv/Cn);
+            rho        = tanh(PtsCart.y1_kv/Cn);
         end        
         function theta = FindInterfaceAngle(this,rho)
 
@@ -94,7 +94,7 @@ classdef DiffuseInterface < handle
                        
         function PlotMu_and_U(this,mu,uv)                        
             figure('Position',[0 0 1800 600],'color','white');
-            subplot(1,2,1); this.IC.doPlots(mu);
+            subplot(1,2,1); this.IC.doPlots(mu,'SC');
             subplot(1,2,2); PlotU(this,uv); hold on; this.IC.doPlots(mu,'contour');
         end        
         function PlotSeppecherSolution(this,D_B,theta,rho)            
@@ -177,15 +177,22 @@ classdef DiffuseInterface < handle
             rhoL             = rho(Ind.top & Ind.left);
             rhoR             = rho(Ind.top & Ind.right);
             
-            u_flow     = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                        
+            pt.y2_kv  =  y2Max;
+            y1Int      = fsolve(@rhoX1,y2Max*cos(theta));%,fsolveOpts);
+            y1Delta    = y1Int - y2Max*cos(theta);
+                        
+            ptsBorderTop.y1_kv  = ptsBorderTop.y1_kv - y1Delta;                        
+            u_flow     = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                                    
+            
             rhoBorder  = InterpOntoBorder*rho;
             rhoBorder2 = repmat(rhoBorder,2,1);
                         
             massFlux   = ((rhoR+rho_m)-(rhoL+rho_m))*(y2Max-0)*UWall;      %due to mapping to infinity
             
             a          = fsolve(@massInflux,0);            
+            disp(['a = ',num2str(a)]);
             
-            u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv(Ind.top),...
+            u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv(Ind.top) - y1Delta,...
                                          PtsCart.y2_kv(Ind.top)],UWall,0,0,theta);          
             rhoBorder2 = repmat(rho(Ind.top),2,1);
                                      
@@ -195,7 +202,28 @@ classdef DiffuseInterface < handle
                  u_corrected = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
                  m          = IntNormal_Path*(u_corrected.*(rhoBorder2+rho_m)) + massFlux;    
             end
+            
+            function z = rhoX1(y1)
+                pt.y1_kv = y1;
+                IP       = this.IC.SubShapePtsCart(pt);
+                z        = IP*rho;
+            end    
                         
+        end
+        
+        function DisplayFullError(this,rho,uv)
+            Cn       = this.optsPhys.Cn;
+            M        = this.IC.M;
+            
+            [Af,bf]  = ContMom_DiffuseInterfaceSingleFluid(this,rho);                         
+            mu_s     = DoublewellPotential(rho,Cn) - Cn*(this.IC.Diff.Lap*rho);               
+            
+            error    = Af*[mu_s;uv] - bf;
+            PrintErrorPos(error(1:M),'continuity equation',this.IC.Pts);            
+            PrintErrorPos(error(1+M:2*M),'y1-momentum equation',this.IC.Pts);            
+            PrintErrorPos(error(2*M+1:end),'y2-momentum equation',this.IC.Pts);                        
+            
+            PrintErrorPos(error(repmat(~this.IC.Ind.bound,2,1)),'bulk continuity and momentum equations');               
         end
         
    end
