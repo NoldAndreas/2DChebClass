@@ -27,6 +27,8 @@ function Compute_DisjoiningPressure_II(this)
     end
     close(hw);        
         
-    this.disjoiningPressure_II = fB;                    
+    this.disjoiningPressure_II = fB;    
+    
+    SumRule_DisjoiningPressure_II(this);
             
 end

@@ -7,9 +7,8 @@ function y1Cart = ComputeInterfaceContourY2(this,level,y2)
         level = 0.5;
     end
     
-    f            = this.rho_eq;    
-    drho         = (this.optsPhys.rhoLiq_sat - this.optsPhys.rhoGas_sat);
-        
+    f            = this.GetRhoEq();
+    drho         = (this.optsPhys.rhoLiq_sat - this.optsPhys.rhoGas_sat);        
     rhoV         = this.optsPhys.rhoGas_sat + level*drho;
     
     fsolveOpts   = optimset('Display','off');
@@ -28,7 +27,7 @@ function y1Cart = ComputeInterfaceContourY2(this,level,y2)
     
     function z = rhoX1(y1)
         pt.y1_kv = y1;
-        IP = this.HS.SubShapePtsCart(pt);
+        IP = this.IDC.SubShapePtsCart(pt);
         z  = IP*f-rhoV;
     end    
 

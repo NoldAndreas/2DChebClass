@@ -178,13 +178,6 @@ classdef ContactLineHS < DDFT_2D
             PtsCart                    = this.IDC.GetCartPts();
             this.VAdd                  = getVAdd(PtsCart.y1_kv,PtsCart.y2_kv,0,this.optsPhys.V1);
         end       
-        function InitAnalysisGrid(this,y2Int)
-            
-
-            if(~isempty(y2Int))
-                [this.y2,this.Int_y2,this.DiffY2] = InitAnalysisGridY(this,y2Int,100);                      
-            end
-        end        
         function y0  = getInitialGuess(this,rho_ig)
                     
         	rhoLiq_sat    = this.optsPhys.rhoLiq_sat;
@@ -198,6 +191,51 @@ classdef ContactLineHS < DDFT_2D
         
         %Plot functions
         [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)        
+        PlotContourResults(this,plain)
+        function PlotDensityResult(this)                        
+            rho           = GetRhoEq(this);
+            
+            figure('Color','white','Position',[0 0 1200 800]);
+            this.IDC.doPlots(rho,'SC');
+            zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
+            colormap(hsv);
+            set(gca, 'CLim', [0, 1.0]);
+            PlotArea = this.optsNum.PlotAreaCart;
+            pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
+            view([-10 5 3]);
+
+            print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq],gcf);
+            saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '.fig']);
+            
+        end
+        function PlotInterfaceResults(this)
+            %*******************************************************
+            % ***************** Interface Plots ********************
+            %*******************************************************
+            figure('Color','white','Position',[0 0 800 1000],'name','1D Interface Plots');
+            subplot(3,1,1);
+            this.IDC.do1DPlotParallel(this.rho1D_lg); 
+            title('Liquid-Gas Interface');
+            ylabel('$\varrho$','Interpreter','Latex'); 
+            xlabel('$y_1$','Interpreter','Latex');
+
+            subplot(3,1,2);
+            this.IDC.do1DPlotNormal(this.rho1D_wg);
+            title('Wall-Gas Interface');
+            ylabel('$\varrho$','Interpreter','Latex');  
+            xlabel('$y_2$','Interpreter','Latex');
+
+            subplot(3,1,3);
+            this.IDC.do1DPlotNormal(this.rho1D_wl);
+            title('Wall-Liquid Interface');
+            ylabel('$\varrho$','Interpreter','Latex'); 
+            xlabel('$y_2$','Interpreter','Latex');
+
+            print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_Interfaces'],gcf);
+            saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_Interfaces.fig']);
+
+        end
+    
         PlotDisjoiningPressures(this)
         PlotDensitySlices(this)
                 
@@ -311,18 +349,24 @@ classdef ContactLineHS < DDFT_2D
 
             fsolveOpts   = optimset('Display','off');            
             f            = this.hIII-h0;
-            DeltaY1_III  = fsolve(@fX,0,fsolveOpts);
+            [~,j]        = max(this.hIII);
+            [DeltaY1_III,~,exitflag]  = fsolve(@fX,this.y1_SpectralLine.Pts.y(j),fsolveOpts);            
+            if(exitflag < 1)
+                cprintf('*r','ComputeDeltaFit: Fitting hIII vs hI: no solution found');
+            end
             
             f            = this.hII;
-            DeltaY1_II   = fsolve(@fX,0,fsolveOpts);
-            
+            [~,j]        = max(this.hII);
+            [DeltaY1_II,~,exitflag] = fsolve(@fX,this.y1_SpectralLine.Pts.y(j),fsolveOpts);            
+            if(exitflag < 1)
+                cprintf('*r','ComputeDeltaFit: Fitting hII vs hI: no solution found');
+            end
             
             function z = fX(y1)                
                 IP = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1);
                 z  = IP*f-hS;
             end    
 
-            
         end
         
         %Postprocess

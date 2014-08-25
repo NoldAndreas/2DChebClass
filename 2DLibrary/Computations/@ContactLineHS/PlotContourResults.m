@@ -1,12 +1,5 @@
-function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
-    %Compute contact angle from density profile
-  %  [alphaM,pt1,pt2] = MeasureContactAngle();    
-    
-    %Compute excess grand potential as a function of y1
-    %Fex_Y1 = GetExcessGrandPotential_Y1(rho);        
-    
-    %**************************************
-    %Initialization
+function [fContour] =  PlotContourResults(this,plain)
+
     global dirData        
     
     rho           = GetRhoEq(this);
@@ -18,7 +11,7 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
 	%*******************************************************
     % ******************** Contour Plot ********************
     %*******************************************************
-    if((nargin <= 2) || (saveFigs))
+    if((nargin == 1) || ~plain)
         fContour = figure('Color','white','Position',[0 0 1200 800]);
     end
     
@@ -57,8 +50,8 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
         end
     else
         optDetails.y2CartShift = -0.5;
-        optDetails.clabel = false;  
-        optDetails.linewidth = 1.4;  
+        optDetails.clabel      = false;  
+        optDetails.linewidth   = 1.4;  
         
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         drho = rhoLiq_sat - rhoGas_sat;
@@ -115,55 +108,10 @@ function [fContour] =  PlotEquilibriumResults(this,plain,saveFigs)
     
     
  %   pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 1]);
-    if((nargin < 5) || saveFigs)      
+    if((nargin >= 2) && plain)
         print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour'],gcf);
         saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour.fig']);
     end
     
-    if((nargin >= 5) && plain)
-        return;
-    end
-    
-    %*******************************************************
-    % ******************** 3D Plot ********************
-    %*******************************************************
-    figure('Color','white','Position',[0 0 1200 800]);
-    this.IDC.doPlots(rho,'SC');
-    zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
-    colormap(hsv);
-    set(gca, 'CLim', [0, 1.0]);
-    PlotArea = this.optsNum.PlotAreaCart;
-    pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
-    view([-10 5 3]);
-
-    if((nargin < 5) || saveFigs)
-        print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq],gcf);
-        saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '.fig']);
-    end
-    %*******************************************************
-    % ***************** Interface Plots ********************
-    %*******************************************************
-    figure('Color','white','Position',[0 0 800 1000],'name','1D Interface Plots');
-    subplot(3,1,1);
-    this.IDC.do1DPlotParallel(this.rho1D_lg); 
-    title('Liquid-Gas Interface');
-    ylabel('$\varrho$','Interpreter','Latex'); 
-    xlabel('$y_1$','Interpreter','Latex');
-
-    subplot(3,1,2);
-    this.IDC.do1DPlotNormal(this.rho1D_wg);
-    title('Wall-Gas Interface');
-    ylabel('$\varrho$','Interpreter','Latex');  
-    xlabel('$y_2$','Interpreter','Latex');
-
-    subplot(3,1,3);
-    this.IDC.do1DPlotNormal(this.rho1D_wl);
-    title('Wall-Liquid Interface');
-    ylabel('$\varrho$','Interpreter','Latex'); 
-    xlabel('$y_2$','Interpreter','Latex');
-
-    if((nargin == 1) || saveFigs)
-        print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_Interfaces'],gcf);
-        saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_Interfaces.fig']);
-    end            
+  
 end

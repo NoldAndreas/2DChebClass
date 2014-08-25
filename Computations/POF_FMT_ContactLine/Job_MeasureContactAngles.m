@@ -10,49 +10,38 @@ function Job_MeasureContactAngles()
                       'y2wall',0.,...
                       'N2bound',24,'h',1,...
                       'alpha_deg',90);
-
-    PhysArea.Conv  = struct('L',1,'L2',[],'N',[34,34]);
-
+    
+    V2Num   = struct('Fex','SplitDisk','L',1,'L2',[],'N',[34,34]);    
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
-%   Fex_Num   = struct('Fex','CarnahanStarling');
  
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',Fex_Num,...
                      'maxComp_y2',10,...
-                     'y1Shift',0);
+                     'V2Num',V2Num);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.49);
     V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
                       'kBT',0.75,...                                                    
-                      'Dmu',0.0,'nSpecies',1,...
+                      'Dmu',0.0,...
+                      'nSpecies',1,...
                       'sigmaS',1);      
 
     config = v2struct(optsNum,optsPhys);                        
     
     %***********************************************************
-    %Check convergence of surface tensions and errors of conact density
-   % ConvergenceSurfaceTensions(config);
-    
-    %***********************************************************
-    %Setup result file for this Job
-    filename   = ([dirData filesep]); 
-    filename   = [filename,'Job_MeasureContactAngles_epw_',...
-                                getTimeStr(),'.txt'];
-    
-    %filename    = [dirData filesep subDir filesep 'Job__12_11_13_ComputeContactAngles_epw.txt'];
-    Struct2File(filename,config,['Computed at ',datestr(now)]);
-    
-	opts.epw_YCA = 0.7:0.005:1.6;
-    opts.config  = config;
-    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
+    %ComputeYoungContactAngle(config);
     
     %opts.epw_YCA = 1.50:0.001:1.54;
     %opts.config  = config;
     %resG = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);
-   
+    
+    %***********************************************************************
+    %***********************************************************************
+    %***********************************************************************
+    
     close all;    
 
     opts90_a.config                            = config;    
@@ -62,11 +51,15 @@ function Job_MeasureContactAngles()
     opts90_a.config.optsNum.PhysArea.L1        = 4; 
     opts90_a.config.optsNum.PhysArea.N2bound   = 14; 
     opts90_a.epw                               = 1.:0.02:1.08;
-    resM90_a = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_a,[]);    
+   % resM90_a = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_a,[]);    
     
     opts90_b     = opts90_a;
     opts90_b.epw = 1.1:0.02:1.16;
-    resM90_b = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_b,[]);    
+   % resM90_b = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_b,[]);    
+    
+    opts90_c     = opts90_a;
+    opts90_c.epw = 0.55:0.05:1.;
+    resM90_c = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts90_c,[]);
         
     opts90 = opts90_a;
     %opts90.config                            = config;
@@ -206,7 +199,7 @@ function Job_MeasureContactAngles()
         
         configM = opts.config;               
         
-        CL = ContactLine(configM);
+        CL = ContactLineHS(configM);
         CL.Preprocess();
         
         for i = 1:length(epw)
@@ -226,51 +219,7 @@ function Job_MeasureContactAngles()
         res.thetaM_err = err;
         res.theta_YCA  = theta_YCA;
          
-    end
-    
-    function res = MeasureYoungContactAngles(opts,h)
-
-        epw_YCA  = opts.epw_YCA; 
-        theta_CA = zeros(size(epw_YCA));
-        omWG     = zeros(size(epw_YCA));
-        omWL     = zeros(size(epw_YCA));
-        
-        %*********************************************************************
-        %(1) Measure Contact Angles from Youngs Equation        
-        opts.config.optsNum.maxComp_y2 = -1;        
-        
-        confP = opts.config;
-        confP.optsNum.PhysArea.N2bound = 3;
-        confP.optsNum.PhysArea.N = [60;3];
-        CLP = ContactLine(confP);
-        CLP.Preprocess();     
-        omLG = CLP.ST_1D.om_LiqGas;            
-        
-        
-        opts.config.optsNum.PhysArea.N = [1;100];
-        CLN = ContactLine(opts.config);
-        CLN.Preprocess();     
-        
-        for j = 1:length(epw_YCA)                  
-            CLN.optsPhys.V1.epsilon_w = epw_YCA(j);                        
-            CLN.ComputeST(false);
-            
-            omWG(j) = CLN.ST_1D.om_wallGas;
-            omWL(j) = CLN.ST_1D.om_wallLiq;
-            
-            theta_CA(j) = ComputeContactAngle(omWG(j),omWL(j),omLG);
-                        
-        end 
-        
-        res.theta_CA = theta_CA;
-        res.omWG     = omWG;
-        res.omWL     = omWL;
-        res.omLG     = omLG;
-        res.epw      = epw_YCA;
-
-        %*********************************************************************
-        
-    end
+    end    
 
     function plotErr(resIn,str1,str2)
         mark = iseq(res.epw,resIn.epw);

@@ -244,9 +244,9 @@ classdef (Abstract) Shape < handle
                 fl_y1     = flux(1:this.N1*this.N2,iSpecies);
                 fl_y2     = flux(this.N1*this.N2+1:end,iSpecies);
                 
-                if(strcmp(this.polar,'polar'))
-                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
-                end                
+                %if(strcmp(this.polar,'polar'))
+%                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
+%                end                
                 
                 fl_y1 = fl_y1(mask,:);  fl_y2 = fl_y2(mask,:);
 

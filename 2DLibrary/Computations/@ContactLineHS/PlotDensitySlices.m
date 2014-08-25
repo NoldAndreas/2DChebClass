@@ -7,10 +7,7 @@ function PlotDensitySlices(this)
     y2Max = this.optsNum.PlotAreaCart.y2Max;
     y1Min = this.optsNum.PlotAreaCart.y1Min;
     y1Max = this.optsNum.PlotAreaCart.y1Max;
-    
-    rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
-    rhoGas_sat     = this.optsPhys.rhoGas_sat;     
-    
+        
     y1P = y1Min + (y1Max-y1Min)*(0:1:n)/n;
     str = {'r','b','m','g','c'};
     
@@ -35,15 +32,15 @@ function PlotDensitySlices(this)
     ylabel('$n\sigma^3$','Interpreter','Latex','fontsize',25);
     set(gca,'fontsize',20);                        
     set(gca,'linewidth',1.5);          
-    pbaspect([(y1Max-y1Min) (y2Max) 1]);
+    %pbaspect([(y1Max-y1Min) (y2Max) 1]);
 
     f2 = figure('color','white','Position',[0 0 600 500]);    
-	PlotEquilibriumResults(this,[y1Min y1Max],[0.5 y2Max],true,false); hold on;        
+	PlotContourResults(this,true); hold on;        
     for i = 1:n
         plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],[str{i},':'],'linewidth',1.5);
     end
 
-    inset2(f1,f2,0.4,[0.55,0.55]);
+    inset2(f1,f2,0.43,[0.55,0.62]);
     set(gca,'fontsize',10);
     
     %inset2(f1,f2,0.35,[0.22,0.55]);
