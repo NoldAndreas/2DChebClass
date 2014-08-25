@@ -143,8 +143,13 @@ for iSpecies=1:nSpecies
             %u = ur.*cos(theta)-utheta.*sin(theta);
             %v = ur.*sin(theta)+utheta.*cos(theta);
             
-            fluxS1 = fluxS1temp.*cos(x2f) - fluxS2temp.*sin(x2f);
-            fluxS2 = fluxS1temp.*sin(x2f) + fluxS2temp.*cos(x2f); 
+            % flux is given in cartesian even in polar case
+%             fluxS1 = fluxS1temp.*cos(x2f) - fluxS2temp.*sin(x2f);
+%             fluxS2 = fluxS1temp.*sin(x2f) + fluxS2temp.*cos(x2f); 
+
+            fluxS1=fluxS1temp;
+            fluxS2=fluxS2temp;
+
             
             %rhoS=reshape(fft(reshape(rhoS,N2,N1)),N1*N2,1);
             
