@@ -15,7 +15,7 @@ function Seppecher_M1Inf_Intermediate()
                         'zeta',10+2/3,'eta',1,...
                         'Cak',0.1,'Cn',4/3,...
                         'UWall',1,...
-                        'rho_m',5);
+                        'rho_m',2);
                     
     config = v2struct(optsPhys,optsNum);   
     
@@ -53,7 +53,7 @@ function Seppecher_M1Inf_Intermediate()
   %      mu      = DoublewellPotential(rho,Cn) - Cn*(DI.IC.Diff.Lap*rho);
                        
         DI.PlotMu_and_U(mu,uv); hold on;
-        DI.PlotSeppecherSolution(0,theta,rho);
+%        DI.PlotSeppecherSolution(0,theta,rho);
         DI.IC.doPlots(rho,'contour');
         
         figure; L_ana = 10;

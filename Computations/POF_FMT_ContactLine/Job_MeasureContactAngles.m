@@ -29,7 +29,7 @@ function Job_MeasureContactAngles()
 
     config = v2struct(optsNum,optsPhys);                        
         
-    [res,f1] = ComputeYoungContactAngle(config,[0.5:0.05:1.35,1.35:0.005:1.51]);
+    [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.35,1.35:0.005:1.51]);
     %[res,f1] = ComputeYoungContactAngle(config,[0.55:0.05:1.]);
             
     f2 = figure('Color','white','Position',[0 0 800 800]);    	
@@ -37,21 +37,31 @@ function Job_MeasureContactAngles()
     
     %ComputeAndPlot(0.55:0.02:1.25,90,15,'o','k');    
     ComputeAndPlot(0.55:0.05:1.25,90,15,'o','k');    
-    ComputeAndPlot(1.2:0.05:1.4,60,15,'s','k'); % N = [45,90]??        
-    ComputeAndPlot(1.3:0.05:1.44,40,15,'o','k');    
+    ComputeAndPlot(0.45:0.05:0.8,120,15,'+','k');
+    ComputeAndPlot(1.3:0.05:1.44,40,15,'d','k');    
+  %  ComputeAndPlot(1.2:0.05:1.4,60,15,'s','k'); % N = [45,90]?? 
     
+    xlim([0.45 1.44]);
     xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
     ylabel('$\theta -\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25);
     set(gca,'fontsize',20);    
            
-    inset2(f1,f2,0.45,[0.5,0.5]);
+    inset2(f1,f2,0.38,[0.3,0.25]);
     close(f2);            
+    
+    f3 = hgload('D:\2DChebData\POF_FMT_ContactLine\deg90\EquilibriumSolutions\2014_8_19_3_33_12.276_contour.fig');
+    set(gca,'linewidth',2);
+    plot([-5 20],[15 15],'k--','linewidth',2);
+    inset2(f1,f2,0.35,[0.55,0.65]);
+    close(f3);
+    
+      
     
     str = [getTimeStr() , '_ContactAngles'];
     print2eps([dirData filesep 'ContactAngleMeasurements' filesep str],gcf);
     saveas(gcf,[dirData filesep 'ContactAngleMeasurements' filesep str '.fig']);
     
-    close all;        
+   % close all;        
     %*************************************************
 %     figure('Color','white','Position',[0 0 800 800]);
 % 	f1 = figure('Color','white','Position',[0 0 800 800]);
@@ -140,14 +150,17 @@ function Job_MeasureContactAngles()
         res.theta_YCA  = theta_YCA;
          
     end    
-
     function plotErr(resIn,str1,str2)
-        mark = iseq(res.epw,resIn.epw);
-        h = thetaYCA(mark);
-        plot(res.epw(mark),(resIn.thetaM - h),[str1,'k'],'MarkerFaceColor',str2,'MarkerSize',8); hold on;
+        %mark = iseq(res.epw,resIn.epw);
+        %h    = thetaYCA(mark);
+        for i = 1:length(resIn.epw)
+            mark = iseq(res.epw,resIn.epw(i));
+            epw_h = res.epw(mark);
+            th_h  = thetaYCA(mark);
+            plot(epw_h(1),resIn.thetaM(i) - th_h(1),[str1,'k'],'MarkerFaceColor',str2,'MarkerSize',8); hold on;
+        end
         %plot(h,(resIn.theta_YCA - h),['k',str2],'linewidth',1.5);  
     end
-
     function z = iseq(x,y)
         z = false(size(x));        
         for i = 1:length(x)
@@ -167,37 +180,3 @@ function Job_MeasureContactAngles()
         plotErr(resL,symbol,color);
     end
 end
-
-
-
-%         PhysArea = struct('N',[40,40],'L1',2,'L2',2,'y2wall',0.,...
-%                           'N2bound',24,'h',1,'L2_AD',2.,'alpha_deg',90);
-% 
-%         PhysArea.Conv  = struct('L',1,'L2',[],'N',[20,20]);
-% 
-%         Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-%                            'Ncircle',1,'N1disc',35,'N2disc',34);
-% 
-%         optsNum = struct('PhysArea',PhysArea,...
-%                          'FexNum',Fex_Num,...
-%                          'maxComp_y2',10,...
-%                          'y1Shift',0,...c 
-%                          'plotTimes_T',100,...
-%                          'plotTimes_Interval',0.1);
-% 
-%         V1 = struct('V1DV1','Vext_Cart_7',...
-%                             'epsilon_w',0.74,... %0.482218,...
-%                             'epsilon_w_max',0.3,....
-%                             'tau',20);
-%                         
-%         V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'R',1);
-% 
-%         optsPhys = struct('V1',V1,'V2',V2,...                      
-%                           'kBT',0.75,...   
-%                           'gamma',2,...
-%                           'Inertial',1,...
-%                           'Dmu',0.0,'nSpecies',1,...
-%                           'sigmaS',1);      
-%                       
-%         configuration = v2struct(optsNum,optsPhys);
-%         configName    = SaveConfig(configuration,'Configurations');
