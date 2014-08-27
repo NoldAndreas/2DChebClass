@@ -14,11 +14,18 @@ function y1Cart = ComputeInterfaceContourY2(this,level,y2)
     fsolveOpts   = optimset('Display','off');
     y1Cart       = zeros(size(y2));
     
-    y1I = 4;
+    y1I = 10;
     for i = 1:length(y2)
         pt.y2_kv  = y2(i);        
         y1Cart(i) = fsolve(@rhoX1,y1I,fsolveOpts);
-        y1I       = max(y1Cart(i),4);        
+                
+        if(this.optsNum.PhysArea.alpha_deg == 90)
+            y1I = y1Cart(i);
+        elseif(this.optsNum.PhysArea.alpha_deg < 90)
+            y1I       = max(y1Cart(i),4);        
+        else
+            y1I       = min(y1Cart(i),-4); 
+        end
     end
     
     if(nargin < 3)

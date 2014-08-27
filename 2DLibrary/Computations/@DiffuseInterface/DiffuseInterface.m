@@ -92,35 +92,65 @@ classdef DiffuseInterface < handle
             end    
         end
                        
-        function PlotMu_and_U(this,mu,uv)                        
-            figure('Position',[0 0 1800 600],'color','white');
-            subplot(1,2,1); this.IC.doPlots(mu,'SC');
-            subplot(1,2,2); PlotU(this,uv); hold on; this.IC.doPlots(mu,'contour');
+        function PlotResultsMu(this,mu,uv)    
+            figure('Position',[0 0 800 600],'color','white');
+            this.IC.doPlots(mu,'contour');  
+            PlotU(this,uv); hold on; 
+        end
+        function PlotResultsRho(this,uv,rho,theta)
+            figure('Position',[0 0 800 600],'color','white');
+            PlotU(this,uv); hold on; 
+            this.IC.doPlots(rho,'contour');            
+            this.PlotSeppecherSolution(theta,rho);
         end        
-        function PlotSeppecherSolution(this,theta)
+        function PlotSeppecherSolution(this,theta,rho)
             UWall   = this.optsPhys.UWall;
 %            D_A     = this.optsPhys.D_A;                        
 %             u_flow = GetSeppecherSolutionCart(this.PlotBCShape.GetCartPts,...
 %                                               UWall,D_A,D_B,theta);                                                                        
 %             this.PlotBCShape.doPlots(u_flow,'flux',struct('reshape',false,'linecolor','m'));
             
-            
-             PtsCart = this.IC.GetCartPts();
-             y2Max   = this.optsNum.PhysArea.y2Max;            
+            PtsCart = this.IC.GetCartPts(); 
+            if(nargin > 2)
+                deltaX = GetDeltaX(this,rho,theta);             
+                PtsCart.y1_kv = PtsCart.y1_kv - deltaX;
+            else
+                deltaX = 0;
+            end             
+             
+             %y2Max   = this.optsNum.PhysArea.y2Max;            
                          
-             u_flow = GetSeppecherSolutionCart(PtsCart,UWall,0,0,theta);                        
+             u_flow = GetSeppecherSolutionCart(PtsCart,UWall,0,0,theta);     
 %                         
 %             if(nargin >= 4)
 %                 figure('Position',[0 0 1800 600],'Color','white');            
 %                 subplot(1,2,1);  
-                 PlotU(this,u_flow);            
+            PlotU(this,u_flow);            hold on;                   
+            
+            y2Max = this.optsNum.PhysArea.y2Max;
+            plot([deltaX (deltaX+y2Max/tan(theta))],[0 y2Max],'k--','linewidth',2.5);
 %                 subplot(1,2,2);  this.IC.doPlotFLine([-100,100],[y2Max,y2Max],rho.*u_flow(end/2+1:end),'CART'); 
 %             else
 %                 figure('Position',[0 0 800 800],'Color','white');            
 %                 PlotU(this,u_flow);            
 %             end
 %             title('Check accuracy of map');
-        end        
+        end  
+        
+        function SavePlotResults(this,uv,rho,theta,mu)
+            global dirData
+            
+            filename = getTimeStr();
+            
+            PlotResultsRho(this,uv,rho,theta);
+            print2eps([dirData filesep 'Density_' filename ],gcf);
+            saveas(gcf,[dirData filesep 'Density_' filename '.fig']);
+            
+            PlotResultsMu(this,mu,uv);
+            print2eps([dirData filesep 'ChemPot' filename],gcf);
+            saveas(gcf,[dirData filesep 'ChemPot' filename '.fig']);
+        end
+        
         function PlotU(this,uv)            
             y2Max = this.optsNum.PhysArea.y2Max;
             
@@ -135,8 +165,7 @@ classdef DiffuseInterface < handle
                              y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
-        end                
-        
+        end                        
         function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
             Cn     = this.optsPhys.Cn;
             rho_m  = this.optsPhys.rho_m;
@@ -168,6 +197,33 @@ classdef DiffuseInterface < handle
         [A,b]       = Div_FullStressTensor(this,rho)
         [A,b]       = FullStressTensorIJ(this,rho,i,j)   
         [rho,uv]    = SolveFull(this,ic)
+        
+        function deltaX = GetDeltaX(this,rho,theta)
+            y2Max      = this.optsNum.PhysArea.y2Max;
+            pt.y2_kv   =  y2Max;
+            fsolveOpts = optimset('Display','off');
+            
+            if(nargin > 2)
+                x1_ig = y2Max*cos(theta);
+            else
+                x1_ig = 0;
+            end
+            
+            [y1Int,~,flag] = fsolve(@rhoX1,x1_ig,fsolveOpts);
+            if(flag < 1)
+                cprintf('*r','CorrectVelocityProfile: Finding rho(y1,y_2max)=0: No solution found.\n');
+                deltaX = NaN;
+            else
+                deltaX    = y1Int - y2Max*cos(theta);
+                disp(['Delta x = ',num2str(deltaX)]);
+            end  
+            
+            function z = rhoX1(y1)
+                pt.y1_kv = y1;
+                IP       = this.IC.SubShapePtsCart(pt);
+                z        = IP*rho;
+            end   
+        end
       
         function uvBound_Corr = CorrectVelocityProfile(this,theta,rho)
             InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
@@ -181,15 +237,7 @@ classdef DiffuseInterface < handle
             rhoL             = rho(Ind.top & Ind.left);
             rhoR             = rho(Ind.top & Ind.right);
             
-            pt.y2_kv   =  y2Max;
-            fsolveOpts = optimset('Display','off');
-            [y1Int,~,flag] = fsolve(@rhoX1,y2Max*cos(theta),fsolveOpts);
-            if(flag < 1)
-                cprintf('*r','CorrectVelocityProfile: Finding rho(y1,y_2max)=0: No solution found.\n');
-            else
-                y1Delta    = y1Int - y2Max*cos(theta);
-                disp(['Delta x = ',num2str(y1Delta)]);
-            end            
+            y1Delta = GetDeltaX(this,rho,theta);
                         
             ptsBorderTop.y1_kv  = ptsBorderTop.y1_kv - y1Delta;                        
             u_flow     = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                                    
@@ -198,8 +246,8 @@ classdef DiffuseInterface < handle
             rhoBorder2 = repmat(rhoBorder,2,1);
                         
             massFlux   = ((rhoR+rho_m)-(rhoL+rho_m))*(y2Max-0)*UWall;      %due to mapping to infinity
-            
-            
+                        
+            fsolveOpts = optimset('Display','off');
             [a,~,flag] = fsolve(@massInflux,0,fsolveOpts);            
             if(flag < 1)
                 cprintf('*r','CorrectVelocityProfile: Finding parameter a: No solution found.\n');                                
@@ -216,16 +264,9 @@ classdef DiffuseInterface < handle
             function m = massInflux(a)
                  u_corrected = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
                  m          = IntNormal_Path*(u_corrected.*(rhoBorder2+rho_m)) + massFlux;    
-            end
-            
-            function z = rhoX1(y1)
-                pt.y1_kv = y1;
-                IP       = this.IC.SubShapePtsCart(pt);
-                z        = IP*rho;
-            end    
+            end             
                         
-        end
-        
+        end        
         function DisplayFullError(this,rho,uv)
             Cn       = this.optsPhys.Cn;
             M        = this.IC.M;

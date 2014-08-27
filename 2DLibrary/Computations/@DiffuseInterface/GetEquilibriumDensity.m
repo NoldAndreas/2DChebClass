@@ -1,4 +1,4 @@
-function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv,rho)
+function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
     Cn     = this.optsPhys.Cn;
     g      = this.optsPhys.g;    
     
@@ -7,6 +7,7 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv
     Diff   = this.IC.Diff;
     Int    = this.IC.Int;
     y2Max  = this.optsNum.PhysArea.y2Max;
+    nParticles = this.optsPhys.nParticles;
     
     IntSubArea  = this.IntSubArea;          
 %     Dy1 = this.optsNum.PhysArea.y2Max*cos(theta);
@@ -27,11 +28,15 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,nParticles,uv
     
     %y        = NewtonMethod([0;rho],@f_eq);    %0;
  %   nParticles = -cos(theta)*(y2Max)^2;
-    y        = NewtonMethod([0;theta;rho],@f_eq_theta,0.001,2000);    %0;
-    
-    muDelta  = y(1);
-    theta    = y(2);
-    rho      = y(3:end);
+    if((nargin > 4) && strcmp(findTheta,'findTheta'))
+        y        = NewtonMethod([0;theta;rho],@f_eq_theta,0.001,2000);    %0;
+
+        muDelta  = y(1);
+        theta    = y(2);
+        rho      = y(3:end);
+    else
+        muDelta  = 0;
+    end
     
   %  nParticles = -cos(theta)*(y2Max)^2;
     y        = NewtonMethod([muDelta;rho],@f_eq);    %0;

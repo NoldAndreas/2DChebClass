@@ -1,11 +1,15 @@
 function Seppecher_M1Inf_Intermediate()
 
     close all;
+    
+    global dirData
+    AddPaths();        
+    ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
     %% Parameters    
-    PhysArea = struct('N',[80,30],'y2Min',0,'y2Max',15,'L1',10,... %12,80,50
+    PhysArea = struct('N',[60,40],'y2Min',0,'y2Max',15,'L1',10,... %12,80,50
                       'NBorder',200);
 
-    PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
+    PlotArea = struct('y1Min',-20,'y1Max',20,'N1',100,...
                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',100);   
 
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
@@ -15,7 +19,8 @@ function Seppecher_M1Inf_Intermediate()
                         'zeta',10+2/3,'eta',1,...
                         'Cak',0.1,'Cn',4/3,...
                         'UWall',1,...
-                        'rho_m',2);
+                        'rho_m',4,...
+                        'nParticles',0);
                     
     config = v2struct(optsPhys,optsNum);   
     
@@ -32,13 +37,8 @@ function Seppecher_M1Inf_Intermediate()
     %******** Start iterative procedure ************
     %***********************************************    
     
-    %nParticles = 0;     
-    
-    Cn        = optsPhys.Cn;    
     rho       = DI.InitialGuessRho();    
-    theta     = 90*pi/180;%DI.FindInterfaceAngle(rho);    
-    nParticles = 30;%-cos(theta)*(PhysArea.y2Max)^2;
-    uv        = zeros(3*DI.IC.M,1);
+    theta     = 90*pi/180;%DI.FindInterfaceAngle(rho);        
     mu        = 0;
     
     
@@ -47,14 +47,18 @@ function Seppecher_M1Inf_Intermediate()
     
     for j = 1:20             
         close all;        
-        [rho,theta]  = DI.GetEquilibriumDensity(mu,theta,nParticles,uv,rho);            
+        if(mod(j,3)==2 || j > 5)
+            [rho,theta]  = DI.GetEquilibriumDensity(mu,theta,rho,'findTheta');
+        else
+            [rho,theta]  = DI.GetEquilibriumDensity(mu,theta,rho);
+        end
         [mu,uv] = DI.GetVelocityAndChemPot(rho,0,theta);        
         
   %      mu      = DoublewellPotential(rho,Cn) - Cn*(DI.IC.Diff.Lap*rho);
                        
-        DI.PlotMu_and_U(mu,uv); hold on;
-%        DI.PlotSeppecherSolution(0,theta,rho);
-        DI.IC.doPlots(rho,'contour');
+        DI.PlotResultsMu(mu,uv);
+        DI.PlotResultsRho(uv,rho,theta);
+        
         
         figure; L_ana = 10;
         DI.IC.doPlotFLine([-L_ana L_ana],...
@@ -79,30 +83,11 @@ function Seppecher_M1Inf_Intermediate()
         ptC.y2 = PhysArea.y2Max + cos(theta)*R;
                 
         
-        DI.DisplayFullError(rho,uv);
-        
-        %*** 3rd step ***        
-        %for i=1:1
-           % nParticles = cos(theta)*(PhysArea.y2Max)^2;
-         
-            %rho   = DI.GetEquilibriumDensityR(mu,theta,nParticles,rho,ptC);
-            
-          %  theta = DI.FindInterfaceAngle(rho);                
-            
-           % IP    = DI.ResetOrigin(rho);
-            
-            %rho = IP*rho;
-            %mu  = IP*mu;
-            %uv  = blkdiag(IP,IP)*uv;
-            
-           %figure;
-           %subplot(1,2,1); DI.IC.doPlots(rho,'contour');
-           %subplot(1,2,2); DI.IC.doPlots(mu,'contour');
-
-        %end
-
-        
+        DI.DisplayFullError(rho,uv);        
     end
+    
+    
+    DI.SavePlotResults(uv,rho,theta,mu);
   
     %***************************************************************
     %   Physical Auxiliary functions:
