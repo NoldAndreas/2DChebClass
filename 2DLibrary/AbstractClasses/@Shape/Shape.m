@@ -519,9 +519,9 @@ classdef (Abstract) Shape < handle
             
             if((nargin > 5) && islogical(opts))
                 plain = opts;                
-            elseif((nargin > 5) && ischar(opts))                
+            elseif((nargin > 5) && (ischar(opts) || isnumeric(opts))) 
                 plain = true;
-                color   = opts;            
+                color = opts;
             end
             
             if((nargin < 5) || isempty(CART))
@@ -586,7 +586,7 @@ classdef (Abstract) Shape < handle
                 IPG1     = SubShapePts(this,ptsG1);
                 IPG2     = SubShapePts(this,ptsG2);
             end
-            plot(dist,IP*f,color,'linewidth',1.5); hold on;
+            plot(dist,IP*f,'color',color,'linewidth',1.5); hold on;
             if(~plain)
                 plot(distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
                 plot(distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');

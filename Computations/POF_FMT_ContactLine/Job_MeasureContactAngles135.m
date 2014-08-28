@@ -9,8 +9,7 @@ function Job_MeasureContactAngles135()
     AddPaths();    
     
     ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
-    
- %   [y2_90deg,theta_90deg] =  Load90DegComputation();    
+         
 
     PhysArea = struct('N',[45,75],...
                       'L1',4,'L2',2,'L2_AD',2.,...
@@ -59,11 +58,15 @@ function Job_MeasureContactAngles135()
     [y2_30,theta_30] = GetY2Theta(30);
     [y2_35,theta_35] = GetY2Theta(35);
     
+    clear 'CLT'
     config140 = config;
     config140.optsNum.PhysArea.alpha_deg = 140;
     CLT140 = ContactLineHS(config140);
     CLT140.Preprocess();    
     [y2_20_140,theta_20_140] = GetY2Theta140(20);
+    [y2_25_140,theta_25_140] = GetY2Theta140(25);
+    [y2_30_140,theta_30_140] = GetY2Theta140(30);
+    [y2_35_140,theta_35_140] = GetY2Theta140(35);
         
     %Load configuration \Config_2014_8_18_11_32_15.686.mat    
     f1 = figure('Color','white','Position',[0 0 800 800]);    
@@ -71,6 +74,13 @@ function Job_MeasureContactAngles135()
     plot(y2_25,theta_25,'k-.','linewidth',1.5); hold on; 
     plot(y2_30,theta_30,'k--','linewidth',1.5); hold on; 
     plot(y2_35,theta_35,'k','linewidth',1.5); hold on; 
+        
+    plot(y2_20_140,theta_20_140,'m:','linewidth',1.5); hold on; 
+    plot(y2_25_140,theta_25_140,'m-.','linewidth',1.5); hold on; 
+    plot(y2_30_140,theta_30_140,'m--','linewidth',1.5); hold on; 
+    plot(y2_35_140,theta_35_140,'m','linewidth',1.5); hold on; 
+    
+    [y2_90deg,theta_90deg] =  Load90DegComputation();
     
     plot(y2_90deg,theta_90deg,'r','linewidth',1.5);
     

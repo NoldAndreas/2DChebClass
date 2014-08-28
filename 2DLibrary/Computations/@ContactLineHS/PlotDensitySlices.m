@@ -8,8 +8,9 @@ function PlotDensitySlices(this)
     y1Min = this.optsNum.PlotAreaCart.y1Min;
     y1Max = this.optsNum.PlotAreaCart.y1Max;
         
-    y1P = y1Min + (y1Max-y1Min)*(0:1:n)/n;
-    str = {'r','b','m','g','c'};
+    y1P = y1Min + (y1Max-y1Min)*(0.5:1:(n-0.5))/n;
+    col = distinguishable_colors_NoRedBlueGreen();
+    %str = {'','','m','','c'};
     
     % Plotting
     f1 = figure('color','white','Position',[0 0 700 700]);    
@@ -21,8 +22,8 @@ function PlotDensitySlices(this)
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
         
         hold on;
-        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,[str{i},'--'],'linewidth',1.5); hold on;
-        this.IDC.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,'CART',str{i});        
+        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;
+        this.IDC.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,'CART',col(i,:));        
     end
     
     box on;
@@ -33,13 +34,19 @@ function PlotDensitySlices(this)
     set(gca,'fontsize',20);                        
     set(gca,'linewidth',1.5);          
     %pbaspect([(y1Max-y1Min) (y2Max) 1]);
+    
+    print2eps([dirData filesep 'DensitySlices'],f1);
+    saveas(f1,[dirData filesep 'DensitySlices.fig']);
 
     f2 = figure('color','white','Position',[0 0 600 500]);    
 	PlotContourResults(this,true); hold on;        
     for i = 1:n
-        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],[str{i},':'],'linewidth',1.5);
+        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.5);
     end
 
+    print2eps([dirData filesep 'DensitySlices_contour'],f2);
+    saveas(f2,[dirData filesep 'DensitySlices_contour.fig']);
+    
     inset2(f1,f2,0.43,[0.55,0.62]);
     set(gca,'fontsize',10);
     
@@ -47,7 +54,17 @@ function PlotDensitySlices(this)
     close(f2);      
         
     % Save plot
-	print2eps([dirData filesep 'DensitySlices'],f1);
-    saveas(f1,[dirData filesep 'DensitySlices.fig']);
+	print2eps([dirData filesep 'DensitySlices_Inset'],f1);
+    saveas(f1,[dirData filesep 'DensitySlices_Inset.fig']);
+    
+    function str = distinguishable_colors_NoRedBlueGreen()
+        str = [0 1 1;... %cyan
+               0.9412 0.4706 0;...	%Orange
+               0.251 0 0.502;...%	Purple
+               0 0.502 0.502;...%	Turquoise               
+               1 0 1;...%pink
+               1 0.502 0.502;...%peach	
+               0.502 0.251 0]; %	Brown
+    end
 
 end
