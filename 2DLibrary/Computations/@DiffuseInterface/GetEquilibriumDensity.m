@@ -1,6 +1,6 @@
 function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
     Cn     = this.optsPhys.Cn;
-    g      = this.optsPhys.g;    
+    thetaEq = this.optsPhys.thetaEq;
     
     M      = this.IC.M;           
     Ind    = this.IC.Ind;    
@@ -29,7 +29,7 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
     %y        = NewtonMethod([0;rho],@f_eq);    %0;
  %   nParticles = -cos(theta)*(y2Max)^2;
     if((nargin > 4) && strcmp(findTheta,'findTheta'))
-        y        = NewtonMethod([0;theta;rho],@f_eq_theta,0.001,2000);    %0;
+        y        = NewtonMethod([0;theta;rho],@f_eq_theta,0.001,100);    %0;
 
         muDelta  = y(1);
         theta    = y(2);
@@ -63,10 +63,12 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
         
         %% Boundary condition for the density at wall
         % 
-        % $${\bf n}\cdot {\nabla \rho} = g$$
+        % $${\bf n}\cdot {\nabla \rho} = g$$               
         %                 
-        y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
-        J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];                
+        rhoDiag = diag(rho_s);        
+        y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - cos(thetaEq)*(1-rho_s(Ind.bottom)).^2/Cn;
+        J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),...
+                                Ind.normalBottom*Diff.grad-2*cos(thetaEq)*(1-rhoDiag(Ind.bottom,:))/Cn];
         
         %% Boundary condition for the density at y2max
         % 
@@ -113,9 +115,11 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
         %% Boundary condition for the density at wall
         % 
         % $${\bf n}\cdot {\nabla \rho} = g$$
-        %                 
-        y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - g;
-        J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),Ind.normalBottom*Diff.grad];                
+        %                                
+        rhoDiag = diag(rho_s);        
+        y(Ind.bottom)   = Ind.normalBottom*(Diff.grad*rho_s) - cos(thetaEq)*(1-rho_s(Ind.bottom)).^2/Cn;
+        J(Ind.bottom,:) = [zeros(sum(Ind.bottom),1),...
+                                Ind.normalBottom*Diff.grad-2*cos(thetaEq)*(1-rhoDiag(Ind.bottom,:))/Cn];
         
         %% Boundary condition for the density at y2max
         % 

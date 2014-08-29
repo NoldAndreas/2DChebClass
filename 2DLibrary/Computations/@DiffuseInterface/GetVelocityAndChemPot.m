@@ -1,4 +1,4 @@
-function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
+function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
 %% Equations solved:
 %
 % Continuity: div(rho*uv) = 0
@@ -24,7 +24,6 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     Int     = this.IC.Int;
     Ind     = this.IC.Ind;
     PtsCart = this.IC.GetCartPts();
-    D_A     = this.optsPhys.D_A;
     UWall   = this.optsPhys.UWall;
     Cn      = this.optsPhys.Cn;
     Cak     = this.optsPhys.Cak;
@@ -59,7 +58,7 @@ function [mu,uv,A,b] = GetVelocityAndChemPot(this,rho,D_B,theta)
     %uvBound([Ind.top;Ind.top]) = GetSeppecherSolutionCart(...
 %                                        [PtsCart.y1_kv(Ind.top),...
 %                                         PtsCart.y2_kv(Ind.top)],UWall,D_A,D_B,theta);                                     
-    uvBound([Ind.top;Ind.top]) = CorrectVelocityProfile(this,theta,rho);
+    [uvBound([Ind.top;Ind.top]),a] = CorrectVelocityProfile(this,theta,rho);
     b([F;IBB])                 = uvBound(IBB);           
 
     %% BC3
