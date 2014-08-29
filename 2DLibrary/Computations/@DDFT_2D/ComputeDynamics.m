@@ -128,6 +128,9 @@ function ComputeDynamics(this,x_ic,mu)
         end
         
         flux_dir               = Diff.grad*mu_s;
+        if(doHI)
+            flux_dir           = flux_dir + HI_s;
+        end
         dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 

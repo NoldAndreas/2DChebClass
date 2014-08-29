@@ -108,6 +108,7 @@ nPlots=length(plotTimes);
 
 % determine which movies to make
 doGif=optsPlot.doMovieGif;
+doAvi=optsPlot.doMovieAvi;
 doSwf=optsPlot.doMovieSwf;
 doPdfs=optsPlot.doPdfs;
 
@@ -202,6 +203,15 @@ set(hPa,'nextplot','replacechildren');
 if(doGif)
     gifFile=[movieFile '.gif'];
     delayTime=1/fps;
+    outputFile = gifFile;
+end
+
+if(doAvi)
+    aviFile=[movieFile '.avi'];
+    writerObj = VideoWriter(aviFile);
+    writerObj.FrameRate = fps;
+    open(writerObj);
+    outputFile = aviFile;
 end
 
 %--------------------------------------------------------------------------
@@ -390,8 +400,20 @@ for iPlot=1:nPlots
             imwrite(im,map,gifFile,'gif','WriteMode','append','DelayTime',delayTime);
         end
         
-        outputFile = gifFile;
+    end
+    
+    if(doAvi)
         
+        f = getframe(hRPf);
+        writeVideo(writerObj,f);
+
+        if(iPlot==1)
+            %make poster file for beamer presentations
+            posterFile=[movieFile 'Poster.png'];
+            [im,map] = rgb2ind(f.cdata,256,'nodither');
+            imwrite(im,map,posterFile,'png');
+        end
+         
     end
     
     %----------------------------------------------------------------------
@@ -435,6 +457,10 @@ if(doSwf)
     
     outputFile = swfFile;
     
+end
+
+if(doAvi)
+    close(writerObj);
 end
 
 close(hRPf);

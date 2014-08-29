@@ -112,6 +112,7 @@ end
 %--------------------------------------------------------------------------
 
 D.doMovieGif=false;
+D.doMovieAvi=false;
 D.doPdfs=false;
 D.doMovieSwf=false;
 D.doInitialFinal=false;

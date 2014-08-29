@@ -44,7 +44,6 @@ if(~isempty(stocStruct))
     
     optsStoc = optsStocFull(1);
 
-    loadSamples  = optsStoc.loadSamples;
     fixedInitial = optsStoc.fixedInitial;
 
     optsStoc = rmfield(optsStoc,'loadSamples');
@@ -228,7 +227,7 @@ end
 % make movie
 %--------------------------------------------------------------------------
 
-if(optsPlot.doMovieGif || optsPlot.doMovieSwf || optsPlot.doPdfs)
+if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs) 
     movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
     plotFiles = cat(2,plotFiles,movieFile);
 end
