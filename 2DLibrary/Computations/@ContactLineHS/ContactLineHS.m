@@ -31,18 +31,8 @@ classdef ContactLineHS < DDFT_2D
     methods (Access = public)          
         function this = ContactLineHS(configuration)             
              configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';
-             this@DDFT_2D(configuration);
-            
-             global dirData
-             if(nargin > 0)                
-                this.configName    = SaveConfig(configuration,'Configurations');        
-             else
-                [configIn,DataFolder] = uigetfile([dirData filesep 'Configurations' filesep '*.mat'],['Select Config File']);
-                load([DataFolder,configIn]);
-                disp(['Loading configuration ',[DataFolder,configIn],' ...']);
-                this.configName = configIn(1:end-4);        
-             end   
-                                                    
+             this@DDFT_2D(configuration);                         
+             this.configName    = SaveConfig(configuration,'Configurations');                                                                         
         end                
         
         %Preprocessing and testing of results
@@ -301,7 +291,7 @@ classdef ContactLineHS < DDFT_2D
             if(IsDrying(this))
                 estTheta = 180 - estTheta;
             end
-            error_estTheta = 180/pi*sum(Int_y1)*max(abs(this.disjoiningPressure_II(1)),abs(this.disjoiningPressure_II(end)))/ST_LG*(1/sqrt(1+h^2));
+            error_estTheta = 180/pi*sum(Int_y1)*max(abs(this.disjoiningPressure_II(1)),abs(this.disjoiningPressure_II(end)))/ST_LG/cos(estTheta*pi/180);%*(1/sqrt(1+h^2));
             disp(['Theta from Sum rule = ',num2str(estTheta),' [deg] /+- ',num2str(error_estTheta),' [deg]']);    
 
             %PrintErrorPos(180/pi*(estTheta-this.alpha_YCA),'Estimated contact angle through sum rule integrating disjoining pressure [percent]');

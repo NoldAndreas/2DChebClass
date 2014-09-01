@@ -63,7 +63,7 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
      CLT.Compute_hI();
      CLT.Compute_hContour(0.5);
 %     
-     CLT.PlotEquilibriumResults();
+     CLT.PlotContourResults();
      CLT.PlotDisjoiningPressures();
 
     %     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46

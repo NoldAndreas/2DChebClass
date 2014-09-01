@@ -32,7 +32,7 @@ function Job_ComputeExactAdsorptionIsotherm()
     config = v2struct(optsNum,optsPhys);                        
     
     
-    config.optsPhys.V1.epsilon_w = 1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+    config.optsPhys.V1.epsilon_w = 1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
     
     CL = ContactLineHS(config);
 	CL.Preprocess();    

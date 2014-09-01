@@ -6,8 +6,11 @@ classdef DiffuseInterface < handle
        IntSubArea
        PlotBCShape
        
-       rho = [],uv  = [],theta
+       rho = [],uv  = [],theta=[],a
+       errors = []
        %surfaceTension = 4/3;
+       
+       configName,filename
    end
    
    
@@ -15,6 +18,7 @@ classdef DiffuseInterface < handle
         function this = DiffuseInterface(config)             
             this.optsNum         = config.optsNum;
             this.optsPhys        = config.optsPhys;                                                               
+            this.configName    = SaveConfig(config,'Configurations');                                                                         
         end       
         function Preprocess(this)                        
             this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
@@ -65,7 +69,7 @@ classdef DiffuseInterface < handle
         [A,b]       = ContMom_DiffuseInterfaceSingleFluid(this,rho)
         [rho,uv]    = SolveFull(this,ic)
         
-        deltaX = GetDeltaX(this,rho,theta)              
+        deltaX           = GetDeltaX(this,rho,theta)              
         [uvBound_Corr,a] = CorrectVelocityProfile(this,theta,rho)
                          
         function [bulkError,bulkAverageError] = DisplayFullError(this,rho,uv)            
@@ -206,7 +210,7 @@ classdef DiffuseInterface < handle
             
             global dirData
             
-            filename = getTimeStr();
+            filename = this.filename;
             
             PlotResultsRho(this,uv,rho,theta);
             print2eps([dirData filesep 'Density_' filename ],gcf);
@@ -231,6 +235,26 @@ classdef DiffuseInterface < handle
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
         end           
+
+        function PlotErrorIterations(this)           
+            disp('*** Results ***');
+            disp(['theta = ',num2str(this.theta*180/pi),' [deg]']);
+            disp(['a = ',num2str(this.errors.aIter(end))]);
+            disp(['Max error of equations excluding boundaries: ',num2str(this.errors.errorIterations(end))]);
+
+            figure('color','white');
+            semilogy(this.errors.errorIterations,'ro','MarkerFaceColor','r'); hold on;
+            semilogy(this.errors.errorAverage,'ko','MarkerFaceColor','k');
+            legend({'Maximal error','Average error'});
+            
+            xlabel('Iteration');
+            ylabel('Error');
+            
+            global dirData
+            
+            print2eps([dirData filesep 'ErrorIterations' this.filename],gcf);
+            saveas(gcf,[dirData filesep 'ErrorIterations' this.filename '.fig']);
+        end
         
         %Old
         D_B         = SetD_B(this,theta,rho,initialGuessDB)

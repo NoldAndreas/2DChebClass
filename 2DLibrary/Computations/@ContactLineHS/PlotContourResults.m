@@ -98,7 +98,7 @@ function [fContour] =  PlotContourResults(this,plain)
     end
 
     if(~isempty(this.hI))% && ((nargin == 1) || ~plain))
-        [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
+        [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();        
         plot(this.y1_I+DeltaY1_II,this.hI+R+h0,'k-.','linewidth',2.5); 
         plot(this.y1_I+DeltaY1_III,this.hI+R+h0,'k-.','linewidth',2.5); 
     end

@@ -6,7 +6,7 @@ function Seppecher_M1Inf_Intermediate()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
     %% Parameters    
-    PhysArea = struct('N',[70,60],'y2Min',0,'y2Max',20,'L1',5,... %12,80,50
+    PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',23,'L1',7,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',100,...
@@ -26,6 +26,8 @@ function Seppecher_M1Inf_Intermediate()
     DI = DiffuseInterface(config);
     DI.Preprocess();                                               
     DI.SolveMovingContactLine(15);        
+    
+    DI.PlotErrorIterations();
     DI.SavePlotResults();
     
 

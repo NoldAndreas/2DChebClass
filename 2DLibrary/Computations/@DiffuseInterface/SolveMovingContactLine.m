@@ -9,31 +9,40 @@ function SolveMovingContactLine(this,noIterations)
     params.optsNum      = this.optsNum;
     params.optsPhys     = this.optsPhys;
     
-    otherInput.thetaInitialGuess = 90*pi/180;
+    if(isempty(this.theta))
+        otherInput.thetaInitialGuess = 90*pi/180;
+    else
+        otherInput.thetaInitialGuess = this.theta;
+    end
+        
 
-    res = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
+    [res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
     
     this.rho   = res.rho;
     this.uv    = res.uv;
-    this.theta = res.thetaIter(end);
+    this.theta = res.thetaIter(end);    
     
-    disp('*** Results ***');
-    disp(['theta = ',num2str(this.theta*180/pi),' [deg]']);
-    disp(['a = ',num2str(res.aIter(end))]);
-    disp(['Max error of equations excluding boundaries: ',num2str(res.errorIterations(end))]);
+    this.errors.errorIterations = res.errorIterations;
+    this.errors.errorAverage    = res.errorAverage;
+    this.errors.aIter           = res.aIter;
+    this.errors.thetaIter       = res.thetaIter;
     
-    figure('color','white');
-    semilogy(res.errorIterations,'ro','MarkerFaceColor','r'); hold on;
-    semilogy(res.errorAverage,'ko','MarkerFaceColor','k');
-    legend({'Maximal error','Average error'});
-
+    this.filename               = Parameters.Filename;
+    
     function res = IterativeSolverCahnHilliard(params,otherInput)
         
          noIter = params.noIterations;
          
-         theta  = otherInput.thetaInitialGuess;
-         rho    = InitialGuessRho(this);
-         mu     = 0;
+         if(otherInput.thetaInitialGuess == pi/2)
+            theta  = otherInput.thetaInitialGuess;
+            rho    = InitialGuessRho(this);
+            mu     = 0;
+         else
+            theta  = otherInput.thetaInitialGuess;
+            rho    = this.rho;
+            mu     = this.GetMu();
+         end
+         
          
          error          = zeros(noIter,1);
          errorAverage   = zeros(noIter,1);

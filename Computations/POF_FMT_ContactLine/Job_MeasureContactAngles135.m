@@ -59,10 +59,10 @@ function Job_MeasureContactAngles135()
     [y2_35,theta_35] = GetY2Theta(35);
     
     clear 'CLT'
-    config140 = config;
-    config140.optsNum.PhysArea.alpha_deg = 140;
-    CLT140 = ContactLineHS(config140);
-    CLT140.Preprocess();    
+    config2 = config;
+    config2.optsNum.PhysArea.alpha_deg = 134;
+    CLT2 = ContactLineHS(config2);
+    CLT2.Preprocess();    
     [y2_20_140,theta_20_140] = GetY2Theta140(20);
     [y2_25_140,theta_25_140] = GetY2Theta140(25);
     [y2_30_140,theta_30_140] = GetY2Theta140(30);
@@ -70,33 +70,35 @@ function Job_MeasureContactAngles135()
         
     %Load configuration \Config_2014_8_18_11_32_15.686.mat    
     f1 = figure('Color','white','Position',[0 0 800 800]);    
-    plot(y2_20,theta_20,'k:','linewidth',1.5); hold on; 
-    plot(y2_25,theta_25,'k-.','linewidth',1.5); hold on; 
-    plot(y2_30,theta_30,'k--','linewidth',1.5); hold on; 
-    plot(y2_35,theta_35,'k','linewidth',1.5); hold on; 
+    plot(y2_20,theta_20,'m:','linewidth',1.5); hold on; 
+    plot(y2_25,theta_25,'m-.','linewidth',1.5); hold on; 
+    plot(y2_30,theta_30,'m--','linewidth',1.5); hold on; 
+    plot(y2_35,theta_35,'m','linewidth',1.5); hold on; 
         
-    plot(y2_20_140,theta_20_140,'m:','linewidth',1.5); hold on; 
-    plot(y2_25_140,theta_25_140,'m-.','linewidth',1.5); hold on; 
-    plot(y2_30_140,theta_30_140,'m--','linewidth',1.5); hold on; 
-    plot(y2_35_140,theta_35_140,'m','linewidth',1.5); hold on; 
+    plot(y2_20_140,theta_20_140,'k:','linewidth',1.5); hold on; 
+    plot(y2_25_140,theta_25_140,'k-.','linewidth',1.5); hold on; 
+    plot(y2_30_140,theta_30_140,'k--','linewidth',1.5); hold on; 
+    plot(y2_35_140,theta_35_140,'k','linewidth',1.5); hold on; 
     
-    [y2_90deg,theta_90deg] =  Load90DegComputation();
+ %   [y2_90deg,theta_90deg] =  Load90DegComputation();
     
-    plot(y2_90deg,theta_90deg,'r','linewidth',1.5);
+    %plot(y2_90deg,theta_90deg,'r','linewidth',1.5);
     
     xlim([5 37]);
     %ylim([60 60.8]);   
     %set(gca,'YTick',60:0.2:60.8);
-    plot([5 40],CLT.alpha_YCA*180/pi*[1 1],'--','linewidth',2);
+    plot([5 40],CLT2.alpha_YCA*180/pi*[1 1],'b--','linewidth',2);
+    plot([5 40],134*[1 1],'k--','linewidth',2);
+    plot([5 40],135*[1 1],'m--','linewidth',2);
     
     xlabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
     ylabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',25);
     set(gca,'linewidth',1.5,'fontsize',20);    
 
     f2 = figure('Color','white');
-    CLT.PlotContourResults(true);
+    CLT2.PlotContourResults(true);
         
-    inset2(f1,f2,0.6,[0.35,0.45]);
+    inset2(f1,f2,0.5,[0.45,0.55]);
     close(f2);   
     
     print2eps([dirData filesep 'CA_Asymptotics' filesep 'CA'],f1);
@@ -126,9 +128,9 @@ function Job_MeasureContactAngles135()
     end
 
     function [y2,theta] = GetY2Theta140(y2Max)
-        CLT140.optsNum.maxComp_y2 = y2Max;
-        CLT140.ComputeEquilibrium();  
-        [y2,theta] = CLT140.PlotInterfaceAnalysisY2([5 (y2Max+3)]);        
+        CLT2.optsNum.maxComp_y2 = y2Max;
+        CLT2.ComputeEquilibrium();  
+        [y2,theta] = CLT2.PlotInterfaceAnalysisY2([5 (y2Max+3)]);        
     end
 
     function [y2,theta] = Load90DegComputation()
