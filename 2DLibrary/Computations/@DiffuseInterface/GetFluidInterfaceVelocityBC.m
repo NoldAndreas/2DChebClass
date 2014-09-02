@@ -1,4 +1,4 @@
- function [uvBound_Corr,a] = CorrectVelocityProfile(this,theta,rho)
+ function [uvBound_Corr,a] = GetFluidInterfaceVelocityBC(this,theta,rho)
     InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
     IntNormal_Path   = this.IC.borderTop.IntNormal_Path;   
     ptsBorderTop     = this.IC.borderTop.Pts;

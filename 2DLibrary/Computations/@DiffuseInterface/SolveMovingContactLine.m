@@ -56,35 +56,19 @@ function SolveMovingContactLine(this,noIterations)
          for j = 1:noIter
             disp(['** Iteration no ',num2str(j),' **']) 
             close all;        
-            if(mod(j,3)==2 || j > 5)
+            if((j==2 || j > 4) && ~isempty(a))
                 [rho,theta]  = GetEquilibriumDensity(this,mu,theta,rho,'findTheta');
             else
                 [rho,theta]  = GetEquilibriumDensity(this,mu,theta,rho);
             end
-            [mu,uv,~,~,a] = GetVelocityAndChemPot(this,rho,theta);
-            
-      %      mu      = DoublewellPotential(rho,Cn) - Cn*(DI.IC.Diff.Lap*rho);
-
-         %   DI.PlotResultsMu(mu,uv);
-         %   DI.PlotResultsRho(uv,rho,theta);
-
-
-%             figure; L_ana = 10;
-%             DI.IC.doPlotFLine([-L_ana L_ana],...
-%                              [PhysArea.y2Max,PhysArea.y2Max],mu,'CART'); hold on;
-%             DI.IC.doPlotFLine([-L_ana L_ana],...
-%                              [PhysArea.y2Max,PhysArea.y2Max]/2,mu,'CART'); hold on;
-%             muM = mean(mu(DI.IC.Ind.left));   
-%             muP = mean(mu(DI.IC.Ind.right));
-%             plot([0 2*L_ana],[muM muM],'k:');
-%             plot([0 2*L_ana],[muP muP],'k:');
-%             pM = DI.GetPressure_from_ChemPotential(muM,-1);
-%             pP = DI.GetPressure_from_ChemPotential(muP,1);
-%             R = surfaceTension/(pM-pP);            
+            [mu,uv,~,~,a] = GetVelocityAndChemPot(this,rho,theta);                  
 
             [error(j),errorAverage(j)] = DisplayFullError(this,rho,uv);      
-            thetaIter(j) = theta;
-            aIter(j)     = a;            
+            
+            if(~isempty(a))
+                thetaIter(j) = theta;
+                aIter(j)     = a;            
+            end
             
             hold on;
             plot(j,error(j),'ro','MarkerFaceColor','r'); hold on;

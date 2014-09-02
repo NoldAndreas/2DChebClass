@@ -60,6 +60,18 @@ function Job_MeasureContactAngles135()
     
     clear 'CLT'
     config2 = config;
+    config2.optsNum.PhysArea.alpha_deg = 134.2;
+    CLT2 = ContactLineHS(config2);
+    CLT2.Preprocess();    
+    [y2_20_134_2,theta_20_134_2] = GetY2Theta140(20);
+    [y2_25_134_2,theta_25_134_2] = GetY2Theta140(25);
+    [y2_30_134_2,theta_30_134_2] = GetY2Theta140(30);
+    [y2_35_134_2,theta_35_134_2] = GetY2Theta140(35);
+    
+    clear 'CLT'
+    clear 'CLT2'
+    
+    config2 = config;
     config2.optsNum.PhysArea.alpha_deg = 134;
     CLT2 = ContactLineHS(config2);
     CLT2.Preprocess();    
@@ -69,16 +81,22 @@ function Job_MeasureContactAngles135()
     [y2_35_140,theta_35_140] = GetY2Theta140(35);
         
     %Load configuration \Config_2014_8_18_11_32_15.686.mat    
-    f1 = figure('Color','white','Position',[0 0 800 800]);    
+    f1 = figure('Color','white','Position',[0 0 900 800]);    
+    
     plot(y2_20,theta_20,'m:','linewidth',1.5); hold on; 
     plot(y2_25,theta_25,'m-.','linewidth',1.5); hold on; 
     plot(y2_30,theta_30,'m--','linewidth',1.5); hold on; 
     plot(y2_35,theta_35,'m','linewidth',1.5); hold on; 
+    
+    plot(y2_20_134_2,theta_20_134_2,'k:','linewidth',1.5); hold on; 
+    plot(y2_25_134_2,theta_25_134_2,'k-.','linewidth',1.5); hold on; 
+    plot(y2_30_134_2,theta_30_134_2,'k--','linewidth',1.5); hold on; 
+    plot(y2_35_134_2,theta_35_134_2,'k','linewidth',1.5); hold on; 
         
-    plot(y2_20_140,theta_20_140,'k:','linewidth',1.5); hold on; 
-    plot(y2_25_140,theta_25_140,'k-.','linewidth',1.5); hold on; 
-    plot(y2_30_140,theta_30_140,'k--','linewidth',1.5); hold on; 
-    plot(y2_35_140,theta_35_140,'k','linewidth',1.5); hold on; 
+    plot(y2_20_140,theta_20_140,'b:','linewidth',1.5); hold on; 
+    plot(y2_25_140,theta_25_140,'b-.','linewidth',1.5); hold on; 
+    plot(y2_30_140,theta_30_140,'b--','linewidth',1.5); hold on; 
+    plot(y2_35_140,theta_35_140,'b','linewidth',1.5); hold on; 
     
  %   [y2_90deg,theta_90deg] =  Load90DegComputation();
     
@@ -87,8 +105,9 @@ function Job_MeasureContactAngles135()
     xlim([5 37]);
     %ylim([60 60.8]);   
     %set(gca,'YTick',60:0.2:60.8);
-    plot([5 40],CLT2.alpha_YCA*180/pi*[1 1],'b--','linewidth',2);
-    plot([5 40],134*[1 1],'k--','linewidth',2);
+    plot([5 40],CLT2.alpha_YCA*180/pi*[1 1],'r--','linewidth',2);
+    plot([5 40],134*[1 1],'b--','linewidth',2);
+    plot([5 40],134.2*[1 1],'k--','linewidth',2);
     plot([5 40],135*[1 1],'m--','linewidth',2);
     
     xlabel('$y/\sigma$','Interpreter','Latex','fontsize',25);

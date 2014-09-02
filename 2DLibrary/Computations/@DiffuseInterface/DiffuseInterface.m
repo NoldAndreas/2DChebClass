@@ -36,6 +36,11 @@ classdef DiffuseInterface < handle
             this.IC.ComputeDifferentiationMatrix(Sel);
             
             this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
+            
+            this.IC.Ind.fluidInterface = [];
+            if(isfield(this.optsPhys,'fluidInterface'))
+                this.IC.Ind.fluidInterface = this.IC.Ind.(this.optsPhys.fluidInterface);
+            end
 
             bxArea          = this.optsNum.PlotArea;
             bxArea.N        = [100,100];
@@ -61,16 +66,34 @@ classdef DiffuseInterface < handle
             rho        = tanh(PtsCart.y1_kv/Cn);
         end                      
                     
-        SolveMovingContactLine(this,maxIterations)
+        SolveMovingContactLine(this,maxIterations)       
         [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
-        [rho,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,rho,ptC)                  
+        [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,rho,theta)
         
-        [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
-        [A,b]       = ContMom_DiffuseInterfaceSingleFluid(this,rho)
-        [rho,uv]    = SolveFull(this,ic)
+        [A,b]            = ContMom_DiffuseInterfaceSingleFluid(this,rho)        
         
         deltaX           = GetDeltaX(this,rho,theta)              
-        [uvBound_Corr,a] = CorrectVelocityProfile(this,theta,rho)
+        [uvBound_Corr,a] = GetFluidInterfaceVelocityBC(this,theta,rho)
+        function uvBound = GetWallVelocityBC(this)
+            
+            Ind     = this.IC.Ind;    
+            UWall   = this.optsPhys.UWall;
+            M       = this.IC.M; 
+            y2Min   = this.optsNum.PhysArea.y2Min;
+            y2Max   = this.optsNum.PhysArea.y2Max;
+            IBB     = repmat(Ind.bound,2,1);
+            y2_kv   = this.IC.GetCartPts.y2_kv;
+            
+            
+            if(length(UWall) == 1)
+                UWall = UWall*[1,1];
+            end
+            
+            uwall        = [UWall(1) + ...
+                            (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
+                            zeros(M,1)];
+            uvBound(IBB) =  uwall(IBB);
+        end
                          
         function [bulkError,bulkAverageError] = DisplayFullError(this,rho,uv)            
             M        = this.IC.M;
@@ -136,7 +159,7 @@ classdef DiffuseInterface < handle
                 y = DoublewellPotential(rho,Cn) - mu;
             end
             
-        end                   
+        end          
         
         %Plotting                           
         function PlotResultsMu(this,mu,uv) 
@@ -146,10 +169,10 @@ classdef DiffuseInterface < handle
             end
             
             figure('Position',[0 0 800 600],'color','white');
-            this.IC.doPlots(mu,'contour');  
+            this.IC.doPlots(mu,'contour');             
             PlotU(this,uv); hold on; 
         end
-        function PlotResultsRho(this,uv,rho,theta)
+        function PlotResultsRho(this,rho,uv,theta)
             if(nargin == 1)
                 uv  = this.uv;
                 rho = this.rho;
@@ -158,10 +181,13 @@ classdef DiffuseInterface < handle
             figure('Position',[0 0 800 600],'color','white');
             PlotU(this,uv); hold on; 
             this.IC.doPlots(rho,'contour');     
-            sp = FindStagnationPoint(this);hold on;
-            plot(sp(1),sp(2),'or','MarkerFaceColor','r','MarkerSize',10); 
             
-            this.PlotSeppecherSolution(theta,rho);
+            if(sum(this.IC.Ind.fluidInterface)>0)
+                sp = FindStagnationPoint(this);hold on;
+                plot(sp(1),sp(2),'or','MarkerFaceColor','r','MarkerSize',10); 
+    
+                this.PlotSeppecherSolution(theta,rho);
+            end
         end        
         function PlotSeppecherSolution(this,theta,rho)
             if(nargin == 1)                
@@ -212,11 +238,11 @@ classdef DiffuseInterface < handle
             
             filename = this.filename;
             
-            PlotResultsRho(this,uv,rho,theta);
+            PlotResultsRho(this);
             print2eps([dirData filesep 'Density_' filename ],gcf);
             saveas(gcf,[dirData filesep 'Density_' filename '.fig']);
             
-            PlotResultsMu(this,mu,uv);
+            PlotResultsMu(this);
             print2eps([dirData filesep 'ChemPot' filename],gcf);
             saveas(gcf,[dirData filesep 'ChemPot' filename '.fig']);
         end        
@@ -229,9 +255,10 @@ classdef DiffuseInterface < handle
             y2L = (1:y2Max)';
             y1L = (y1Min:y1Max)';
             
-            startPtsy1    = [y1Max*ones(size(y2L));...
-                             y1Min*ones(size(y2L));...
-                             y1L];
+            
+            startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
+                         y1Min*ones(size(y2L));...
+                         y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
         end           
@@ -296,6 +323,9 @@ classdef DiffuseInterface < handle
                 z        = IP*rho;
             end    
         end   
+        
+        [rho,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,rho,ptC)                  
+        [rho,uv]       = SolveFull(this,ic)
    end
     
 end
