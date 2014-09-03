@@ -17,7 +17,7 @@ function SolveMovingContactLine(this,noIterations)
         
 
     [res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
-    
+        
     this.rho   = res.rho;
     this.uv    = res.uv;
     this.theta = res.thetaIter(end);    
@@ -28,6 +28,8 @@ function SolveMovingContactLine(this,noIterations)
     this.errors.thetaIter       = res.thetaIter;
     
     this.filename               = Parameters.Filename;
+    
+	FindStagnationPoint(this);
     
     function res = IterativeSolverCahnHilliard(params,otherInput)
         

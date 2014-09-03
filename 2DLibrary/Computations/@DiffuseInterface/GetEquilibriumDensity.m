@@ -27,8 +27,7 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
     else
         muDelta  = 0;
     end
-    
-  %  nParticles = -cos(theta)*(y2Max)^2;
+      
     y        = NewtonMethod([muDelta;rho],@f_eq);    %0;
     muDelta  = y(1);    
     rho      = y(2:end);
@@ -38,7 +37,8 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
 	
     
     function [a_direction,a_direction_theta] = Set_a_direction(theta)
-        a_y1             = zeros(M,1); a_y2             = zeros(M,1);               
+        a_y1             = zeros(M,1); 
+        a_y2             = zeros(M,1);               
         
         a_y1(Ind.bottom) = 0;          
         a_y2(Ind.bottom) = -1;           %BC at wall:        
@@ -62,13 +62,13 @@ function [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta
         Jg  = zeros(M,M);
         rhoDiag         = diag(rho_s);
         
-        g(Ind.bottom)    = cos(thetaEq(1))*(1-rho_s(Ind.bottom)).^2/Cn;                            
-        Jg(Ind.bottom,:) = 2*cos(thetaEq(1))*(1-rhoDiag(Ind.bottom,:))/Cn;
+        g(Ind.bottom)    = cos(thetaEq(1))*(1-(rho_s(Ind.bottom)).^2)/Cn;                            
+        Jg(Ind.bottom,:) = - 2*cos(thetaEq(1))*rhoDiag(Ind.bottom,:)/Cn;
         
-        g(Ind.top)       = cos(thetaEq(2))*(1-rho_s(Ind.top)).^2/Cn;                            
-        Jg(Ind.top,:)    = 2*cos(thetaEq(2))*(1-rhoDiag(Ind.top,:))/Cn;
+        g(Ind.top)       = cos(thetaEq(2))*(rho_s(Ind.top)).^2/Cn;                            
+        Jg(Ind.top,:)    = - 2*cos(thetaEq(2))*(1-rhoDiag(Ind.top,:))/Cn;
         
-        g(Ind.fluidInterface,:)  = 0;
+        g(Ind.fluidInterface)    = 0;
         Jg(Ind.fluidInterface,:) = 0;
     end
 

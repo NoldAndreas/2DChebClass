@@ -4,7 +4,7 @@ function ShearWithInterface()
     
     global dirData
     AddPaths();        
-    ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
+    ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');    
     %% Parameters    
     PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',25,'L1',10,... %12,80,50
                       'NBorder',200);

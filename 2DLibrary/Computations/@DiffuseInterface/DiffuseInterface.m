@@ -7,7 +7,7 @@ classdef DiffuseInterface < handle
        PlotBCShape
        
        rho = [],uv  = [],theta=[],a
-       errors = []
+       errors = [],StagnationPoint=[]
        %surfaceTension = 4/3;
        
        configName,filename
@@ -112,15 +112,20 @@ classdef DiffuseInterface < handle
             bulkAverageError = mean(abs(error(repmat(~this.IC.Ind.bound,2,1))));
         end        
         function spt = FindStagnationPoint(this)
+            
             uv = this.uv;
+            
             fsolveOpts = optimset('Display','off');
             [spt,~,flag] = fsolve(@ValueAtXY,[-2,2],fsolveOpts);                        
+            
             if(flag < 1)
                 disp('No stagnation point found');
                 spt = [];
             else
+                this.StagnationPoint = spt;
                 disp(['Stagnation point found at (',num2str(spt(1)),',',num2str(spt(2)),')']);
             end
+            
             function z = ValueAtXY(xy)
                 pt.y1_kv = xy(1);
                 pt.y2_kv = xy(2);
@@ -170,7 +175,7 @@ classdef DiffuseInterface < handle
             
             figure('Position',[0 0 800 600],'color','white');
             this.IC.doPlots(mu,'contour');             
-            PlotU(this,uv); hold on; 
+            PlotU(this,uv); hold on;             
         end
         function PlotResultsRho(this,rho,uv,theta)
             if(nargin == 1)
@@ -181,11 +186,8 @@ classdef DiffuseInterface < handle
             figure('Position',[0 0 800 600],'color','white');
             PlotU(this,uv); hold on; 
             this.IC.doPlots(rho,'contour');     
-            
+                        
             if(sum(this.IC.Ind.fluidInterface)>0)
-                sp = FindStagnationPoint(this);hold on;
-                plot(sp(1),sp(2),'or','MarkerFaceColor','r','MarkerSize',10); 
-    
                 this.PlotSeppecherSolution(theta,rho);
             end
         end        
@@ -239,12 +241,12 @@ classdef DiffuseInterface < handle
             filename = this.filename;
             
             PlotResultsRho(this);
-            print2eps([dirData filesep 'Density_' filename ],gcf);
-            saveas(gcf,[dirData filesep 'Density_' filename '.fig']);
+            print2eps([dirData filesep filename '_Density'],gcf);
+            saveas(gcf,[dirData filesep filename '_Density.fig']);
             
             PlotResultsMu(this);
-            print2eps([dirData filesep 'ChemPot' filename],gcf);
-            saveas(gcf,[dirData filesep 'ChemPot' filename '.fig']);
+            print2eps([dirData filesep filename '_ChemPot' ],gcf);
+            saveas(gcf,[dirData filesep filename '_ChemPot.fig']);
         end        
         function PlotU(this,uv)            
             y2Max = this.optsNum.PhysArea.y2Max;
@@ -261,6 +263,13 @@ classdef DiffuseInterface < handle
                          y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
+            
+            sp = this.StagnationPoint;
+            if(~isempty(sp))          
+                hold on;
+                plot(sp(1),sp(2),'or','MarkerFaceColor','r','MarkerSize',10); 
+                hold on;
+            end
         end           
 
         function PlotErrorIterations(this)           
@@ -279,8 +288,8 @@ classdef DiffuseInterface < handle
             
             global dirData
             
-            print2eps([dirData filesep 'ErrorIterations' this.filename],gcf);
-            saveas(gcf,[dirData filesep 'ErrorIterations' this.filename '.fig']);
+            print2eps([dirData filesep this.filename '_ErrorIterations'],gcf);
+            saveas(gcf,[dirData filesep  this.filename '_ErrorIterations.fig']);
         end
         
         %Old
