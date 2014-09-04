@@ -10,7 +10,7 @@ function res = LubricationForcedWettingInnerFinite(delta)
     if(nargin == 0)
         delta   = 0.1;
     end
-    N       = 500;
+    N       = 400;
     
     IntM    = 0;    
     Dy = 0; DDy = 0;
@@ -23,10 +23,10 @@ function res = LubricationForcedWettingInnerFinite(delta)
     SolveInnerL(100);
     
     [res.L20.y,res.L20.hP] = SolveInnerL(20);
-    [res.L50.y,res.L50.hP] = SolveInnerL(50);
+    [res.L50.y,res.L50.hP] = SolveInnerL(40);
     [res.L100.y,res.L100.hP] = SolveInnerL(100);
-    [res.L500.y,res.L500.hP] = SolveInnerL(500);
-    [res.L5000.y,res.L5000.hP] = SolveInnerL(5000);    
+    [res.L500.y,res.L500.hP] = SolveInnerL(400);
+    [res.L5000.y,res.L5000.hP] = SolveInnerL(4000);    
     
      function SolveInner_ThirdOrder_L(L)
 

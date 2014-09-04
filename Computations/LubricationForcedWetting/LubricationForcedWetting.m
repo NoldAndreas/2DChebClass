@@ -109,79 +109,94 @@ function LubricationForcedWetting()
     %% Plot results
     close all;
     
+    lw = 2.5;
+    
       %**** Print for Paper **********
-        fig1 = figure('color','white','Position',[0 0 800 800]);
-        HIS.doPlots(hP,'plain');    hold on;
-        plot(yInner,IP_In.InterPol*hP,'k','linewidth',1.5);
-        plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',1.5);
-
-        set(gca,'XScale','log');    
+        fig1 = figure('color','white','Position',[0 0 1300 600]);
+        
+        subplot(1,2,1);            
+     
+        
         yP = 10.^((-5.6:0.01:1)');     
 
         maskY =(y>1e-4);
-        plot(y(maskY),h0P(maskY),'b:','linewidth',1.5);
-        plot(y(maskY),h0P(maskY)+delta*h1P(maskY),'r:','linewidth',1.5);    
-        plot(y(maskY),h0P(maskY)+delta*h1P(maskY)+delta^2*h2P(maskY),'m:','linewidth',1.5);
+        plot(y(maskY),h0P(maskY),'b:','linewidth',lw); hold on;
+        plot(y(maskY),h0P(maskY)+delta*h1P(maskY),'r:','linewidth',lw);    
+        plot(y(maskY),h0P(maskY)+delta*h1P(maskY)+delta^2*h2P(maskY),'m:','linewidth',lw);
 
         mark_h = (y*lambda<1e-5);
-        plot(y(mark_h)*lambda,ones(size(y(mark_h))),'b-.','linewidth',1.5);        
-        plot(y(mark_h)*lambda,hIP_0(mark_h)+delta*hIP_1(mark_h),'r-.','linewidth',1.5);        
+        plot(y(mark_h)*lambda,ones(size(y(mark_h))),'b-.','linewidth',lw);        
+        plot(y(mark_h)*lambda,hIP_0(mark_h)+delta*hIP_1(mark_h),'r-.','linewidth',lw);
         plot(y(mark_h)*lambda,hIP_0(mark_h) + ...
                                delta*hIP_1(mark_h) + ...
-                               delta^2*hIP_2(mark_h),'m-.','linewidth',1.5);        
+                               delta^2*hIP_2(mark_h),'m-.','linewidth',lw);        
+
+        HIS.doPlots(hP,struct('plain',true,'linecolor','k','linewidth',lw));                           
+        plot(yInner,IP_In.InterPol*hP,'k','linewidth',lw); hold on;
+        plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',lw);
 
         %Intermediate Region result
    %     plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'k--','linewidth',1.5);    
         
         %plot(lambda*res.L100.y,res.L100.hP,'k','linewidth',2);
         %plot(lambda*res.L500.y,res.L500.hP,'k','linewidth',2);    
-
+        set(gca,'XScale','log');    
+        
         ylim([0.9 2.5]);
         xlim([1e-8 1e2]);            
 
-        xlabel('$x$','Interpreter','Latex','fontsize',25);
-        ylabel('$dh/dx$','Interpreter','Latex','fontsize',25);    
+        xlabel('$x$','Interpreter','Latex','fontsize',20);
+        ylabel('$dh/dx$','Interpreter','Latex','fontsize',20);
         
         set(gca,'XTick',[1e-8,1e-6,1e-4,1e-2,1e0,1e2]);
         set(gca,'fontsize',15); 
 
-        print2eps([dirData filesep 'LubrAsym1'],fig1);
-        saveas(fig1,[dirData filesep 'LubrAsym1.fig']);
-        
-        
-        fig1 = figure('color','white','Position',[0 0 800 800]);
-        
+        subplot(1,2,2);
+        %print2eps([dirData filesep 'LubrAsym1'],fig1);
+        %saveas(fig1,[dirData filesep 'LubrAsym1.fig']);
+        %fig1 = figure('color','white','Position',[0 0 800 800]);        
         
         yP = 10.^((-5.6:0.01:1)');     
 
-        maskY =(y>4e-5);
-        HIS.doPlots(hP,'plain');    hold on;
-        plot(yInner,IP_In.InterPol*hP,'k','linewidth',1.5);
-        plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',1.5);
+        maskY =(y>4e-5);     
                 
-        plot(y(maskY),h0P(maskY),'b:','linewidth',1.5);
-        plot(y(maskY),h0P(maskY)+delta*h1P(maskY),'r:','linewidth',1.5);    
-        plot(y(maskY),h0P(maskY)+delta*h1P(maskY)+delta^2*h2P(maskY),'m:','linewidth',1.5);
+        plot(y(maskY),h0P(maskY),'b:','linewidth',lw); hold on;
+        plot(y(maskY),h0P(maskY)+delta*h1P(maskY),'r:','linewidth',lw);    
+        plot(y(maskY),h0P(maskY)+delta*h1P(maskY)+delta^2*h2P(maskY),'m:','linewidth',lw);
      
 
         %Intermediate Region result
-        plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'k--','linewidth',1.5);    
+        plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'k--','linewidth',lw);    
         
-        plot(lambda*res.L50.y,res.L50.hP,'b-.','linewidth',2);        
-        plot(lambda*res.L500.y,res.L500.hP,'r-.','linewidth',2);    
-        plot(lambda*res.L5000.y,res.L5000.hP,'m-.','linewidth',2);    
+        plot(lambda*res.L50.y,res.L50.hP,'g-','linewidth',lw);        
+        plot(lambda*res.L500.y,res.L500.hP,'g-','linewidth',lw);    
+        plot(lambda*res.L5000.y,res.L5000.hP,'g-','linewidth',lw);    
+        
+        HIS.doPlots(hP,struct('plain',true,'linecolor','k','linewidth',2));    hold on;
+        plot(yInner,IP_In.InterPol*hP,'k','linewidth',2);
+        plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',2);
 
         ylim([1 2.4]);
         xlim([1e-6 1e1]);            
 
-        xlabel('$x$','Interpreter','Latex','fontsize',25);
-        ylabel('$dh/dx$','Interpreter','Latex','fontsize',25);
+        xlabel('$x$','Interpreter','Latex','fontsize',20);
+        ylabel('$dh/dx$','Interpreter','Latex','fontsize',20);
         
         set(gca,'XScale','log');    
         set(gca,'fontsize',15);    
         
-        print2eps([dirData filesep 'LubrAsym2'],fig1);
-        saveas(fig1,[dirData filesep 'LubrAsym2.fig']);
+        ht1 = annotation('textbox',[0.07 0.87 0.1 0.1]);
+        set(ht1,'String','(a)','interpreter','none','FontSize',15);
+        set(ht1','LineStyle','none');
+        
+        ht1 = annotation('textbox',[0.52 0.87 0.1 0.1]);
+       set(ht1,'String','(b)','interpreter','none','FontSize',15);
+       set(ht1','LineStyle','none');
+
+
+        
+        print2eps([dirData filesep 'LubrAsym'],fig1);
+        saveas(fig1,[dirData filesep 'LubrAsym.fig']);
        
     PlotInnerRegion();
     PlotFullResults();

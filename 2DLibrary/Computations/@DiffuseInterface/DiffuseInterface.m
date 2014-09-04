@@ -7,7 +7,9 @@ classdef DiffuseInterface < handle
        PlotBCShape
        
        rho = [],uv  = [],theta=[],a
-       errors = [],StagnationPoint=[]
+       errors = []
+       
+       IsolineInterfaceY2=[],StagnationPoint=[]
        %surfaceTension = 4/3;
        
        configName,filename
@@ -165,6 +167,9 @@ classdef DiffuseInterface < handle
             end
             
         end          
+        
+        %Analysis functions
+        interface = ComputeInterfaceContour(this)         
         
         %Plotting                           
         function PlotResultsMu(this,mu,uv) 
