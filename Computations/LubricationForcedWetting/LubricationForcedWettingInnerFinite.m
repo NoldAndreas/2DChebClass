@@ -1,4 +1,4 @@
-function LubricationForcedWettingInnerFinite
+function res = LubricationForcedWettingInnerFinite(delta)
 
 
     global dirData
@@ -7,8 +7,10 @@ function LubricationForcedWettingInnerFinite
     close all;
     
     %% Parameters
-    delta   = 0.1;
-    N       = 200;
+    if(nargin == 0)
+        delta   = 0.1;
+    end
+    N       = 500;
     
     IntM    = 0;    
     Dy = 0; DDy = 0;
@@ -20,13 +22,13 @@ function LubricationForcedWettingInnerFinite
     subplot(1,2,1);
     SolveInnerL(100);
     
-    SolveInnerL(20);
-    SolveInnerL(50);
-    SolveInnerL(100);
-    SolveInnerL(500);
-    SolveInnerL(5000);    
+    [res.L20.y,res.L20.hP] = SolveInnerL(20);
+    [res.L50.y,res.L50.hP] = SolveInnerL(50);
+    [res.L100.y,res.L100.hP] = SolveInnerL(100);
+    [res.L500.y,res.L500.hP] = SolveInnerL(500);
+    [res.L5000.y,res.L5000.hP] = SolveInnerL(5000);    
     
-    function SolveInner_ThirdOrder_L(L)
+     function SolveInner_ThirdOrder_L(L)
 
         shape      = struct('N',N,'yMin',0,'yMax',L);    
         plotShape  = struct('yMin',0,'yMax',L,'N',N);
@@ -114,13 +116,11 @@ function LubricationForcedWettingInnerFinite
         z(1)   = hP(1);
         z(end) = Dy(end,:)*hP;
     end
-
     function z = ODE2(hP)
         z      = h1.*(2*y+1)./((y.*(y+1)).^2) - DDy*hP; 
         z(1)   = hP(1);
         z(end) = Dy(end,:)*hP;
-    end
-    
+    end    
     function y = ODE(hP)
         
         h = IntM*hP;        

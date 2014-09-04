@@ -1,4 +1,4 @@
-function LubricationForcedWetting()
+function LubricationForcedWetting_old()
 %% Reproduce computation in Fig. 1 of Eggers PoF,17,082106 (2005)
 
 %% ODE to solve

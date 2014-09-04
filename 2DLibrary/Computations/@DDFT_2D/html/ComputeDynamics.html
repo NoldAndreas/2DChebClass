@@ -1,0 +1,439 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ComputeDynamics</title><meta name="generator" content="MATLAB 8.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-07-01"><meta name="DC.source" content="ComputeDynamics.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Solves</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> ComputeDynamics(this,x_ic,mu)
+</pre><h2>Solves<a name="2"></a></h2><p><img src="ComputeDynamics_eq38084.png" alt="$$\frac{\partial \varrho}{\partial t} = \nabla \cdot ( \varrho \nabla \mu )$$"></p><p>in computational variable x: <img src="ComputeDynamics_eq28262.png" alt="$\varrho = e^{(x-Vext)/(k_B T)}$"></p><p><img src="ComputeDynamics_eq43528.png" alt="$$\frac{\partial x}{\partial t} = k_B T \Delta \mu + (\nabla x - \nabla V)\cdot \nabla \mu$$"></p><pre class="codeinput">    <span class="comment">% Initialization</span>
+    optsPhys    = this.optsPhys;
+    optsNum     = this.optsNum;
+
+    kBT         = optsPhys.kBT;
+    <span class="keyword">if</span>(isfield(optsPhys,<span class="string">'sigmaS'</span>))
+        R       = optsPhys.sigmaS/2;
+    <span class="keyword">else</span>
+        R       = [];
+    <span class="keyword">end</span>
+    D0          = optsPhys.D0;
+    Diff        = this.IDC.Diff;
+    plotTimes   = this.optsNum.plotTimes;
+    nSpecies    = this.optsPhys.nSpecies;
+    M           = this.IDC.M;
+    Vext        = this.Vext;
+    Vext_grad   = this.Vext_grad;
+    IntMatrHI   = this.IntMatrHI;
+    IntMatrFex  = this.IntMatrFex;
+    Int_of_path = this.Int_of_path;
+    Conv        = this.IntMatrV2;
+    Ind         = this.IDC.Ind;
+    getFex      = str2func([<span class="string">'Fex_'</span>,optsNum.FexNum.Fex]);
+    doHI        = this.doHI;
+
+    markVinf    = (Vext == inf);
+    <span class="keyword">if</span>(strcmp(this.IDC.polar,<span class="string">'polar'</span>))
+        polarShape = true;
+    <span class="keyword">else</span>
+        polarShape = false;
+    <span class="keyword">end</span>
+
+    subArea     = this.subArea;
+
+	I           = eye(M);
+    eyes        = [I I];
+
+    PtsCart = this.IDC.GetCartPts();
+	y1S     = repmat(PtsCart.y1_kv,1,nSpecies);
+    y2S     = repmat(PtsCart.y2_kv,1,nSpecies);
+
+    ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
+
+    <span class="keyword">if</span>(nargin &lt; 2)
+        x_ic = this.x_eq;
+        mu   = this.mu;
+    <span class="keyword">end</span>
+
+    tic
+
+    fprintf(1,<span class="string">'Computing dynamics ...'</span>);
+
+    <span class="keyword">if</span>(isfield(optsNum,<span class="string">'PlotArea'</span>))
+        optsNumT = rmfield(optsNum,<span class="string">'PlotArea'</span>);
+    <span class="keyword">end</span>
+    [X_t,recEq,paramsEq] = DataStorage(<span class="string">'Dynamics'</span>,<span class="keyword">...</span>
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); <span class="comment">%true</span>
+
+    fprintf(1,<span class="string">'done.\n'</span>);
+
+    t_dynSol = toc;
+
+    disp([<span class="string">'Dynamics computation time (sec): '</span>, num2str(t_dynSol)]);
+
+    <span class="comment">%************************************************</span>
+    <span class="comment">%****************  Postprocess  ****************</span>
+    <span class="comment">%************************************************</span>
+
+    nPlots    = length(plotTimes);
+
+	accFlux   = X_t(:,1:nSpecies);
+    X_t       = X_t(:,nSpecies+1:end)';
+
+    rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
+
+    X_t       = reshape(X_t,M,nSpecies,nPlots);
+    rho_t     = reshape(rho_t,M,nSpecies,nPlots);
+    flux_t    = zeros(2*M,nSpecies,nPlots);
+    V_t       = zeros(M,nSpecies,nPlots);
+
+    <span class="keyword">for</span> i = 1:length(plotTimes)
+        <span class="keyword">if</span>(doHI)
+            flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));
+        <span class="keyword">else</span>
+            flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));
+        <span class="keyword">end</span>
+        V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
+    <span class="keyword">end</span>
+
+    data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
+    data.shape = this.IDC;
+    <span class="keyword">if</span>(this.doSubArea)
+        data.Subspace = v2struct(subArea,accFlux);
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span>(~isfield(optsNum,<span class="string">'doPlots'</span>) <span class="keyword">...</span>
+            || (isfield(optsNum,<span class="string">'doPlots'</span>) &amp;&amp; optsNum.doPlots) )
+        figure
+        PlotDDFT(v2struct(optsPhys,optsNum,data));
+    <span class="keyword">end</span>
+
+    <span class="keyword">function</span> X_t = ComputeDDFTDynamics(params,misc)
+        mM              = ones(M,1);
+        mM(Ind.finite)  = 0; <span class="comment">%| markVinf</span>
+        mM              = repmat(mM,nSpecies,1);
+        mM(markVinf(:)) = 0;
+
+        opts    = odeset(<span class="string">'RelTol'</span>,10^-8,<span class="string">'AbsTol'</span>,10^-8,<span class="string">'Mass'</span>,diag([ones(nSpecies,1);mM]));
+        [~,X_t] = ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);
+    <span class="keyword">end</span>
+
+
+     <span class="keyword">function</span> dxdt = dx_dt(t,x)
+
+        <span class="comment">% ignore first row of entries. This is mass in subsystem</span>
+        x        = x(nSpecies+1:end);
+
+        x        = reshape(x,M,nSpecies);
+
+        mu_s     = GetExcessChemPotential(x,t,mu);
+        mu_s(markVinf) = 0;
+
+        h_s      = Diff.grad*x - Vext_grad;
+        h_s([markVinf;markVinf]) = 0;
+
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));
+
+        <span class="keyword">if</span>(doHI)
+            rho_s    = exp((x-Vext)/kBT);
+            rho_s    = [rho_s;rho_s];
+            gradMu_s = Diff.grad*mu_s;
+            HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);
+            dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );
+        <span class="keyword">end</span>
+
+        flux_dir               = Diff.grad*mu_s;
+        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;
+        dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
+
+        dxdt = D0.*dxdt;
+
+        dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
+     <span class="keyword">end</span>
+
+     <span class="keyword">function</span> mu_s = GetExcessChemPotential(x,t,mu)
+        rho_s    = exp((x-Vext)/kBT);
+        mu_s     = getFex(rho_s,IntMatrFex,kBT,R) + <span class="keyword">...</span>
+                                Fex_Meanfield(rho_s,Conv,kBT);
+
+        <span class="keyword">for</span> iSpecies=1:nSpecies
+           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu(iSpecies);
+        <span class="keyword">end</span>
+
+        mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
+    <span class="keyword">end</span>
+
+    <span class="keyword">function</span> flux = GetFlux(x,t)
+        rho_s = exp((x-Vext)/kBT);
+        mu_s  = GetExcessChemPotential(x,t,mu);
+        flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);
+        <span class="keyword">if</span>(polarShape)
+            <span class="comment">%then transform to cartesian corrdinates</span>
+            flux = GetCartesianFromPolarFlux(flux,ythS);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+
+    <span class="keyword">function</span> flux = GetFlux_HI(x,t)
+        rho_s = exp((x-Vext)/kBT);
+        rho_s = [rho_s;rho_s];
+        mu_s  = GetExcessChemPotential(x,t,mu);
+        gradMu_s = Diff.grad*mu_s;
+        HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        flux  = -rho_s.*(gradMu_s + HI_s);
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput">The class DDFT_2D has no property or method named 'ComputeDynamics'.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function ComputeDynamics(this,x_ic,mu)
+
+%% Solves
+% 
+% $$\frac{\partial \varrho}{\partial t} = \nabla \cdot ( \varrho \nabla \mu )$$
+% 
+% in computational variable x: $\varrho = e^{(x-Vext)/(k_B T)}$
+% 
+% $$\frac{\partial x}{\partial t} = k_B T \Delta \mu + (\nabla x - \nabla V)\cdot \nabla \mu$$
+% 
+
+
+
+    % Initialization
+    optsPhys    = this.optsPhys;
+    optsNum     = this.optsNum;
+    
+    kBT         = optsPhys.kBT;
+    if(isfield(optsPhys,'sigmaS'))    
+        R       = optsPhys.sigmaS/2;
+    else
+        R       = [];
+    end
+    D0          = optsPhys.D0;
+    Diff        = this.IDC.Diff;
+    plotTimes   = this.optsNum.plotTimes;
+    nSpecies    = this.optsPhys.nSpecies;
+    M           = this.IDC.M;
+    Vext        = this.Vext;
+    Vext_grad   = this.Vext_grad;
+    IntMatrHI   = this.IntMatrHI;
+    IntMatrFex  = this.IntMatrFex;
+    Int_of_path = this.Int_of_path;
+    Conv        = this.IntMatrV2;
+    Ind         = this.IDC.Ind;        
+    getFex      = str2func(['Fex_',optsNum.FexNum.Fex]);    
+    doHI        = this.doHI;    
+    
+    markVinf    = (Vext == inf);
+    if(strcmp(this.IDC.polar,'polar'))
+        polarShape = true;
+    else
+        polarShape = false;
+    end
+    
+    subArea     = this.subArea;
+    
+	I           = eye(M);  
+    eyes        = [I I];
+    
+    PtsCart = this.IDC.GetCartPts();
+	y1S     = repmat(PtsCart.y1_kv,1,nSpecies); 
+    y2S     = repmat(PtsCart.y2_kv,1,nSpecies);
+
+    ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
+    
+    if(nargin < 2)
+        x_ic = this.x_eq;
+        mu   = this.mu;
+    end
+        
+    tic   
+    
+    fprintf(1,'Computing dynamics ...'); 
+
+    if(isfield(optsNum,'PlotArea'))
+        optsNumT = rmfield(optsNum,'PlotArea');
+    end
+    [X_t,recEq,paramsEq] = DataStorage('Dynamics',...
+                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+            
+    fprintf(1,'done.\n');
+    
+    t_dynSol = toc;
+    
+    disp(['Dynamics computation time (sec): ', num2str(t_dynSol)]);
+    
+    %************************************************
+    %****************  Postprocess  ****************
+    %************************************************        
+
+    nPlots    = length(plotTimes);
+    
+	accFlux   = X_t(:,1:nSpecies);
+    X_t       = X_t(:,nSpecies+1:end)';
+    
+    rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
+    
+    X_t       = reshape(X_t,M,nSpecies,nPlots);
+    rho_t     = reshape(rho_t,M,nSpecies,nPlots);
+    flux_t    = zeros(2*M,nSpecies,nPlots);
+    V_t       = zeros(M,nSpecies,nPlots);   
+    
+    for i = 1:length(plotTimes)
+        if(doHI)
+            flux_t(:,:,i) = GetFlux_HI(X_t(:,:,i),plotTimes(i));        
+        else
+            flux_t(:,:,i) = GetFlux(X_t(:,:,i),plotTimes(i));        
+        end    
+        V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
+    end
+                           
+    data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
+    data.shape = this.IDC;
+    if(this.doSubArea) 
+        data.Subspace = v2struct(subArea,accFlux);
+    end
+    
+    if(~isfield(optsNum,'doPlots') ...
+            || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        figure
+        PlotDDFT(v2struct(optsPhys,optsNum,data));  
+    end
+    
+    function X_t = ComputeDDFTDynamics(params,misc)        
+        mM              = ones(M,1);        
+        mM(Ind.finite)  = 0; %| markVinf
+        mM              = repmat(mM,nSpecies,1);
+        mM(markVinf(:)) = 0;
+        
+        opts    = odeset('RelTol',10^-8,'AbsTol',10^-8,'Mass',diag([ones(nSpecies,1);mM]));    
+        [~,X_t] = ode15s(@dx_dt,plotTimes,[zeros(nSpecies,1);x_ic(:)],opts);   
+    end
+
+    
+     function dxdt = dx_dt(t,x)
+        
+        % ignore first row of entries. This is mass in subsystem 
+        x        = x(nSpecies+1:end);              
+        
+        x        = reshape(x,M,nSpecies);
+        
+        mu_s     = GetExcessChemPotential(x,t,mu);        
+        mu_s(markVinf) = 0;
+        
+        h_s      = Diff.grad*x - Vext_grad;        
+        h_s([markVinf;markVinf]) = 0;
+        
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        
+        if(doHI)
+            rho_s    = exp((x-Vext)/kBT);
+            rho_s    = [rho_s;rho_s];
+            gradMu_s = Diff.grad*mu_s;
+            HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
+            dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
+        end
+        
+        flux_dir               = Diff.grad*mu_s;
+        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
+        dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
+
+        dxdt = D0.*dxdt;
+                
+        dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
+     end
+
+     function mu_s = GetExcessChemPotential(x,t,mu)
+        rho_s    = exp((x-Vext)/kBT);
+        mu_s     = getFex(rho_s,IntMatrFex,kBT,R) + ...
+                                Fex_Meanfield(rho_s,Conv,kBT);
+        
+        for iSpecies=1:nSpecies
+           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu(iSpecies);
+        end
+
+        mu_s = mu_s + x + getVAdd(y1S,y2S,t,optsPhys.V1);
+    end   
+    
+    function flux = GetFlux(x,t)
+        rho_s = exp((x-Vext)/kBT);       
+        mu_s  = GetExcessChemPotential(x,t,mu); 
+        flux  = -[rho_s;rho_s].*(Diff.grad*mu_s);                                
+        if(polarShape)
+            %then transform to cartesian corrdinates
+            flux = GetCartesianFromPolarFlux(flux,ythS);
+        end
+    end
+
+
+    function flux = GetFlux_HI(x,t)
+        rho_s = exp((x-Vext)/kBT);  
+        rho_s = [rho_s;rho_s];
+        mu_s  = GetExcessChemPotential(x,t,mu); 
+        gradMu_s = Diff.grad*mu_s;
+        HI_s =  ComputeHI(rho_s,gradMu_s,IntMatrHI);
+        flux  = -rho_s.*(gradMu_s + HI_s);                                  
+    end
+
+end
+##### SOURCE END #####
+--></body></html>
