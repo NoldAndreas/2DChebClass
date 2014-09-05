@@ -81,12 +81,13 @@ function LubricationForcedWetting()
     hI_1  = (log(y+1).*(y+1).^2-log(y).*(y.^2)-y)/2;
     hIP_1 = (y+1).*log(y+1)-y.*log(y);     
     
-    z1 = y;
-    help1 = (2*log(z1).*log(z1+1).*(z1.^2)+2*log(z1).*log(z1+1).*z1-log(z1).*(z1.^2)+log(z1+1).*(z1.^2)+4*dilog(-z1).*(z1.^2)+2*log(z1+1).*z1+4*dilog(-z1).*z1+log(z1+1)-z1)./((z1+1).*z1);
-    help1(1) = 0;
-    help1(end) = 0;
-    help1 = -1/2*help1;
-    hIP_2 = IntM*help1-y*pi.^2/3;
+%     z1 = y;
+%     help1 = (2*log(z1).*log(z1+1).*(z1.^2)+2*log(z1).*log(z1+1).*z1-log(z1).*(z1.^2)+log(z1+1).*(z1.^2)+4*dilog(1+z1).*(z1.^2)+2*log(z1+1).*z1+4*dilog(1+z1).*z1+log(z1+1)-z1)./((z1+1).*z1);
+%     help1(1) = 0;
+%     help1(end) = 0;
+%     help1 = -1/2*help1;
+%     hIP_2_ = IntM*help1-y*pi.^2/3;    
+    hIP_2 = 3/2*(y.*log(y./(y+1))-log(y+1).*log(y))-log(y+1).*(1+log(y).*y)-(1/3)*y*pi^2-(2*y+1).*dilog(y+1);
     
     %% Analytical outer region results
     
