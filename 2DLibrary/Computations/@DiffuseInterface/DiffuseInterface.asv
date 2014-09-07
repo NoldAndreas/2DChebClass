@@ -74,63 +74,32 @@ classdef DiffuseInterface < handle
         
         [A,b]            = ContMom_DiffuseInterfaceSingleFluid(this,rho)        
         
-        deltaX                      = GetDeltaX(this,rho,theta)              
-        function [a,deltaX]         = Get_a_deltaX(this,rho,theta)
+        deltaX           = GetDeltaX(this,rho,theta)              
+        [uvBound_Corr,a] = GetFluidInterfaceVelocityBC(this,theta,rho)
+        function uvBound = GetWallVelocityBC(this)
             
-            Ind              = this.IC.Ind;
-            UWall            = this.optsPhys.UWall;    
-            InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
-            ptsBorderTop     = this.IC.borderTop.Pts;
-            y2Max            = this.optsNum.PhysArea.y2Max;
-            rhoL             = rho(Ind.top & Ind.left);
-            rhoR             = rho(Ind.top & Ind.right);
-
+            Ind     = this.IC.Ind;    
+            UWall   = this.optsPhys.UWall;
+            M       = this.IC.M; 
+            y2Min   = this.optsNum.PhysArea.y2Min;
+            y2Max   = this.optsNum.PhysArea.y2Max;
+            IBB     = repmat(Ind.bound,2,1);
+            y2_kv   = this.IC.GetCartPts.y2_kv;
             
-            IntNormal_Path   = this.IC.borderTop.IntNormal_Path;       
-            rho_m            = this.optsPhys.rho_m;    
-            
-            deltaX              = GetDeltaX(this,rho,theta);
-            ptsBorderTop.y1_kv  = ptsBorderTop.y1_kv - deltaX;                        
-            u_flow              = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                                    
-
-            rhoBorder  = InterpOntoBorder*rho;
-            rhoBorder2 = repmat(rhoBorder,2,1);
-
-            massFlux   = ((rhoR+rho_m)-(rhoL+rho_m))*(y2Max-0)*UWall;      %due to mapping to infinity
-
-            fsolveOpts = optimset('Display','off');
-            [a,~,flag] = fsolve(@massInflux,0,fsolveOpts);            
-            if(flag < 1)
-                cprintf('*r','CorrectVelocityProfile: Finding parameter a: No solution found.\n');                                
-            else
-                disp(['a = ',num2str(a)]);
-            end         
-            
-            function m = massInflux(a)
-                u_corrected = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
-                m          = IntNormal_Path*(u_corrected.*(rhoBorder2+rho_m)) + massFlux;    
-            end       
-        end                    
-        function [uvBound,a,deltaX] = GetBoundaryCondition(this,theta,rho)
-            UWall            = this.optsPhys.UWall;    
-            PtsCart          = this.IC.GetCartPts();
-            Ind              = this.IC.Ind;
-            rhoL             = rho(Ind.top & Ind.left);
-            rhoR             = rho(Ind.top & Ind.right);
             
             if(length(UWall) == 1)
-                [a,deltaX] = Get_a_deltaX(this,rho,theta);    
-                u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
-                                         PtsCart.y2_kv],UWall,0,0,theta);          
-                rhoBorder2 = repmat(rho,2,1);
-                uvBound    = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);   
-            else
-                a = [];  deltaX = [];
-                uvBound    = [UWall(1) + ...
-                            (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
-                            zeros(M,1)];                
+                UWall = UWall*[1,1];
             end
+            
+            uwall        = [UWall(1) + ...
+                            (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
+                            zeros(M,1)];
+           % uvBound      =  zeros(M,1);
+            %uvBound(IBB) =  uwall(IBB);
+            uvBound = uwall;
         end
+        
+        function uvBound = GetBoundaryCondition(thist)
                          
         function [bulkError,bulkAverageError] = DisplayFullError(this,rho,uv)            
             M        = this.IC.M;

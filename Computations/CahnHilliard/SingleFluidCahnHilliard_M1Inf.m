@@ -9,7 +9,7 @@
     %PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',20,'L1',7,... %12,80,50
     PhysArea = struct('N',[50,30],'y2Min',0,'y2Max',10,'L1',7,... %12,80,50    
                       'NBorder',200,...
-                      'y1Max',1000);
+                      'y1Max',inf);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',80,...
                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',80);   

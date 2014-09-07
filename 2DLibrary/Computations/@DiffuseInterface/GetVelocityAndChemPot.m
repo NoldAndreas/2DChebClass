@@ -49,9 +49,10 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
     b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
 
     %% BC1 and BC2   
-    uvBound   = GetWallVelocityBC(this);    
+    %uvBound   = GetWallVelocityBC(this);    
     if(sum(Ind.fluidInterface > 0))
-        [uvBound(repmat(Ind.fluidInterface,1,2)),a] = GetFluidInterfaceVelocityBC(this,theta,rho);
+        %[uvBound(repmat(Ind.fluidInterface,1,2)),a] = GetFluidInterfaceVelocityBC(this,theta,rho);        
+        [uvBound,a] = GetBoundaryCondition(this,theta,rho);
     else
         a = [];
     end
@@ -94,7 +95,7 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
         
      
      %reduce by ignoring velocities with y1>y1Max
-     markRed = (abs(this.IC.GetCartPts.y1_kv) < inf);%this.optsNum.PhysArea.y1Max);
+     markRed = (abs(this.IC.GetCartPts.y1_kv) < this.optsNum.PhysArea.y1Max);
      markRedFull  = [T;markRed;markRed];
      ARed = A(markRedFull,markRedFull);
      bRed = b(markRedFull) - A(markRedFull,~markRedFull)*...
