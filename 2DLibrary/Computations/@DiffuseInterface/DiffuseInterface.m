@@ -94,7 +94,9 @@ classdef DiffuseInterface < handle
             uwall        = [UWall(1) + ...
                             (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
                             zeros(M,1)];
-            uvBound(IBB) =  uwall(IBB);
+           % uvBound      =  zeros(M,1);
+            %uvBound(IBB) =  uwall(IBB);
+            uvBound = uwall;
         end
                          
         function [bulkError,bulkAverageError] = DisplayFullError(this,rho,uv)            

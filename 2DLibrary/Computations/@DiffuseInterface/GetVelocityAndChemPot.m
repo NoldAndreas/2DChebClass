@@ -49,13 +49,13 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
     b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
 
     %% BC1 and BC2   
-    uvBound                                 = GetWallVelocityBC(this);    
+    uvBound   = GetWallVelocityBC(this);    
     if(sum(Ind.fluidInterface > 0))
-        [uvBound(repmat(Ind.fluidInterface,1,2)),a] = GetFluidInterfaceVelocityBC(this,theta,rho);            
+        [uvBound(repmat(Ind.fluidInterface,1,2)),a] = GetFluidInterfaceVelocityBC(this,theta,rho);
     else
         a = [];
     end
-	b([F;IBB])                              = uvBound(IBB);
+	b([F;IBB])     = uvBound(IBB);
 
     %% BC3
     ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;    
@@ -92,8 +92,18 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,rho,theta)
                                          + this.IC.borderLeft.IntSc*diag(rho+rho_m);
      b([indBC5;FF])                  = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
         
+     
+     %reduce by ignoring velocities with y1>y1Max
+     markRed = (abs(this.IC.GetCartPts.y1_kv) < inf);%this.optsNum.PhysArea.y1Max);
+     markRedFull  = [T;markRed;markRed];
+     ARed = A(markRedFull,markRedFull);
+     bRed = b(markRedFull) - A(markRedFull,~markRedFull)*...
+                                uvBound(~[markRed;markRed]);
+     
     % Solve Equation
-    x               = A\b;
+    %x               = A\b;
+    x               = [ones(M,1);uvBound];
+    x(markRedFull)  = ARed\bRed;
 
     disp(['Error: ',num2str(max(abs(A*x-b)))]);
 
