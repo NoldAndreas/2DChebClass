@@ -4,8 +4,8 @@ function Compute_DisjoiningPressure_II(this)
 
     %Disjoining Pressure based on 2D density profile:    
     rho_eq    = this.GetRhoEq();    
-    rho_wl   = kron(ones(this.IDC.Pts.N1,1),this.rho1D_wl);
-    %rho_wg   = kron(ones(this.IDC.Pts.N1,1),this.rho1D_wg);       
+    %rho_ref   = kron(ones(this.IDC.Pts.N1,1),this.rho1D_wl);
+    rho_ref   = kron(ones(this.IDC.Pts.N1,1),this.rho1D_wg);       
     
     fB            = zeros(size(y1));           
     
@@ -21,7 +21,8 @@ function Compute_DisjoiningPressure_II(this)
 
         [I,w,weights,IP,pts] = this.IDC.doIntFLine([y1i y1i],[0.5 y2Max],[],'CHEB');
         [h1,dVadd_i]         = getVAdd(pts.y1_kv,pts.y2_kv,0,this.optsPhys.V1);
-        fB(iy1)              = - weights*(dVadd_i.dy2.*(IP*(rho_eq-rho_wl))) + this.optsPhys.kBT*(IP0*(rho_eq - rho_wl));        
+        
+        fB(iy1)              = - weights*(dVadd_i.dy2.*(IP*(rho_eq-rho_ref))) + this.optsPhys.kBT*(IP0*(rho_eq - rho_ref));        
         
         hw = waitbar(iy1/length(y1));
     end

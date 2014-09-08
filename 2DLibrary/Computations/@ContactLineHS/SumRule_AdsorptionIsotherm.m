@@ -36,5 +36,9 @@ function theta_sumrule = SumRule_AdsorptionIsotherm(this,ST_LG)
     end
     
     %fprintf(['Error for Contact Angle from Sum Rule for Disjoining Potential: ',num2str((theta_sumrule-this.alpha_YCA)*180/pi,2),' [deg]\n']);
-    fprintf(['Contact Angle from Sum Rule for Disjoining Potential: ',num2str((theta_sumrule)*180/pi),' [deg]\n']);
+    errI = I-ST_LG*(1-abs(cos(this.alpha_YCA)));
+    disp(['Integral expression: ',num2str(I),' +/- ',num2str(errI)]);
+    fprintf(['Contact Angle from Sum Rule for Disjoining Potential: ',num2str((theta_sumrule)*180/pi),' [deg] +/_ ',num2str(errI/ST_LG/sin(theta_sumrule)*180/pi),' [deg]\n' ]);
+    
+    
 end

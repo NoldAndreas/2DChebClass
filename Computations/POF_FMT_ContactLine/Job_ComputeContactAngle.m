@@ -71,10 +71,10 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
 %     
 % 	%f1 = figure('Color','white','Position',[0 0 1000 600]);
 %     [f1,f2] = CLT.Post_HFrom2DDisjoiningPressure();
-%     
+%
 %     print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces'],f1);
 %     saveas(f1,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces.fig']);
-%     
+%
 %     print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure'],f2);
 %     saveas(f2,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure.fig']);
 %     

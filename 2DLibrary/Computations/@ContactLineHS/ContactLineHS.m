@@ -283,8 +283,9 @@ classdef ContactLineHS < DDFT_2D
             
             Int_y1  = this.y1_SpectralLine.Int;
             sinGamm = sin(this.alpha_YCA)*ST_LG;
-            err     = (Int_y1*this.disjoiningPressure_II + sinGamm)/sinGamm*100;
-            disp(['Normal force balance, error: ',num2str(err),' percent']);
+            err       = (Int_y1*this.disjoiningPressure_II + sinGamm);
+            errPC     = err/sinGamm*100;            
+            disp(['Integral expression: ',num2str(Int_y1*this.disjoiningPressure_II),' +/- ',num2str(err) , ' or relative: ',num2str(errPC),' percent']);
 
             h              = (-Int_y1*this.disjoiningPressure_II)/ST_LG;
             estTheta       = asin(h)*180/pi;
@@ -292,7 +293,9 @@ classdef ContactLineHS < DDFT_2D
                 estTheta = 180 - estTheta;
             end
             error_estTheta = 180/pi*sum(Int_y1)*max(abs(this.disjoiningPressure_II(1)),abs(this.disjoiningPressure_II(end)))/ST_LG/cos(estTheta*pi/180);%*(1/sqrt(1+h^2));
-            disp(['Theta from Sum rule = ',num2str(estTheta),' [deg] /+- ',num2str(error_estTheta),' [deg]']);    
+            disp(['Theta from Sum rule = ',num2str(estTheta),' [deg] +/- ',num2str(err/ST_LG/cos(estTheta*pi/180)*180/pi),' [deg]']);                            
+            disp(['Error from numerical estimate : ',num2str(error_estTheta),' [deg]']);
+            %disp(['Error from difference to integral estimate : ',num2str(err/ST_LG/cos(estTheta*pi/180)*180/pi),' [deg]']);
 
             %PrintErrorPos(180/pi*(estTheta-this.alpha_YCA),'Estimated contact angle through sum rule integrating disjoining pressure [percent]');
         end        
