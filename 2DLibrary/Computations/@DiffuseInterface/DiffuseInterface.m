@@ -204,7 +204,35 @@ classdef DiffuseInterface < handle
         end          
         
         %Analysis functions
-        interface = ComputeInterfaceContour(this)         
+        function ComputeInterfaceContour(this)
+            y2           = this.IC.Pts.y2;
+            rho          = this.rho; 
+
+            fsolveOpts   = optimset('Display','off');
+            interface    = zeros(size(y2));
+
+            y1Bottom = this.IC.GetCartPts.y1_kv(this.IC.Ind.bottom);
+            [~,j]    = min(abs(rho(this.IC.Ind.bottom)));
+            y1I      = y1Bottom(j);
+                        
+            for i = 1:length(y2)
+                pt.y2_kv     = y2(i);        
+                [interface(i),~,flag] = fsolve(@rhoX1,y1I,fsolveOpts);        
+                if(flag < 1)
+                    cprintf('*r',['ComputeInterfaceContour: Interface not found at y2 = ',num2str(y2(i)),'\n']);
+                    return;
+                end
+                y1I          = interface(i);        
+            end
+
+            this.IsolineInterfaceY2 = interface;    
+
+            function z = rhoX1(y1)
+                pt.y1_kv = y1;
+                IP = this.IC.SubShapePtsCart(pt);
+                z  = IP*rho;
+            end   
+        end
         
         %Plotting                           
         function PlotResultsMu(this,mu,uv) 
@@ -227,6 +255,11 @@ classdef DiffuseInterface < handle
             PlotU(this,uv); hold on; 
             this.IC.doPlots(rho,'contour');     
                         
+            hold on;
+            if(~isempty(this.IsolineInterfaceY2))
+                plot(this.IsolineInterfaceY2,this.IC.Pts.y2,...
+                                                    'k','linewidth',3);
+            end
             if(sum(this.IC.Ind.fluidInterface)>0)
                 this.PlotSeppecherSolution(theta,rho);
             end
@@ -311,6 +344,27 @@ classdef DiffuseInterface < handle
                 hold on;
             end
         end           
+        function PlotInterfaceAnalysis(this)            
+            
+            y2      = this.IC.Pts.y2;
+            L       = this.optsNum.PhysArea.y2Max;
+            
+            Diff    = barychebdiff(y2,1);
+            thetaY2 = pi/2 + atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
+            
+            A = -0.34; k = 0.2; 
+            analytic_BriantYeomans = A* (-(1+exp(-k*L)) + (exp(-k*y2) + exp(-k*(L-y2))));            
+            
+            %maxthetaY2 = max(ab
+            
+            figure('color','white','Position',[0 0 800 800]);
+            
+            plot(y2,cos(thetaY2),'k','linewidth',2); hold on;
+            plot(y2,analytic_BriantYeomans,'k--','linewidth',2);
+            
+            xlabel('$y_2$','Interpreter','Latex','fontsize',20);
+            ylabel('$cos(\theta)$','Interpreter','Latex','fontsize',20);
+        end
 
         function PlotErrorIterations(this)           
             disp('*** Results ***');
