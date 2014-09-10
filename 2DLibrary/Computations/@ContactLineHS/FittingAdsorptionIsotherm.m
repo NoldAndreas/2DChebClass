@@ -4,7 +4,7 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     
     absFT = abs(this.AdsorptionIsotherm.FT);
 
-    LogPlotInt = [5 FT_Int(2)];
+    LogPlotInt = [2 FT_Int(2)];
     
     mark = ((absFT <= FT_Int(2)) & (absFT >= FT_Int(1))); %choose range
     
@@ -42,7 +42,7 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     ylabel('$\ell/\sigma$','Interpreter','Latex','fontsize',25);    
     ylim([0 max(absFT)]);    
     ylim([0 15]);
-    xlim([min(this.AdsorptionIsotherm.dmuCheck)-0.02,max(this.AdsorptionIsotherm.dmuCheck)+0.02]);
+    xlim([min(this.AdsorptionIsotherm.dmuCheck)-0.02,max(this.AdsorptionIsotherm.dmuCheck)]);
     %xlim([-0.02 0.1]);
     
     f2 = figure('Color','white','Position',[0 0 800 800]); 
@@ -60,11 +60,12 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     
     xlim(LogPlotInt);
     ylim([min(y(markk)),max(y(markk))]);
+    ylim([min(y(markk)),0.1]);
     ylabel('$|\Delta \mu|/\varepsilon$','Interpreter','Latex','fontsize',25);
     xlabel('$\ell/\sigma$','Interpreter','Latex','fontsize',25);
     
-    set(gca,'XTick',LogPlotInt(1):5:LogPlotInt(2));
-    set(gca,'YTick',0.0005:0.0005:0.002);%LogPlotInt(1):5:LogPlotInt(2));
+    set(gca,'XTick',[2 5 10 15]); %LogPlotInt(1):5:LogPlotInt(2)
+    set(gca,'YTick',[0.001 0.01 0.1]);%LogPlotInt(1):5:LogPlotInt(2));
     set(gca, 'XTickLabel', num2str(get(gca, 'XTick').'));
     set(gca, 'YTickLabel', num2str(get(gca, 'YTick').'));
     set(gca,'fontsize',20);

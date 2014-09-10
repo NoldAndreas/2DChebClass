@@ -26,18 +26,18 @@ function Job_ComputeExactAdsorptionIsotherm()
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
                       'kBT',0.75,...                                                    
-                      'Dmu',0.0,'nSpecies',1,...
+                      'Dmu',0.03,'nSpecies',1,...
                       'sigmaS',1);      
 
     config = v2struct(optsNum,optsPhys);                        
     
     
-    config.optsPhys.V1.epsilon_w = 1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+    config.optsPhys.V1.epsilon_w = 0.7;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
     
     CL = ContactLineHS(config);
 	CL.Preprocess();    
-    %CL.ComputeAdsorptionIsotherm(300,'drying');    
-    CL.ComputeAdsorptionIsotherm(300,'wetting');    
+    CL.ComputeAdsorptionIsotherm(300,'drying');    
+    %CL.ComputeAdsorptionIsotherm(300,'wetting');    
     CL.FittingAdsorptionIsotherm([10 14],1)
     if(optsPhys.kBT == 0.75)
         CL.SumRule_AdsorptionIsotherm(0.3463);

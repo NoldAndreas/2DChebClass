@@ -22,7 +22,7 @@ function PlotDensitySlices(this)
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
         
         hold on;
-        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;
+        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
         this.IDC.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,'CART',col(i,:));        
     end
     
