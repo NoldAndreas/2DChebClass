@@ -14,8 +14,7 @@ classdef DiffuseInterface < handle
        
        configName,filename
    end
-   
-   
+      
    methods (Access = public)          
         function this = DiffuseInterface(config)             
             this.optsNum         = config.optsNum;
@@ -66,14 +65,8 @@ classdef DiffuseInterface < handle
             Cn         = this.optsPhys.Cn;
             
             rho        = tanh(PtsCart.y1_kv/Cn);
-        end                      
-                    
-        SolveMovingContactLine(this,maxIterations)       
-        [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
-        [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,rho,theta)
-        
-        [A,b]            = ContMom_DiffuseInterfaceSingleFluid(this,rho)        
-        
+        end                                                  
+                
         deltaX                      = GetDeltaX(this,rho,theta)              
         function [a,deltaX]         = Get_a_deltaX(this,rho,theta)
             
@@ -180,28 +173,7 @@ classdef DiffuseInterface < handle
             end
             Cn       = this.optsPhys.Cn;
             mu_s     = DoublewellPotential(rho,Cn) - Cn*(this.IC.Diff.Lap*rho);               
-        end        
-        function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
-            Cn     = this.optsPhys.Cn;
-            rho_m  = this.optsPhys.rho_m;
-            %for bulk
-            % 0 = W' - m
-            % p = - W + mu*(rho + rho_m)
-            
-            fsolveOpts = optimset('Display','off');
-            [rho,~,exitflag]   = fsolve(@f,rho_ig,fsolveOpts);
-            if(exitflag < 1)
-                cprintf('*r','No solution for density for given chemical potential found');
-            end
-            
-            [~,W] = DoublewellPotential(rho,Cn);
-            p     = - W + mu*(rho+rho_m);
-            
-            function y = f(rho)
-                y = DoublewellPotential(rho,Cn) - mu;
-            end
-            
-        end          
+        end                   
         
         %Analysis functions
         function ComputeInterfaceContour(this)
