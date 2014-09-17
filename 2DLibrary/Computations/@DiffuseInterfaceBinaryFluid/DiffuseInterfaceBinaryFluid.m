@@ -1,6 +1,14 @@
 classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
     
    properties (Access = public)
-       p
+       p %pressure       
+   end
+       
+	methods (Access = public) 
+       function this = DiffuseInterfaceBinaryFluid(config)           
+             this@DiffuseInterface(config);
+       end
+       
+       [rho,theta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
    end
 end

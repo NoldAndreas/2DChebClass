@@ -1,6 +1,10 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
     
-    methods (Access = public)          
+    methods (Access = public) 
+         function this = DiffuseInterfaceSingleFluid(config)           
+             this@DiffuseInterface(config);
+         end
+        
         SolveMovingContactLine(this,maxIterations)       
         [rho,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
         [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,rho,theta)

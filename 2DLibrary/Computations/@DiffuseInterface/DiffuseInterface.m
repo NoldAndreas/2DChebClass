@@ -33,7 +33,7 @@ classdef DiffuseInterface < handle
                    'DDDy2';'DDDy1';...
                    'Dy1Dy2'; 'DDy1Dy2'; 'Dy1DDy2';...
                    'Lap' ;'grad' ;'div'; ...
-                   'gradLap' ;'gradDiv'; 'LapVec';'LapDiv'};
+                   'gradLap' ;'gradDiv'; 'LapVec';'LapDiv';'Lap2'};
             this.IC.ComputeDifferentiationMatrix(Sel);
             
             this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
@@ -218,13 +218,15 @@ classdef DiffuseInterface < handle
             PlotU(this,uv); hold on;             
         end
         function PlotResultsRho(this,rho,uv,theta)
-            if(nargin == 1)
-                uv  = this.uv;
+            if(nargin == 1)                
                 rho = this.rho;
+                uv  = this.uv;
                 theta = this.theta;
             end
             figure('Position',[0 0 800 600],'color','white');
-            PlotU(this,uv); hold on; 
+            if(~isempty(uv))
+                PlotU(this,uv); hold on; 
+            end
             this.IC.doPlots(rho,'contour');     
                         
             hold on;

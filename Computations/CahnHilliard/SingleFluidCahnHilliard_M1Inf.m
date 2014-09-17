@@ -32,7 +32,7 @@
     for j = 1:length(y2M)
         config.optsNum.PhysArea.y2Max = y2M(j);
         config.optsNum.PlotArea.y2Max = y2M(j);
-        DI = DiffuseInterface(config);
+        DI = DiffuseInterfaceSingleFluid(config);
         DI.Preprocess();        
         if(y2M(j)>15)
             DI.SolveMovingContactLine(30);    

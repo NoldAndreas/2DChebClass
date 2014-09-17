@@ -1,4 +1,4 @@
-function ShearWithInterface()
+function ShearWithInterfaceBinaryFluid()
 
     close all;
     
@@ -6,7 +6,7 @@ function ShearWithInterface()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');
     %% Parameters    
-    PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',25,'L1',10,... %12,80,50
+    PhysArea = struct('N',[50,20],'y2Min',0,'y2Max',25,'L1',10,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',80,...
@@ -15,11 +15,10 @@ function ShearWithInterface()
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
     
     optsPhys = struct('thetaEq',[pi/2,pi/2],...   
-                      'zeta',10,'eta',1,...
+                      'eta',1,...
                       'Cak',0.1,'Cn',1,...
-                      'UWall',[1,-1],...
-                      'rho_m',4,...
-                      'nParticles',0);
+                      'UWall',[1,-1],...                      .
+                      'mobility',1);
                     
     config = v2struct(optsPhys,optsNum);   
                       
@@ -28,7 +27,7 @@ function ShearWithInterface()
         config.optsNum.PhysArea.y2Max = y2M;
         config.optsNum.PlotArea.y2Max = y2M;
         
-        DI = DiffuseInterfaceSingleFluid(config);
+        DI = DiffuseInterfaceBinaryFluid(config);
         DI.Preprocess();                             
         DI.SolveMovingContactLine(60);    
         DI.SavePlotResults();
