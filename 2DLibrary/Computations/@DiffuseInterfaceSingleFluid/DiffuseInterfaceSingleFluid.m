@@ -10,6 +10,9 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,rho,theta)
         [A,b]               = ContMom_DiffuseInterfaceSingleFluid(this,rho)                
         
+        
+        [A,b]       = Div_FullStressTensor(this,rho)
+        [A,b]       = FullStressTensorIJ(this,rho,i,j)           
         function p = GetPressure_from_ChemPotential(this,mu,rho_ig)
             Cn     = this.optsPhys.Cn;
             rho_m  = this.optsPhys.rho_m;

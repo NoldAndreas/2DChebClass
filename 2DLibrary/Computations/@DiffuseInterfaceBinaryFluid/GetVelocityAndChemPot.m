@@ -4,6 +4,9 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 % Continuity: div(uv) = 0
 % Momentum:    div(m) = 0
 %         0 = -grad(p) + Lap*u + 1/Cak *mu*grad(phi)
+%           = Lap*u + 1/Cak * div*PI
+%
+% PI = (-p*Cak + f_DW + Cn/2*|Grad(phi)|^2) I - Cn (Grad(rho)) X (Grad(rho))
 %
 % with boundary conditions
 % 
@@ -12,6 +15,9 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 % (BC3) mu = div(div(m))
 %          = -Lap(p) + 1/Cak*div(mu*grad(phi))
 % (BC4) p = 0 for Ind.left
+%
+%
+%
 % (BC5) int( m_{1,2} ,y_1=-inf..inf,y2=y2Max) 
 %     - int( m_{1,2} ,y_1=-inf..inf,y2=0) = [mu*(rho+rho_m)*y2Max]_y1=inf 
 %                                         - [mu*(rho+rho_m)*y2Max]_y1=-inf
@@ -20,9 +26,6 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     Ind     = this.IC.Ind;       
     Cn      = this.optsPhys.Cn;
     Cak     = this.optsPhys.Cak;
-	eta     = this.optsPhys.eta;
-    zeta    = this.optsPhys.zeta;
-    rho_m   = this.optsPhys.rho_m;
     Diff    = this.IC.Diff;
     y2Max   = this.optsNum.PhysArea.y2Max;
     
@@ -33,10 +36,10 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     b       = zeros(3*M,1);        
         
     IntPathUpLow       = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
-    [Tt11,Tb11]        = FullStressTensorIJ(this,rho,1,1);
-    [Tt12,Tb12]        = FullStressTensorIJ(this,rho,1,2);            
-    [Tt22,Tb22]        = FullStressTensorIJ(this,rho,2,2);
-    [~,WFull]          = DoublewellPotential(rho,Cn);
+    [Tt11,Tb11]        = FullStressTensorIJ(this,phi,1,1);
+    [Tt12,Tb12]        = FullStressTensorIJ(this,phi,1,2);            
+    [Tt22,Tb22]        = FullStressTensorIJ(this,phi,2,2);
+    %[~,WFull]          = DoublewellPotential(rho,Cn);
     
         
     %% Continuity and Momentum Equation
@@ -55,16 +58,16 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 	b([F;IBB])     = uvBound(IBB);
 
     %% BC3
-    ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;    
-    Cmu            = -diag(rho + rho_m)*Diff.Lap - diag(Diff.Lap*rho) ...
-                     - 2*diag(Diff.Dy1*rho)*Diff.Dy1 ...
-                     - 2*diag(Diff.Dy2*rho)*Diff.Dy2;
-    Cuv            = Cak*(zeta + 4/3*eta)*Diff.LapDiv; 
-    C              = [Cmu,Cuv];
-    bBound         = - repmat(ys,2,1).*(Diff.grad*rho); 
-
-    A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
-    b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
+%     ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;    
+%     Cmu            = -diag(rho + rho_m)*Diff.Lap - diag(Diff.Lap*rho) ...
+%                      - 2*diag(Diff.Dy1*rho)*Diff.Dy1 ...
+%                      - 2*diag(Diff.Dy2*rho)*Diff.Dy2;
+%     Cuv            = zeros(M,2*M);
+%     C              = [Cmu,Cuv];
+%     bBound         = - repmat(ys,2,1).*(Diff.grad*rho); 
+% 
+%     A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
+%     b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
                
     %% BC4
     A([Ind.left;FF],[T;FF]) = Diff.Dy2(Ind.left,:);
@@ -73,23 +76,22 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     A([Ind.left&Ind.top;FF],[Ind.left&Ind.top;FF])  = eye(sum(Ind.left&Ind.top));    
     
     %% BC5    
-    [~,WL] = DoublewellPotential(rho(Ind.left&Ind.top),Cn);
-    [~,WR] = DoublewellPotential(rho(Ind.right&Ind.top),Cn);
+    [~,WL] = DoublewellPotential(phi(Ind.left&Ind.top),Cn);
+    [~,WR] = DoublewellPotential(phi(Ind.right&Ind.top),Cn);
     
     indBC5 = Ind.right & Ind.top;
     
-    A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
+     A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
         
     
      A([indBC5;FF],[T;FF]) = 0;
-     A([indBC5;FF],:)                = IntPathUpLow*Tt12;
-     A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF]) ...
-                                         - this.IC.borderRight.IntSc*diag(rho+rho_m);
-     A([indBC5;FF],[T;FF])           = A(indBC5,[T;FF])  ...
-                                         + this.IC.borderLeft.IntSc*diag(rho+rho_m);
-     b([indBC5;FF])                  = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
-        
-     
+     A([indBC5;FF],:)      = IntPathUpLow*Tt12;
+     A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF]) ...
+                                 - this.IC.borderRight.IntSc*diag(rho+rho_m);
+     A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF])  ...
+                                + this.IC.borderLeft.IntSc*diag(rho+rho_m);
+     b([indBC5;FF])        = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
+             
      %reduce by ignoring velocities with y1>y1Max
      markRed = (abs(this.IC.GetCartPts.y1_kv) < this.optsNum.PhysArea.y1Max);
      markRedFull  = [T;markRed;markRed];

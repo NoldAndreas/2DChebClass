@@ -165,8 +165,6 @@ classdef DiffuseInterface < handle
         end
         
         %Auxiliary Cahn-Hilliard
-        [A,b]       = Div_FullStressTensor(this,rho)
-        [A,b]       = FullStressTensorIJ(this,rho,i,j)   
         function mu_s = GetMu(this,rho)
             if(nargin == 1)
                 rho = this.rho;

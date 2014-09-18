@@ -10,5 +10,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        end
        
        [rho,theta] = GetEquilibriumDensity(this,mu,theta,rho,findTheta)
+       [A,b] = ContMom_DiffuseInterfaceBinaryFluisFluid(this,phi_s)
    end
 end
