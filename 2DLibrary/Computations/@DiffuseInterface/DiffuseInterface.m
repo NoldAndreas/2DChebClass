@@ -6,7 +6,7 @@ classdef DiffuseInterface < handle
        IntSubArea
        PlotBCShape
        
-       rho = [],uv  = [],theta=[],a
+       phi = [],uv  = [],theta=[],a
        errors = []
        
        IsolineInterfaceY2=[],StagnationPoint=[]
@@ -14,12 +14,21 @@ classdef DiffuseInterface < handle
        
        configName,filename
    end
-      
+   
+   methods (Abstract = true, Access = public)
+       [A,b] = FullStressTensorIJ(this,phi,i,j)
+       [A,b] = ContinuumMomentumEqs(this,phi)
+       [bulkError,bulkAverageError] = DisplayFullError(this) 
+   end
+   
    methods (Access = public)          
         function this = DiffuseInterface(config)             
             this.optsNum         = config.optsNum;
             this.optsPhys        = config.optsPhys;                                                               
             this.configName    = SaveConfig(config,'Configurations');                                                                         
+            if(~isfield(this.optsNum.PhysArea,'y1Max'))
+                this.optsNum.PhysArea.y1Max = inf;
+            end            
         end       
         function Preprocess(this)                        
             this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
@@ -60,36 +69,36 @@ classdef DiffuseInterface < handle
             plotBC.N1 = 10; plotBC.N2 = 2;
             this.PlotBCShape.ComputeAll(plotBC);
         end        
-        function rho = InitialGuessRho(this)
+        function phi = InitialGuessRho(this)
             PtsCart    = this.IC.GetCartPts();
             Cn         = this.optsPhys.Cn;
             
-            rho        = tanh(PtsCart.y1_kv/Cn);
+            phi        = tanh(PtsCart.y1_kv/Cn);
         end                                                  
                 
-        deltaX                      = GetDeltaX(this,rho,theta)              
-        function [a,deltaX]         = Get_a_deltaX(this,rho,theta)
+        deltaX                      = GetDeltaX(this,phi,theta)              
+        function [a,deltaX]         = Get_a_deltaX(this,phi,theta)
             
             Ind              = this.IC.Ind;
             UWall            = this.optsPhys.UWall;    
             InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
             ptsBorderTop     = this.IC.borderTop.Pts;
             y2Max            = this.optsNum.PhysArea.y2Max;
-            rhoL             = rho(Ind.top & Ind.left);
-            rhoR             = rho(Ind.top & Ind.right);
+            phiL             = phi(Ind.top & Ind.left);
+            phiR             = phi(Ind.top & Ind.right);
 
             
             IntNormal_Path   = this.IC.borderTop.IntNormal_Path;       
-            rho_m            = this.optsPhys.rho_m;    
+            phi_m            = this.optsPhys.phi_m;    
             
-            deltaX              = GetDeltaX(this,rho,theta);
+            deltaX              = GetDeltaX(this,phi,theta);
             ptsBorderTop.y1_kv  = ptsBorderTop.y1_kv - deltaX;                        
             u_flow              = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                                    
 
-            rhoBorder  = InterpOntoBorder*rho;
-            rhoBorder2 = repmat(rhoBorder,2,1);
+            phiBorder  = InterpOntoBorder*phi;
+            phiBorder2 = repmat(phiBorder,2,1);
 
-            massFlux   = ((rhoR+rho_m)-(rhoL+rho_m))*(y2Max-0)*UWall;      %due to mapping to infinity
+            massFlux   = ((phiR+phi_m)-(phiL+phi_m))*(y2Max-0)*UWall;      %due to mapping to infinity
 
             fsolveOpts = optimset('Display','off');
             [a,~,flag] = fsolve(@massInflux,0,fsolveOpts);            
@@ -100,23 +109,27 @@ classdef DiffuseInterface < handle
             end         
             
             function m = massInflux(a)
-                u_corrected = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);
-                m          = IntNormal_Path*(u_corrected.*(rhoBorder2+rho_m)) + massFlux;    
+                u_corrected = u_flow .*(1 + a*(phiL-phiBorder2).^2.*(phiR-phiBorder2).^2);
+                m          = IntNormal_Path*(u_corrected.*(phiBorder2+phi_m)) + massFlux;    
             end       
         end                    
-        function [uvBound,a,deltaX] = GetBoundaryCondition(this,theta,rho)
+        function [uvBound,a,deltaX] = GetBoundaryCondition(this,theta,phi)
             UWall            = this.optsPhys.UWall;    
             PtsCart          = this.IC.GetCartPts();
             Ind              = this.IC.Ind;
-            rhoL             = rho(Ind.top & Ind.left);
-            rhoR             = rho(Ind.top & Ind.right);
+            phiL             = phi(Ind.top & Ind.left);
+            phiR             = phi(Ind.top & Ind.right);
+            y2_kv            = PtsCart.y2_kv;
+            y2Min            = this.optsNum.PhysArea.y2Min;
+            y2Max            = this.optsNum.PhysArea.y2Max;
+            M                = this.IC.M;
             
             if(length(UWall) == 1)
-                [a,deltaX] = Get_a_deltaX(this,rho,theta);    
+                [a,deltaX] = Get_a_deltaX(this,phi,theta);    
                 u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
                                          PtsCart.y2_kv],UWall,0,0,theta);          
-                rhoBorder2 = repmat(rho,2,1);
-                uvBound    = u_flow .*(1 + a*(rhoL-rhoBorder2).^2.*(rhoR-rhoBorder2).^2);   
+                phiBorder2 = repmat(phi,2,1);
+                uvBound    = u_flow .*(1 + a*(phiL-phiBorder2).^2.*(phiR-phiBorder2).^2);   
             else
                 a = [];  deltaX = [];
                 uvBound    = [UWall(1) + ...
@@ -125,22 +138,7 @@ classdef DiffuseInterface < handle
             end
         end
                          
-        function [bulkError,bulkAverageError] = DisplayFullError(this,rho,uv)            
-            M        = this.IC.M;
-            
-            [Af,bf]  = ContMom_DiffuseInterfaceSingleFluid(this,rho);                         
-            mu_s     = GetMu(this,rho);
-            
-            error    = Af*[mu_s;uv] - bf;
-            PrintErrorPos(error(1:M),'continuity equation',this.IC.Pts);            
-            PrintErrorPos(error(1+M:2*M),'y1-momentum equation',this.IC.Pts);            
-            PrintErrorPos(error(2*M+1:end),'y2-momentum equation',this.IC.Pts);                        
-            
-            PrintErrorPos(error(repmat(~this.IC.Ind.bound,2,1)),'bulk continuity and momentum equations');               
-            
-            bulkError        = max(abs(error(repmat(~this.IC.Ind.bound,2,1))));
-            bulkAverageError = mean(abs(error(repmat(~this.IC.Ind.bound,2,1))));
-        end        
+                
         function spt = FindStagnationPoint(this)
             
             uv = this.uv;
@@ -165,29 +163,30 @@ classdef DiffuseInterface < handle
         end
         
         %Auxiliary Cahn-Hilliard
-        function mu_s = GetMu(this,rho)
+        [A,b] = Div_FullStressTensor(this,phi)
+        function mu_s = GetMu(this,phi)
             if(nargin == 1)
-                rho = this.rho;
+                phi = this.phi;
             end
             Cn       = this.optsPhys.Cn;
-            mu_s     = DoublewellPotential(rho,Cn) - Cn*(this.IC.Diff.Lap*rho);               
+            mu_s     = DoublewellPotential(phi,Cn) - Cn*(this.IC.Diff.Lap*phi);               
         end                   
         
         %Analysis functions
         function ComputeInterfaceContour(this)
             y2           = this.IC.Pts.y2;
-            rho          = this.rho; 
+            phi          = this.phi; 
 
             fsolveOpts   = optimset('Display','off');
             interface    = zeros(size(y2));
 
             y1Bottom = this.IC.GetCartPts.y1_kv(this.IC.Ind.bottom);
-            [~,j]    = min(abs(rho(this.IC.Ind.bottom)));
+            [~,j]    = min(abs(phi(this.IC.Ind.bottom)));
             y1I      = y1Bottom(j);
                         
             for i = 1:length(y2)
                 pt.y2_kv     = y2(i);        
-                [interface(i),~,flag] = fsolve(@rhoX1,y1I,fsolveOpts);        
+                [interface(i),~,flag] = fsolve(@phiX1,y1I,fsolveOpts);        
                 if(flag < 1)
                     cprintf('*r',['ComputeInterfaceContour: Interface not found at y2 = ',num2str(y2(i)),'\n']);
                     return;
@@ -197,10 +196,10 @@ classdef DiffuseInterface < handle
 
             this.IsolineInterfaceY2 = interface;    
 
-            function z = rhoX1(y1)
+            function z = phiX1(y1)
                 pt.y1_kv = y1;
                 IP = this.IC.SubShapePtsCart(pt);
-                z  = IP*rho;
+                z  = IP*phi;
             end   
         end
         
@@ -208,16 +207,16 @@ classdef DiffuseInterface < handle
         function PlotResultsMu(this,mu,uv) 
             if(nargin == 1)
                 uv  = this.uv;
-                mu  = GetMu(this,this.rho);            
+                mu  = GetMu(this,this.phi);            
             end
             
             figure('Position',[0 0 800 600],'color','white');
             this.IC.doPlots(mu,'contour');             
             PlotU(this,uv); hold on;             
         end
-        function PlotResultsRho(this,rho,uv,theta)
+        function PlotResultsRho(this,phi,uv,theta)
             if(nargin == 1)                
-                rho = this.rho;
+                phi = this.phi;
                 uv  = this.uv;
                 theta = this.theta;
             end
@@ -225,7 +224,7 @@ classdef DiffuseInterface < handle
             if(~isempty(uv))
                 PlotU(this,uv); hold on; 
             end
-            this.IC.doPlots(rho,'contour');     
+            this.IC.doPlots(phi,'contour');     
                         
             hold on;
             if(~isempty(this.IsolineInterfaceY2))
@@ -233,12 +232,12 @@ classdef DiffuseInterface < handle
                                                     'k','linewidth',3);
             end
             if(sum(this.IC.Ind.fluidInterface)>0)
-                this.PlotSeppecherSolution(theta,rho);
+                this.PlotSeppecherSolution(theta,phi);
             end
         end        
-        function PlotSeppecherSolution(this,theta,rho)
+        function PlotSeppecherSolution(this,theta,phi)
             if(nargin == 1)                
-                rho = this.rho;            
+                phi = this.phi;            
                 theta = this.theta;
             end
             UWall   = this.optsPhys.UWall;
@@ -249,7 +248,7 @@ classdef DiffuseInterface < handle
             
             PtsCart = this.IC.GetCartPts(); 
             if(nargin > 2)
-                deltaX = GetDeltaX(this,rho,theta);             
+                deltaX = GetDeltaX(this,phi,theta);             
                 PtsCart.y1_kv = PtsCart.y1_kv - deltaX;
             else
                 deltaX = 0;
@@ -266,18 +265,18 @@ classdef DiffuseInterface < handle
             
             y2Max = this.optsNum.PhysArea.y2Max;
             plot([deltaX (deltaX+y2Max/tan(theta))],[0 y2Max],'k--','linewidth',2.5);
-%                 subplot(1,2,2);  this.IC.doPlotFLine([-100,100],[y2Max,y2Max],rho.*u_flow(end/2+1:end),'CART'); 
+%                 subplot(1,2,2);  this.IC.doPlotFLine([-100,100],[y2Max,y2Max],phi.*u_flow(end/2+1:end),'CART'); 
 %             else
 %                 figure('Position',[0 0 800 800],'Color','white');            
 %                 PlotU(this,u_flow);            
 %             end
 %             title('Check accuracy of map');
         end          
-        function SavePlotResults(this,uv,rho,theta,mu)
+        function SavePlotResults(this,uv,phi,theta,mu)
             if(nargin == 1)
                 uv  = this.uv;
-                rho = this.rho;
-                mu  = GetMu(this,rho);
+                phi = this.phi;
+                mu  = GetMu(this,phi);
                 theta = this.theta;
             end
             
@@ -359,48 +358,48 @@ classdef DiffuseInterface < handle
         end
         
         %Old
-        D_B         = SetD_B(this,theta,rho,initialGuessDB)
-        function Interp = ResetOrigin(this,rho)
+        D_B         = SetD_B(this,theta,phi,initialGuessDB)
+        function Interp = ResetOrigin(this,phi)
             
             pt.y2_kv  =  0;
-            DeltaY1   = fsolve(@rhoX1,-1);%,fsolveOpts);
+            DeltaY1   = fsolve(@phiX1,-1);%,fsolveOpts);
             
             ptsCartShift       = this.IC.GetCartPts();
             ptsCartShift.y1_kv = ptsCartShift.y1_kv + DeltaY1;
             
             Interp = this.IC.SubShapePtsCart(ptsCartShift);                       
             
-            function z = rhoX1(y1)
+            function z = phiX1(y1)
                 pt.y1_kv = y1;
                 IP       = this.IC.SubShapePtsCart(pt);
-                z        = IP*rho;
+                z        = IP*phi;
             end    
         end
-        function theta = FindInterfaceAngle(this,rho)
+        function theta = FindInterfaceAngle(this,phi)
 
             y2M = 0; y2P = 10;
           %  fsolveOpts   = optimset('Display','off');                
 
             pt.y2_kv  =  y2M;
-            y1CartStart = fsolve(@rhoX1,-1);%,fsolveOpts);
+            y1CartStart = fsolve(@phiX1,-1);%,fsolveOpts);
 
             pt.y2_kv  = y2P;
-            y1CartEnd = fsolve(@rhoX1,2);%,fsolveOpts);                
+            y1CartEnd = fsolve(@phiX1,2);%,fsolveOpts);                
 
             alpha = atan((y1CartStart-y1CartEnd)/(y2P-  y2M));
             theta = alpha + pi/2;
             
             disp(['Contact angle: ',num2str(theta*180/pi),'[deg].']);
 
-            function z = rhoX1(y1)
+            function z = phiX1(y1)
                 pt.y1_kv = y1;
                 IP       = this.IC.SubShapePtsCart(pt);
-                z        = IP*rho;
+                z        = IP*phi;
             end    
         end   
         
-        [rho,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,rho,ptC)                  
-        [rho,uv]       = SolveFull(this,ic)
+        [phi,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  
+        [phi,uv]       = SolveFull(this,ic)
    end
     
 end

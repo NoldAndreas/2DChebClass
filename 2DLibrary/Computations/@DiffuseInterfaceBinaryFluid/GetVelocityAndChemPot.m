@@ -6,7 +6,7 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 %         0 = -grad(p) + Lap*u + 1/Cak *mu*grad(phi)
 %           = Lap*u + 1/Cak * div*PI
 %
-% PI = (-p*Cak + f_DW + Cn/2*|Grad(phi)|^2) I - Cn (Grad(rho)) X (Grad(rho))
+% PI = (-p*Cak + f_DW + Cn/2*|Grad(phi)|^2) I - Cn (Grad(phi)) X (Grad(phi))
 %
 % with boundary conditions
 % 
@@ -19,8 +19,8 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 %
 %
 % (BC5) int( m_{1,2} ,y_1=-inf..inf,y2=y2Max) 
-%     - int( m_{1,2} ,y_1=-inf..inf,y2=0) = [mu*(rho+rho_m)*y2Max]_y1=inf 
-%                                         - [mu*(rho+rho_m)*y2Max]_y1=-inf
+%     - int( m_{1,2} ,y_1=-inf..inf,y2=0) = [mu*(phi+phi_m)*y2Max]_y1=inf 
+%                                         - [mu*(phi+phi_m)*y2Max]_y1=-inf
 
     M       = this.IC.M;    
     Ind     = this.IC.Ind;       
@@ -39,32 +39,26 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     [Tt11,Tb11]        = FullStressTensorIJ(this,phi,1,1);
     [Tt12,Tb12]        = FullStressTensorIJ(this,phi,1,2);            
     [Tt22,Tb22]        = FullStressTensorIJ(this,phi,2,2);
-    %[~,WFull]          = DoublewellPotential(rho,Cn);
+    [~,WFull]          = DoublewellPotential(phi,Cn);
     
         
     %% Continuity and Momentum Equation
-    [Af,bf]                  = ContMom_DiffuseInterfaceSingleFluid(this,rho);
-    A([~Ind.bound;~IBB],:)   = Af([~Ind.bound;~IBB],:);   
-    b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
+    [Af,bf]                  = ContinuumMomentumEqs(this,phi);
+    A([~Ind.left;~IBB],:)   = Af([~Ind.left;~IBB],:);   
+    b([~Ind.left;~IBB])     = bf([~Ind.left;~IBB]);
 
-    %% BC1 and BC2   
-    %uvBound   = GetWallVelocityBC(this);    
-    if(sum(Ind.fluidInterface > 0))
-        %[uvBound(repmat(Ind.fluidInterface,1,2)),a] = GetFluidInterfaceVelocityBC(this,theta,rho);        
-        [uvBound,a] = GetBoundaryCondition(this,theta,rho);
-    else
-        a = [];
-    end
-	b([F;IBB])     = uvBound(IBB);
+    %% BC1 and BC2       
+	[uvBound,a] = GetBoundaryCondition(this,theta,phi);    
+	b([F;IBB])  = uvBound(IBB);
 
     %% BC3
-%     ys             = DoublewellPotential(rho,Cn) - Cn*Diff.Lap*rho;    
-%     Cmu            = -diag(rho + rho_m)*Diff.Lap - diag(Diff.Lap*rho) ...
-%                      - 2*diag(Diff.Dy1*rho)*Diff.Dy1 ...
-%                      - 2*diag(Diff.Dy2*rho)*Diff.Dy2;
+%     ys             = DoublewellPotential(phi,Cn) - Cn*Diff.Lap*phi;    
+%     Cmu            = -diag(phi + phi_m)*Diff.Lap - diag(Diff.Lap*phi) ...
+%                      - 2*diag(Diff.Dy1*phi)*Diff.Dy1 ...
+%                      - 2*diag(Diff.Dy2*phi)*Diff.Dy2;
 %     Cuv            = zeros(M,2*M);
 %     C              = [Cmu,Cuv];
-%     bBound         = - repmat(ys,2,1).*(Diff.grad*rho); 
+%     bBound         = - repmat(ys,2,1).*(Diff.grad*phi); 
 % 
 %     A([Ind.top|Ind.bottom;FF],:)  = C(Ind.top|Ind.bottom,:);                        
 %     b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
@@ -79,7 +73,7 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     [~,WL] = DoublewellPotential(phi(Ind.left&Ind.top),Cn);
     [~,WR] = DoublewellPotential(phi(Ind.right&Ind.top),Cn);
     
-    indBC5 = Ind.right & Ind.top;
+     indBC5 = Ind.right & Ind.top;
     
      A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
         
@@ -87,9 +81,9 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
      A([indBC5;FF],[T;FF]) = 0;
      A([indBC5;FF],:)      = IntPathUpLow*Tt12;
      A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF]) ...
-                                 - this.IC.borderRight.IntSc*diag(rho+rho_m);
+                                 - this.IC.borderRight.IntSc*Cak;
      A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF])  ...
-                                + this.IC.borderLeft.IntSc*diag(rho+rho_m);
+                                + this.IC.borderLeft.IntSc*Cak;
      b([indBC5;FF])        = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
              
      %reduce by ignoring velocities with y1>y1Max
@@ -106,25 +100,27 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 
     disp(['Error: ',num2str(max(abs(A*x-b)))]);
 
-    mu              = x(1:M);
+    p               = x(1:M);
     uv              = x(1+M:end);
 
-    [At,bt] = Div_FullStressTensor(this,rho);
-    [maxError,j] = max(abs(At*[mu;uv] + bt));
+    this.p = p; this.uv = uv;
+
+    [At,bt] = Div_FullStressTensor(this,phi);
+    [maxError,j] = max(abs(At*[p;uv] + bt));
     j = mod(j,M);
     disp(['Error of divergence of stress tensor: ',num2str(maxError),...
                 ' at y_1 = ',num2str(this.IC.GetCartPts.y1_kv(j)),...
                 ' at y_2 = ',num2str(this.IC.GetCartPts.y2_kv(j))]);
     
     %Accuracy of force balance normal to the substrate:
-    errorNormal = IntPathUpLow*Tt22*[mu;uv] + IntPathUpLow*Tb22;
+    errorNormal = IntPathUpLow*Tt22*[p;uv] + IntPathUpLow*Tb22;
     disp(['Error of force balance normal to substate: ',num2str(errorNormal)])    
 
     
     %Accuracy of force balance normal to the substrate:    
-    h         = WFull - (rho+rho_m).*mu;
+    h         =  WFull - Cak*p;
     
-    errorParallel = IntPathUpLow*Tt12*[mu;uv] + IntPathUpLow*Tb12 + (this.IC.borderRight.IntSc - this.IC.borderLeft.IntSc)*h;
+    errorParallel = IntPathUpLow*Tt12*[p;uv] + IntPathUpLow*Tb12 + (this.IC.borderRight.IntSc - this.IC.borderLeft.IntSc)*h;
     disp(['Error of force balance parallel to substate: ',num2str(errorParallel)])    
     
 end

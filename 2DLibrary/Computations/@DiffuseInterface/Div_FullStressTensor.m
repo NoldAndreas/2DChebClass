@@ -1,11 +1,11 @@
- function [A,b] = Div_FullStressTensor(this,rho)
+ function [A,b] = Div_FullStressTensor(this,phi)
 
     Diff      = this.IC.Diff;    
 
-    [A11,b11] = FullStressTensorIJ(this,rho,1,1); 
-    [A12,b12] = FullStressTensorIJ(this,rho,1,2); 
-    [A21,b21] = FullStressTensorIJ(this,rho,2,1); 
-    [A22,b22] = FullStressTensorIJ(this,rho,2,2); 
+    [A11,b11] = FullStressTensorIJ(this,phi,1,1); 
+    [A12,b12] = FullStressTensorIJ(this,phi,1,2); 
+    [A21,b21] = FullStressTensorIJ(this,phi,2,1); 
+    [A22,b22] = FullStressTensorIJ(this,phi,2,2); 
 
     A1        = Diff.Dy1 * A11  + Diff.Dy2*A21;
     A2        = Diff.Dy1 * A12  + Diff.Dy2*A22;

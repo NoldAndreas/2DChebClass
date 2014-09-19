@@ -1,7 +1,7 @@
-function [A,b] = ContMom_DiffuseInterfaceBinaryFluid(this,phi)
-    %Continuitiy: div(rho*uv) = 0
-    %Momentum: - (rho+rho_m)*grad(mu) +
-    %          ... +grad(rho)*(W'(rho) - mu - Cn*Lap(rho) )
+function [A,b] = ContinuumMomentumEqs(this,phi)
+    %Continuitiy: div(phi*uv) = 0
+    %Momentum: - (phi+phi_m)*grad(mu) +
+    %          ... +grad(phi)*(W'(phi) - mu - Cn*Lap(phi) )
     %          + Cak*(eta*Lap(uv) + (zeta + eta/3)*grad(div(uv)) )
 
     %
@@ -23,6 +23,6 @@ function [A,b] = ContMom_DiffuseInterfaceBinaryFluid(this,phi)
     A              = [A_cont;A_mom];  
 
     b              = zeros(3*M,1);            
-    ys             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*rho);
+    ys             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*phi);
     b(1+M:end)     = - repmat(ys,2,1).*(Diff.grad*phi); 
 end        

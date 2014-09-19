@@ -1,8 +1,12 @@
-function [phi,theta] = GetEquilibriumDensity(this,theta,phi)%,findTheta)
+function [phi,theta] = GetEquilibriumDensity(this,theta,phi,uv)%,findTheta)
 
     Cn      = this.optsPhys.Cn;
     m       = this.optsPhys.mobility;
     thetaEq = this.optsPhys.thetaEq;
+    M       = this.IC.M;           
+    Ind     = this.IC.Ind;    
+    Diff    = this.IC.Diff;
+    
     if(length(thetaEq) == 1)
         thetaEq = thetaEq*[1,1];
     end
@@ -12,20 +16,18 @@ function [phi,theta] = GetEquilibriumDensity(this,theta,phi)%,findTheta)
     if(nargin < 3)
         phi = InitialGuessRho(this);
     end
-    
-    M       = this.IC.M;           
-    Ind     = this.IC.Ind;    
-    Diff    = this.IC.Diff;                    
-    uv      = zeros(2*M,1);
+	if(nargin < 4)
+        uv      = zeros(2*M,1);
+    end        
         
     a_direction = Set_a_direction(theta);
     
-    Convect    = [diag(uv(1:end/2)),diag(uv(1+end/2:end))]*Diff.grad;
+    Convect    = [diag(uv(1:end/2)),diag(uv(1+end/2:end))]*Diff.grad/m;
     
-    phi        = NewtonMethod(phi,@f_eq);    %0;
+    phi        = NewtonMethod(phi,@f_eq,1e-10,200,0.1);    %0;
     %phi        = fsolve(@f_eq,phi);    %0;
     disp(['theta = ',num2str(theta*180/pi)]);    
-	this.rho = phi;
+	this.phi = phi;
     
     function [a_direction,a_direction_theta] = Set_a_direction(theta)
         a_y1             = zeros(M,1); 
@@ -69,27 +71,26 @@ function [phi,theta] = GetEquilibriumDensity(this,theta,phi)%,findTheta)
         J             = diag(ddW) - Cn*Diff.Lap;   
         J             = [-ones(length(rho_s),1),J];
     end
-
     function [y,J] = f_eq(phi_s)                       
         
         %y      = m*Diff.Lap*GetExcessChemPotential(phi_s) - Convect*phi_s;
         absGradRho  = ( (Diff.Dy1*phi_s).^2 + (Diff.Dy2*phi_s).^2 );
         
         y      = - Convect*phi_s ...
-                 + 12*m/Cn*phi_s.*absGradRho ...
-                 + 2*m/Cn*(3*phi_s.^2 -1).*(Diff.Lap*phi_s)...
-                 - m*Cn*Diff.Lap2*phi_s;
+                 + 12*Cn*phi_s.*absGradRho ...
+                 + 2*Cn*(3*phi_s.^2 -1).*(Diff.Lap*phi_s)...
+                 - Cn*Diff.Lap2*phi_s;
         
-        J      = 12*m/Cn*diag(absGradRho + phi_s.*(Diff.Lap*phi_s))...
-                  - Convect ...
-                  + 24*m/Cn*diag(phi_s)*(diag(Diff.Dy1*phi_s)*Diff.Dy1 + diag(Diff.Dy2*phi_s)*Diff.Dy2)...
-                  + 2*m/Cn*diag(3*phi_s.^2-1)*Diff.Lap ...
-                  - Cn*m*Diff.Lap2;
+        J      =  - Convect ...
+                  + 12/Cn*diag(absGradRho + phi_s.*(Diff.Lap*phi_s))...                  
+                  + 24/Cn*diag(phi_s)*(diag(Diff.Dy1*phi_s)*Diff.Dy1 + diag(Diff.Dy2*phi_s)*Diff.Dy2)...
+                  + 2/Cn*diag(3*phi_s.^2-1)*Diff.Lap ...
+                  - Cn*Diff.Lap2;
         
         [g,Jg] = get_g(phi_s);
         
         % Boundary condition at top and bottom boundaries
-        topBottom       = Ind.bottom | Ind.top;
+        topBottom      = Ind.bottom | Ind.top;
         y(topBottom)   = a_direction(topBottom,:)*(Diff.grad*phi_s) - g(topBottom);
         J(topBottom,:) = a_direction(topBottom,:)*Diff.grad-Jg(topBottom,:);
         

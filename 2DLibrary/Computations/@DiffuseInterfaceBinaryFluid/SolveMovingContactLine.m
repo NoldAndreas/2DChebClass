@@ -1,5 +1,7 @@
 function SolveMovingContactLine(this,noIterations)    
 
+    M = this.IC.M;
+
     if(nargin == 1)
         params.noIterations = 20;
     else
@@ -15,8 +17,8 @@ function SolveMovingContactLine(this,noIterations)
         otherInput.thetaInitialGuess = this.theta;
     end
         
-
-    [res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
+    IterativeSolverCahnHilliard(params,otherInput);
+    %[res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
         
     this.phi   = res.phi;
     this.uv    = res.uv;
@@ -44,7 +46,7 @@ function SolveMovingContactLine(this,noIterations)
             phi    = this.phi;
             mu     = this.GetMu();
          end
-         
+         uv = zeros(2*M,1);
          
          error          = zeros(noIter,1);
          errorAverage   = zeros(noIter,1);
@@ -54,29 +56,28 @@ function SolveMovingContactLine(this,noIterations)
          %eps = 10^(-5);        
         %this.IC.doPlotFLine([2,100],[this.optsNum.PhysArea.y2Max,...
         %   this.optsNum.PhysArea.y2Max],phi+1,'CART'); ylim([-eps,eps]);        
+        [phi,theta]  = GetEquilibriumDensity(this,theta,phi,uv);
+        [p,uv,~,~,a] = GetVelocityAndChemPot(this,phi,theta);
+        DisplayFullError(this);
          
-         for j = 1:noIter
-            disp(['** Iteration no ',num2str(j),' **']) 
-            close all;        
-            if((j==2 || j > 4) && ~isempty(a))
-                [phi,theta]  = GetEquilibriumDensity(this,mu,theta,phi,'findTheta');
-            else
-                [phi,theta]  = GetEquilibriumDensity(this,mu,theta,phi);
-            end
-            [mu,uv,~,~,a] = GetVelocityAndChemPot(this,phi,theta);                  
-
-            [error(j),errorAverage(j)] = DisplayFullError(this,phi,uv);      
-            
-            if(~isempty(a))
-                thetaIter(j) = theta;
-                aIter(j)     = a;            
-            end
-            
-            hold on;
-            plot(j,error(j),'ro','MarkerFaceColor','r'); hold on;
-            plot(j,errorAverage(j),'ko','MarkerFaceColor','k'); drawnow;           
-            
-         end
+        %2nd Iteration
+        mob = this.optsPhys.mobility; 
+        for m = 100:-5:55
+            this.optsPhys.mobility = m;
+            [phi,theta]  = GetEquilibriumDensity(this,theta,phi,uv);
+            [p,uv,~,~,a] = GetVelocityAndChemPot(this,phi,theta);
+            [phi,theta]  = GetEquilibriumDensity(this,theta,phi,uv);
+            [p,uv,~,~,a] = GetVelocityAndChemPot(this,phi,theta);
+            DisplayFullError(this);      
+        end
+        
+        %3rd Iteration
+        for j = 1:10            
+            [phi,theta]  = GetEquilibriumDensity(this,theta,phi,uv);
+            [p,uv,~,~,a] = GetVelocityAndChemPot(this,phi,theta);
+            DisplayFullError(this);   
+        end
+         
          
          res.errorIterations = error;
          res.errorAverage    = errorAverage;
