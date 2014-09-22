@@ -1,33 +1,43 @@
-function [phi,theta] = GetEquilibriumDensity(this,theta,phi,uv)%,findTheta)
+function [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
 
-    Cn      = this.optsPhys.Cn;
-    m       = this.optsPhys.mobility;
+    Cn     = this.optsPhys.Cn;
     thetaEq = this.optsPhys.thetaEq;
-    M       = this.IC.M;           
-    Ind     = this.IC.Ind;    
-    Diff    = this.IC.Diff;
-    
     if(length(thetaEq) == 1)
         thetaEq = thetaEq*[1,1];
     end
-    if(nargin < 2)
-        theta = pi/2;
-    end
-    if(nargin < 3)
-        phi = InitialGuessRho(this);
-    end
-	if(nargin < 4)
-        uv      = zeros(2*M,1);
-    end        
+    
+    M      = this.IC.M;           
+    Ind    = this.IC.Ind;    
+    Diff   = this.IC.Diff;        
+    nParticles = this.optsPhys.nParticles;            
+    
+    IntSubArea  = this.IntSubArea;          
+            
+    if(isscalar(mu))
+        mu = mu*ones(M,1);
+    end                   
         
     a_direction = Set_a_direction(theta);
     
-    Convect    = [diag(uv(1:end/2)),diag(uv(1+end/2:end))]*Diff.grad/m;
+    if((nargin > 4) && strcmp(findTheta,'findTheta'))
+        y        = NewtonMethod([theta;0;phi],@f_eq_theta,1e-6,100,0.5);    %0;
+
+        theta    = y(1);
+        muDelta  = y(2);        
+        phi      = y(3:end);
+    else
+        muDelta  = 0;
+    end
+      
+    y        = NewtonMethod([muDelta;phi],@f_eq);    %0;
+    muDelta  = y(1);    
+    phi      = y(2:end);
     
-    phi        = NewtonMethod(phi,@f_eq,1e-10,200,0.1);    %0;
-    %phi        = fsolve(@f_eq,phi);    %0;
-    disp(['theta = ',num2str(theta*180/pi)]);    
-	this.phi = phi;
+    this.phi = phi;
+    
+    disp(['theta = ',num2str(theta*180/pi)]);
+    disp(['Delta mu = ',num2str(muDelta)]);
+	
     
     function [a_direction,a_direction_theta] = Set_a_direction(theta)
         a_y1             = zeros(M,1); 
@@ -50,65 +60,60 @@ function [phi,theta] = GetEquilibriumDensity(this,theta,phi,uv)%,findTheta)
         a_direction_theta = [diag(a_y1),diag(a_y2)];
         
     end    
-    function [g,Jg] = get_g(rho_s)
+    function [g,Jg] = get_g(phi_s)
         g   = zeros(M,1);
         Jg  = zeros(M,M);
-        rhoDiag         = diag(rho_s);
+        phiDiag         = diag(phi_s);
         
-        g(Ind.bottom)    = cos(thetaEq(1))*(1-(rho_s(Ind.bottom)).^2)/Cn;                            
-        Jg(Ind.bottom,:) = - 2*cos(thetaEq(1))*rhoDiag(Ind.bottom,:)/Cn;
+        g(Ind.bottom)    = cos(thetaEq(1))*(1-(phi_s(Ind.bottom)).^2)/Cn;                            
+        Jg(Ind.bottom,:) = - 2*cos(thetaEq(1))*phiDiag(Ind.bottom,:)/Cn;
         
-        g(Ind.top)       = cos(thetaEq(2))*(rho_s(Ind.top)).^2/Cn;                            
-        Jg(Ind.top,:)    = - 2*cos(thetaEq(2))*(1-rhoDiag(Ind.top,:))/Cn;
+        g(Ind.top)       = cos(thetaEq(2))*(phi_s(Ind.top)).^2/Cn;                            
+        Jg(Ind.top,:)    = - 2*cos(thetaEq(2))*(1-phiDiag(Ind.top,:))/Cn;
         
         g(Ind.fluidInterface)    = 0;
         Jg(Ind.fluidInterface,:) = 0;
     end
 
-    function [mu_s,J] = GetExcessChemPotential(rho_s)
-        [dW,~,ddW]    = DoublewellPotential(rho_s,Cn);
-        mu_s          = dW - Cn*(Diff.Lap*rho_s);  
+    function [mu_s,J] = GetExcessChemPotential(phi_s,mu_offset)    
+        [dW,~,ddW]    = DoublewellPotential(phi_s,Cn);
+        mu_s          = dW - Cn*(Diff.Lap*phi_s) - mu_offset;                                   
         J             = diag(ddW) - Cn*Diff.Lap;   
-        J             = [-ones(length(rho_s),1),J];
+        J             = [-ones(length(phi_s),1),J];
     end
-    function [y,J] = f_eq(phi_s)                       
+
+    function [y,J] = f_eq(x)
         
-        %y      = m*Diff.Lap*GetExcessChemPotential(phi_s) - Convect*phi_s;
-        absGradRho  = ( (Diff.Dy1*phi_s).^2 + (Diff.Dy2*phi_s).^2 );
-        
-        y      = - Convect*phi_s ...
-                 + 12*Cn*phi_s.*absGradRho ...
-                 + 2*Cn*(3*phi_s.^2 -1).*(Diff.Lap*phi_s)...
-                 - Cn*Diff.Lap2*phi_s;
-        
-        J      =  - Convect ...
-                  + 12/Cn*diag(absGradRho + phi_s.*(Diff.Lap*phi_s))...                  
-                  + 24/Cn*diag(phi_s)*(diag(Diff.Dy1*phi_s)*Diff.Dy1 + diag(Diff.Dy2*phi_s)*Diff.Dy2)...
-                  + 2/Cn*diag(3*phi_s.^2-1)*Diff.Lap ...
-                  - Cn*Diff.Lap2;
+        dmu         = x(1);
+        mu_s        = mu + dmu;
+        phi_s       = x(2:end); 
+        [y,J]       = GetExcessChemPotential(phi_s,mu_s); 
         
         [g,Jg] = get_g(phi_s);
         
-        % Boundary condition at top and bottom boundaries
-        topBottom      = Ind.bottom | Ind.top;
+        % Boundary condition for the density
+        topBottom       = Ind.bottom | Ind.top;
         y(topBottom)   = a_direction(topBottom,:)*(Diff.grad*phi_s) - g(topBottom);
-        J(topBottom,:) = a_direction(topBottom,:)*Diff.grad-Jg(topBottom,:);
+        J(topBottom,:) = [zeros(sum(topBottom),1),...
+                                a_direction(topBottom,:)*Diff.grad-Jg(topBottom,:)];
+                           
+        % Mass condition
+        phiM        = phi_s(Ind.left & Ind.top);
+        phiP        = phi_s(Ind.right & Ind.top);
+        y           = [IntSubArea*(phi_s - (phiM + phiP)/2) - nParticles;y];
         
-        % Boundary condition at left and right boundaries
-        EYE = eye(M);
-        y(Ind.left)    = phi_s(Ind.left) + 1;
-        J(Ind.left,:)  = EYE(Ind.left,:);        
-        
-        y(Ind.right)    = phi_s(Ind.right) -1;
-        J(Ind.right,:)  = EYE(Ind.right,:);
-        
+        Jint                      = IntSubArea;        
+        Jint(Ind.left & Ind.top)  = IntSubArea(Ind.left & Ind.top)/2;
+        Jint(Ind.right & Ind.top) = IntSubArea(Ind.right & Ind.top)/2;
+
+        J           = [0,Jint;J];   
     end
 
     function [y,J] = f_eq_theta(x)
         
         theta_s     = x(1);  
         dmu         = x(2);                    
-        rho_s       = x(3:end); 
+        phi_s       = x(3:end); 
         
         [y1,J1]     = f_eq(x(2:end));
         y           = [dmu;y1];
@@ -116,7 +121,7 @@ function [phi,theta] = GetEquilibriumDensity(this,theta,phi,uv)%,findTheta)
         [a_direction,a_direction_theta] = Set_a_direction(theta_s);        
         
         J_theta          = zeros(M,1);
-        J_theta(Ind.top) = a_direction_theta(Ind.top,:)*(Diff.grad*rho_s);         
+        J_theta(Ind.top) = a_direction_theta(Ind.top,:)*(Diff.grad*phi_s);         
         
         J                = [0,1,zeros(1,M);...
                             0,J1(1,:);...

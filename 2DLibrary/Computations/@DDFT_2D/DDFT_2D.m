@@ -45,7 +45,8 @@ classdef DDFT_2D < handle
             end
             
             % Special Case: HalfSpace_FMT
-            if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT'))
+            if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT') || ...
+               strcmp(optsNum.PhysArea.shape,'InfCapillary_FMT'))
                 shape.R = this.optsPhys.sigmaS/2;
             end
             

@@ -1,4 +1,5 @@
 function [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
+
     Cn     = this.optsPhys.Cn;
     thetaEq = this.optsPhys.thetaEq;
     if(length(thetaEq) == 1)

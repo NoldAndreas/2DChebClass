@@ -1,4 +1,4 @@
-function [A,b] = ContinuumMomentumEqs(this,phi)
+function [A,b] = ContinuityMomentumEqs(this,phi)
     %Continuitiy: div(phi*uv) = 0
     %Momentum: - (phi+phi_m)*grad(mu) +
     %          ... +grad(phi)*(W'(phi) - mu - Cn*Lap(phi) )

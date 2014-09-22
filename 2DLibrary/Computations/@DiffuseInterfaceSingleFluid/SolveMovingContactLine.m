@@ -36,7 +36,7 @@ function SolveMovingContactLine(this,noIterations)
          noIter = params.noIterations;
          
          if(otherInput.thetaInitialGuess == pi/2)
-            theta  = otherInput.thetaInitialGuess;
+            theta  = pi/2;
             phi    = InitialGuessRho(this);
             mu     = 0;
          else

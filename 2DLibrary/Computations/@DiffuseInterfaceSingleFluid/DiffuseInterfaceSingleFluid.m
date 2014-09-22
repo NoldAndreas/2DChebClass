@@ -8,7 +8,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         SolveMovingContactLine(this,maxIterations)       
         [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
         [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,phi,theta)
-        [A,b]               = [A,b] = ContinuumMomentumEqs(this,phi)
+        [A,b]               = ContinuityMomentumEqs(this,phi)
                         
         [A,b]       = FullStressTensorIJ(this,phi,i,j)           
         function p = GetPressure_from_ChemPotential(this,mu,phi_ig)
@@ -36,7 +36,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         function [bulkError,bulkAverageError] = DisplayFullError(this,phi,uv)            
             M        = this.IC.M;
             
-            [Af,bf]  = ContinuumMomentumEqs(this,phi);                         
+            [Af,bf]  = ContinuityMomentumEqs(this,phi);                         
             mu_s     = GetMu(this,phi);
             
             error    = Af*[mu_s;uv] - bf;

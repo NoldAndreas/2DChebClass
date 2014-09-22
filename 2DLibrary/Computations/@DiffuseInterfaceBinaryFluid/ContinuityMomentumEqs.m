@@ -1,8 +1,7 @@
-function [A,b] = ContinuumMomentumEqs(this,phi)
-    %Continuitiy: div(phi*uv) = 0
-    %Momentum: - (phi+phi_m)*grad(mu) +
-    %          ... +grad(phi)*(W'(phi) - mu - Cn*Lap(phi) )
-    %          + Cak*(eta*Lap(uv) + (zeta + eta/3)*grad(div(uv)) )
+function [A,b] = ContinuityMomentumEqs(this,phi)
+    %Continuitiy: div(uv) = 0
+    %Momentum: -Grad(p) + grad(phi)*(W'(phi) - Cn*Lap(phi) )
+    %          + Cak*Lap(uv)
 
     %
     % A*[p;uv] = b corresponds to momentum and continuity Eq. for given phasefield phi               
@@ -22,7 +21,7 @@ function [A,b] = ContinuumMomentumEqs(this,phi)
     A_mom          = [A_mom_p, A_mom_uv];
     A              = [A_cont;A_mom];  
 
-    b              = zeros(3*M,1);            
-    ys             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*phi);
-    b(1+M:end)     = - repmat(ys,2,1).*(Diff.grad*phi); 
+    b              = zeros(3*M,1);
+    mu             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*phi);
+    b(1+M:end)     = - repmat(mu,2,1).*(Diff.grad*phi); 
 end        

@@ -17,7 +17,7 @@ classdef DiffuseInterface < handle
    
    methods (Abstract = true, Access = public)
        [A,b] = FullStressTensorIJ(this,phi,i,j)
-       [A,b] = ContinuumMomentumEqs(this,phi)
+       [A,b] = ContinuityMomentumEqs(this,phi)
        [bulkError,bulkAverageError] = DisplayFullError(this) 
    end
    
@@ -214,13 +214,14 @@ classdef DiffuseInterface < handle
             this.IC.doPlots(mu,'contour');             
             PlotU(this,uv); hold on;             
         end
-        function PlotResultsRho(this,phi,uv,theta)
+        function PlotResultsPhi(this,phi,uv,theta)
             if(nargin == 1)                
                 phi = this.phi;
                 uv  = this.uv;
                 theta = this.theta;
+                figure('Position',[0 0 800 600],'color','white');
             end
-            figure('Position',[0 0 800 600],'color','white');
+            
             if(~isempty(uv))
                 PlotU(this,uv); hold on; 
             end
@@ -303,7 +304,7 @@ classdef DiffuseInterface < handle
             
             
             startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
-                         y1Min*ones(size(y2L));...
+                         y1Min*ones(size(y2L))+0.1;...
                          y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);

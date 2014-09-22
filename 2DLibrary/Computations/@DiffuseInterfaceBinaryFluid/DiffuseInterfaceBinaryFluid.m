@@ -9,10 +9,17 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              this@DiffuseInterface(config);
        end
        
-       [rho,theta] = GetEquilibriumDensity(this,theta,phi,uv)
-       [A,b] = ContinuumMomentumEqs(this,phi)
-       SolveMovingContactLine(this,noIterations)  
-       [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)    
+       [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
+       [rho,theta]         = GetEquilibriumDensity_Flux(this,theta,phi,uv)
+       
+       [A,b] = ContinuityMomentumEqs(this,phi)
+       [A,b] = ContinuityMomentumEqs_mu_p_uv(this,phi)
+       
+       SolveMovingContactLine(this,noIterations)
+       [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
+       [p,mu,uv,A,b,a] = GetVelocityPressureAndChemPot(this,phi,theta)
+       
+       mu = SolvePhasefieldForChemPot(this,uv,phi)
        
        function [bulkError,bulkAverageError] = DisplayFullError(this)
             M        = this.IC.M;
@@ -24,7 +31,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             phi      = this.phi;
             p        = this.p;
             
-            [Af,bf]  = ContinuumMomentumEqs(this,phi);                                     
+            [Af,bf]  = ContinuityMomentumEqs(this,phi);                                     
             Convect    = [diag(uv(1:end/2)),diag(uv(1+end/2:end))]*this.IC.Diff.grad/m;
             
             error    = Af*[p;uv] - bf;

@@ -44,7 +44,7 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     
         
     %% Continuity and Momentum Equation
-    [Af,bf]                  = ContinuumMomentumEqs(this,phi);
+    [Af,bf]                  = ContinuityMomentumEqs(this,phi);
     A([~Ind.bound;~IBB],:)   = Af([~Ind.bound;~IBB],:);   
     b([~Ind.bound;~IBB])     = bf([~Ind.bound;~IBB]);
 

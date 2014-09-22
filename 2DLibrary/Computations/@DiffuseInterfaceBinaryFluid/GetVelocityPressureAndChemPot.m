@@ -1,10 +1,11 @@
-function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
+function [p,mu,uv,A,b,a] = GetVelocityPressureAndChemPot(this,phi,theta)
 %% Equations solved:
 %
 % Continuity: div(uv) = 0
 % Momentum:    div(m) = 0
 %         0 = -grad(p) + Lap*u + 1/Cak *mu*grad(phi)
 %           = Lap*u + 1/Cak * div*PI
+% Chem. Pot:   0 = u*grad(phi) - m*Lap(mu)
 %
 % PI = (-p*Cak + f_DW + Cn/2*|Grad(phi)|^2) I - Cn (Grad(phi)) X (Grad(phi))
 %
@@ -15,12 +16,12 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 % (BC3) mu = div(div(m))
 %          = -Lap(p) + 1/Cak*div(mu*grad(phi))
 % (BC4) p = 0 for Ind.left
-%
-%
-%
+%  
 % (BC5) int( m_{1,2} ,y_1=-inf..inf,y2=y2Max) 
 %     - int( m_{1,2} ,y_1=-inf..inf,y2=0) = [mu*(phi+phi_m)*y2Max]_y1=inf 
 %                                         - [mu*(phi+phi_m)*y2Max]_y1=-inf
+% (BC6) Grad(mu)*nu = 0 at the wall
+% (BC7) Grad(mu)*(0,1) = 0 at x = +/- infinity
 
     M       = this.IC.M;    
     Ind     = this.IC.Ind;       
@@ -43,13 +44,13 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     
         
     %% Continuity and Momentum Equation
-    [Af,bf]                 = ContinuityMomentumEqs(this,phi);
-    A([~Ind.left;~IBB],:)   = Af([~Ind.left;~IBB],:);   
-    b([~Ind.left;~IBB])     = bf([~Ind.left;~IBB]);
+    [Af,bf]                 = ContinuityMomentumEqs_mu_p_uv(this,phi);
+    A([~Ind.left;~Ind.bound,~IBB],:)   = Af([~Ind.left;~IBB],:);   
+    b([~Ind.left;~Ind.bound,~IBB])     = bf([~Ind.left;~IBB]);
 
     %% BC1 and BC2       
-	[uvBound,a] = GetBoundaryCondition(this,theta,phi);    
-	b([F;IBB])  = uvBound(IBB);
+	[uvBound,a]   = GetBoundaryCondition(this,theta,phi);    
+	b([F;F;IBB])  = uvBound(IBB);
 
     %% BC3
 %     ys             = DoublewellPotential(phi,Cn) - Cn*Diff.Lap*phi;    
@@ -64,10 +65,10 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
 %     b([Ind.top|Ind.bottom;FF])    = Diff.div(Ind.top|Ind.bottom,:)*bBound;
                
     %% BC4
-    A([Ind.left;FF],[T;FF]) = Diff.Dy2(Ind.left,:);
+    A([Ind.left;F;FF],[T;F;FF]) = Diff.Dy2(Ind.left,:);
     
-    A([Ind.left&Ind.top;FF],:)                      = 0;        
-    A([Ind.left&Ind.top;FF],[Ind.left&Ind.top;FF])  = eye(sum(Ind.left&Ind.top));    
+    A([Ind.left&Ind.top;F;FF],:)                        = 0;        
+    A([Ind.left&Ind.top;F;FF],[Ind.left&Ind.top;F;FF])  = eye(sum(Ind.left&Ind.top));    
     
     %% BC5    
     [~,WL] = DoublewellPotential(phi(Ind.left&Ind.top),Cn);
@@ -75,35 +76,47 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     
      indBC5 = Ind.right & Ind.top;
     
-     A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
+     A([Ind.right;F;FF],[T;F;FF]) = Diff.Dy2(Ind.right,:);
         
     
-     A([indBC5;FF],[T;FF]) = 0;
-     A([indBC5;FF],:)      = IntPathUpLow*Tt12;
-     A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF]) ...
+     A([indBC5;F;FF],[T;F;FF]) = 0;
+     A([indBC5;F;FF],:)      = IntPathUpLow*Tt12;
+     A([indBC5;F;FF],[T;F;FF]) = A(indBC5,[T;F;FF]) ...
                                  - this.IC.borderRight.IntSc*Cak;
-     A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF])  ...
+     A([indBC5;F;FF],[T;F;FF]) = A(indBC5,[T;F;FF])  ...
                                 + this.IC.borderLeft.IntSc*Cak;
-     b([indBC5;FF])        = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
-             
-     %reduce by ignoring velocities with y1>y1Max
-     markRed = (abs(this.IC.GetCartPts.y1_kv) < this.optsNum.PhysArea.y1Max);
-     markRedFull  = [T;markRed;markRed];
-     ARed = A(markRedFull,markRedFull);
-     bRed = b(markRedFull) - A(markRedFull,~markRedFull)*...
-                                uvBound(~[markRed;markRed]);
+     b([indBC5;F;FF])        = -IntPathUpLow*Tb12 + (WL - WR)*y2Max;
+     
+     %% BC6 
+     A([F;Ind.top|Ind.bottom;FF],:)        = 0;
+     direction                             = [zeros(M),eye(M)];
+     A([F;Ind.top|Ind.bottom;FF],[F;T;FF]) = direction(Ind.top|Ind.bottom,:)*Diff.grad;     
+     
+     %% BC7 
+     EYM = eye(m);
+     A([F;Ind.left|Ind.right;FF],:)        = 0;          
+     A([F;Ind.left|Ind.right;FF],[F;T;FF]) = EYM(Ind.left|Ind.right,:);     
+
+%      %reduce by ignoring velocities with y1>y1Max
+%      markRed = (abs(this.IC.GetCartPts.y1_kv) < this.optsNum.PhysArea.y1Max);
+%      markRedFull  = [T;markRed;markRed];
+%      ARed = A(markRedFull,markRedFull);
+%      bRed = b(markRedFull) - A(markRedFull,~markRedFull)*...
+%                                 uvBound(~[markRed;markRed]);
      
     % Solve Equation
-    %x               = A\b;
-    x               = [ones(M,1);uvBound];
-    x(markRedFull)  = ARed\bRed;
+    x               = A\b;
+    %x               = [ones(M,1);uvBound];
+    %x(markRedFull)  = ARed\bRed;
 
     disp(['Error: ',num2str(max(abs(A*x-b)))]);
 
     p               = x(1:M);
-    uv              = x(1+M:end);
+    mu              = x(1+M:2*M);
+    uv              = x(2*M+1:end);
 
-    this.p = p; this.uv = uv;
+    this.p = p;
+    this.uv = uv;
 
     [At,bt] = Div_FullStressTensor(this,phi);
     [maxError,j] = max(abs(At*[p;uv] + bt));

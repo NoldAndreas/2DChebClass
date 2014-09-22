@@ -1,6 +1,6 @@
  classdef HalfSpace_Composed < ConvolutionFiniteSupport
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-%Always Check: The y1-Map (PhysSpace1) has to be the same for SubStrip
+% Always Check: The y1-Map (PhysSpace1) has to be the same for SubStrip
 % and SubHalfSpace
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    properties 
@@ -233,40 +233,7 @@
        function PlotGridLines(this)
             this.Sub_HalfSpace.PlotGridLines(); hold on;
             this.Sub_Strip.PlotGridLines();
-       end
-%        
-%        function [refpts,ptsy2] = GetRefY2Pts(this,diskLimit) 
-%            
-%            M = length(this.Sub_Strip.Pts.y1_kv);
-%            
-%            N21 = this.Sub_Strip.Pts.N2;
-%            
-%            %Set up ptsy2           
-%            for i = 1:N21
-%                ptsy2(i)  = this.Pts.y2_kv(i);
-%            end
-%            for i = 1:this.Sub_HalfSpace.Pts.N2
-%                if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
-%                    ptsy2(N21 + i) = this.Sub_HalfSpace.Pts.y2_kv(i);               
-%                else
-%                    break;
-%                end
-%            end
-%            
-%            %Set up refpts
-%            refpts    = zeros(length(this.Pts.y1_kv),1);
-%            for i = 1:M
-%                refpts(i) = mmod(i,this.Sub_Strip.N2);               
-%            end
-%            
-%            for i = 1:length(this.Sub_HalfSpace.Pts.y1_kv)
-%                if(this.Sub_HalfSpace.Pts.y2_kv(i) < diskLimit)
-%                    refpts(M+i) = N21 + mmod(i,this.Sub_HalfSpace.N2);
-%                else
-%                    refpts(M+i) = -1;
-%                end
-%            end
-%        end      
+       end        
        
 %        function PlotGrid(this)
 %             scatter(this.Sub_Strip.Pts.y1_kv,...
