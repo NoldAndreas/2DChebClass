@@ -29,7 +29,7 @@ function [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta
         muDelta  = 0;
     end
       
-    y        = NewtonMethod([muDelta;phi],@f_eq);    %0;
+    y        = NewtonMethod([muDelta;phi],@f_eq,1e-6,1,0.5);    %0;
     muDelta  = y(1);    
     phi      = y(2:end);
     

@@ -21,6 +21,6 @@ function mu = SolvePhasefieldForChemPot(this,uv,phi)
     A(Ind.left|Ind.right,:) = EYM(Ind.left|Ind.right,:);
     rhs(Ind.left|Ind.right) = 0;           
     
-    mu = A\rhs;
-
+    mu      = A\rhs;
+    this.mu = mu;
 end

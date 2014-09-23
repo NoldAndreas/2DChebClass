@@ -2,12 +2,13 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
 %%
 %
 % This function computes the convolution between a function defined on 
-% a HalfSpace with a set of functions with of finite support, at a specific
+% an infinite capillary with a set of functions with of finite support, at a specific
 % set of points 
 
 %% Input
 %
-% * area - structure with two methods (1) [int,A] = ComputeIntegrationVector() and
+% * area - object of a class with two methods 
+%                   (1) [int,A] = ComputeIntegrationVector() and
 %                   (2) pts = GetCartPts(), with pts = struct(y1_kv,y2_kv)
 % * weights - a cell with a list of functions which get a structure with 
 %         two arrays [y1_kv,y2_kv] as input and returns one
@@ -31,7 +32,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
 % list _weights_.
 %
 %           
-% Note: This method is only tested if pts are in a shape of a HalfSpace.
+% Note: This method is only tested if pts are in a shape of an infinite capillary.
     
     %% Initialization
     %
@@ -45,6 +46,8 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     % always a subset of _this_ class. These are collected in
     % ptsStrip.
     %
+    
+    alpha = pi/2; %this.alpha
 
     fprintf('Computing interpolation for matrices for averaged densities..\n');
     tic
@@ -52,24 +55,29 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     AD          = zeros(length(pts.y1_kv),this.M,numel(weights)+1);%always include unity weight
     areaPtsCart = area.GetCartPts();
 
-    y2Sep    = this.y2wall + this.R/sin(this.alpha) + ...
-                           + abs(min(areaPtsCart.y2_kv))/sin(this.alpha);
+    y2SepMin    = this.y2Min + abs(min(areaPtsCart.y2_kv))/sin(alpha);
+    y2SepMax    = this.y2Max - abs(max(areaPtsCart.y2_kv))/sin(alpha);
+                       
+                       
     % Note: division through sin(this.alpha) takes into account that
     % pts.y1_kv and pts.y2_kv are the coordinates in the skewed
     % grid.
-    markY2  = (pts.y2    < y2Sep);
-    markYkv = (pts.y2_kv < y2Sep);            
+    mark_Y2{1}  = (pts.y2    < y2SepMin);
+    mark_Ykv{1} = (pts.y2_kv < y2SepMin);            
+    
+    mark_Y2{2}  = ((pts.y2    >= y2SepMin) & (pts.y2  <= y2SepMax));
+    mark_Ykv{2} = ((pts.y2_kv >= y2SepMin) & (pts.y2_kv <= y2SepMax));            
+    
+    mark_Y2{3}  = (pts.y2    > y2SepMax);
+    mark_Ykv{3} = (pts.y2_kv > y2SepMax);            
 
-    ptsStrip.y1_kv = pts.y1_kv(markYkv);
-    ptsStrip.y2_kv = pts.y2_kv(markYkv);
-    ptsStrip.y2    = pts.y2(markY2);
-    ptsStrip.y1    = pts.y1;
-
-    ptsHS.y1_kv = pts.y1_kv(~markYkv);
-    ptsHS.y2_kv = pts.y2_kv(~markYkv);
-    ptsHS.y2    = pts.y2(~markY2);
-    ptsHS.y1    = pts.y1;
-
+    for i = 1:3
+        ptsStrip{i}.y1_kv = pts.y1_kv(mark_Ykv{i});
+        ptsStrip{i}.y2_kv = pts.y2_kv(mark_Ykv{i});
+        ptsStrip{i}.y2    = pts.y2(mark_Y2{i});
+        ptsStrip{i}.y1    = pts.y1;
+    end
+   
     %% Computation of Intersections
     %
     % <<DraftX.png>>
@@ -81,15 +89,22 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     % We make use of this property, for performance purposes, as the
     % points in ptsStrip are aligned with a grid.
     
-    ptsStripCart = GetCartPts(this,0,ptsStrip.y2);
+    ptsStripCart = GetCartPts(this,0,ptsStrip{1}.y2);
     ptsy2        = ptsStripCart.y2_kv;
-
     for iPts = 1:length(ptsy2)
         area.Origin(2) = ptsy2(iPts);
-        dataAD(iPts)   = Intersect(this,area);
-    end
+        dataAD1(iPts)   = Intersect(this,area);
+    end    
     area.Origin(2) = 0;
 
+    ptsStripCart = GetCartPts(this,0,ptsStrip{3}.y2);
+    ptsy2        = ptsStripCart.y2_kv;
+    for iPts = 1:length(ptsy2)
+        area.Origin(2) = ptsy2(iPts);
+        dataAD3(iPts)   = Intersect(this,area);
+    end    
+    area.Origin(2) = 0;
+    
     %% Computation of convolution matrices
     %
     % For the point in the set ptsHS, the integration matrix (over
@@ -100,11 +115,14 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     % for r in ptsHSthe area A is independent of r_i.     
   
     if(nargin==5)
-        AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
-        AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights,params);    
+        AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights,params);
+        AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights,params);    
+        AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights,params);
     else
-        AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights);        
-        AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights);    
+        
+        AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights);
+        AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights);
+        AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights);        
     end
 
     t = toc;

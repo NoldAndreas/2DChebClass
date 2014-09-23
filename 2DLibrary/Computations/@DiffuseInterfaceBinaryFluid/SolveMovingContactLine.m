@@ -55,23 +55,26 @@ function SolveMovingContactLine(this,noIterations)
          %eps = 10^(-5);        
         %this.IC.doPlotFLine([2,100],[this.optsNum.PhysArea.y2Max,...
         %   this.optsNum.PhysArea.y2Max],phi+1,'CART'); ylim([-eps,eps]);
-        
-        [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi);   
-        [p,uv,~,~,a]        = GetVelocityAndChemPot(this,phi,theta);
         mu                  = SolvePhasefieldForChemPot(this,uv,phi);
-        for j = 1:10
-            for j = 1:5
-                [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi);   
-                [p,uv,~,~,a]        = GetVelocityAndChemPot(this,phi,theta);
-            end
+        for j = 1:100
+           % for j = 1:5
+            [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi);               
             mu                  = SolvePhasefieldForChemPot(this,uv,phi);
+            [p,uv,~,~,a]        = GetVelocityAndChemPot(this,phi,mu,theta);
+            mu                  = SolvePhasefieldForChemPot(this,uv,phi);
+            %end
             
+            
+            DisplayFullError(this);
+            
+            f1 = figure;
             subplot(2,2,1)
             PlotResultsPhi(this,phi,uv,theta)
             subplot(2,2,2)
             this.IC.doPlots(p,'SC');
             subplot(2,2,3)
             this.IC.doPlots(mu,'SC');
+            close(f1);
         end
 
         DisplayFullError(this);

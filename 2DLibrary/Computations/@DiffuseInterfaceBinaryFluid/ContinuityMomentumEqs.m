@@ -1,4 +1,4 @@
-function [A,b] = ContinuityMomentumEqs(this,phi)
+function [A,b] = ContinuityMomentumEqs(this,phi,mu)
     %Continuitiy: div(uv) = 0
     %Momentum: -Grad(p) + grad(phi)*(W'(phi) - Cn*Lap(phi) )
     %          + Cak*Lap(uv)
@@ -22,6 +22,6 @@ function [A,b] = ContinuityMomentumEqs(this,phi)
     A              = [A_cont;A_mom];  
 
     b              = zeros(3*M,1);
-    mu             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*phi);
+    %mu             = DoublewellPotential(phi,Cn) - Cn*(Diff.Lap*phi);
     b(1+M:end)     = - repmat(mu,2,1).*(Diff.grad*phi); 
 end        

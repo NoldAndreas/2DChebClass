@@ -1,4 +1,4 @@
-function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
+function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,mu,theta)
 %% Equations solved:
 %
 % Continuity: div(uv) = 0
@@ -43,7 +43,7 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     
         
     %% Continuity and Momentum Equation
-    [Af,bf]                 = ContinuityMomentumEqs(this,phi);
+    [Af,bf]                 = ContinuityMomentumEqs(this,phi,mu);
     A([~Ind.left;~IBB],:)   = Af([~Ind.left;~IBB],:);   
     b([~Ind.left;~IBB])     = bf([~Ind.left;~IBB]);
 
