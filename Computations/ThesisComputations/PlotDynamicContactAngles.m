@@ -8,23 +8,33 @@ function PlotDynamicContactAngles
 	close all;
     
     nData = 1;
+    data  = {};
+    
+    L_Lambda    = [10^4,exp(1.92/3)];
+    lines = {'k--','k:','k-.'};
+    
     
     HoffmannFit = LoadHoffmannData('Fit','-',[]);
+    
+    nData = 1;
 
-%     data{nData} = LoadDataFluidData('Stroem/Stroem_ParaffinOil_untreatedPS','s','r');  
-%     %LoadDataFluidData('Stroem/Stroem_ParaffinOil_PTFE','d','r'); %(no zero static contact angle)
-%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_I_untreatedPS','d','r');    
-%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_untreatedPS','o','r');    
-%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_oxidizedPS','v','r');    
-%     
-%     data{nData} = LoadHoffmannData('BlackCircles','s','k');
-%     data{nData} = LoadHoffmannData('Triangles','d','k');
-%     data{nData} = LoadHoffmannData('Crosses','^','k');
-%     data{nData} = LoadHoffmannData('Hexagons','o','k');
-%     data{nData} = LoadHoffmannData('Squares','v','k');            
+    data{nData} = LoadDataFluidData('Stroem/Stroem_ParaffinOil_untreatedPS','s','r',struct('rad','deg','Ca','V'));  
+    %LoadDataFluidData('Stroem/Stroem_ParaffinOil_PTFE','d','r'); %(no zero static contact angle)
+    data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_I_untreatedPS','d','r',struct('rad','deg','Ca','V'));
+    data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_untreatedPS','o','r',struct('rad','deg','Ca','V'));
+    data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_oxidizedPS','v','r',struct('rad','deg','Ca','V'));
     
-    data{nData} = LoadDataFluidData('Kavehpour/eta_0_5','v','k'); 
+    data{nData} = LoadHoffmannData('BlackCircles','s','k');
+    data{nData} = LoadHoffmannData('Triangles','d','k');
+    data{nData} = LoadHoffmannData('Crosses','^','k');
+    data{nData} = LoadHoffmannData('Hexagons','o','k');
+    data{nData} = LoadHoffmannData('Squares','v','k');            
     
+    LoadDataFluidData('Kavehpour/eta_0_007','s','m',struct('rad','rad','Ca','Ca')); 
+    LoadDataFluidData('Kavehpour/eta_0_5','d','m',struct('rad','rad','Ca','Ca'));     
+    LoadDataFluidData('Kavehpour/eta_1_0','^','m',struct('rad','rad','Ca','Ca')); 
+    LoadDataFluidData('Kavehpour/eta_5_0','o','m',struct('rad','rad','Ca','Ca')); 
+    LoadDataFluidData('Kavehpour/eta_10_0','v','m',struct('rad','rad','Ca','Ca'));         
    
     PlotGThetaOverCa();
     PlotThetaOverCaPlusF(data,'FHoffmann');
@@ -48,17 +58,21 @@ function PlotDynamicContactAngles
             end
             hold on;
         end
+        noPlots = i + 1;
         
-        h_legend = legend(plotLegend,'Location','Northwest');          
-        set(h_legend,'FontSize',10);        
-
         thetaM = (0:0.01:pi)';
         G_thM  = GHR(thetaM);
 
-        plot(G_thM/log(10^4),thetaM*180/pi,'k--','linewidth',2);
-
-        xlim([1e-5 100]);
-        ylim([0 180]);
+        for k = 1:length(L_Lambda)
+            plot(G_thM/log(L_Lambda(k)),thetaM*180/pi,lines{k},'linewidth',2);
+            plotLegend{noPlots} = ['analytical prediction with L/lambda = ',num2str(L_Lambda(k))];
+            noPlots = noPlots + 1;
+        end
+        
+        h_legend = legend(plotLegend,'Location','Northwest');          
+        set(h_legend,'FontSize',10);        
+        
+       % xlim([1e-5 100]);        ylim([0 180]);
         xlabel('$Ca$','Interpreter','Latex','fontsize',20);
         ylabel('$\theta_m [^\circ]$','Interpreter','Latex','fontsize',20);
 
@@ -81,9 +95,11 @@ function PlotDynamicContactAngles
         elseif(strcmp(FHoffmann_FGHR,'FGR'))
             thetaM = (0:0.01:pi)';
             G_thM  = GHR(thetaM);    
-            semilogx(G_thM/log(10^4),thetaM*180/pi,'k--','linewidth',2); 
-            plotLegend{noPlots} = 'Fit to G';
-            noPlots = noPlots + 1;  
+            for k = 1:length(L_Lambda)
+                semilogx(G_thM/log(L_Lambda(k)),thetaM*180/pi,lines{k},'linewidth',2);  hold on;
+                plotLegend{noPlots} = ['Fit to G with L/lambda = ',num2str(L_Lambda(k))];
+                noPlots = noPlots + 1;  
+            end
         end  
         
         hold on;
@@ -129,8 +145,7 @@ function PlotDynamicContactAngles
                     'MarkerSize',data{i}.MarkerSize+2); hold on; 
         end
 
-        xlim([1e-5 100]);
-        ylim([0 180]);
+        %xlim([1e-5 100]); ylim([0 180]);
         
         ylabel('$\theta_m [^\circ]$','Interpreter','Latex','fontsize',20);
         set(gca,'fontsize',20);
@@ -170,10 +185,12 @@ function PlotDynamicContactAngles
             hold on;
         end
                       
-        xP = (0:1e-5:10);
-        plot(xP,xP*log(1e4),'linewidth',2);
-        plotLegend{noPlots} = 'analytical prediction with L/lambda = 10^4';
-        noPlots = noPlots + 1;
+        xP = 10.^(-6:0.1:1);%(0:1e-6:10);
+        for k = 1:length(L_Lambda)
+            plot(xP,xP*log(L_Lambda(k)),lines{k},'linewidth',2);
+            plotLegend{noPlots} = ['analytical prediction with L/lambda = ',num2str(L_Lambda(k))];
+            noPlots = noPlots + 1;
+        end
         
         h_legend = legend(plotLegend,'Location','Northwest');          
         set(h_legend,'FontSize',10);                       
@@ -183,67 +200,76 @@ function PlotDynamicContactAngles
 
         set(gca,'fontsize',15);
         
-        xlim([1e-5,1e2]);
-        ylim([1e-4,1e2]);
+        %xlim([1e-5,1e2]);
+        %ylim([1e-4,1e2]);
 
         print2eps('GThetaOverCa',gcf);  
         saveas(gcf,'GThetaOverCa.fig');
         
     end        
    
-    function data =  LoadHoffmannData(name,symbol,color)
+    function dataL =  LoadHoffmannData(name,symbol,color)
         fid = fopen([dir,'Hoffmann/Hoffmann_',name,'.txt']);
         y = textscan(fid,'%[^\n]',1,'headerlines',4); %[T, rhoG, rhoL]        
         x = textscan(fid,'%f %f'); %[T, rhoG, rhoL]
         fclose(fid); 
         
-        data.legend = char(y{1});
-        data.Feq = x{1}(1);
-        data.thetaEq = x{1}(2);
-        data.Ca  = x{1}(3:end) - data.Feq;
-        data.theta = x{2}(3:end);                
+        dataL.legend = char(y{1});
+        dataL.Feq = x{1}(1);
+        dataL.thetaEq = x{1}(2);
+        dataL.Ca  = x{1}(3:end) - dataL.Feq;
+        dataL.theta = x{2}(3:end);                
         
-        data.color  = color;
-        data.symbol = symbol;
+        dataL.color  = color;
+        dataL.symbol = symbol;
         
         if(isempty(color))
-            data.lw    = 2;
+            dataL.lw    = 2;
             %semilogx(data.Ca,data.theta,symbol,'linewidth',2); hold on;
         else
-            data.MarkerSize = 10;
+            dataL.MarkerSize = 10;
             %semilogx(data.Ca,data.theta,symbol,'MarkerFaceColor',color,'MarkerSize',10); hold on;
         end
         
-        nData = nData + 1;
-                
+        data{nData} = dataL;
+        nData       = nData + 1;                
     end
-    function data =  LoadDataFluidData(name,symbol,color)
+    function dataL = LoadDataFluidData(name,symbol,color,opts)
         fid = fopen([dir,name,'.txt']);
         y = textscan(fid,'%[^\n]',1,'headerlines',4); %[T, rhoG, rhoL]        
         x = textscan(fid,'%f %f'); %[T, rhoG, rhoL]
         fclose(fid); 
         
         
-        data.gamma = x{1}(1);
-        data.eta = x{1}(2);
-        data.rho = x{1}(3);
+        dataL.gamma = x{1}(1);
+        dataL.eta = x{1}(2);
+        dataL.rho = x{1}(3);
         
-        data.theta = x{1}(4:end);
-        data.Ca    = x{2}(4:end)*data.eta/data.gamma*10^-3;
-        
-        data.thetaEq = data.theta(data.Ca == 0);        
-        data.legend  = char(y{1});
-        
-        data.color  = color;
-        data.symbol = symbol;
-        
-        if(isempty(color))
-            data.lw = 2;            
-        else
-            data.MarkerSize = 10;            
+        if(strcmp(opts.rad,'rad'))
+            dataL.theta = x{1}(4:end)*180/pi;            
+        elseif(strcmp(opts.rad,'deg'))
+            dataL.theta = x{1}(4:end);
+        end
+        if((nargin > 3) && strcmp(opts.Ca,'Ca'))
+            dataL.Ca    = x{2}(4:end);
+        elseif((nargin > 3) && strcmp(opts.Ca,'V'))
+            dataL.Ca    = x{2}(4:end)*dataL.eta/dataL.gamma*10^-3;
         end
         
-        nData = nData + 1;
+        dataL.thetaEq = dataL.theta(dataL.Ca == 0);        
+        dataL.legend  = char(y{1});
+        
+        dataL.color  = color;
+        dataL.symbol = symbol;
+        
+        if(isempty(color))
+            dataL.lw = 2;            
+        else
+            dataL.MarkerSize = 10;            
+        end
+        
+        data{nData} = dataL;
+        nData       = nData + 1;
                
     end
     function z = GHR(t)
