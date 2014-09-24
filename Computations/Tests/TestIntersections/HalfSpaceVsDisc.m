@@ -10,7 +10,7 @@ plot([-10,10],[bottom,bottom],'b--','LineWidth',2);
 
 xlim([-5,5])
 ylim([-1.3 2])
-ylim([bottom-R,bottom+3*R])
+ylim([bottom-R-1,bottom+3*R])
 xlabel('$x$','Interpreter','Latex','fontsize',20);
 ylabel('$y$','Interpreter','Latex','fontsize',20);
 axis equal
@@ -23,7 +23,10 @@ while(y20 > bottom - R)
     Origin = [y10,y20];
     N      = [10,10];
     sphere = true;
-    DC     = Disc(v2struct(Origin,R,N,sphere));   
+    
+    DC     = Disc(v2struct(Origin,R,N,sphere));       
+    %theta1 = 0;  theta2 = pi;    
+    %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));       
 
     hold on
     area = Intersect(HS,DC);

@@ -17,22 +17,22 @@
            %Geometry includes:
            % y2Min,h,L1,L2,N,N2bound
            
-           shapeStripB     = struct('y2Min',Geometry.y2Min - Geometry.h,...
-                                    'y2Max',Geometry.y2Min,...
+           shapeStripB     = struct('y2Min',Geometry.y2Min - Geometry.R,...
+                                    'y2Max',Geometry.y2Min + Geometry.R,...
                                     'L1',Geometry.L1,...
                                     'N',[Geometry.N(1),Geometry.N2bound],...
                                     'alpha',pi/2);                                
            this.Bottom_Strip  = InfCapillarySkewed(shapeStripB); 
            
-           shapeMainStrip  = struct('y2Min',Geometry.y2Min,...
-                                    'y2Max',Geometry.y2Max,...
+           shapeMainStrip  = struct('y2Min',Geometry.y2Min + Geometry.R,...
+                                    'y2Max',Geometry.y2Max - Geometry.R,...
                                     'L2',Geometry.L2,'L1',Geometry.L1,...
                                     'N',Geometry.N,...
                                     'alpha',pi/2);
            this.Main_Strip = InfCapillarySkewed(shapeMainStrip);
            
-           shapeStripT     = struct('y2Min',Geometry.y2Max,...
-                                    'y2Max',Geometry.y2Max  + Geometry.h,...
+           shapeStripT     = struct('y2Min',Geometry.y2Max - Geometry.R,...
+                                    'y2Max',Geometry.y2Max + Geometry.R,...
                                     'L1',Geometry.L1,...
                                     'N',[Geometry.N(1),Geometry.N2bound],...
                                     'alpha',pi/2);           
@@ -47,7 +47,7 @@
                                this.Main_Strip.Pts.y2_kv;...
                                this.Top_Strip.Pts.y2_kv];
                            
-           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == 0);
+           this.Pts.y1      = this.Pts.y1_kv(this.Pts.y2_kv == min(this.Pts.y2_kv));
            this.Pts.y2      = this.Pts.y2_kv(this.Pts.y1_kv == inf);
            
            this.Pts.x1      = this.Main_Strip.Pts.x1;
@@ -147,7 +147,7 @@
         end 
         function IP = SubShapePts(this,a_shapePts)
             maskB = (a_shapePts.y2_kv < this.Bottom_Strip.y2Max);
-            maskM = ((a_shapePts.y2_kv >= this.Main_Strip.y2Min) && ...
+            maskM = ((a_shapePts.y2_kv >= this.Main_Strip.y2Min) & ...
                      (a_shapePts.y2_kv <= this.Main_Strip.y2Max));
             maskT = (a_shapePts.y2_kv > this.Top_Strip.y2Min);
            
@@ -157,7 +157,7 @@
                throw(exc);
            end           
            
-           IP = zeros(length(a_shapePts.y1_kv),this.Mstrip+this.MHS);
+           IP = zeros(length(a_shapePts.y1_kv),this.M);
            
            
            IP(maskB,this.mark_id(:,1))  = this.Bottom_Strip.InterpolationMatrix_Pointwise(...
@@ -218,27 +218,28 @@
             id(y2 > this.Top_Strip.y2Min)       = 3;
             
         end
-% 	   function do1DPlotNormal(this,V)
-%             global PersonalUserOutput
-%             if(~PersonalUserOutput)
-%                 return;
-%             end
-%             %V: Vector of length N2
-%             y2Max       = 5;
-%             mark        = (this.Pts.y1_kv == inf);            
-%             y2IP        = (0:0.1:y2Max)';
-%             [h_1,IP]      = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));
-%             
-%             PtsCart     = GetCartPts(this);
-%             y2IPCart    = y2IP*sin(this.alpha);            
-%             plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
-%             hold on;
-%             plot(y2IPCart,IP*V,'linewidth',1.5);
-%             xlim([min(y2IPCart) max(y2IPCart)]);
-%             xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
-%             set(gca,'fontsize',20);                        
-%             set(gca,'linewidth',1.5);       
-%        end    
+	   function do1DPlotNormal(this,V)
+            global PersonalUserOutput
+            if(~PersonalUserOutput)
+                return;
+            end
+            alpha = pi/2 ; %this.alpha
+            
+            %V: Vector of length N2            
+            mark        = (this.Pts.y1_kv == inf);            
+            y2IP        = (this.Bottom_Strip.y2Min:0.1:this.Top_Strip.y2Max)';
+            [h_1,IP]      = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));
+            
+            PtsCart     = GetCartPts(this);
+            y2IPCart    = y2IP*sin(alpha);            
+            plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
+            hold on;
+            plot(y2IPCart,IP*V,'linewidth',1.5);
+            xlim([min(y2IPCart) max(y2IPCart)]);
+            xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
+            set(gca,'fontsize',20);                        
+            set(gca,'linewidth',1.5);       
+       end    
 %        function do1DPlotParallel(this,V)  
 %             global PersonalUserOutput
 %             if(~PersonalUserOutput)

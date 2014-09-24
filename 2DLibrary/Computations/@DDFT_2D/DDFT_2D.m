@@ -88,6 +88,8 @@ classdef DDFT_2D < handle
                 this.optsPhys.nSpecies = length(optsPhys.Dmu);
             elseif(isfield(optsPhys,'mu'))
                 this.optsPhys.nSpecies = length(optsPhys.mu);
+            elseif(isfield(optsPhys,'nSpecies'))
+                this.optsPhys.nSpecies = optsPhys.nSpecies;
             end
                                                              
             Preprocess_HardSphereContribution(this);

@@ -5,7 +5,7 @@ function EX = Test_DDFT_DiffusionInfCapillary_FMT(doHI)
     end
 
     Phys_Area = struct('shape','InfCapillary_FMT','N',[30;30],'L1',2,'L2',2, ...
-                       'y2Min',0,'y2Max',10,'N2bound',10,'h',1,'L2_AD',1);
+                       'y2Min',0,'y2Max',10,'N2bound',10,'L2_AD',1);
     
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
                        'y2Min',0.5,'y2Max',5,'N2',100);

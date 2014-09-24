@@ -118,7 +118,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         %if(~exist('Data','var') || ((nargin == 5) && recompute == true))
         if(recompute)
            startComp = tic;
-           fprintf(['Computing data, starting at ', datestr(now), '...']);
+           fprintf(['Computing data, starting at ', datestr(now), '...\n']);
            Data     = func(OriginalParameters,OtherInputs);
            t        = toc(startComp);     
            if(isnumeric(Data) && isscalar(Data) && (Data == 0))

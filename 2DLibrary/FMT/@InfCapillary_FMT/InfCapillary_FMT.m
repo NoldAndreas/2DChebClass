@@ -44,7 +44,7 @@ classdef InfCapillary_FMT < InfCapillary & ConvolutionFiniteSupport
                              'L2',L2_AD,...
                              'y2Min',Geometry.y2Min,...
                              'y2Max',Geometry.y2Max,...
-                             'h',Geometry.h,...
+                             'R',R,...
                              'N',Geometry.N,'N2bound',Geometry.N2bound);
 
             this.AD = InfCapillary_Composed(shapeAD);                        
@@ -71,8 +71,7 @@ classdef InfCapillary_FMT < InfCapillary & ConvolutionFiniteSupport
              this.mark_12   = ones(1,1); 
         end                        
         
-%         AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)        
-%         
+         AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)                 
         function [AD,AAD] = GetAverageDensities(this,area,weights)            
             %%
             % 

@@ -50,7 +50,6 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     alpha = pi/2; %this.alpha
 
     fprintf('Computing interpolation for matrices for averaged densities..\n');
-    tic
 
     AD          = zeros(length(pts.y1_kv),this.M,numel(weights)+1);%always include unity weight
     areaPtsCart = area.GetCartPts();
@@ -124,7 +123,5 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
         AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights);
         AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights);        
     end
-
-    t = toc;
-    disp([num2str(t),'s']);  
+    
 end      

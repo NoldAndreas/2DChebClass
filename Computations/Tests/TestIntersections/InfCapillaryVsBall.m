@@ -1,6 +1,5 @@
 clear all; close all;
 
-L      = 1;
 R      = 1;
 bottom = 0;
 top    = 5;
@@ -24,9 +23,10 @@ while(y20 > bottom - R)
     Origin       = [y10,y20];
     N            = [15,16];
     sphere       = true;
-    theta1 = 0;
-    theta2 = pi;    
-    DC           = Ball(v2struct(Origin,N,sphere,L,theta1,theta2,R));   
+    
+    DC     = Disc(v2struct(Origin,R,N,sphere));       
+    %theta1 = 0;  theta2 = pi;    
+    %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));   
 
     hold on
     area = Intersect(HS,DC);

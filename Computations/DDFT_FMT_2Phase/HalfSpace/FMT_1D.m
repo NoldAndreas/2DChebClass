@@ -13,6 +13,10 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     R         = optsPhys.sigmaS/2;
     fBulk     = str2func(['FexBulk_',FexNum.Fex]);  
     
+    if(~isfield(optsPhys,'V2'))
+        optsPhys.V2 = struct('V2DV2','zeroPotential');                  
+    end
+    
     if(isfield(optsPhys,'Dmu') && isfield(optsPhys,'mu_sat'))
         mu        = optsPhys.mu_sat + optsPhys.Dmu;
     elseif(isfield(optsPhys,'eta'))

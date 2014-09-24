@@ -35,7 +35,7 @@ classdef (Abstract) InfCapillaryGeneral < SpectralSpectral & ConvolutionPointwis
 %             [y1,dy1,dx,ddx,dddx,ddddx] = SqrtMap(x1,this.L1,inf);            
 %             y1 =  this.y10 + y1; 
 %         end
-%         function xf = CompSpace1(this,y1)            
+%         function xf = CompSpace1(this,y1)
 %             xf  = InvSqrtMap(y1 - this.y10,this.L1,inf);
 %         end
         function [th,dth,dx,ddx,dddx,ddddx] = PhysSpace2(this,x2)                
@@ -193,6 +193,39 @@ classdef (Abstract) InfCapillaryGeneral < SpectralSpectral & ConvolutionPointwis
          end
         
         [X,checkSum] = InterpolateAndIntegratePtsOrigin(this,ptsOr,data,weights);       
+        
+        function do1DPlotNormal(this,V)
+            %doPlotFLine(this,[inf inf],[this.y2Min this.y2Max],rho);
+            
+            global PersonalUserOutput
+            if(~PersonalUserOutput)
+                return;
+            end
+            V = V(:);
+            
+            %V: Vector of length N2
+            ptsM        = GetInvCartPts(this,inf,this.y2Max);
+            y2Max       = ptsM.y2_kv;%10
+            mark        = (this.Pts.y1_kv == inf);            
+            IP          = ComputeInterpolationMatrix(this,1,(-1:0.01:CompSpace2(this,y2Max))',true);         
+            
+            if(length(V) == this.M)
+                V = V(mark);
+            end
+            IP.InterPol = IP.InterPol(:,mark);
+            
+            PtsCart     = GetCartPts(this);
+            IPPtsCart   = GetCartPts(this,IP.pts1,IP.pts2);            
+            plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
+            hold on;
+            plot(IPPtsCart.y2_kv,IP.InterPol*V,'linewidth',1.5);
+            xlim([min(IPPtsCart.y2_kv) max(IPPtsCart.y2_kv)]);
+            xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
+            set(gca,'fontsize',20);                        
+            set(gca,'linewidth',1.5);       
+        end
        
+             
+        
     end
 end
