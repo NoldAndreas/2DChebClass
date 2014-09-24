@@ -1,20 +1,29 @@
 function PlotDynamicContactAngles   
 
+    if(exist('D:\','dir'))
+        dir = 'D://SyncGit/Projects/Data/ExperimentalContactAngle/';
+    elseif(exist('/Users/NoldAndreas/','dir'))
+        dir = '/Users/NoldAndreas/Documents/SyncGit/Projects/Data/ExperimentalContactAngle/';
+    end
 	close all;
+    
+    nData = 1;
     
     HoffmannFit = LoadHoffmannData('Fit','-',[]);
 
-    data{1} = LoadDataFluidData('Stroem/Stroem_ParaffinOil_untreatedPS','s','r');  
-    %LoadDataFluidData('Stroem/Stroem_ParaffinOil_PTFE','d','r'); %(no zero static contact angle)
-    data{2} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_I_untreatedPS','d','r');    
-    data{3} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_untreatedPS','o','r');    
-    data{4} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_oxidizedPS','v','r');    
+%     data{nData} = LoadDataFluidData('Stroem/Stroem_ParaffinOil_untreatedPS','s','r');  
+%     %LoadDataFluidData('Stroem/Stroem_ParaffinOil_PTFE','d','r'); %(no zero static contact angle)
+%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_I_untreatedPS','d','r');    
+%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_untreatedPS','o','r');    
+%     data{nData} = LoadDataFluidData('Stroem/Stroem_SiliconeOil_II_oxidizedPS','v','r');    
+%     
+%     data{nData} = LoadHoffmannData('BlackCircles','s','k');
+%     data{nData} = LoadHoffmannData('Triangles','d','k');
+%     data{nData} = LoadHoffmannData('Crosses','^','k');
+%     data{nData} = LoadHoffmannData('Hexagons','o','k');
+%     data{nData} = LoadHoffmannData('Squares','v','k');            
     
-    data{5} = LoadHoffmannData('BlackCircles','s','k');
-    data{6} = LoadHoffmannData('Triangles','d','k');
-    data{7} = LoadHoffmannData('Crosses','^','k');
-    data{8} = LoadHoffmannData('Hexagons','o','k');
-    data{9} = LoadHoffmannData('Squares','v','k');            
+    data{nData} = LoadDataFluidData('Kavehpour/eta_0_5','v','k'); 
     
    
     PlotGThetaOverCa();
@@ -183,7 +192,7 @@ function PlotDynamicContactAngles
     end        
    
     function data =  LoadHoffmannData(name,symbol,color)
-        fid = fopen(['D://Data/ExperimentalContactAngle/Hoffmann/Hoffmann_',name,'.txt']);
+        fid = fopen([dir,'Hoffmann/Hoffmann_',name,'.txt']);
         y = textscan(fid,'%[^\n]',1,'headerlines',4); %[T, rhoG, rhoL]        
         x = textscan(fid,'%f %f'); %[T, rhoG, rhoL]
         fclose(fid); 
@@ -192,9 +201,7 @@ function PlotDynamicContactAngles
         data.Feq = x{1}(1);
         data.thetaEq = x{1}(2);
         data.Ca  = x{1}(3:end) - data.Feq;
-        data.theta = x{2}(3:end);
-        
-        
+        data.theta = x{2}(3:end);                
         
         data.color  = color;
         data.symbol = symbol;
@@ -206,10 +213,12 @@ function PlotDynamicContactAngles
             data.MarkerSize = 10;
             %semilogx(data.Ca,data.theta,symbol,'MarkerFaceColor',color,'MarkerSize',10); hold on;
         end
+        
+        nData = nData + 1;
                 
     end
     function data =  LoadDataFluidData(name,symbol,color)
-        fid = fopen(['D://Data/ExperimentalContactAngle/',name,'.txt']);
+        fid = fopen([dir,name,'.txt']);
         y = textscan(fid,'%[^\n]',1,'headerlines',4); %[T, rhoG, rhoL]        
         x = textscan(fid,'%f %f'); %[T, rhoG, rhoL]
         fclose(fid); 
@@ -233,6 +242,8 @@ function PlotDynamicContactAngles
         else
             data.MarkerSize = 10;            
         end
+        
+        nData = nData + 1;
                
     end
     function z = GHR(t)
