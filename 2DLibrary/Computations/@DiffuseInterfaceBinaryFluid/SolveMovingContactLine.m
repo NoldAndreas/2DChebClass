@@ -17,7 +17,7 @@ function SolveMovingContactLine(this,noIterations)
         otherInput.thetaInitialGuess = this.theta;
     end
         
-    IterativeSolverCahnHilliard2(params,otherInput);
+    IterativeSolverCahnHilliard_Full(params,otherInput);
     %[res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
         
     this.phi   = res.phi;
@@ -32,6 +32,29 @@ function SolveMovingContactLine(this,noIterations)
     this.filename               = Parameters.Filename;
     
 	FindStagnationPoint(this);
+	
+    function res = IterativeSolverCahnHilliard_Full(params,otherInput)
+         noIter = params.noIterations;
+         
+         if(otherInput.thetaInitialGuess == pi/2)
+            theta  = pi/2;
+            phi    = InitialGuessRho(this);
+            mu     = 0;
+         else
+            theta  = otherInput.thetaInitialGuess;
+            phi    = this.phi;
+            mu     = this.GetMu();
+         end
+         
+         this.uv = zeros(2*M,1);
+         this.p  = zeros(M,1);
+         this.mu  = zeros(M,1);
+         this.phi = phi;                   
+         
+         G    = this.mu - this.s*this.phi;             
+         vec  = [this.uv;this.phi;G;this.p];
+         IterationStepFullProblem(this,vec);         
+    end
     
 	function res = IterativeSolverCahnHilliard2(params,otherInput)
         noIter = params.noIterations;

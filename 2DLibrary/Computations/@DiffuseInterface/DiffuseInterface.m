@@ -116,15 +116,16 @@ classdef DiffuseInterface < handle
         function [uvBound,a,deltaX] = GetBoundaryCondition(this,theta,phi)
             UWall            = this.optsPhys.UWall;    
             PtsCart          = this.IC.GetCartPts();
-            Ind              = this.IC.Ind;
-            phiL             = phi(Ind.top & Ind.left);
-            phiR             = phi(Ind.top & Ind.right);
+            Ind              = this.IC.Ind;            
             y2_kv            = PtsCart.y2_kv;
             y2Min            = this.optsNum.PhysArea.y2Min;
             y2Max            = this.optsNum.PhysArea.y2Max;
             M                = this.IC.M;
             
             if(length(UWall) == 1)
+                phiL             = phi(Ind.top & Ind.left);
+                phiR             = phi(Ind.top & Ind.right);
+                
                 [a,deltaX] = Get_a_deltaX(this,phi,theta);    
                 u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
                                          PtsCart.y2_kv],UWall,0,0,theta);          

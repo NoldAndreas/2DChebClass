@@ -6,7 +6,7 @@ function ShearWithInterfaceBinaryFluid()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');
     %% Parameters    
-    PhysArea = struct('N',[40,30],'y2Min',0,'y2Max',10,'L1',5,... %12,80,50
+    PhysArea = struct('N',[30,30],'y2Min',0,'y2Max',10,'L1',5,... %12,80,50
                       'NBorder',200);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',80,...

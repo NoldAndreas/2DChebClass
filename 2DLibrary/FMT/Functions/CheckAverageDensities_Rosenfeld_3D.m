@@ -3,18 +3,31 @@
        if(nargin == 2)
            VisualOutput = true;
        end
+       
+       if(isa(this,'InfCapillary'))
+           topB = true;
+           y2M  = this.y2Max;
+       else
+           topB = false;
+       end
          
         IntMatrFex  = Get1DMatrices(IntMatrFex_2D,this);
         R = this.R(1);
-        subPts.y2_kv              = (0.:0.01:3.5)';
+                
+        if(topB)
+            subPts.y2_kv          = (0.:0.01:this.y2Max+R)';
+            subPtsAAD.y2_kv       = (this.y2Min:0.01:this.y2Max)';
+        else
+            subPts.y2_kv          = (0.:0.01:3.5)';
+            subPtsAAD.y2_kv       = (this.y2Min:0.01:3.5)';        
+        end
         subPts.y1_kv              = inf*ones(size(subPts.y2_kv));           
         IP                        = this.AD.SubShapePts(subPts);
         Interp1D_AD.InterPol      = IP(:,this.AD.Pts.y1_kv == inf);
         Interp1D_AD.pts1          = subPts.y1_kv; 
         Interp1D_AD.pts2          = subPts.y2_kv;
         Interp1D_AD.ptsCart       = this.GetCartPts(Interp1D_AD.pts1,Interp1D_AD.pts2);
-
-        subPtsAAD.y2_kv           = (this.y2Min:0.01:3.5)';
+        
         subPtsAAD.y1_kv           = inf*ones(size(subPtsAAD.y2_kv));           
         IP                        = this.SubShapePts(subPtsAAD);
         Interp1D_AAD.InterPol     = IP(:,this.Pts.y1_kv == inf);
@@ -30,7 +43,11 @@
  
         y0 = ones(this.N2,1);
         
-        x = 0:0.01:5;
+        if(topB)
+            x = (0:0.01:this.y2Max+R)';
+        else            
+            x = 0:0.01:5;
+        end
         
         if(VisualOutput)
             f1 = figure('name','Average densities');
@@ -58,8 +75,14 @@
         %2nd Check: Average Densities with density = 2-erf(x)
         x = CartPts.y2_kv(markInf);    
         row = 2;
+        %if(topB)
+%            rhoAD = erf(z) + erf(y2M + R - z) - 1;
+%        else
+            rhoAD = 2-erf(x);
+%        end
+        
         if(VisualOutput)
-            PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex(1),2-erf(x),rows,4);
+            PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex,rhoAD,rows,4);
             xC = 0:0.01:5;        
             subplot(rows,3,4); plot(xC,f2_h2(xC+R) - f2_h2(max(R,xC-R)),'m');%n2        
             subplot(rows,3,5); plot(xC,f3_h2(xC,xC+R) - f3_h2(xC,max(R,xC-R)),'m'); %n3       
@@ -74,7 +97,12 @@
         %*************************************************
         %3rd Check: Average Densities with density = 2-erf(x)
         z = ADCartPts.y2_kv(markInfAD);
-        rhoAD = erf(z);
+        if(topB)
+            rhoAD = erf(z) + erf(y2M + R - z) - 1;
+        else
+            rhoAD = erf(z);
+        end
+           
         row = 3;
         
         if(VisualOutput)
@@ -100,11 +128,13 @@
         %*********************************************
         
                 
-        %*******************************        
-        zD = this.Pts.y2_kv(this.Pts.y1_kv == inf);    
-        [FMT,phi] = Fex_FMTRosenfeld_3DFluid(ones(size(zD)),IntMatrFex,1,R);
-        FMT_Bulk  = FexBulk_FMTRosenfeld_3DFluid(1,1);
-        PrintErrorPos(FMT(end)-FMT_Bulk,'Bulk FMT Value');
+        %*******************************       
+        if(~topB)
+            zD = this.Pts.y2_kv(this.Pts.y1_kv == inf);    
+            [FMT,phi] = Fex_FMTRosenfeld_3DFluid(ones(size(zD)),IntMatrFex,1,R);
+            FMT_Bulk  = FexBulk_FMTRosenfeld_3DFluid(1,1);
+            PrintErrorPos(FMT(end)-FMT_Bulk,'Bulk FMT Value');
+        end
 %         if(abs(FMT(end)-FMT_Bulk) > 1e-3)            
 %             cprintf('red','Error for computation of bulk FMT value > 10^(-3) \n');
 %             figure('name','FMT');
@@ -144,17 +174,36 @@
 
     function y  = check1n2(x)
         y        = ones(size(x));
-        y(x < 1) = x(x<2*R);
+        y(x < 1) = x(x<1);        
+        
+        if(topB)
+            markT    = ((y2M+R -x) < 1);
+            y(markT) = y2M + R - x(markT);
+        end
         y = y*2*pi*R;
     end
     function y  = check1n3(x)
         y        = 4*(R^3)*ones(size(x));
         y(x < 1) = (x(x<1)).^2.*(3*R-x(x<1));
+        
+        if(topB)
+            markT    = ((y2M+R -x) < 1);
+            xR       = y2M + R - x(markT);            
+            y(markT) = xR.^2.*(3*R-xR);                        
+        end
+        
         y        = y*pi/3;
     end
     function y  = check1n2z(x)
         y        = zeros(size(x));
         y(x < 1) = pi*(x(x<1)).*(x(x<1)-2*R);        
+        
+        if(topB)
+            markT    = ((y2M+R -x) < 1);
+            xR       = y2M + R - x(markT);           
+            y(markT) = -pi*xR.*(xR-2*R);                    
+        end
+        
     end
 
      function y = checkADn2(z)

@@ -3,6 +3,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
    properties (Access = public)
        p  % pressure       
        mu % chemical potential
+       s = 0.5
    end
        
 	methods (Access = public) 
@@ -10,7 +11,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              this@DiffuseInterface(config);
        end
        
-       IterationStepFullProblem(this)
+       IterationStepFullProblem(this,vec)
        [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
        [rho,theta]         = GetEquilibriumDensity_Flux(this,theta,phi,uv)
        
