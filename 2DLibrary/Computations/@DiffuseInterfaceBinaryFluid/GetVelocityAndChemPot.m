@@ -76,8 +76,7 @@ function [p,uv,A,b,a] = GetVelocityAndChemPot(this,phi,mu,theta)
      indBC5 = Ind.right & Ind.top;
     
      A([Ind.right;FF],[T;FF]) = Diff.Dy2(Ind.right,:);
-        
-    
+           
      A([indBC5;FF],[T;FF]) = 0;
      A([indBC5;FF],:)      = IntPathUpLow*Tt12;
      A([indBC5;FF],[T;FF]) = A(indBC5,[T;FF]) ...

@@ -20,9 +20,9 @@ function rho = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
          %display(num2str(err));             
          i  = i+1;
          
-         for ih = 1:no
-            fprintf('\b');
-        end 
+        % for ih = 1:no
+         %   fprintf('\b');
+        %end 
      end
      display(['Error: ',num2str(err)]);
      display(['No of iterations: ' , num2str(i)]);

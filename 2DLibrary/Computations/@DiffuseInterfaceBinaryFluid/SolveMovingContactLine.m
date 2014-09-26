@@ -20,8 +20,6 @@ function SolveMovingContactLine(this,noIterations)
     IterativeSolverCahnHilliard_Full(params,otherInput);
     %[res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
         
-    this.phi   = res.phi;
-    this.uv    = res.uv;
     this.theta = res.thetaIter(end);    
     
     this.errors.errorIterations = res.errorIterations;
@@ -46,14 +44,23 @@ function SolveMovingContactLine(this,noIterations)
             mu     = this.GetMu();
          end
          
-         this.uv = zeros(2*M,1);
-         this.p  = zeros(M,1);
+         this.uv  = GetBoundaryCondition(this);%,theta,phi);            
+         this.p   = zeros(M,1);
          this.mu  = zeros(M,1);
          this.phi = phi;                   
          
          G    = this.mu - this.s*this.phi;             
          vec  = [this.uv;this.phi;G;this.p];
-         IterationStepFullProblem(this,vec);         
+         IterationStepFullProblem(this,vec);                 
+       
+         figure;
+         this.PlotU();
+         hold on;
+         this.IC.doPlots(this.phi,'contour');
+         figure;
+         this.IC.doPlots(this.mu,'SC');
+         figure;
+         this.IC.doPlots(this.p,'SC');
     end
     
 	function res = IterativeSolverCahnHilliard2(params,otherInput)

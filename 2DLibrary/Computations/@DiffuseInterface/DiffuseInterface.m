@@ -294,15 +294,18 @@ classdef DiffuseInterface < handle
             print2eps([dirData filesep filename '_ChemPot' ],gcf);
             saveas(gcf,[dirData filesep filename '_ChemPot.fig']);
         end        
-        function PlotU(this,uv)            
+        function PlotU(this,uv) 
+            
+            if(nargin<2)
+                uv = this.uv;
+            end
             y2Max = this.optsNum.PhysArea.y2Max;
             
             y1Min = this.optsNum.PlotArea.y1Min;
             y1Max = this.optsNum.PlotArea.y1Max;
             
             y2L = (1:y2Max)';
-            y1L = (y1Min:y1Max)';
-            
+            y1L = (y1Min:y1Max)';            
             
             startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
                          y1Min*ones(size(y2L))+0.1;...

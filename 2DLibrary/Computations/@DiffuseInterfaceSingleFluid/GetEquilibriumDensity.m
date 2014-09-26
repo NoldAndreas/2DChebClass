@@ -72,14 +72,12 @@ function [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta
         g(Ind.fluidInterface)    = 0;
         Jg(Ind.fluidInterface,:) = 0;
     end
-
     function [mu_s,J] = GetExcessChemPotential(phi_s,mu_offset)    
         [dW,~,ddW]    = DoublewellPotential(phi_s,Cn);
         mu_s          = dW - Cn*(Diff.Lap*phi_s) - mu_offset;                                   
         J             = diag(ddW) - Cn*Diff.Lap;   
         J             = [-ones(length(phi_s),1),J];
     end
-
     function [y,J] = f_eq(x)
         
         dmu         = x(1);
