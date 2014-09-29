@@ -4,6 +4,8 @@ R      = 1;
 bottom = 0;
 top    = 5;
 
+IntersectShape = 'InfAnnulus';
+
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[10,10],'L1',1,'L2',2);
 HS    = InfCapillary(shape);
@@ -24,10 +26,18 @@ while(y20 > bottom - R)
     N            = [15,16];
     sphere       = true;
     
-    DC     = Disc(v2struct(Origin,R,N,sphere));       
-    %theta1 = 0;  theta2 = pi;    
-    %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));   
-
+    if(strcmp(IntersectShape,'Disc'))
+        DC     = Disc(v2struct(Origin,R,N,sphere));       
+    elseif(strcmp(IntersectShape,'Ball'))    
+        theta1 = 0;  theta2 = pi;    
+        DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));   
+	elseif(strcmp(IntersectShape,'InfAnnulus')) 
+        L            = 1;
+        shapeDC      = v2struct(Origin,N,sphere,L);
+        shapeDC.RMin = R;
+        DC           = InfAnnulus(shapeDC);  
+    end
+        
     hold on
     area = Intersect(HS,DC);
     

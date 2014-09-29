@@ -4,6 +4,7 @@
         y2Wall
         L1        
         LeftRight
+        TopBottom
         Rmax = Inf
     end
     
@@ -17,6 +18,9 @@
             this.y2Wall     = Geometry.y2Wall;
             this.LeftRight  = Geometry.LeftRight;
             %this.Rmax       = Geometry.Rmax;
+            if(isfield(Geometry,'TopBottom'))
+                this.TopBottom = Geometry.TopBottom;
+            end
             
             InitializationPts(this);                        
             this.polar = 'polar';
@@ -29,11 +33,24 @@
             O = ones(size(x1));
             
             if(strcmp(this.LeftRight,'Left'))
-                thMin = pi;
-                thMax = pi + asin((this.Origin(2)-this.y2Wall)/this.R);
+                d_th = asin(abs(this.Origin(2)-this.y2Wall)/this.R);
+                if(strcmp(this.TopBottom,'Bottom'))
+                    thMin = pi;
+                    thMax = pi + d_th;
+                else
+                    thMin = pi - d_th;
+                    thMax = pi;
+                end
             elseif(strcmp(this.LeftRight,'Right'))
-                thMin = 2*pi - asin((this.Origin(2)-this.y2Wall)/this.R);
-                thMax = 2*pi;
+                d_th = asin(abs(this.Origin(2)-this.y2Wall)/this.R);
+                if(strcmp(this.TopBottom,'Bottom'))
+                    thMin = 2*pi - d_th;
+                    thMax = 2*pi;
+                else
+                    thMin = 0;
+                    thMax = d_th;                    
+                end
+                
             else
                 error('HalfStripMinusDisk:Choose Left or Right.');
             end
@@ -44,7 +61,7 @@
             if(strcmp(this.LeftRight,'Left'))
                 rMax(y2_kv == pi) = this.Rmax;
             else
-                rMax(y2_kv == 2*pi) = this.Rmax;
+                rMax((y2_kv == 2*pi) | (y2_kv == 0)) = this.Rmax;
             end
             rd                = rMax-this.R;
             %L1_r              = min(O*this.L1,rd/3);

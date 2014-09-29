@@ -20,16 +20,16 @@ function SolveMovingContactLine(this,noIterations)
     IterativeSolverCahnHilliard_Full(params,otherInput);
     %[res,~,Parameters] = DataStorage('CahnHilliardSolver',@IterativeSolverCahnHilliard,params,otherInput);
         
-    this.theta = res.thetaIter(end);    
+    %this.theta = res.thetaIter(end);    
     
-    this.errors.errorIterations = res.errorIterations;
-    this.errors.errorAverage    = res.errorAverage;
-    this.errors.aIter           = res.aIter;
-    this.errors.thetaIter       = res.thetaIter;
-    
-    this.filename               = Parameters.Filename;
-    
-	FindStagnationPoint(this);
+%     this.errors.errorIterations = res.errorIterations;
+%     this.errors.errorAverage    = res.errorAverage;
+%     this.errors.aIter           = res.aIter;
+%     this.errors.thetaIter       = res.thetaIter;
+%     
+%     this.filename               = Parameters.Filename;
+%     
+% 	FindStagnationPoint(this);
 	
     function res = IterativeSolverCahnHilliard_Full(params,otherInput)
          noIter = params.noIterations;

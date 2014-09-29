@@ -14,7 +14,7 @@ classdef HalfSpaceSkewed < HalfSpace
             Geometry.y2Min = Geometry.y2Min/sin(Geometry.alpha);
             this@HalfSpace(Geometry);
                         
-            if(isfield(Geometry,'alpha'))                
+            if(isfield(Geometry,'alpha'))
                 this.alpha  = Geometry.alpha;
             elseif(isfield(Geometry,'alpha_deg'))
                this.alpha  = Geometry.alpha_deg*pi/180; 

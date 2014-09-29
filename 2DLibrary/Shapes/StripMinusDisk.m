@@ -3,6 +3,7 @@
         R        
         y2Wall
         L1        
+        TopBottom = 'Bottom'
     end
     
     methods
@@ -16,8 +17,14 @@
             this.Origin     = Geometry.Origin;
             this.y2Wall     = Geometry.y2Wall;
             
+            if(isfield(Geometry,'TopBottom'))
+                this.TopBottom = Geometry.TopBottom;
+            end
+            
             InitializationPts(this);                        
             this.polar = 'polar';
+            
+            
         end        
         %***************************************************************
         %   Mapping functions:
@@ -26,7 +33,12 @@
             
             O = ones(size(x1));
             
-            [y2_kv,dy2]   = LinearMap(x2,pi,2*pi);
+            if(strcmp(this.TopBottom,'Top'))
+                [y2_kv,dy2] = LinearMap(x2,0,pi);
+            elseif(strcmp(this.TopBottom,'Bottom'))
+                [y2_kv,dy2] = LinearMap(x2,pi,2*pi);
+            end            
+            %[y2_kv,dy2]   = LinearMap(x2,pi,2*pi);
             
             rd            = abs((this.Origin(2)-this.y2Wall)./sin(y2_kv));
             rd((y2_kv==pi)|(y2_kv==2*pi)) =  inf;

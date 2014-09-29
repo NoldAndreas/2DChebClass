@@ -42,6 +42,37 @@ function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape)
 
         [dataIntersect.int] = area.ComputeIntegrationVector();
         dataIntersect.area  = Inf;
+    elseif(isa(MainShape,'InfCapillary'))
+        
+        %Cartesian shift     
+        y2Min = MainShape.y2Min;
+        y2Max = MainShape.y2Max;
+        if(isa(MainShape,'InfCapillarySkewed'))   
+            y2Min = y2Min*sin(MainShape.alpha);
+        end                
+        
+        shape.N  = N;
+        shape.R  = r;     
+
+        %1. find points of disk in HalfSpace            
+        if((y20 < y2Min) || (y20 > y2Max))
+            error('Intersect_InfCapillary: Case not yet implemented');          
+        else
+            shape.Origin    = infAnnulusShape.Origin;
+            shape.Origin(2) = y20;
+            shape.L1        = infAnnulusShape.L;
+            shape.y2Min     = y2Min;            
+            shape.y2Max     = y2Max;
+            area            = InfCapillaryMinusDisk(shape);
+                        
+            dataIntersect.pts       = area.GetCartPts();
+            dataIntersect.ptsPolLoc = area.GetPts();
+        end            
+
+        %Shift in y2-direction
+
+        [dataIntersect.int] = area.ComputeIntegrationVector();
+        dataIntersect.area  = Inf;
     else
         exc = MException('Intersect_InfAnnulus ','case not implemented');
         throw(exc);                

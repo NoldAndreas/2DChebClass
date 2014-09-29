@@ -17,7 +17,7 @@ function [VBack_S,VAdd_S]=Vext_Cart_1(y1,y2,t,optsPhys)
                     'dy1',DVBackDy1,'dy2',DVBackDy2,...
                     'grad',[DVBackDy1;DVBackDy2]);
 
-    if(grav == 0)
+    if((grav == 0) || (t == 0))
         VAdd         = zeros(size(y1));
     else
         VAdd         = -grav*(y1+y2).*(1-exp(-t^2));

@@ -24,12 +24,12 @@ classdef InfCapillary_FMT < InfCapillary & ConvolutionFiniteSupport
             
             alpha_rad = pi/2;
             L1        = Geometry.L1/sin(alpha_rad);
-            L2        = Geometry.L2/sin(alpha_rad);           
-            L2_AD     = Geometry.L2_AD/sin(alpha_rad);            
+%            L2        = Geometry.L2/sin(alpha_rad);           
+%            L2_AD     = Geometry.L2_AD/sin(alpha_rad);            
             
             shapeIC       = Geometry;            
             shapeIC.L1    = L1;
-            shapeIC.L2    = L2;
+%            shapeIC.L2    = L2;
             
             this@InfCapillary(shapeIC);
                         
@@ -40,8 +40,9 @@ classdef InfCapillary_FMT < InfCapillary & ConvolutionFiniteSupport
             %Check how to handle multiple Species!
             %this.Boundary(1,length(R)) = InfCapillary();
             %for i = 1:length(R)            
+            
+            %                             'L2',L2_AD,...
             shapeAD = struct('L1',L1,...
-                             'L2',L2_AD,...
                              'y2Min',Geometry.y2Min,...
                              'y2Max',Geometry.y2Max,...
                              'R',R,...

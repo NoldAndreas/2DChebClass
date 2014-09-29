@@ -30,14 +30,17 @@ function IterationStepFullProblem(this,vec)
 
     F       = false(M,1);   T       = true(M,1);
     
-    res = DataStorage('BinaryFluid_DiffuseInterface',@SolveBinaryFluid,struct('initialGuess',vec),[]);
+    optsNum = this.optsNum;
+    optsPhys = this.optsNum;
+    
+    res = DataStorage('BinaryFluid_DiffuseInterface',@SolveBinaryFluid,v2struct(optsNum,optsPhys),struct('initialGuess',vec));
 	   
     this.uv = res.uv;
     this.p  = res.p;
     this.mu = res.G + s*res.phi;
     this.phi = res.phi;    
     
-    function res = SolveBinaryFluid(in,opts)
+    function res = SolveBinaryFluid(conf,in)
         vec = NewtonMethod(in.initialGuess,@f,1e-6,100,0.8);    
     
         res.uv  = vec([T;T;F;F;F]);

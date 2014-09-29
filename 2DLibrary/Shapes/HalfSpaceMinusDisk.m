@@ -1,8 +1,6 @@
 classdef HalfSpaceMinusDisk < handle
    
-    properties 
-        TopShape
-        BottomShape
+    properties         
         SubShape
         Int
     end

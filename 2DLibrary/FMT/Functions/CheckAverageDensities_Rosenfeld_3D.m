@@ -1,6 +1,8 @@
- function CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,VisualOutput)           
+ function CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,opts)           
  
-       if(nargin == 2)
+       if((nargin > 2) && islogical(opts))
+           VisualOutput = opts;
+       else
            VisualOutput = true;
        end
        
@@ -9,6 +11,12 @@
            y2M  = this.y2Max;
        else
            topB = false;
+       end
+       
+       if((nargin > 2) && strcmp(opts,'checkTop'))
+           checkTop = true;
+       else
+           checkTop = false;
        end
          
         IntMatrFex  = Get1DMatrices(IntMatrFex_2D,this);
@@ -49,6 +57,8 @@
             x = 0:0.01:5;
         end
         
+        xADInt = ADCartPts.y2_kv(this.AD.Pts.y1_kv == inf);
+        
         if(VisualOutput)
             f1 = figure('name','Average densities');
             set(gcf,'Color','white');
@@ -57,69 +67,87 @@
         
         rows = 4;
         %*************************************************
-        %1st Check: Average Densities with density = 1        
+        %% 1st Check: Average Densities with density = 1        
         if(VisualOutput)
             PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex(1),y0,rows,1); 
             subplot(rows,3,1); hold on; plot(x,check1n2(x),'m');
             subplot(rows,3,2); hold on; plot(x,check1n3(x),'m');
             subplot(rows,3,3); hold on; plot(x,check1n2z(x),'m');      
         end
-        
-        xADInt = ADCartPts.y2_kv(this.AD.Pts.y1_kv == inf);
+                
         PrintErrorPos(IntMatrFex.AD.n2*y0-check1n2(xADInt),'FMT n2 for ones',xADInt);
         PrintErrorPos(IntMatrFex.AD.n3*y0-check1n3(xADInt),'FMT n3 for ones',xADInt);
-        PrintErrorPos(IntMatrFex.AD.n2_v_2*y0-check1n2z(xADInt),'FMT n2_v_2 for ones',xADInt);
-        %*************************************************
+        PrintErrorPos(IntMatrFex.AD.n2_v_2*y0-check1n2z(xADInt),'FMT n2_v_2 for ones',xADInt);        
+               
+        %% 2nd Check: Average Densities with density = 2-erf(x)
+        x       = CartPts.y2_kv(markInf);                
         
-        %*************************************************
-        %2nd Check: Average Densities with density = 2-erf(x)
-        x = CartPts.y2_kv(markInf);    
+        if(checkTop)            
+            xC_Cart = (y2M-5):0.01:(y2M+R); 
+            x  = this.y2Max + R - x;    
+            xC = this.y2Max + R - xC_Cart;                
+        else
+            xC_Cart = 0:0.01:5; 
+            xC = xC_Cart;
+        end
         row = 2;
-        %if(topB)
-%            rhoAD = erf(z) + erf(y2M + R - z) - 1;
-%        else
-            rhoAD = 2-erf(x);
-%        end
+        xADIntC = xADInt;
+        if(topB && ~ checkTop)
+            mark = (xADInt < 3);
+        elseif(topB && checkTop)
+            mark = (abs(this.y2Max + R - xADInt)  < 3);
+            xADInt = y2M + R - xADInt;
+        else
+            mark = true(size(xADInt));
+        end
+        
+        rhoAD = 2-erf(x);
         
         if(VisualOutput)
-            PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex,rhoAD,rows,4);
-            xC = 0:0.01:5;        
-            subplot(rows,3,4); plot(xC,f2_h2(xC+R) - f2_h2(max(R,xC-R)),'m');%n2        
-            subplot(rows,3,5); plot(xC,f3_h2(xC,xC+R) - f3_h2(xC,max(R,xC-R)),'m'); %n3       
-            subplot(rows,3,6); plot(xC,f2z_h2(xC,xC+R) - f2z_h2(xC,max(R,xC-R)),'m');%n2z
+            PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex,rhoAD,rows,4);                   
+            subplot(rows,3,4); plot(xC_Cart,f2_h2(xC+R) - f2_h2(max(R,xC-R)),'m');%n2        
+            subplot(rows,3,5); plot(xC_Cart,f3_h2(xC,xC+R) - f3_h2(xC,max(R,xC-R)),'m'); %n3       
+            subplot(rows,3,6); plot(xC_Cart,f2z_h2(xC,xC+R) - f2z_h2(xC,max(R,xC-R)),'m');%n2z
         end
         
-        PrintErrorPos(IntMatrFex.AD.n2*(2-erf(x))-f2_h2Diff(xADInt),'FMT n2 for 2-erf(x)',xADInt); %(f2_h2(xADInt+R) - f2_h2(max(R,xADInt-R)))
-        PrintErrorPos(IntMatrFex.AD.n3*(2-erf(x))-f3_h2Diff(xADInt),'FMT n3 for 2-erf(x)',xADInt); %(f3_h2(xADInt,xADInt+R) - f3_h2(xADInt,max(R,xADInt-R)))
-        PrintErrorPos(IntMatrFex.AD.n2_v_2*(2-erf(x))-f2z_h2Diff(xADInt),'FMT n2_v_2 for 2-erf(x)',xADInt); %(f2z_h2(xADInt,xADInt+R) - f2z_h2(xADInt,max(R,xADInt-R)))
-        %*************************************************
-        
-        %*************************************************
-        %3rd Check: Average Densities with density = 2-erf(x)
-        z = ADCartPts.y2_kv(markInfAD);
-        if(topB)
-            rhoAD = erf(z) + erf(y2M + R - z) - 1;
+        err = IntMatrFex.AD.n2*(2-erf(x))-f2_h2Diff(xADInt);
+        PrintErrorPos(err(mark),'FMT n2 for 2-erf(x)',xADIntC(mark)); 
+        err = IntMatrFex.AD.n3*(2-erf(x))-f3_h2Diff(xADInt);
+        PrintErrorPos(err(mark),'FMT n3 for 2-erf(x)',xADIntC(mark)); 
+        err = IntMatrFex.AD.n2_v_2*(2-erf(x))-f2z_h2Diff(xADInt);
+        PrintErrorPos(err(mark),'FMT n2_v_2 for 2-erf(x)',xADIntC(mark));
+                                        
+        %% 3rd Check: Average Densities with density = 2-erf(x)
+        z_Cart    = ADCartPts.y2_kv(markInfAD);                                
+        %xC_Cart = 0:0.01:5;
+        if(checkTop)     
+            z  = this.y2Max + R - z_Cart;
+            %xC = this.y2Max + R - xC_Cart;                
         else
-            rhoAD = erf(z);
+            z = z_Cart;
         end
-           
-        row = 3;
+        
+        rhoAD = erf(z);           
+        row   = 3;
         
         if(VisualOutput)
             PlotRosenfeldFMT_AADInf(IntMatrFex(1),rhoAD,rows,7);
-            subplot(rows,3,6+1); plot(z,checkADn2(z),'m');            
-            subplot(rows,3,6+2); plot(z,checkADn3(z),'m');
-            subplot(rows,3,6+3); plot(z,checkADn2_v_2(z),'m');            
+            subplot(rows,3,6+1); plot(z_Cart,checkADn2(z),'m');            
+            subplot(rows,3,6+2); plot(z_Cart,checkADn3(z),'m');
+            subplot(rows,3,6+3); plot(z_Cart,checkADn2_v_2(z),'m');            
         end
-        PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for ones',xADInt);
-        PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for ones',xADInt);
-        PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for ones',xADInt);
+        PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for ones',xADIntC);
+        PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for ones',xADIntC);
+        PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for ones',xADIntC);
         
         %*************************************************
         
         
         %*********************************************
         z     = this.AD.Pts.y2_kv(this.AD.Pts.y1_kv == inf);    
+        if(checkTop)     
+            z = y2M + R - z;
+        end
         rhoAD = f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
         row   = 4;
         if(VisualOutput)
@@ -166,10 +194,13 @@
 
     function y = f2z_h2Diff(x)
         y          = f2z_h2(x,x+R) - f2z_h2(x,max(R,x-R));    
-        y(x==Inf)  = 0;
+        y(x==Inf)  = 0;                
     end
     function y = f2z_h2(x,xt)
         y = pi^(1/2)*xt.*exp(-xt.^2) - (pi*erf(xt))/2 - 2*pi^(1/2)*x.*exp(-xt.^2) - 2*pi*xt.^2 + pi*xt.^2.*erf(xt) + 4*pi*x.*xt - 2*pi*x.*xt.*erf(xt);
+        if(topB && checkTop)
+            y = -y;
+        end
     end
 
     function y  = check1n2(x)
@@ -206,9 +237,11 @@
         
     end
 
-     function y = checkADn2(z)
-         y = -2*sqrt(pi)*R*(-z*sqrt(pi).*erf(z+R)-sqrt(pi)*erf(z+R)*R-exp(-(z+R).^2)-sqrt(pi)*z.*erf(-z+R)+sqrt(pi)*erf(-z+R)*R+exp(-(-z+R).^2));
-         y(z==inf) = 4*pi*R^2;
+    function y = checkADn2(z)
+        
+         y = -2*sqrt(pi)*R*(-z*sqrt(pi).*erf(z+R)-sqrt(pi)*erf(z+R)*R-exp(-(z+R).^2)-sqrt(pi)*z.*erf(-z+R)+sqrt(pi)*erf(-z+R)*R+exp(-(-z+R).^2));                  
+         
+         y(z==inf) = 4*pi*R^2;                           
      end
     function y = checkADn3(z) 
         y = (1/6)*sqrt(pi)*(-2*sqrt(pi)*erf(z+R).*z.^3.*exp(z.^2+2*R*z+R^2)+6*sqrt(pi)*erf(z+R).*z*R^2.*exp(z.^2+2*R*z+R^2)+4*sqrt(pi)*erf(z+R)*R^3.*exp(z.^2+2*R*z+R^2)-2*z.^2+2*R*z+4*R^2-2-3*sqrt(pi)*erf(z+R).*z.*exp(z.^2+2*R*z+R^2)-2*exp(z.^2+2*R*z+R^2).*erf(-z+R).*z.^3*sqrt(pi)+6*exp(z.^2+2*R*z+R^2).*erf(-z+R).*z*R^2*sqrt(pi)-4*exp(z.^2+2*R*z+R^2).*erf(-z+R)*R^3*sqrt(pi)+2*exp(4*R*z).*z.^2+2*exp(4*R*z)*R.*z-4*exp(4*R*z)*R^2+2*exp(4*R*z)-3*exp(z.^2+2*R*z+R^2).*z.*erf(-z+R)*sqrt(pi)).*exp(-z.^2-2*R*z-R^2);
@@ -217,9 +250,13 @@
     function y = checkADn2_v_2(z) 
         y = -(1/2)*sqrt(pi)*(-2*erf(z+R)*sqrt(pi).*exp(2*z.^2+2*R^2).*z.^2+2*erf(z+R)*sqrt(pi).*exp(2*z.^2+2*R^2)*R^2-2*exp((-z+R).^2).*z+2*exp((-z+R).^2)*R-erf(z+R)*sqrt(pi).*exp(2*z.^2+2*R^2)-2*erf(-z+R)*sqrt(pi).*exp(2*z.^2+2*R^2).*z.^2+2*erf(-z+R)*sqrt(pi).*exp(2*z.^2+2*R^2)*R^2+2*exp((z+R).^2).*z+2*exp((z+R).^2)*R-erf(-z+R)*sqrt(pi).*exp(2*z.^2+2*R^2)).*exp(-2*z.^2-2*R^2);
         y(z>15) = 0; %error: < 10^-13
+        
+        if(topB && checkTop)
+            y = -y;
+        end
     end
 
-     function PlotRosenfeldFMT_AverageDensitiesInf(FMTMatrices,rho,rows,no)
+    function PlotRosenfeldFMT_AverageDensitiesInf(FMTMatrices,rho,rows,no)
 
         if(nargin == 2)
             f1 = figure('name','Average densities');
