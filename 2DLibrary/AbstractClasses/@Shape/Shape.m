@@ -44,7 +44,7 @@ classdef (Abstract) Shape < handle
             
             if(strcmp(this.polar,'polar'))
                 [ptsCart.y1_kv,ptsCart.y2_kv] = pol2cart(pts_y2,pts_y1);
-                mark0 = (((pts_y2==0) | (pts_y2==pi)) & (pts_y1==Inf));
+                mark0 = (((pts_y2==2*pi) |(pts_y2==0) | (pts_y2==pi)) & (pts_y1==Inf));
                 ptsCart.y2_kv(mark0) = 0;
             elseif(strcmp(this.polar,'sphSurf'))
                  th  = pts_y1;  phi = pts_y2;                          

@@ -1,5 +1,5 @@
 function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,BoolPlot)
-    global PersonalUserOutput dirData MinimalOutput
+    global PersonalUserOutput dirData
             
     saveFigs = true;
     if(nargin < 6)
@@ -72,9 +72,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     mark      = (HS.AD.Pts.y1_kv == inf);
     PtsADCart = HS.AD.GetCartPts();
     Int_1D_AD(PtsADCart.y2_kv(mark)>y2MaxInt) = 0;
-    if(~MinimalOutput)
-        cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);
-    end
+    
+	cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);    
         
     %****************************************************************
     %**************** Solve for equilibrium 1D condition   **********

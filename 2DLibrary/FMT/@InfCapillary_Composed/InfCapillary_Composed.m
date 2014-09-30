@@ -109,38 +109,44 @@
              pts.y2_kv = ptsCart_y2;             
         end              
          
-%        function doPlots(this,V,opts)                      
-%            global PersonalUserOutput
-%            if(~PersonalUserOutput)
-%                 return;
-%            end
-%            xl = [-5 5];
-%            yl = [0 5];
-%            N  = 50;
-%            
-%            PlotArea = struct('y1Min',xl(1),'y1Max',xl(2),...
-%                              'y2Min',this.Sub_Strip.y2Min,'y2Max',this.Sub_Strip.y2Max,...
-%                              'N1',N,'N2',N);
-%            this.Sub_Strip.InterpolationPlot(PlotArea,true);           
-%            
-%            PlotArea.y2Min = this.Sub_HalfSpace.y2Min;
-%            PlotArea.y2Max = yl(2);
-%            
-%            this.Sub_HalfSpace.InterpolationPlot(PlotArea,true);
-%            
-%            if((nargin > 2) && (ischar(opts)))
-%                 this.Sub_Strip.doPlots(V(this.mark_id(:,1)),opts); hold on;           
-%                 this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)),opts);
-%            else
-%                this.Sub_Strip.doPlots(V(this.mark_id(:,1))); hold on;           
-%                this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)));
-%            end
-%                       
-%            xlim(xl);
-%            ylim(yl);
-%            pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);
-%           
-%        end       
+        function doPlots(this,V,opts)                      
+           global PersonalUserOutput
+           if(~PersonalUserOutput)
+                return;
+           end
+           xl = [-5 5];           
+           yl = [this.Bottom_Strip.y2Min this.Top_Strip.y2Max]
+           N  = 50;
+           
+           PlotArea = struct('y1Min',xl(1),'y1Max',xl(2),...
+                             'y2Min',this.Bottom_Strip.y2Min,...
+                             'y2Max',this.Bottom_Strip.y2Max,...
+                             'N1',N,'N2',N);
+           this.Bottom_Strip.InterpolationPlot(PlotArea,true);           
+           
+           PlotArea.y2Min = this.Main_Strip.y2Min;
+           PlotArea.y2Max = this.Main_Strip.y2Max;           
+           this.Main_Strip.InterpolationPlot(PlotArea,true);
+                      
+           PlotArea.y2Min = this.Top_Strip.y2Min;
+           PlotArea.y2Max = this.Top_Strip.y2Max;           
+           this.Top_Strip.InterpolationPlot(PlotArea,true);
+           
+           if((nargin > 2) && (ischar(opts)))
+                this.Bottom_Strip.doPlots(V(this.mark_id(:,1)),opts); hold on;           
+                this.Main_Strip.doPlots(V(this.mark_id(:,2)),opts);hold on;      
+                this.Top_Strip.doPlots(V(this.mark_id(:,3)),opts);
+           else
+                this.Bottom_Strip.doPlots(V(this.mark_id(:,1))); hold on;
+                this.Main_Strip.doPlots(V(this.mark_id(:,2)));hold on;      
+                this.Top_Strip.doPlots(V(this.mark_id(:,3)));
+           end
+                      
+           xlim(xl);
+           ylim(yl);
+           pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);
+          
+       end       
         function IP = SubShapePtsCart(this,a_shapePts)
              pts = GetInvCartPts(this,a_shapePts.y1_kv,a_shapePts.y2_kv);
              IP  = SubShapePts(this,pts);  

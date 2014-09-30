@@ -54,35 +54,13 @@ classdef ContactLineHS < DDFT_2D
             ComputeST(this);
         end        
         function TestPreprocess(this)                          
-            
-             M = this.IDC.M;
-             R = this.IDC.R;             
+                        
+            R = this.IDC.R;             
              
-             disp('*** Test preprocessed matrices ***');
+            disp('*** Test preprocessed matrices ***');
                                     
-             disp('*** Test convolution matrix ***');
-             %Test Convolution at infinity             
-             fMF       = str2func(this.optsPhys.V2.V2DV2);
-             [h1,h2,a] = fMF(1,this.optsPhys.V2);
-             marky2Inf = (this.IDC.Pts.y2_kv == inf);
-             PrintErrorPos(this.IntMatrV2.Conv(marky2Inf,:)*ones(M,1)- 2*a,'convolution at y2 = infinity',this.IDC.Pts.y1_kv(marky2Inf));          
-
-             %Convolution profile
-             if(strcmp(this.optsPhys.V2.V2DV2,'Phi2DLongRange'))
-                 y0R = PtsCart.y2_kv-R;
-                 h = this.optsPhys.V2.epsilon*(- pi^2/2 + ...
-                                          + pi*atan(-y0R)+...
-                                          - pi*(y0R)./(1+y0R.^2));
-                 PrintErrorPos(h-this.IntMatrV2.Conv*ones(M,1),'Phi2DLongRange*1',this.IDC.GetCartPts);
-             elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHenderson_2D'))                 
-                 conv = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
-                 y2_h = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - R;                          
-                 Psi(y2_h < 1)  = -16/9*pi +6/5*pi*y2_h(y2_h < 1);         
-                 Psi(y2_h >= 1) = 4*pi*(1./(45*y2_h(y2_h >= 1).^9) - 1./(6*y2_h(y2_h >= 1).^3));
-                 check          = 2*a-this.optsPhys.V2.epsilon*Psi;
-                 
-                 PrintErrorPos(conv*ones(M,1) - check','convolution at y1 = infinity',y2_h);                 
-             end     
+            disp('*** Test convolution matrix ***');
+            CheckMeanfieldConvolution(this);
             
             %(4) Test FMT Matrices            
             disp('*** Test FMT matrices ***');

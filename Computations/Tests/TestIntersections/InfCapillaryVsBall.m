@@ -4,7 +4,7 @@ R      = 1;
 bottom = 0;
 top    = 5;
 
-IntersectShape = 'InfAnnulus';
+IntersectShape = 'Disc';
 
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[10,10],'L1',1,'L2',2);
@@ -20,6 +20,7 @@ set(gca,'fontsize',20);
 axis equal
 
 [y10,y20] = ginput(1);   
+y20 = 0
 while(y20 > bottom - R)
     
     Origin       = [y10,y20];

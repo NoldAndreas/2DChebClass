@@ -28,13 +28,16 @@ function PlotDynamicContactAngles
     data{nData} = LoadHoffmannData('Triangles','d','k');
     data{nData} = LoadHoffmannData('Crosses','^','k');
     data{nData} = LoadHoffmannData('Hexagons','o','k');
-    data{nData} = LoadHoffmannData('Squares','v','k');            
+    data{nData} = LoadHoffmannData('Squares','v','k');
     
-    LoadDataFluidData('Kavehpour/eta_0_007','s','m',struct('rad','rad','Ca','Ca')); 
-    LoadDataFluidData('Kavehpour/eta_0_5','d','m',struct('rad','rad','Ca','Ca'));     
-    LoadDataFluidData('Kavehpour/eta_1_0','^','m',struct('rad','rad','Ca','Ca')); 
-    LoadDataFluidData('Kavehpour/eta_5_0','o','m',struct('rad','rad','Ca','Ca')); 
-    LoadDataFluidData('Kavehpour/eta_10_0','v','m',struct('rad','rad','Ca','Ca'));         
+    LoadDataFluidData('Kavehpour/eta_0_007','s','m',struct('rad','rad','Ca','Ca'));
+    LoadDataFluidData('Kavehpour/eta_0_5','d','m',struct('rad','rad','Ca','Ca'));
+    LoadDataFluidData('Kavehpour/eta_1_0','^','m',struct('rad','rad','Ca','Ca'));
+    LoadDataFluidData('Kavehpour/eta_5_0','o','m',struct('rad','rad','Ca','Ca'));
+    LoadDataFluidData('Kavehpour/eta_10_0','v','m',struct('rad','rad','Ca','Ca'));
+
+	LoadDataFluidData('RameGaroff/CH3','v','g',struct('rad','deg','Ca','Ca'));
+    LoadDataFluidData('RameGaroff/OH','o','g',struct('rad','deg','Ca','Ca'));
    
     PlotGThetaOverCa();
     PlotThetaOverCaPlusF(data,'FHoffmann');

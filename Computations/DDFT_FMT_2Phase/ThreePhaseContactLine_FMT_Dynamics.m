@@ -11,7 +11,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
     
     disp('** ThreePhaseContactLine_FMT_DynamicsOverdamped **');    
     AddPaths();
-    global PersonalUserOutput dirData MinimalOutput
+    global PersonalUserOutput dirData
     %************************************************
     %***************  Initialization ****************
     %************************************************       
@@ -105,7 +105,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
     %************************************************       
     tic                
     %(1) Thermodynamic Values
-    [rhoGas_sat,rhoLiq_sat,mu_sat] = BulkSatValues(optsPhys,[0.01;0.6;-2],~MinimalOutput);
+    [rhoGas_sat,rhoLiq_sat,mu_sat] = BulkSatValues(optsPhys,[0.01;0.6;-2]);
     GetCriticalPoint(optsPhys);
 
     optsPhys.mu_sat      = mu_sat;
@@ -500,11 +500,11 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
         
         close all;    
 
-        if(~MinimalOutput)
-            fprintf(['Omega(Liq/Gas) = ',num2str(om_LiqGas),'\n']);
-            fprintf(['Omega(wall/Liq) = ',num2str(om_wallLiq),'\n']);
-            fprintf(['Omega(wall/Gas) = ',num2str(om_wallGas),'\n']);
-        end
+        
+        fprintf(['Omega(Liq/Gas) = ',num2str(om_LiqGas),'\n']);
+        fprintf(['Omega(wall/Liq) = ',num2str(om_wallLiq),'\n']);
+        fprintf(['Omega(wall/Gas) = ',num2str(om_wallGas),'\n']);
+        
 
         alpha_YCA = ComputeContactAngle(om_wallGas,om_wallLiq,om_LiqGas);
     end

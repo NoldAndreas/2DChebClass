@@ -66,9 +66,9 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     
     mark_Y2{2}  = ((pts.y2    >= y2SepMin) & (pts.y2  <= y2SepMax));
     mark_Ykv{2} = ((pts.y2_kv >= y2SepMin) & (pts.y2_kv <= y2SepMax));            
-    
-    mark_Y2{3}  = (pts.y2    > y2SepMax);
-    mark_Ykv{3} = (pts.y2_kv > y2SepMax);            
+
+    mark_Y2{3}  = ((pts.y2    > y2SepMax) & (pts.y2    > y2SepMin));
+    mark_Ykv{3} = ((pts.y2_kv > y2SepMax) & (pts.y2_kv > y2SepMin));
 
     for i = 1:3
         ptsStrip{i}.y1_kv = pts.y1_kv(mark_Ykv{i});
@@ -98,6 +98,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
 
     ptsStripCart = GetCartPts(this,0,ptsStrip{3}.y2);
     ptsy2        = ptsStripCart.y2_kv;
+        
     for iPts = 1:length(ptsy2)
         area.Origin(2) = ptsy2(iPts);
         dataAD3(iPts)   = Intersect(this,area);
@@ -119,8 +120,12 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
         AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights,params);
     else        
         AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights);
-        AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights);
-        AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights);        
+        if(~isempty(ptsStrip{2}.y2))
+            AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights);
+        end
+        if(~isempty(ptsStrip{3}.y2))
+            AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights);        
+        end
     end
     
 end      

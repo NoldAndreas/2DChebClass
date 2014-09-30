@@ -144,9 +144,9 @@ classdef DDFT_2D < handle
             rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
         end        
         function Preprocess_HardSphereContribution(this)      
-            tic
+            %tic
             if(isfield(this.optsNum,'FexNum'))
-                fprintf(1,'Computing FMT matrices ...');   
+                fprintf(1,'Computing FMT matrices ...\n');   
                 paramsFex.sigmaS   = this.optsPhys.sigmaS;
                 paramsFex.kBT      = this.optsPhys.kBT;            
                 paramsFex.Pts      = this.IDC.Pts;
@@ -162,13 +162,13 @@ classdef DDFT_2D < handle
             end
 
             fprintf(1,'done.\n');
-            t_fex = toc;
-            disp(['Fex computation time (sec): ', num2str(t_fex)]);
+            %t_fex = toc;
+            %disp(['Fex computation time (sec): ', num2str(t_fex)]);
         end            
         function Preprocess_MeanfieldContribution(this)
             
             if(isfield(this.optsNum,'V2Num'))
-                fprintf(1,'Computing mean field convolution matrices ...');   
+                fprintf(1,'Computing mean field convolution matrices ...\n');   
                 paramsFex.V2       = this.optsPhys.V2;
                 paramsFex.kBT      = this.optsPhys.kBT;
                 paramsFex.FexNum   = this.optsNum.V2Num;
@@ -177,6 +177,8 @@ classdef DDFT_2D < handle
 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
                 this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   
+                
+                CheckMeanfieldConvolution(this);
 
             elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                
                 error('Define V2Num structure in optsNum')

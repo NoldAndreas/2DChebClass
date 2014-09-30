@@ -4,7 +4,6 @@ function AddPaths()
     global dirDataOrg
     global dirResults
     global PersonalUserOutput
-    global MinimalOutput
     global CodeVersionsDir
     
     global recomputeAll
@@ -41,8 +40,7 @@ function AddPaths()
     addpath(genpath(dirDDFT));        
     rmpath(genpath([pwd filesep 'NoClass']));       
     
-    PersonalUserOutput = true;
-    MinimalOutput      = false;
+    PersonalUserOutput = true;    
     
     dirDataOrg = dirData;
     

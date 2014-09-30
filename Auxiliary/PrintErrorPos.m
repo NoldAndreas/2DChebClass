@@ -1,8 +1,4 @@
-function [error,ind] = PrintErrorPos(error,text,Pts1,Pts2)
-    global MinimalOutput
-    if(MinimalOutput)
-        return;
-    end
+function [error,ind] = PrintErrorPos(error,text,Pts1,Pts2)    
     
     if(sum(isnan(error))>0)
         fprintf(['Error of ',text,': ']);

@@ -75,8 +75,13 @@ function dataDisk = Intersect_Disk(MainShape,diskShape)%y20,r,N,sphere)
             shape.Wall_VertHor = 'horizontal';
             shape.Wall_Y       = y2Min;            
            % shape.N         = GetPointNumber(shape,'Segment',this.Accuracy);
-            area            = SegmentWall(shape);                               
-        elseif((y20 >= y2Min) && (y20 < y2Min + r))
+            area            = SegmentWall(shape);      
+        elseif(y20 == y2Min)
+            shape.Rout = r;
+            shape.th1  = 0;
+            shape.th2  = pi;
+            area = Wedge(shape);                         
+        elseif((y20 > y2Min) && (y20 < y2Min + r))
             shape.Wall_VertHor = 'horizontal';
             shape.Wall_Y       = y2Min;       
             
@@ -85,8 +90,8 @@ function dataDisk = Intersect_Disk(MainShape,diskShape)%y20,r,N,sphere)
 
             area            = BigSegment(shape);
         elseif((y20 >= y2Min + r) && (y20 <= y2Max - r))
-            area            = Disc(shape);                                                      
-        elseif((y20 > y2Max-r) && (y20 <= y2Max))
+            area            = Disc(shape);            
+        elseif((y20 > y2Max-r) && (y20 < y2Max))
             shape.Wall_VertHor = 'horizontal';
             shape.Wall_Y       = y2Max;       
             
@@ -94,6 +99,11 @@ function dataDisk = Intersect_Disk(MainShape,diskShape)%y20,r,N,sphere)
             shape.NT        = N;
 
             area            = BigSegment(shape);            
+        elseif(y20 == y2Max)
+            shape.Rout = r;
+            shape.th1  = pi;
+            shape.th2  = 2*pi;
+            area = Wedge(shape);
         elseif((y20 > y2Max) && (y20 <= y2Max+r))                     
             shape.Wall_VertHor = 'horizontal';
             shape.Wall_Y       = y2Max;            

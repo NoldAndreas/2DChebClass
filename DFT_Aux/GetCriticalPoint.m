@@ -1,6 +1,5 @@
 function [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,initialGuess,output)
 
-    global MinimalOutput
  %Load Data & Initializing
     if(ischar(optsPhys.V2.V2DV2))
         Phi_r = str2func(optsPhys.V2.V2DV2);        
@@ -32,7 +31,7 @@ function [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,initialG
     [h1,CS_L] = HS_f(rho,kBT);
     p_crit    = -(kBT*rho_crit*(log(rho_crit) - 1) + alpha*rho_crit^2 + CS_L - mu_crit*rho_crit);
             
-    if((~MinimalOutput) && ((nargin < 3) || (output == true)))
+    if(((nargin < 3) || (output == true)))
         disp('***');
         disp('Values at Critical point:');
         disp(['kBT_crit = ',num2str(kBT_crit)]);
