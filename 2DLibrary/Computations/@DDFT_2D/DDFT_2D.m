@@ -269,15 +269,17 @@ classdef DDFT_2D < handle
             end
         end        
         
-        function PlotDynamics(this)
+        function PlotDynamics(this,rec)
+                if(nargin == 1)
+                    rec = false;
+                end
                 plotData.optsPhys = this.optsPhys;
                 plotData.optsNum  = this.optsNum;
                 plotData.data     = this.dynamicsResult;
                 
                 figure('Position',[0 0 1000 1000]);
-                PlotDDFT(plotData);  
-        end    
-        
+                PlotDDFT(plotData,rec);
+        end            
         function ResetTemperature(this,T)
             if(nargin > 1)
                 this.optsPhys.kBT = T;

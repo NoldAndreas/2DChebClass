@@ -82,8 +82,8 @@ function PlotDDFT(input,Bool_Record)
          set(gca,'fontsize',20);                        
          set(gca,'linewidth',1.5);      
          
-         print2eps([Bool_Record , '_M:3ass'],gcf);
-         saveas(gcf,[Bool_Record , '_Mass.fig']);
+         print2eps([gifFile(1:end-4) , '_Mass'],gcf);
+         saveas(gcf,[gifFile(1:end-4) , '_Mass.fig']);
          
         %(b2) Plot Mass in Subbox
         if(bool_subSp)
@@ -98,8 +98,8 @@ function PlotDDFT(input,Bool_Record)
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);      
 
-            print2eps([Bool_Record , '_Mass_SubArea'],gcf);
-            saveas(gcf,[Bool_Record , '_Mass_SubArea.fig']); 
+            print2eps([gifFile(1:end-4) , '_Mass_SubArea'],gcf);
+            saveas(gcf,[gifFile(1:end-4) , '_Mass_SubArea.fig']); 
         end
          
         %(c) Plot Movie        
@@ -145,7 +145,7 @@ function PlotDDFT(input,Bool_Record)
         
         disp(['Gif Movie` saved in: ',gifFile]);
         
-        str         = Bool_Record;
+        str         = gifFile(1:end-4);
         allPdfFiles = [str,'.pdf'];
         swfFile     = [str,'.swf'];
 
