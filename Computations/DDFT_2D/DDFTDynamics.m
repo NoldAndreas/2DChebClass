@@ -13,7 +13,7 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
         EX.ComputeDynamics();
     end
     
-    if(optsPlot.doDDFTPlots)
+    if((nargin < 3) || optsPlot.doDDFTPlots)
         EX.PlotDynamics();
     end
 end

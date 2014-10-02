@@ -119,21 +119,26 @@ function ComputeDynamics(this,x_ic,mu)
         dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
         %dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
         
-        if(doHI)
-            rho_s    = exp((x-Vext)/kBT);
-            rho_s    = [rho_s;rho_s];
+        rho_s    = exp((x-Vext)/kBT);
+        rho_s2   = [rho_s;rho_s];
+        if(doHI)            
             gradMu_s = Diff.grad*mu_s;
-            HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
+            HI_s     = ComputeHI(rho_s2,gradMu_s,IntMatrHI);            
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        flux_dir               = Diff.grad*mu_s;
-        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
+        gradMu                 = (Diff.grad*mu_s);
+        
+        dxdt(Ind.finite,:)     = Ind.normalFinite*gradMu;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
         dxdt = D0*dxdt;
-                
-        dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
+        
+        flux_dir               = GetFlux(x,t);
+        if(~isempty(this.subArea) && strcmp(this.subArea.polar,'polar'))
+            flux_dir = GetPolarFromCartesianFlux(flux_dir,ythS);
+        end
+        dxdt = [Int_of_path*flux_dir;dxdt(:)];
     end
     function mu_s = GetExcessChemPotential(x,t,mu)
         rho_s    = exp((x-Vext)/kBT);

@@ -30,8 +30,7 @@ classdef Wedge < Polar_SpectralSpectral
 
             InitializationPts(this);  
             if(isfield(Geometry,'Origin'))
-                this.Origin = Geometry.Origin;
-                %this.Pts    = shiftDisc(this.Pts,Geometry.r0,Geometry.t0);            
+                this.Origin = Geometry.Origin;                    
             end       
             
         end                         
