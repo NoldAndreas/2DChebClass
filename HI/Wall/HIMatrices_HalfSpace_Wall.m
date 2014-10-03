@@ -56,6 +56,14 @@ function HIStruct = HIMatrices_HalfSpace_Wall(opts,IDC)
             %HITemp11 = IDC.ComputeAreaIntegrationFiniteSupport(shapeGeom,@F11,[],doConv);
             %HITemp12 = IDC.ComputeAreaIntegrationFiniteSupport(shapeGeom,@F12,[],doConv);
             
+            %%Andreas Testing
+            %annulusArea       = InfAnnulus(shapeGeom);
+            %paramsIJ.pts.x0 = 0;
+            %paramsIJ.pts.y0 = 0;
+         %   HITemp11_a = IDC.ComputeConvolutionFiniteSupport(annulusArea,{@F11},IDC.Pts,paramsIJ);
+            %HITemp12_a = IDC.ComputeConvolutionFiniteSupport(annulusArea,{'TwoOseen_2D_noConv_Pts'},IDC.Pts,paramsIJ);
+            %%End Andreas Testing
+            
             HITemp11 = IDC.ComputeAreaIntegrationFiniteSupport(shapeGeom,@F11,paramsIJ,doConv);
             HITemp12 = IDC.ComputeAreaIntegrationFiniteSupport(shapeGeom,@F12,paramsIJ,doConv);
             

@@ -33,10 +33,10 @@ function M_int = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,conv
 
         IntersectArea = Intersect(this,area);
 
-        Int    = IntersectArea.int;   % 1 x N1*N2  
-        IntT   = Int.';               % N1*N2 x 1
-        IntT = IntT(:,ones(1,nElts)); % N1*N2 x nElts
-        IntT = IntT(:);               % N1*N2*nElts x 1
+        Int    = IntersectArea.int;     % 1 x N1*N2  
+        IntT   = Int.';                 % N1*N2 x 1
+        IntT   = IntT(:,ones(1,nElts)); % N1*N2 x nElts
+        IntT   = IntT(:);               % N1*N2*nElts x 1
 
         IP     = this.SubShapePts(IntersectArea.pts);
 

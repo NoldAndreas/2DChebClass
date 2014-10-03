@@ -155,9 +155,8 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
             AD   = ComputeConvolutionFiniteSupport(this,area,weights,this.AD.Pts);  
         end
 
-<<<<<<< HEAD                           
         M_int  = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,convolution)
->>>>>>> BenTemp
+
     end
     
     

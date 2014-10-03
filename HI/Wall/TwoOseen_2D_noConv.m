@@ -41,8 +41,8 @@ function HI = TwoOseen_2D_noConv(x,y,optsPhys)
     end
 
    function Oseen = oseen(x,y,sigmaH)
-        rr = roxr(x,y);
-        rInv = rInverse(x,y);
+        rr    = roxr(x,y);
+        rInv  = rInverse(x,y);
         Oseen = 3/8*sigmaH*rInv.*(id + rr);
         Oseen(~isfinite(Oseen)) = 0;
     end
