@@ -2,7 +2,7 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
 
     if(nargin<1)
         doHI     = false;
-        doHIWall = false
+        doHIWall = false;
     elseif(nargin<2)
         doHIWall = false;
     end
@@ -49,6 +49,7 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
     
     if(doHIWall)
         optsNum.HINum.Wall = 'DiffusionCoefficientWall';
+        %optsNum.HINum.Wall = 'NoDiffusionCoefficientWall';
     end
                   
     optsPlot.doDDFTPlots=true;

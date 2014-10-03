@@ -44,7 +44,6 @@ if(~isempty(stocStruct))
     
     optsStoc = optsStocFull(1);
 
-    loadSamples  = optsStoc.loadSamples;
     fixedInitial = optsStoc.fixedInitial;
 
     optsStoc = rmfield(optsStoc,'loadSamples');
@@ -182,16 +181,33 @@ if(~isempty(DDFTStruct))
     nDDFT = length(DDFTStruct);
     
     for iDDFT = 1:nDDFT
-        
-        rhoI = DDFTStruct(iDDFT).rho_t(:,:,1);
-        rhoF = DDFTStruct(iDDFT).rho_t(:,:,end);
-        
-        DDFTStruct(iDDFT).rhoI = rhoI;
-        DDFTStruct(iDDFT).rhoF = rhoF;
-        
-        DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
-        DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
-        DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+                
+        if(isa(DDFTStruct(1),'DDFT_2D'))
+
+            rhoI = DDFTStruct(iDDFT).dynamicsResult.rho_t(:,:,1);
+            rhoF = DDFTStruct(iDDFT).dynamicsResult.rho_t(:,:,end);
+
+            DDFTStruct(iDDFT).dynamicsResult.rhoI = rhoI;
+            DDFTStruct(iDDFT).dynamicsResult.rhoF = rhoF;
+
+            DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT).dynamicsResult);
+            DDFTStruct(iDDFT).dynamicsResult.rMean    = DDFTAveragesStruct.rMean;
+            DDFTStruct(iDDFT).dynamicsResult.fluxMean = DDFTAveragesStruct.fluxMean;
+            
+        else
+
+            rhoI = DDFTStruct(iDDFT).rho_t(:,:,1);
+            rhoF = DDFTStruct(iDDFT).rho_t(:,:,end);
+
+            DDFTStruct(iDDFT).rhoI = rhoI;
+            DDFTStruct(iDDFT).rhoF = rhoF;
+
+            DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
+            DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
+            DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+            
+        end
+          
     end
     
     DDFTPlotStruct = DDFTStruct;
@@ -211,7 +227,7 @@ end
 % make movie
 %--------------------------------------------------------------------------
 
-if(optsPlot.doMovieGif || optsPlot.doMovieSwf || optsPlot.doPdfs)
+if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs) 
     movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
     plotFiles = cat(2,plotFiles,movieFile);
 end

@@ -116,7 +116,8 @@ if(optsStruct.anyDDFT)
     
     % note we use the species data for standard physical parameters                             
     optsPhysDDFTGlobal=struct('dim',optsStruct.DDFTDim, ...
-                                    'type','DDFT');  
+                                    'type','DDFT', ...
+                                     'HSBulk','Fex_ZeroMap');  
 
     optsPhysDDFTGlobal = mergeStruct(optsPhysGlobal, ...  
                                     optsPhysDDFTGlobal );

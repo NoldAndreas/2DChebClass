@@ -145,8 +145,8 @@ end
 if(nDDFT>0)
 
     % get rho, v and r values
-    rho = ddft(1).rho_t;
-    flux = ddft(1).flux_t;
+    rho = ddft(1).dynamicsResult.rho_t;
+    flux = ddft(1).dynamicsResult.flux_t;
     
 
     optsPlot.type=DDFTType(1,:);
@@ -159,7 +159,7 @@ if(nDDFT>0)
     optsPlot.fluxNorm = 1;
     
     % plot the distributions
-    plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).shape.Interp,ddft(1).shape.Pts,optsPlot,handlesRP);
+    plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP);
 
     hold(hRa,'on');
     hold(hPa,'on');

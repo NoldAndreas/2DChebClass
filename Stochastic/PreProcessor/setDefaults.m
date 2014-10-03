@@ -112,6 +112,7 @@ end
 %--------------------------------------------------------------------------
 
 D.doMovieGif=false;
+D.doMovieAvi=false;
 D.doPdfs=false;
 D.doMovieSwf=false;
 D.doInitialFinal=false;
@@ -172,12 +173,6 @@ else
     D.DDFTName=[];
 end
 
-D=getDefaultLines(D);
-
-%--------------------------------------------------------------------------
-% Default axis limits
-%--------------------------------------------------------------------------
-
 D.geom=S.geom;
 
 if(isfield(S,'DDFTDim'))
@@ -185,6 +180,12 @@ if(isfield(S,'DDFTDim'))
 else
     D.dim=1;
 end
+
+D=getDefaultLines(D);
+
+%--------------------------------------------------------------------------
+% Default axis limits
+%--------------------------------------------------------------------------
 
 D=getDefaultAxes(D);
 

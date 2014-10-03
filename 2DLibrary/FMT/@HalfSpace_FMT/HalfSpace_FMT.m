@@ -115,7 +115,8 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
             set(gca,'linewidth',1.5);                                    
         end
         
-        AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)        
+        AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
+        
         function [AD,AAD] = GetAverageDensities(this,area,weights)            
             %%
             % 
@@ -153,6 +154,10 @@ classdef HalfSpace_FMT < HalfSpaceSkewed & ConvolutionFiniteSupport
             AAD  = this.AD.ComputeConvolutionFiniteSupport(area,weights,this.Pts);
             AD   = ComputeConvolutionFiniteSupport(this,area,weights,this.AD.Pts);  
         end
+
+<<<<<<< HEAD                           
+        M_int  = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,convolution)
+>>>>>>> BenTemp
     end
     
     

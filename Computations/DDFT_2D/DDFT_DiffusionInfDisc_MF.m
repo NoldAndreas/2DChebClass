@@ -31,8 +31,8 @@ function EX = Test_DDFT_DiffusionInfDisc_MF()
             alpha13 alpha23 alpha3  ];
         
         
-    V1       = struct('V1DV1','V1_Rotating_Cart',...%V1_Rotating_Polar
-                      'V0',0.05,'V0r',1,'alphar',1,'tau',1,'rV',1); 
+    V1       = struct('V1DV1','V1_Rotating_Cart',...
+                      'V0',0.05,'V0r',0,'alphar',1,'tau',1,'rV',1); 
                            
     V2       = struct('V2DV2','Gaussian','epsilon',epsilonS,'alpha',alphaS);
     

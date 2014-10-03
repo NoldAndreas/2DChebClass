@@ -133,6 +133,7 @@ end
 
 % determine which movies to make
 doGif=optsPlot.doMovieGif;
+doAvi=optsPlot.doMovieAvi;
 doSwf=optsPlot.doMovieSwf;
 doPdfs=optsPlot.doPdfs;
 
@@ -225,6 +226,14 @@ if(doP)
     % y axis limits for mean plots
     PMMin=optsPlot.PMMin;
     PMMax=optsPlot.PMMax;
+end
+
+if(doAvi)
+    aviFile=[movieFile '.avi'];
+    writerObj = VideoWriter(aviFile);
+    writerObj.FrameRate = fps;
+    open(writerObj);
+    outputFile = aviFile;
 end
 
 %--------------------------------------------------------------------------
@@ -400,6 +409,20 @@ for iPlot=1:nPlots
         end
     end
     
+    if(doAvi)
+        
+        f = getframe(hRPf);
+        writeVideo(writerObj,f);
+
+        if(iPlot==1)
+            %make poster file for beamer presentations
+            posterFile=[movieFile 'Poster.png'];
+            [im,map] = rgb2ind(f.cdata,256,'nodither');
+            imwrite(im,map,posterFile,'png');
+        end
+         
+    end
+    
     %----------------------------------------------------------------------
     % Get pdf frames
     %----------------------------------------------------------------------
@@ -454,6 +477,10 @@ if(doSwf)
     
     outputFile = swfFile;
     
+end
+
+if(doAvi)
+    close(writerObj);
 end
 
 %close(hRPf);

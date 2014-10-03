@@ -244,9 +244,9 @@ classdef (Abstract) Shape < handle
                 fl_y1     = flux(1:this.N1*this.N2,iSpecies);
                 fl_y2     = flux(this.N1*this.N2+1:end,iSpecies);
                 
-                %if(strcmp(this.polar,'polar'))
-%                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
-%                end                
+%                 if(strcmp(this.polar,'polar'))
+%                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);
+%                 end                
                 
                 fl_y1 = fl_y1(mask,:);  fl_y2 = fl_y2(mask,:);
 
@@ -289,6 +289,7 @@ classdef (Abstract) Shape < handle
                                             
         end            
         function doPlots(this,V,options,optDetails)
+            
             %options: 'SC' , 'contour'
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -362,10 +363,10 @@ classdef (Abstract) Shape < handle
                 elseif((nargin >= 3) && strcmp(options,'flux'))
                     fl_y1     = VI(1:end/2,iSpecies);
                     fl_y2     = VI(end/2+1:end,iSpecies);
-
-                    if(strcmp(this.polar,'polar'))
-                        [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
-                    end                
+                    
+%                     if(strcmp(this.polar,'polar'))
+%                         [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
+%                     end                
                     
 %                     if(exist('fl_norm','var') && ~isempty(fl_norm))
 %                         O = ones(1,size(fl_y1,2));
@@ -381,8 +382,14 @@ classdef (Abstract) Shape < handle
                     
                     quiver(yCart.y1_kv,yCart.y2_kv,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
                 else
-                    surf(y1M,y2M,reshape(VI,...
+                    h = surf(y1M,y2M,reshape(VI,...
                                   this.Interp.Nplot2,this.Interp.Nplot1)); %mesh
+                    if(nargin>3)
+                        if(isfield(optDetails,'linecolor'))
+                            set(h,'FaceColor',optDetails.linecolor);
+                            set(h,'FaceAlpha',0.5);
+                        end
+                    end
                 end
                 hold on;
                 

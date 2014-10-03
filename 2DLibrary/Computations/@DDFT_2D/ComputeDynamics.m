@@ -127,8 +127,10 @@ function ComputeDynamics(this,x_ic,mu)
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        gradMu                 = (Diff.grad*mu_s);
-        
+        gradMu               = Diff.grad*mu_s;
+        if(doHI)
+            gradMu           = gradMu + HI_s;
+        end
         dxdt(Ind.finite,:)     = Ind.normalFinite*gradMu;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 

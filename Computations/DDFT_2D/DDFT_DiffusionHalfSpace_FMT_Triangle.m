@@ -14,7 +14,8 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
                        'Ncircle',10,'N1disc',10,'N2disc',10);
                    
     HI_Num    = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
-                      'HIPreprocess', 'RotnePragerPreprocess2D');  
+                      'HIPreprocess', 'RotnePragerPreprocess2D',...
+                      'HIWallFull',false);  
     
     tMax = 0.15;
     
@@ -24,7 +25,8 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
                      'plotTimes',0:tMax/100:tMax);
     
 	sigmaS  = 1;
-    sigmaHS = 0.5;
+    %sigmaHS = 0.5;
+    sigmaHS = 1;
     
     V1       = struct('V1DV1','V1_Triangle',...
                       'V0',0.01,'V0add',3,'tau',0.1,'sigma1Add',0.5,'sigma2Add',0.5, ...
