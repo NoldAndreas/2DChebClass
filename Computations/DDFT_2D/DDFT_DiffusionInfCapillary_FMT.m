@@ -1,10 +1,10 @@
-function EX = Test_DDFT_DiffusionInfCapillary_FMT(doHI)
+function EX = DDFT_DiffusionInfCapillary_FMT(doHI)
 
     if(nargin==0)
         doHI = false;
     end
 
-    Phys_Area = struct('shape','InfCapillary_FMT','N',[40;40],... %
+    Phys_Area = struct('shape','InfCapillary_FMT','N',[30;30],... %
                        'L1',3,'y2Min',0,'y2Max',4,'N2bound',10);
     
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',80,...
@@ -16,7 +16,7 @@ function EX = Test_DDFT_DiffusionInfCapillary_FMT(doHI)
                    
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',30,'N2disc',30);
-	V2Num   = struct('Fex','SplitDisk','L',1,'L1',1,'L2',[],'N',[30,30]);            
+	V2Num   = struct('Fex','SplitDisk','L',1,'L1',1,'L2',[],'N',[20,20]);            
 
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...

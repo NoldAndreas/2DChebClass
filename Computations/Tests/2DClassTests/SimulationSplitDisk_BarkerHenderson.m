@@ -1,4 +1,4 @@
-function SimulateSplitDisk_BarkerHenderson()
+function SimulationSplitDisk_BarkerHenderson()
 
     y2_h = 1;
 

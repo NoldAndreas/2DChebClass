@@ -1,4 +1,4 @@
-  function Test_CheckFMTComputation()
+  function CheckFMTComputation()
 
     disp('** CheckFMTComputationSkewed **');
     

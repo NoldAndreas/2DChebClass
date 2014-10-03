@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = Test_DFT_EqInfCapillary_Slit()
+function [optsNum,optsPhys] = DFT_EqInfCapillary_Slit()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','InfCapillary','N',[25,20],...

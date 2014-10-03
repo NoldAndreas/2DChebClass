@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionDisc_MF()
+function EX = DDFT_DiffusionDisc_MF()
 
     Phys_Area = struct('shape','Disc','N',[20;20],'R',4);
     

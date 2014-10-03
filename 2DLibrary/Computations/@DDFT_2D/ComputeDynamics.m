@@ -138,7 +138,9 @@ function ComputeDynamics(this,x_ic,mu)
         if(~isempty(this.subArea) && strcmp(this.subArea.polar,'polar'))
             flux_dir = GetPolarFromCartesianFlux(flux_dir,ythS);
         end
-        dxdt = [Int_of_path*flux_dir;dxdt(:)];
+        
+        fluxP = Int_of_path*flux_dir;
+        dxdt = [fluxP(:);dxdt(:)];        
     end
     function mu_s = GetExcessChemPotential(x,t,mu)
         rho_s    = exp((x-Vext)/kBT);

@@ -3,14 +3,19 @@ function AddPaths()
     global dirData
     global dirDataOrg
     global dirResults
+    
     global PersonalUserOutput
+    global QuickOutput
+    
     global CodeVersionsDir
     
     global recomputeAll
      
     if(exist('D:\','dir'))
         dirData    = 'D:\2DChebData';    
-        dirResults = 'D:\Results\2DCode';        
+        if(isempty(dirResults))
+            dirResults = 'D:\Results\2DCode';        
+        end
         dirDDFT    = pwd;
     elseif(exist('/Users/NoldAndreas/','dir'))
         dirData    = '/Users/NoldAndreas/Documents/2DChebData';
@@ -29,7 +34,7 @@ function AddPaths()
         dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/2DChebClass';
         dirResults = '/Users/Ben/work/MATLAB/Fluids/2DChebData/';
     else
-        disp('Unknown computer; using current directory for save data');
+        disp('Unknown computer; using current directory to save data');
         dirData     = pwd;
         dirDDFT     = pwd;
         dirResults  = pwd;
@@ -44,7 +49,13 @@ function AddPaths()
     
     dirDataOrg = dirData;
     
-    recomputeAll = false;
+    if(isempty(recomputeAll))
+        recomputeAll = false;
+    end
+    
+    if(isempty(QuickOutput))
+        QuickOutput = false;
+    end
     
     if(recomputeAll)
         cprintf('*m','!!! No precomputed data will be used. recomputeAll = true !!!\n');

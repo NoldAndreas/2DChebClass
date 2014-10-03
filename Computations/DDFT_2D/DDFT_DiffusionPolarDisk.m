@@ -25,8 +25,9 @@ function [optsNum,optsPhys] = DDFT_DiffusionPolarDisk()
     
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
-    optsPlot.doDDFTPlots=true;
-                 
+    
+    optsPlot.doDDFTPlots = true;    
+    
     AddPaths();
     DDFTDynamics(optsPhys,optsNum,optsPlot);
    
