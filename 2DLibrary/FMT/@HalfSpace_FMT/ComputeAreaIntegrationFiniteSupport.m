@@ -39,8 +39,7 @@ function M_int = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,conv
         IntT   = IntT(:);               % N1*N2*nElts x 1
 
         IP     = this.SubShapePts(IntersectArea.pts);
-
-        pts = IntersectArea.pts;
+        pts    = IntersectArea.pts;
         
         if(doConv)
             pts.y1_kv = pts.y1_kv - this.Pts.y1_kv(iPt);
