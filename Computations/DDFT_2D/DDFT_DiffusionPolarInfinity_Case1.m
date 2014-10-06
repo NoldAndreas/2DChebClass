@@ -15,7 +15,7 @@ function DDFT_DiffusionPolarInfinity_Case1()
                      'V2Num',V2Num);
 
     V1       = struct('V1DV1','Vext_Cart_2',...
-                      'V0',0.1,'grav',2,'a1',0.1,'a2',0.1);
+                      'V0',0.1,'grav',2,'a',[0.1,0.1]);
     V2       = struct('V2DV2','Gaussian','alpha',2,'epsilon',-0.06);
     
     optsPhys = struct('V2',V2,'V1',V1,...
