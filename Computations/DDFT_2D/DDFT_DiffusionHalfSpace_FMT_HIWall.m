@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
+function EX = DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
 
     if(nargin<1)
         doHI     = false;
