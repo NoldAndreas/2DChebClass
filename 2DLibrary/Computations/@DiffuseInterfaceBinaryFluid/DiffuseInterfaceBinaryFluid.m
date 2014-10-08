@@ -56,6 +56,45 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
             bulkError        = max(abs(error(repmat(~this.IC.Ind.bound,2,1))));
             bulkAverageError = mean(abs(error(repmat(~this.IC.Ind.bound,2,1))));
-        end
+       end        
+       function vec = GetInitialCondition(this) 
+           
+            M = this.IC.M;
+
+            if(isempty(this.theta))
+                otherInput.thetaInitialGuess = pi/2;
+            else
+                otherInput.thetaInitialGuess = this.theta;
+            end            
+
+             if(otherInput.thetaInitialGuess == pi/2)
+                theta  = pi/2;
+                phi    = InitialGuessRho(this);
+                mu     = 0;
+             else
+                theta  = otherInput.thetaInitialGuess;
+                phi    = this.phi;
+                mu     = this.GetMu();
+             end
+
+             this.uv  = GetBoundaryCondition(this);%,theta,phi);            
+             this.p   = zeros(M,1);
+             this.mu  = zeros(M,1);
+             this.phi = phi;                   
+
+             G    = this.mu - this.s*this.phi;             
+             vec  = [this.uv;this.phi;G;this.p];
+       end
+       
+       function SavePlotResults(this)
+           global dirData
+           SavePlotResults@DiffuseInterface(this);
+           
+           figure();
+           this.IC.doPlots(this.p,'SC');     
+           print2eps([dirData filesep this.filename '_Pressure'],gcf);
+           saveas(gcf,[dirData filesep this.filename '_Pressure.fig']);
+       end
+       
    end
 end

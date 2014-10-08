@@ -274,25 +274,16 @@ classdef DiffuseInterface < handle
 %             end
 %             title('Check accuracy of map');
         end          
-        function SavePlotResults(this,uv,phi,theta,mu)
-            if(nargin == 1)
-                uv  = this.uv;
-                phi = this.phi;
-                mu  = GetMu(this,phi);
-                theta = this.theta;
-            end
+        function SavePlotResults(this)
+            global dirData                        
             
-            global dirData
-            
-            filename = this.filename;
-            
-            PlotResultsRho(this);
-            print2eps([dirData filesep filename '_Density'],gcf);
-            saveas(gcf,[dirData filesep filename '_Density.fig']);
+            PlotResultsPhi(this);
+            print2eps([dirData filesep this.filename '_Density'],gcf);
+            saveas(gcf,[dirData filesep this.filename '_Density.fig']);
             
             PlotResultsMu(this);
-            print2eps([dirData filesep filename '_ChemPot' ],gcf);
-            saveas(gcf,[dirData filesep filename '_ChemPot.fig']);
+            print2eps([dirData filesep this.filename '_ChemPot' ],gcf);
+            saveas(gcf,[dirData filesep this.filename '_ChemPot.fig']);
         end        
         function PlotU(this,uv) 
             

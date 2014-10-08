@@ -1,4 +1,4 @@
-function IterationStepFullProblem(this,vec)
+function IterationStepFullProblem(this,noIterations)
     %Continuitiy: 0 = div(uv)
     %Momentum:    0 = -Grad(p) + (G+s*phi)*grad(phi)/Cak + Lap(uv)
     %Phasefield   0 = m*Lap(G + s*phi) - u*grad(phi)
@@ -10,7 +10,8 @@ function IterationStepFullProblem(this,vec)
     % (BC3) nu*grad(G) = 0
     % (BC4) p = 0  at y1 = +/- infinity
     
-    % A*[uv;phi;G;p] = b corresponds to momentum and continuity Eq. for given phasefield phi               
+    % A*[uv;phi;G;p] = b corresponds to momentum and continuity Eq. for given phasefield phi                           
+    
     s              = this.s;
     Cn             = this.optsPhys.Cn;
     Cak            = this.optsPhys.Cak;    
@@ -28,25 +29,33 @@ function IterationStepFullProblem(this,vec)
     IBB  = repmat(Ind.bound,2,1);  
     EYM  = eye(M);  EYMM  = eye(2*M);
 
-    F       = false(M,1);   T       = true(M,1);
+    F       = false(M,1);   T       = true(M,1);    
     
-    optsNum = this.optsNum;
-    optsPhys = this.optsNum;
+    opts = struct('optsNum',this.optsNum,...
+                  'optsPhys',this.optsPhys,...
+                  'Comments',this.configName);
     
-    res = DataStorage('BinaryFluid_DiffuseInterface',@SolveBinaryFluid,v2struct(optsNum,optsPhys),struct('initialGuess',vec));
+    [res,~,Parameters] = DataStorage([],@SolveBinaryFluid,...
+                    opts,struct('initialGuess',GetInitialCondition(this)));
 	   
-    this.uv = res.uv;
-    this.p  = res.p;
-    this.mu = res.G + s*res.phi;
-    this.phi = res.phi;    
+    this.uv       = res.uv;
+    this.p        = res.p;
+    this.mu       = res.G + s*res.phi;
+    this.phi      = res.phi;    
+    this.filename = Parameters.Filename;
+    this.errors.errorIterations = res.errorHistory;
+    
+    %     this.errors.errorIterations = res.errorIterations;
+    
     
     function res = SolveBinaryFluid(conf,in)
-        vec = NewtonMethod(in.initialGuess,@f,1e-6,100,0.8);    
+        [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,0.8);    
     
         res.uv  = vec([T;T;F;F;F]);
         res.phi = vec([F;F;T;F;F]);
         res.G   = vec([F;F;F;T;F]);
-        res.p   = vec([F;F;F;F;T]);                
+        res.p   = vec([F;F;F;F;T]);
+        res.errorHistory = errHistory;
     end
     
     function [v,A] = f(z)
