@@ -5,6 +5,6 @@ function str = getTimeStr()
               num2str(time(3)),'_'... % Returns day as char
               num2str(time(4)),'_'... % Returns hour as char..
               num2str(time(5)),'_'... % Returns minute as char          
-              num2str(time(6)),...    % Returns second as char          
+              num2str(round(time(6))),...    % Returns second as char          
               ]);        
 end

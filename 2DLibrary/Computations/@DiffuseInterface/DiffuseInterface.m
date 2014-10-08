@@ -215,18 +215,11 @@ classdef DiffuseInterface < handle
             this.IC.doPlots(mu,'contour');             
             PlotU(this,uv); hold on;             
         end
-        function PlotResultsPhi(this,phi,uv,theta)
-            if(nargin == 1)                
-                phi = this.phi;
-                uv  = this.uv;
-                theta = this.theta;
-                figure('Position',[0 0 800 600],'color','white');
-            end
+        function PlotResultsPhi(this)
+            figure('Position',[0 0 800 600],'color','white');
             
-            if(~isempty(uv))
-                PlotU(this,uv); hold on; 
-            end
-            this.IC.doPlots(phi,'contour');     
+            PlotU(this); hold on;             
+            this.IC.doPlots(this.phi,'contour');     
                         
             hold on;
             if(~isempty(this.IsolineInterfaceY2))
@@ -288,7 +281,11 @@ classdef DiffuseInterface < handle
         function PlotU(this,uv) 
             
             if(nargin<2)
-                uv = this.uv;
+                if(isempty(this.uv))
+                    return;
+                else
+                    uv = this.uv;
+                end
             end
             y2Max = this.optsNum.PhysArea.y2Max;
             
