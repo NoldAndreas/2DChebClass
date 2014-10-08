@@ -593,11 +593,23 @@ classdef (Abstract) Shape < handle
                 IPG1     = SubShapePts(this,ptsG1);
                 IPG2     = SubShapePts(this,ptsG2);
             end
-            plot(dist,IP*f,'color',color,'linewidth',1.5); hold on;
+            
+            if(y1P(1) == y1P(2))
+                offset = y2P(1);
+                xLab_Txt = 'y_2';                
+            elseif(y2P(1) == y2P(2))
+                offset   = y1P(1);                
+                xLab_Txt = 'y_1';
+            else
+                offset   = 0;
+                xLab_Txt = 'Distance from point y0';
+            end
+            
+            plot(offset + dist,IP*f,'color',color,'linewidth',1.5); hold on;
+            xlabel(xLab_Txt);
             if(~plain)
-                plot(distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
-                plot(distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');
-                xlabel('Distance from point y0');                            
+                plot(offset + distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
+                plot(offset + distG2,IPG2*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');                                       
                 ptsStr = ['(',num2str(y1P(1)),',',num2str(y2P(1)),') to (',num2str(y1P(2)),',',num2str(y2P(2)),')'];
                 title(['Values on line from ',ptsStr]);                                                                                        
             end                        

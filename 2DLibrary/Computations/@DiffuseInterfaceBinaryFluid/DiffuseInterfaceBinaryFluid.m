@@ -59,8 +59,15 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        end        
        function vec = GetInitialCondition(this) 
            
+            if(~isempty(this.uv) && ...
+                ~isempty(this.p) && ...
+                ~isempty(this.mu) && ...
+                ~isempty(this.phi))
+                vec  = [this.uv;this.phi;this.mu - this.s*this.phi;this.p];
+                return;
+            end
+           
             M = this.IC.M;
-
             if(isempty(this.theta))
                 otherInput.thetaInitialGuess = pi/2;
             else
@@ -95,6 +102,37 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.IC.doPlots(this.p,'contour');     
            print2eps([dirData filesep this.filename '_Pressure'],gcf);
            saveas(gcf,[dirData filesep this.filename '_Pressure.fig']);
+       end
+       
+       function CheckResultResolution(this)
+           figure('Position',[0 0 1000 1000],'color','white');
+           
+           y2M = this.IC.y2Max;
+           
+           subplot(2,2,1);           
+           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.mu);           
+           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.mu);
+           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.mu);
+           title('$\Delta \mu$','Interpreter','Latex','fontsize',15);
+           
+           subplot(2,2,2);
+           this.IC.doPlotFLine([-20 20],[0 0],this.mu);           
+           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.mu);
+           this.IC.doPlotFLine([-20 20],[y2M y2M],this.mu);
+           title('$\mu$','Interpreter','Latex','fontsize',15);
+           
+           subplot(2,2,3);
+           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.uv(1:end/2));
+           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.uv(1:end/2));
+           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.uv(1:end/2));
+           title('$\Delta u$','Interpreter','Latex','fontsize',15);           
+           
+           subplot(2,2,4);
+           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.uv(1+end/2:end));
+           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.uv(1+end/2:end));
+           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.uv(1+end/2:end));      
+           title('$\Delta v$','Interpreter','Latex','fontsize',15);
+           
        end
        
    end

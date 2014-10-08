@@ -106,7 +106,7 @@ function IterationStepFullProblem(this,noIterations)
         v_G            = m*Diff.Lap*(G + s*phi) - gradPhiMT*uv;    
 
         % Chemical Potential        
-        A_mu           = [Z,Z,diag(fWPP)-Cn*Diff.Lap-s,-EYM,Z];
+        A_mu           = [Z,Z,diag(fWPP)-Cn*Diff.Lap-s*EYM,-EYM,Z];
         v_mu           = fWP - Cn*Diff.Lap*phi - (G + s*phi);
         
         lr = Ind.left|Ind.right;
@@ -115,7 +115,7 @@ function IterationStepFullProblem(this,noIterations)
         
         A_mu(lr,:) = [Z(lr,:),...
                       Z(lr,:),...
-                      fwD(lr,:)-Cn*Diff.DDy2(lr,:)-s,...
+                      fwD(lr,:)-Cn*Diff.DDy2(lr,:)-s*EYM(lr,:),...
                       -EYM(lr,:),...
                       Z(lr,:)];
         v_mu(lr)   = fWP(lr) - Cn*Diff.DDy2(lr,:)*phi ...
@@ -138,7 +138,7 @@ function IterationStepFullProblem(this,noIterations)
         ind_LR         = Ind.left | Ind.right;
         fwPP_D         = diag(fWPP);
         A_G(ind_LR,:)  = [Z(ind_LR,:),Z(ind_LR,:),...
-                          fwPP_D(ind_LR,:)-s,...%-Cn*Diff.Lap(ind_LR,:),...
+                          fwPP_D(ind_LR,:)-s*EYM(ind_LR,:),...%-Cn*Diff.Lap(ind_LR,:),...
                           -EYM(ind_LR,:),...
                           Z(ind_LR,:)];                
         v_G(ind_LR)    = fWP(ind_LR) ...
@@ -163,7 +163,8 @@ function IterationStepFullProblem(this,noIterations)
        indBC5 = Ind.right & Ind.top;
      
        A_cont(Ind.right,:)           = 0;
-       A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);            
+       A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
+       v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
        
        A_cont(indBC5,[T;T;F;F;F]) = IntPathUpLow*[Diff.Dy2 , Diff.Dy1];              
        
@@ -188,10 +189,28 @@ function IterationStepFullProblem(this,noIterations)
          A_mu(Ind.left & Ind.top,[F;F;T;F;F]) = Jint;
          v_mu(Ind.left & Ind.top)  = IntSubArea*phi - nParticles;                 
         
-         %(BC7)
-        A_mu(Ind.right & Ind.top,:)           = 0;
-        A_mu(Ind.right & Ind.top,[F;F;T;F;F]) = EYM(Ind.right&Ind.top,:);
-        v_mu(Ind.right&Ind.top)               = (phi(Ind.right&Ind.top) - 1);
+         %(BC7) [uv;phi;G;p]
+        %A_mu(Ind.right,:)           = 0;
+        %A_mu(Ind.right,[F;F;T;F;F]) = EYM(Ind.right,:);
+        %v_mu(Ind.right)             = phi(Ind.right) + -1;
+        
+        A_mu(Ind.right,:)           = 0;
+        A_mu(Ind.right,[F;F;T;F;F]) = Diff.Dy2(Ind.right,:);
+        v_mu(Ind.right,:)           = Diff.Dy2(Ind.right,:)*phi;
+        
+        hM  = - m*this.IC.borderBottom.IntSc*Diff.DDy2;        
+        A_mu(Ind.right & Ind.bottom,:)           = 0;
+        A_mu(Ind.right & Ind.bottom,[F;T;F;F;F]) = this.IC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
+        A_mu(Ind.right & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) ...
+                                                - EYM(Ind.left & Ind.bottom,:) ...
+                                              + s*hM...
+                                              + this.IC.borderBottom.IntSc*(Diff.Dy2*(uv(1+end/2:end)));
+        A_mu(Ind.right & Ind.bottom,[F;F;F;T;F]) = hM;
+        v_mu(Ind.right & Ind.bottom)             = phi(Ind.right & Ind.bottom) ...
+                                               - phi(Ind.left & Ind.bottom) ...
+                                               + this.IC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
+                                               + hM*(G + s*phi);
+        
         %A_mu(Ind.left & Ind.top,:)           = 0;
 %         A_mu(Ind.left & Ind.top,[F;F;T;F;F]) = s*(EYM(Ind.left&Ind.top,:) + EYM(Ind.right&Ind.top,:));
 %         A_mu(Ind.left & Ind.top,[F;F;F;T;F]) = EYM(Ind.left&Ind.top,:) + EYM(Ind.right&Ind.top,:);
