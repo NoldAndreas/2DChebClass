@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
+function EX = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
 
     if(nargin==0)
         doHI = false;

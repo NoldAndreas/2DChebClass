@@ -82,24 +82,15 @@ function IterationStepFullProblem(this,noIterations)
         A_cont         = [Diff.div,Z,Z,Z];    
         v_cont         = Diff.div*uv;
 
-        % Momentum     %[uv;phi;G;p]
-%         A_mom          = [Diff.LapVec,...
-%                            diag(repmat(G+s*phi,2,1))*Diff.grad/Cak+s*gradPhiM/Cak,...
-%                            gradPhiM/Cak,...
-%                            - Diff.grad];
-%          v_mom          = Diff.LapVec*uv ...
-%                           + repmat(G+s*phi,2,1).*(Diff.grad*phi)/Cak ...
-%                           - Diff.grad*p;
-         
+        % Momentum     %[uv;phi;G;p]         
          A_mom          = [Diff.LapVec,...
                            diag(repmat(fWP-Cn*Diff.Lap*phi,2,1))*Diff.grad/Cak + ...
-                            diag(Diff.grad*phi)*repmat(diag(fWPP)-Cn*Diff.Lap,2,1)/Cak,...          
+                           diag(Diff.grad*phi)*repmat(diag(fWPP)-Cn*Diff.Lap,2,1)/Cak,...          
                            [Z;Z],...
                            - Diff.grad];
          v_mom          = Diff.LapVec*uv ...
                           + repmat(fWP-Cn*Diff.Lap*phi,2,1).*(Diff.grad*phi)/Cak ...
                           - Diff.grad*p;
-
         
         % Phasefield   %[uv;phi;G;p]        
         A_G            = [-gradPhiMT,s*m*Diff.Lap-uvTdiag*Diff.grad,m*Diff.Lap,Z];
@@ -119,22 +110,56 @@ function IterationStepFullProblem(this,noIterations)
                       -EYM(lr,:),...
                       Z(lr,:)];
         v_mu(lr)   = fWP(lr) - Cn*Diff.DDy2(lr,:)*phi ...
-                                - (G(lr) + s*phi(lr));
+                             - (G(lr) + s*phi(lr));
 
-        %% Boundary conditions [uv;phi;G;p]
-
-        % (BC1) uv = uv_BC    
+       %% Boundary conditions [uv;phi;G;p]
+        
+       % (BC1) p = 0  at y1 = +/- infinity
+       A_cont(Ind.left,:)           = 0;
+       A_cont(Ind.left,[F;F;F;F;T]) = EYM(Ind.left,:);
+       v_cont(Ind.left)             = p(Ind.left);
+        
+        % (BC2) [uv;phi;G;p]
+       
+       [fpW_mInf,fW_mInf] = DoublewellPotential(phiM,Cn);
+       [fpW_pInf,fW_pInf] = DoublewellPotential(phiP,Cn);
+     
+       indBC2 = Ind.right & Ind.top;
+     
+       A_cont(Ind.right,:)           = 0;
+       A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
+       v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
+       
+       A_cont(indBC2,[T;T;F;F;F]) = IntPathUpLow*[Diff.Dy2 , Diff.Dy1];              
+       
+       A_cont(indBC2,[F;F;T;F;F])                 = -Cn/Cak*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
+       A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) = ...
+                        A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) + ...
+                        y2Max*fpW_pInf/Cak;
+       A_cont(indBC2,[F;F;Ind.top&Ind.left;F;F])  = ...
+                        A_cont(indBC2,[F;F;Ind.top&Ind.left;F;F]) - ...
+                        y2Max*fpW_mInf/Cak;
+                    
+       A_cont(indBC2,[F;F;F;F;Ind.top&Ind.right]) = -y2Max;  
+       A_cont(indBC2,[F;F;F;F;Ind.top&Ind.left])  = y2Max;  
+       
+                    
+       v_cont(indBC2) = IntPathUpLow*([Diff.Dy2 , Diff.Dy1]*uv ...
+                              - Cn/Cak*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
+                        +y2Max*((-pP + fW_pInf/Cak) - (-pM + fW_mInf/Cak));
+        
+        % (BC3) uv = uv_BC    
         [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
         A_mom(IBB,:)           = 0;
         A_mom(IBB,[T;T;F;F;F]) = EYMM(IBB,:);
         v_mom(IBB)             = uv(IBB) - uvBound(IBB);
-
-        % (BC2) nu*grad(phi) = 0
-        A_mu(Ind.top|Ind.bottom,:)           = 0;
-        A_mu(Ind.top|Ind.bottom,[F;F;T;F;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
-        v_mu(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*phi;
         
-        % (BC3.a) 0 = f_w' - s*phi - Cn*Lap(phi) - G at y1 = +/- infintity
+        % (BC4) nu*grad(G) = 0
+        A_G(Ind.top|Ind.bottom,:)           = 0;
+        A_G(Ind.top|Ind.bottom,[F;F;F;T;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
+        v_G(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*G;                                    
+        
+        % (BC5) 0 = f_w' - s*phi - Cn*Lap(phi) - G at y1 = +/- infintity
         ind_LR         = Ind.left | Ind.right;
         fwPP_D         = diag(fWPP);
         A_G(ind_LR,:)  = [Z(ind_LR,:),Z(ind_LR,:),...
@@ -143,56 +168,20 @@ function IterationStepFullProblem(this,noIterations)
                           Z(ind_LR,:)];                
         v_G(ind_LR)    = fWP(ind_LR) - Cn*Diff.Lap(ind_LR,:)*phi ...
                                     - (G(ind_LR) + s*phi(ind_LR));
-                                
-        % (BC3.b) nu*grad(G) = 0
-        A_G(Ind.top|Ind.bottom,:)           = 0;
-        A_G(Ind.top|Ind.bottom,[F;F;F;T;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
-        v_G(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*G;                                    
 
-        % (BC4) p = 0  at y1 = +/- infinity
-        A_cont(Ind.left,:)           = 0;
-        A_cont(Ind.left,[F;F;F;F;T]) = EYM(Ind.left,:);
-        v_cont(Ind.left)             = p(Ind.left);
+        % (BC6) nu*grad(phi) = 0
+        A_mu(Ind.top|Ind.bottom,:)           = 0;
+        A_mu(Ind.top|Ind.bottom,[F;F;T;F;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
+        v_mu(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*phi;
+                                
         
-        % (BC5) [uv;phi;G;p]
-       
-       [fpWM,fWM] = DoublewellPotential(phiM,Cn);
-       [fpWP,fWP] = DoublewellPotential(phiP,Cn);
-     
-       indBC5 = Ind.right & Ind.top;
-     
-       A_cont(Ind.right,:)           = 0;
-       A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
-       v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
-       
-       A_cont(indBC5,[T;T;F;F;F]) = IntPathUpLow*[Diff.Dy2 , Diff.Dy1];              
-       
-       A_cont(indBC5,[F;F;T;F;F])                 = -Cn/Cak*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
-       A_cont(indBC5,[F;F;Ind.top&Ind.right;F;F]) = ...
-                        A_cont(indBC5,[F;F;Ind.top&Ind.right;F;F]) + ...
-                        y2Max*fpWP/Cak;
-       A_cont(indBC5,[F;F;Ind.top&Ind.left;F;F])  = ...
-                        A_cont(indBC5,[F;F;Ind.top&Ind.left;F;F]) - ...
-                        y2Max*fpWM/Cak;
-                    
-       A_cont(indBC5,[F;F;F;F;Ind.top&Ind.right]) = -y2Max;  
-       A_cont(indBC5,[F;F;F;F;Ind.top&Ind.left])  = y2Max;  
-       
-                    
-       v_cont(indBC5) = IntPathUpLow*([Diff.Dy2 , Diff.Dy1]*uv ...
-                              - Cn/Cak*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                        +y2Max*((-pP + fWP/Cak) - (-pM + fWM/Cak));
-        %(BC) Mass in subarea:        
+        %(BC7) Mass in subarea:        
          Jint                      = IntSubArea;        
          A_mu(Ind.left & Ind.top,:)           = 0;
          A_mu(Ind.left & Ind.top,[F;F;T;F;F]) = Jint;
          v_mu(Ind.left & Ind.top)  = IntSubArea*phi - nParticles;                 
         
-         %(BC7) [uv;phi;G;p]
-        %A_mu(Ind.right,:)           = 0;
-        %A_mu(Ind.right,[F;F;T;F;F]) = EYM(Ind.right,:);
-        %v_mu(Ind.right)             = phi(Ind.right) + -1;
-        
+         %(BC8) [uv;phi;G;p]
         A_mu(Ind.right,:)           = 0;
         A_mu(Ind.right,[F;F;T;F;F]) = Diff.Dy2(Ind.right,:);
         v_mu(Ind.right,:)           = Diff.Dy2(Ind.right,:)*phi;
@@ -209,12 +198,6 @@ function IterationStepFullProblem(this,noIterations)
                                                - phi(Ind.left & Ind.bottom) ...
                                                + this.IC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
                                                + hM*(G + s*phi);
-        
-        %A_mu(Ind.left & Ind.top,:)           = 0;
-%         A_mu(Ind.left & Ind.top,[F;F;T;F;F]) = s*(EYM(Ind.left&Ind.top,:) + EYM(Ind.right&Ind.top,:));
-%         A_mu(Ind.left & Ind.top,[F;F;F;T;F]) = EYM(Ind.left&Ind.top,:) + EYM(Ind.right&Ind.top,:);
-%         v_mu(Ind.left&Ind.top)  = (G(Ind.left&Ind.top)) + s*phi(Ind.left&Ind.top) ...
-%                                 + (G(Ind.right&Ind.top) + s*phi(Ind.right&Ind.top));
         
         
         A = [A_mom;A_mu;A_G;A_cont];

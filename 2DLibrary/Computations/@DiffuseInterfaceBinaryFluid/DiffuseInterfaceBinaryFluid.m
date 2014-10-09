@@ -3,7 +3,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
    properties (Access = public)
        p  % pressure       
        mu % chemical potential
-       s = 0.5
+       s = 0.
    end
        
 	methods (Access = public) 
@@ -103,6 +103,23 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            print2eps([dirData filesep this.filename '_Pressure'],gcf);
            saveas(gcf,[dirData filesep this.filename '_Pressure.fig']);
        end
+       
+        function PlotU(this) 
+            
+            if(isempty(this.StagnationPoint))
+               FindStagnationPoint(this,[-2,2],[-2,this.IC.y2Max-2]); 
+            end            
+            
+            y1Pts = [0;...
+                     this.optsNum.PlotArea.y1Min+0.1;...
+                     this.optsNum.PlotArea.y1Max-0.1];
+            y2Pts = [this.optsNum.PlotArea.y2Max/2;...
+                     0.5;...
+                     this.optsNum.PlotArea.y2Max-0.5];
+            
+            PlotU@DiffuseInterface(this,[],y1Pts,y2Pts);
+        end
+
        
        function CheckResultResolution(this)
            figure('Position',[0 0 1000 1000],'color','white');

@@ -7,7 +7,7 @@ top    = 5;
 IntersectShape = 'Disc';
 
 figure('color','white','Position',[0 0 800 500]);
-shape = struct('y2Min',bottom,'y2Max',top,'N',[10,10],'L1',1,'L2',2);
+shape = struct('y2Min',bottom,'y2Max',top,'N',[6,6],'L1',1,'L2',2);
 HS    = InfCapillary(shape);
 plot([-10,10],[bottom,bottom],'b--','LineWidth',2); hold on;
 plot([-10,10],[top,top],'b--','LineWidth',2);
@@ -20,11 +20,10 @@ set(gca,'fontsize',20);
 axis equal
 
 [y10,y20] = ginput(1);   
-y20 = 0
 while(y20 > bottom - R)
     
     Origin       = [y10,y20];
-    N            = [15,16];
+    N            = [10,10];
     sphere       = true;
     
     if(strcmp(IntersectShape,'Disc'))

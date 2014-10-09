@@ -140,19 +140,37 @@ classdef DiffuseInterface < handle
         end
                          
                 
-        function spt = FindStagnationPoint(this)
+        function spt = FindStagnationPoint(this,iguess1,iguess2)
             
             uv = this.uv;
             
-            fsolveOpts = optimset('Display','off');
-            [spt,~,flag] = fsolve(@ValueAtXY,[-2,2],fsolveOpts);                        
+            if(nargin < 2)
+                iguess1 = [-2,2];
+            end
+            if(nargin < 3)
+                iguess2 = [-2,this.IC.y2Max-2];
+            end
             
-            if(flag < 1)
+            fsolveOpts = optimset('Display','off');
+            [spt1,~,flag1] = fsolve(@ValueAtXY,iguess1,fsolveOpts);                        
+            if(flag1 >= 1)
+                spt.y1_kv = spt1(1);
+                spt.y2_kv = spt1(2);
+                disp(['Stagnation point found at (',num2str(spt1(1)),',',num2str(spt1(2)),')']);
+            end
+                        
+            [spt2,~,flag2] = fsolve(@ValueAtXY,iguess2,fsolveOpts);
+            if(flag2 >= 1)
+                spt.y1_kv = [spt.y1_kv;spt2(1)];
+                spt.y2_kv = [spt.y2_kv;spt2(2)];
+                disp(['Stagnation point found at (',num2str(spt2(1)),',',num2str(spt2(2)),')']);
+            end
+            
+            if((flag1 < 1) && (flag2 < 1))
                 disp('No stagnation point found');
                 spt = [];
             else
-                this.StagnationPoint = spt;
-                disp(['Stagnation point found at (',num2str(spt(1)),',',num2str(spt(2)),')']);
+                this.StagnationPoint = spt;                
             end
             
             function z = ValueAtXY(xy)
@@ -205,15 +223,10 @@ classdef DiffuseInterface < handle
         end
         
         %Plotting                           
-        function PlotResultsMu(this,mu,uv) 
-            if(nargin == 1)
-                uv  = this.uv;
-                mu  = GetMu(this,this.phi);            
-            end
-            
+        function PlotResultsMu(this)                         
             figure('Position',[0 0 800 600],'color','white');
-            this.IC.doPlots(mu,'contour');             
-            PlotU(this,uv); hold on;             
+            this.IC.doPlots(GetMu(this),'contour');             
+            PlotU(this); hold on;             
         end
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
@@ -266,45 +279,42 @@ classdef DiffuseInterface < handle
 %                 PlotU(this,u_flow);            
 %             end
 %             title('Check accuracy of map');
-        end          
-        function SavePlotResults(this)
-            global dirData                        
+        end           
+        function PlotU(this,uv,y1Pts,y2Pts) 
             
-            PlotResultsPhi(this);
-            print2eps([dirData filesep this.filename '_Density'],gcf);
-            saveas(gcf,[dirData filesep this.filename '_Density.fig']);
-            
-            PlotResultsMu(this);
-            print2eps([dirData filesep this.filename '_ChemPot' ],gcf);
-            saveas(gcf,[dirData filesep this.filename '_ChemPot.fig']);
-        end        
-        function PlotU(this,uv) 
-            
-            if(nargin<2)
+            n = 20;
+            if((nargin<2) || isempty(uv))
                 if(isempty(this.uv))
                     return;
                 else
                     uv = this.uv;
                 end
             end
+            y2Min = this.optsNum.PhysArea.y2Min;
             y2Max = this.optsNum.PhysArea.y2Max;
             
             y1Min = this.optsNum.PlotArea.y1Min;
             y1Max = this.optsNum.PlotArea.y1Max;
-            
-            y2L = (1:y2Max)';
-            y1L = (y1Min:y1Max)';            
+                        
+            y2L = y2Min + (y2Max-y2Min)*(0:n-1)'/(n-1);            
+            y1L = y1Min + (y1Max-y1Min)*(0:n-1)'/(n-1);            
             
             startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
                          y1Min*ones(size(y2L))+0.1;...
                          y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
+            
+            if(nargin >= 4)
+               startPtsy1 = [startPtsy1;y1Pts]; 
+               startPtsy2 = [startPtsy2;y2Pts];
+            end
+            
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
             
             sp = this.StagnationPoint;
             if(~isempty(sp))          
                 hold on;
-                plot(sp(1),sp(2),'or','MarkerFaceColor','r','MarkerSize',10); 
+                plot(sp.y1_kv,sp.y2_kv,'or','MarkerFaceColor','r','MarkerSize',10); 
                 hold on;
             end
         end           
@@ -329,18 +339,40 @@ classdef DiffuseInterface < handle
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
             ylabel('$cos(\theta)$','Interpreter','Latex','fontsize',20);
         end
-
+        function SavePlotResults(this)
+            global dirData                        
+            
+            PlotResultsPhi(this);
+            print2eps([dirData filesep this.filename '_Density'],gcf);
+            saveas(gcf,[dirData filesep this.filename '_Density.fig']);
+            
+            PlotResultsMu(this);
+            print2eps([dirData filesep this.filename '_ChemPot' ],gcf);
+            saveas(gcf,[dirData filesep this.filename '_ChemPot.fig']);
+        end        
         function PlotErrorIterations(this)           
             disp('*** Results ***');
-            disp(['theta = ',num2str(this.theta*180/pi),' [deg]']);
-            disp(['a = ',num2str(this.errors.aIter(end))]);
-            disp(['Max error of equations excluding boundaries: ',num2str(this.errors.errorIterations(end))]);
+            if(~isempty(this.theta))
+                disp(['theta = ',num2str(this.theta*180/pi),' [deg]']);
+            end
+            if(isfield(this.errors,'aIter'))
+                disp(['a = ',num2str(this.errors.aIter(end))]);
+            end            
 
+            legStr = {};
             figure('color','white');
-            semilogy(this.errors.errorIterations,'ro','MarkerFaceColor','r'); hold on;
-            semilogy(this.errors.errorAverage,'ko','MarkerFaceColor','k');
-            legend({'Maximal error','Average error'});
-            
+            if(isfield(this.errors,'errorIterations'))
+                disp(['Max error of equations excluding boundaries: ',num2str(this.errors.errorIterations(end))]);
+                semilogy(this.errors.errorIterations,'ro','MarkerFaceColor','r'); hold on;
+                legStr{end+1} = 'Error';
+            end
+            if(isfield(this.errors,'errorAverage'))
+                semilogy(this.errors.errorAverage,'ko','MarkerFaceColor','k');
+                legStr{end+1} = 'Average error';
+            end
+            if(length(legStr) > 1)
+                legend(legStr);            
+            end
             xlabel('Iteration');
             ylabel('Error');
             
