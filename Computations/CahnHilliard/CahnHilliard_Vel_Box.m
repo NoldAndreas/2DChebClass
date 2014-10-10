@@ -16,6 +16,7 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
 %           (a)eta  = etaRho*rho and 
 %           (a)zeta = zetaRho*rho  
 %*************************************************************************   
+    global dirData
     if(nargin == 0)
         %Numerical Parameters    
         Phys_Area = struct('y1Min',0,'y1Max',10,'N',[22,22],...
@@ -117,7 +118,7 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
                         t_preprocess,t_eqSol,t_dynSol);                        
     
     if(~isfield(optsNum,'savefileDDFT'))
-        SaveToFile(optsNum.DDFTCode,v2struct(data,optsPhys,optsNum),getResultsPath());
+        SaveToFile(optsNum.DDFTCode,v2struct(data,optsPhys,optsNum),dirData);
     end                    
                     
 	display(['Preprocessor, Computation time (sec): ', num2str(t_preprocess)]);

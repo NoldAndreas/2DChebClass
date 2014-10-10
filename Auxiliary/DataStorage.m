@@ -79,7 +79,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 fileParamTxtname    = [filename(1:end-4),'.txt'];
                 
                 load([DataFolder filesep filename]);
-                disp(['Loading file ',DataFolder filesep filename,' ...']);
+                disp(['Data file found in ',DataFolder filesep filename,' ...']);
 
                 if(recomputeAll)
                     recompute = true;
@@ -103,7 +103,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 if(~recompute)
                     %append configuration to index file
                      fileID = fopen([DataFolder filesep fileParamTxtname],'a');
-                     fprintf(fileID,'# %s \n',['loaded ' getTimeStr() ' : ' comments]);
+                     fprintf(fileID,'# %s \n',['loaded on ' datestr(clock) ' : ' comments]);
                      fclose(fileID);
                 end
                 break;

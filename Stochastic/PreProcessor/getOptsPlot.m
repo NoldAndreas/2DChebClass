@@ -100,9 +100,9 @@ optsLeg=makeLegLine(optsStruct);
 % Construct standard plotting options
 %--------------------------------------------------------------------------
 
-global dirResults
+global dirData
 
-plotDir    = [dirResults filesep optsStruct.potNames filesep 'Output'];
+plotDir    = [dirData filesep optsStruct.potNames filesep 'Output'];
 pdfDir     = [plotDir filesep 'pdfs'];
 movieFile  = [plotDir filesep 'dynamics'];
 meansFile  = [plotDir filesep 'means.pdf'];

@@ -1,10 +1,12 @@
 function str = getMovieFile(filename,path)
-    
+
+    global dirData
+
     if(nargin == 2 && path == true)
-        str = [getResultsPath()];
+        str = dirData;
     else
         time = clock; % Gets the current time as a 6 element vector
-        str = ([getResultsPath(),filename,'_' ...
+        str = ([dirData,filename,'_' ...
             num2str(time(1)),'_'... % Returns year as character
             num2str(time(2)),'_'... % Returns month as character
             num2str(time(3)),'_'... % Returns day as char

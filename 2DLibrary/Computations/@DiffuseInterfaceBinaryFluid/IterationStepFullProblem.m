@@ -99,19 +99,7 @@ function IterationStepFullProblem(this,noIterations)
         % Chemical Potential        
         A_mu           = [Z,Z,diag(fWPP)-Cn*Diff.Lap-s*EYM,-EYM,Z];
         v_mu           = fWP - Cn*Diff.Lap*phi - (G + s*phi);
-        
-        lr = Ind.left|Ind.right;
-        A_mu(lr,:) = 0;
-        fwD        = diag(fWPP);
-        
-        A_mu(lr,:) = [Z(lr,:),...
-                      Z(lr,:),...
-                      fwD(lr,:)-Cn*Diff.DDy2(lr,:)-s*EYM(lr,:),...
-                      -EYM(lr,:),...
-                      Z(lr,:)];
-        v_mu(lr)   = fWP(lr) - Cn*Diff.DDy2(lr,:)*phi ...
-                             - (G(lr) + s*phi(lr));
-
+                
        %% Boundary conditions [uv;phi;G;p]
         
        % (BC1) p = 0  at y1 = +/- infinity
@@ -175,16 +163,18 @@ function IterationStepFullProblem(this,noIterations)
         v_mu(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*phi;
                                 
         
-        %(BC7) Mass in subarea:        
+        %(BC7) Mass in subarea:               
+        A_mu(Ind.left|Ind.right,:)           = 0;
+        A_mu(Ind.left|Ind.right,[F;F;T;F;F]) = Diff.Dy2(Ind.left|Ind.right,:);
+        v_mu(Ind.left|Ind.right,:)           = Diff.Dy2(Ind.left|Ind.right,:)*phi;
+        
+                
          Jint                      = IntSubArea;        
          A_mu(Ind.left & Ind.top,:)           = 0;
          A_mu(Ind.left & Ind.top,[F;F;T;F;F]) = Jint;
          v_mu(Ind.left & Ind.top)  = IntSubArea*phi - nParticles;                 
         
          %(BC8) [uv;phi;G;p]
-        A_mu(Ind.right,:)           = 0;
-        A_mu(Ind.right,[F;F;T;F;F]) = Diff.Dy2(Ind.right,:);
-        v_mu(Ind.right,:)           = Diff.Dy2(Ind.right,:)*phi;
         
         hM  = - m*this.IC.borderBottom.IntSc*Diff.DDy2;        
         A_mu(Ind.right & Ind.bottom,:)           = 0;

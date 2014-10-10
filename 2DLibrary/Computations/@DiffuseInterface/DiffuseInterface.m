@@ -137,9 +137,7 @@ classdef DiffuseInterface < handle
                             (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
                             zeros(M,1)];                
             end
-        end
-                         
-                
+        end                         
         function spt = FindStagnationPoint(this,iguess1,iguess2)
             
             uv = this.uv;
@@ -279,7 +277,13 @@ classdef DiffuseInterface < handle
 %                 PlotU(this,u_flow);            
 %             end
 %             title('Check accuracy of map');
-        end           
+        end         
+        function AddStreamlines(this)
+            for i = 1:3
+                [y10,y20] = ginput(1);   
+                this.IC.doPlotsStreamlines(this.uv,y10,y20); %IC.doPlotsFlux(u_flow)(mu);
+            end
+        end
         function PlotU(this,uv,y1Pts,y2Pts) 
             
             n = 20;

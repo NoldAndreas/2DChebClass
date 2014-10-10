@@ -66,6 +66,7 @@ function ComputeDynamics(this,x_ic,mu)
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+    this.FilenameDyn  = paramsEq.Filename;                        
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        

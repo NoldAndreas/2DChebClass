@@ -1,7 +1,7 @@
 function pathResults = getResultsPath()
 
-    global dirResults   
-    pathResults = dirResults;
+    global dirData   
+    pathResults = dirData;
     
 %     if(exist('D:\','dir'))
 %         pathResults = 'D:\Results\2DCode\';

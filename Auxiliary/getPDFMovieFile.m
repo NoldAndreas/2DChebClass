@@ -1,16 +1,22 @@
 function str = getPDFMovieFile(filename,i,path)
 
+    global dirData
+
     if(ispc())
-        addPath = 'Movies\PDFs\';
+        addPath = '\MoviesAuxPdfs\';
     else
-        addPath = 'Movies/PDFs/';
+        addPath = '/MoviesAuxPdfs/';
     end
     
     if(nargin == 3 && path == true)
-        str = ([getResultsPath(),addPath]);
+        str = ([dirData,addPath]);
     else    
         %time = clock; % Gets the current time as a 6 element vector
-        str = ([getResultsPath(),addPath,filename,'_',num2str(i),'.pdf']);
+        dirname = [dirData,addPath];        
+        str = ([dirname,filename,'_',num2str(i),'.pdf']);
+        if(~exist(dirname,'dir'))
+            mkdir(dirname);
+        end
     end
         
 end

@@ -1,17 +1,17 @@
 function TestAll(dirTest)
-    global recomputeAll QuickOutput dirResults
+    global recomputeAll QuickOutput dirData dirDataOrg
 
     recomputeAll = true;
     QuickOutput  = true;
     comments = 'All computation times given in seconds.';
         
     
-    dirResOld  = dirResults;
-    dirResults = ['D:\2DChebData\TestData\',dirTest,'\'];
+    dirResOld  = dirData;
+    dirData    = [dirDataOrg,dirTest,'\'];
     
-    if(~exist(dirResults,'dir'))            
+    if(~exist(dirData,'dir'))            
         disp('Folder not found. Creating new path..');            
-        mkdir(dirResults);
+        mkdir(dirData);
    end
     
 
@@ -75,7 +75,7 @@ function TestAll(dirTest)
         WriteReport();
     end
     
-    dirResults = dirResOld;
+    dirData = dirResOld;
 
     function WriteReport()
         tc = 0;

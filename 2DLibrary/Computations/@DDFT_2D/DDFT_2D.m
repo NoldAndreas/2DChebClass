@@ -12,7 +12,8 @@ classdef DDFT_2D < handle
         
         Vext,Vext_grad,VAdd
         
-        x_eq,mu,FilenameEq
+        x_eq,mu
+        FilenameEq,FilenameDyn
         dynamicsResult
         
         doHI,doHIWall,doSubArea,do2Phase
@@ -291,6 +292,7 @@ classdef DDFT_2D < handle
             plotData.optsPhys = this.optsPhys;
             plotData.optsNum  = this.optsNum;
             plotData.data     = this.dynamicsResult;
+            plotData.filename = this.FilenameDyn;
 
             figure('Position',[0 0 1000 1000]);
             PlotDDFT(plotData,rec);

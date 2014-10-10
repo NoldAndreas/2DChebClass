@@ -1,5 +1,8 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
-    
+	properties (Access = public)              
+        mu
+    end
+         
     methods (Access = public) 
          function this = DiffuseInterfaceSingleFluid(config)           
              this@DiffuseInterface(config);
@@ -32,6 +35,40 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             end
             
         end  
+        
+        IterationStepFullProblem(this,noIterations)
+        function vec = GetInitialCondition(this) 
+           
+            if(~isempty(this.uv) && ...                
+                ~isempty(this.mu) && ...
+                ~isempty(this.phi))
+                vec  = [this.uv;this.phi;this.mu];
+                return;
+            end
+           
+            M = this.IC.M;
+            if(isempty(this.theta))
+                otherInput.thetaInitialGuess = pi/2;
+            else
+                otherInput.thetaInitialGuess = this.theta;
+            end            
+
+             if(otherInput.thetaInitialGuess == pi/2)
+                theta  = pi/2;
+                phi    = InitialGuessRho(this);
+                mu     = 0;
+             else
+                theta  = otherInput.thetaInitialGuess;
+                phi    = this.phi;
+                mu     = this.GetMu();
+             end
+
+             this.uv  = GetBoundaryCondition(this);%,theta,phi);                         
+             this.mu  = zeros(M,1);
+             this.phi = phi;                   
+
+             vec  = [this.uv;this.phi;this.mu];
+       end
         
         function [bulkError,bulkAverageError] = DisplayFullError(this,phi,uv)            
             M        = this.IC.M;

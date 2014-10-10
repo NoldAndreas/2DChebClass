@@ -1,12 +1,14 @@
 function PlotDDFT(input,Bool_Record)
     
-    global QuickOutput
+    global QuickOutput dirData
 
     if((nargin < 2) && ~QuickOutput) 
         Bool_Record = false;
         gifFile = [];
     else
-        if(ischar(Bool_Record))
+        if(isfield(input,'filename'))
+            gifFile = [dirData,'\Dynamics\',input.filename,'.gif'];
+        elseif(ischar(Bool_Record))
             gifFile = [Bool_Record,'.gif'];
         else
             gifFile = getMovieFile('Movie');    
@@ -131,7 +133,7 @@ function PlotDDFT(input,Bool_Record)
                 shape.doPlots(rho,'contour',optsPlot); hold on;                         
             end
             %plot([0;0],[i;i]);
-            title(['t = ', num2str(round(t))]);               
+            title(['t = ', num2str(t)]);               
             set(gca,'fontsize',30);
             set(gca,'linewidth',3);
             %view([2,5,2]);

@@ -1,46 +1,33 @@
 function AddPaths()   
 
     global dirData
-    global dirDataOrg
-    global dirResults
+    global dirDataOrg    
     
     global PersonalUserOutput
     global QuickOutput
-    
-    global CodeVersionsDir
     
     global recomputeAll
      
     if(exist('D:\','dir'))
         dirData    = 'D:\2DChebData';    
-        if(isempty(dirResults))
-            dirResults = 'D:\Results\2DCode';        
-        end
         dirDDFT    = pwd;
     elseif(exist('/Users/NoldAndreas/','dir'))
         dirData    = '/Users/NoldAndreas/Documents/2DChebData';
-        dirResults = '/Users/NoldAndreas/Documents/Results/2DCode/';    
         dirDDFT    = pwd;
     elseif(exist('/home/an2609/','dir'))
         dirData    = '/home/an2609/2DChebData';
-        dirDDFT    = pwd;
-        dirResults = '/home/an2609/Results';
+        dirDDFT    = pwd;        
     elseif(exist('/home/bgoddard/','dir'))
         dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-        dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/2DChebClass';
-        dirResults = '/home/bgoddard/work/MATLAB/Fluids/2DChebData/';
+        dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/2DChebClass';        
     elseif(exist('/Users/Ben/','dir'))
         dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
-        dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/2DChebClass';
-        dirResults = '/Users/Ben/work/MATLAB/Fluids/2DChebData/';
+        dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/2DChebClass';        
     else
         disp('Unknown computer; using current directory to save data');
         dirData     = pwd;
-        dirDDFT     = pwd;
-        dirResults  = pwd;
-    end
-    
-    CodeVersionsDir = [dirData filesep 'CodeVersions'];
+        dirDDFT     = pwd;        
+    end        
     
     addpath(genpath(dirDDFT));        
     rmpath(genpath([pwd filesep 'NoClass']));       
