@@ -1,7 +1,6 @@
-classdef DDFT_2D < handle
+classdef DDFT_2D < Computation
     
-    properties (Access = public)            
-        optsNum,optsPhys        
+    properties (Access = public)                    
         
         IDC,subArea
         IntMatrV2  % integration matrix for mean field two-particle interactions
@@ -20,10 +19,8 @@ classdef DDFT_2D < handle
     end
     
     methods (Access = public)          
-        function this = DDFT_2D(configuration)
-            
-            this.optsNum         = configuration.optsNum;
-            this.optsPhys        = configuration.optsPhys;    
+        function this = DDFT_2D(configuration)            
+            this@Computation(configuration);            
             
             if(~isfield(this.optsPhys,'D0') && isfield(this.optsPhys,'mS') && isfield(this.optsPhys,'gammaS'))
                 this.optsPhys.D0 = 1./(this.optsPhys.gammaS.*this.optsPhys.mS);

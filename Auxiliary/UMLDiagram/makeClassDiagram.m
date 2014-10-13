@@ -6,9 +6,9 @@ function makeClassDiagram
     %addpath([workingDir filesep 'Auxiliary' filesep 'UMLDiagram'])
     
     if(exist('D:\','dir'))
-        cd 'D:\Sync\Projects\2DCode\2DChebClass\2DLibrary';    
+        cd 'D:\2DChebClass\2DLibrary';    
     elseif(exist('/Users/NoldAndreas/','dir'))        
-        cd /Users/NoldAndreas/Documents/ContactLineDynamics/Projects/2DCode/2DChebClass/2dchebclass/2DLibrary;
+        cd /Users/NoldAndreas/Documents/2DChebClass/2DLibrary;
     elseif(exist('/home/bgoddard/','dir'))
         cd '/home/bgoddard/work/MATLAB/Fluids/NComponent2D/DDFT/2DChebClass/2DLibrary';
     elseif(exist('/Users/Ben/','dir'))

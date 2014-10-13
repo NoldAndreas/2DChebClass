@@ -93,15 +93,13 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              vec  = [this.uv;this.phi;G;this.p];
        end
        
-       function SavePlotResults(this)
-           global dirData
+       function SavePlotResults(this)           
            SavePlotResults@DiffuseInterface(this);
            
            figure('Position',[0 0 800 600],'color','white');
            PlotU(this); hold on;            
            this.IC.doPlots(this.p,'contour');     
-           print2eps([dirData filesep this.filename '_Pressure'],gcf);
-           saveas(gcf,[dirData filesep this.filename '_Pressure.fig']);
+           SaveCurrentFigure(this,[this.filename '_Pressure']);                
        end
        
         function PlotU(this) 

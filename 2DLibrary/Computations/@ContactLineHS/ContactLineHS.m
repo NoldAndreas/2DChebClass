@@ -1,8 +1,6 @@
 classdef ContactLineHS < DDFT_2D
     
-    properties (Access = public)                   
-        configName
-                
+    properties (Access = public)                                           
         %(1) 1D Results
         rho1D_lg,rho1D_wl,rho1D_wg,alpha_YCA  
         ST_1D  %1D surface tensions
@@ -31,8 +29,7 @@ classdef ContactLineHS < DDFT_2D
     methods (Access = public)          
         function this = ContactLineHS(configuration)             
              configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';
-             this@DDFT_2D(configuration);                         
-             this.configName    = SaveConfig(configuration,'Configurations');                                                                         
+             this@DDFT_2D(configuration);
         end                
         
         %Preprocessing and testing of results

@@ -1,4 +1,4 @@
-function PlotDDFT_SnapshotsShape(input,filename)
+function PlotDDFT_SnapshotsShape(input,file_name)
 
     %*****************************
     %Initialization of Data     
@@ -69,8 +69,8 @@ function PlotDDFT_SnapshotsShape(input,filename)
         pl_j = pl_j +1;                
     end        
     if(nargin > 1)
-            print2eps(filename,gcf);
-            saveas(gcf,[filename,'.fig']);
-            disp(['Snapshots saved in ',filename,'.eps/.fig.']);
+            print2eps(file_name,gcf);
+            saveas(gcf,[file_name,'.fig']);
+            disp(['Snapshots saved in ',file_name,'.eps/.fig.']);
 	end
 end

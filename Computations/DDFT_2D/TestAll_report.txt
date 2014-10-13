@@ -1,12 +1,12 @@
 # ************************************************************ 
-# Computed at: 06-Oct-2014 09:45:41 Cumulative computation time: 02:52:25.00 (hrs:min:sec) All computation times given in seconds. 
+# Computed at: 13-Oct-2014 11:20:14 Cumulative computation time: 02:47:12.00 (hrs:min:sec) All computation times given in seconds. 
 # ************************************************************ 
-CheckFMTComputation : 56
-CheckFMTComputation_InfCapillary : 49
-DDFT_Diffusion1D_HalfSpace_FMT : 53
-DDFT_DiffusionBox_2Phase_1 : 27
-DDFT_DiffusionBox_2Phase_2 : 130
-DDFT_DiffusionBox_2Phase_3 : 74
+CheckFMTComputation : 7
+CheckFMTComputation_InfCapillary : 12
+DDFT_Diffusion1D_HalfSpace_FMT : 7
+DDFT_DiffusionBox_2Phase_1 : 14
+DDFT_DiffusionBox_2Phase_2 : 18
+DDFT_DiffusionBox_2Phase_3 : 18
 DDFT_DiffusionBox_2Phase_Sat_1 : 24
 DDFT_DiffusionBox_2Phase_Sat_2 : 185
 DDFT_DiffusionBox_LDA_Case1 : 16

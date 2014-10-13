@@ -132,7 +132,9 @@ classdef (Abstract) M1SpectralSpectral < Shape
         end                
         function SetUpBorders(this,N)
             
-            if(length(N) == 1)
+            if((nargin == 1) || isempty(N))
+                N = [this.N2,this.N1,this.N2,this.N1];
+            elseif(length(N) == 1)
                 N = ones(4,1)*N;
             end
             

@@ -155,7 +155,7 @@ classdef (Abstract) Shape < handle
             end
             
         end                 
-        function IP = InterpolationPlot(this,PlotArea,saveBool)
+        function IP = InterpolationPlot(this,PlotArea,saveBool)           
             
             [x1min,x2min] = CompSpace(this,PlotArea.y1Min,PlotArea.y2Min);
             [x1max,x2max] = CompSpace(this,PlotArea.y1Max,PlotArea.y2Max);

@@ -1,18 +1,16 @@
-classdef DiffuseInterface < handle
+classdef DiffuseInterface < Computation
     
    properties (Access = public)              
-       IC              
-       optsNum,optsPhys    
+       IC                     
        IntSubArea
-       PlotBCShape
-       
+              
        phi = [],uv  = [],theta=[],a
        errors = []
        
        IsolineInterfaceY2=[],StagnationPoint=[]
        %surfaceTension = 4/3;
        
-       configName,filename
+       filename
    end
    
    methods (Abstract = true, Access = public)
@@ -22,13 +20,21 @@ classdef DiffuseInterface < handle
    end
    
    methods (Access = public)          
-        function this = DiffuseInterface(config)             
-            this.optsNum         = config.optsNum;
-            this.optsPhys        = config.optsPhys;                                                               
-            this.configName    = SaveConfig(config,'Configurations');                                                                         
+        function this = DiffuseInterface(config)  
+            this@Computation(config);            
             if(~isfield(this.optsNum.PhysArea,'y1Max'))
                 this.optsNum.PhysArea.y1Max = inf;
-            end            
+            end      
+            if(~isfield(this.optsNum.PhysArea,'NBorder'))
+                this.optsNum.PhysArea.NBorder = [];
+            end
+            
+            if(~isfield(this.optsNum.PlotArea,'y2Min'))
+                this.optsNum.PlotArea.y2Min = this.optsNum.PhysArea.y2Min;
+            end
+            if(~isfield(this.optsNum.PlotArea,'y2Max'))
+                this.optsNum.PlotArea.y2Max = this.optsNum.PhysArea.y2Max;
+            end
         end       
         function Preprocess(this)                        
             this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
@@ -44,6 +50,7 @@ classdef DiffuseInterface < handle
                    'Lap' ;'grad' ;'div'; ...
                    'gradLap' ;'gradDiv'; 'LapVec';'LapDiv';'Lap2'};
             this.IC.ComputeDifferentiationMatrix(Sel);
+                        
             
             this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
             
@@ -52,22 +59,16 @@ classdef DiffuseInterface < handle
                 this.IC.Ind.fluidInterface = this.IC.Ind.(this.optsPhys.fluidInterface);
             end
 
-            bxArea          = this.optsNum.PlotArea;
-            bxArea.N        = [100,100];
+            bxArea          = struct('y1Min',this.optsNum.PhysArea.IntInterval(1),...
+                                     'y1Max',this.optsNum.PhysArea.IntInterval(2),...
+                                     'y2Min',this.optsNum.PhysArea.y2Min,...
+                                     'y2Max',this.optsNum.PhysArea.y2Max,...
+                                     'N',[100,100]);
+            
             BX              = Box(bxArea);
             IntBx           = BX.ComputeIntegrationVector();
             this.IntSubArea = IntBx*this.IC.SubShapePts(BX.GetCartPts());
-            
-            shapeBC         = this.optsNum.PhysArea;
-            shapeBC.y2Min   = shapeBC.y2Max;
-            shapeBC.y2Max   = shapeBC.y2Max + 1;
-            this.PlotBCShape  = InfCapillaryQuad(shapeBC);
-            
-            plotBC          = this.optsNum.PlotArea;
-            plotBC.y2Min    = plotBC.y2Max;
-            plotBC.y2Max    = plotBC.y2Max+1;
-            plotBC.N1 = 10; plotBC.N2 = 2;
-            this.PlotBCShape.ComputeAll(plotBC);
+                     
         end        
         function phi = InitialGuessRho(this)
             PtsCart    = this.IC.GetCartPts();
@@ -343,16 +344,13 @@ classdef DiffuseInterface < handle
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
             ylabel('$cos(\theta)$','Interpreter','Latex','fontsize',20);
         end
-        function SavePlotResults(this)
-            global dirData                        
+        function SavePlotResults(this)                                
             
             PlotResultsPhi(this);
-            print2eps([dirData filesep this.filename '_Density'],gcf);
-            saveas(gcf,[dirData filesep this.filename '_Density.fig']);
+            SaveCurrentFigure(this,[this.filename '_Density']);            
             
             PlotResultsMu(this);
-            print2eps([dirData filesep this.filename '_ChemPot' ],gcf);
-            saveas(gcf,[dirData filesep this.filename '_ChemPot.fig']);
+            SaveCurrentFigure(this,[this.filename '_ChemPot']);            
         end        
         function PlotErrorIterations(this)           
             disp('*** Results ***');
@@ -379,11 +377,8 @@ classdef DiffuseInterface < handle
             end
             xlabel('Iteration');
             ylabel('Error');
-            
-            global dirData
-            
-            print2eps([dirData filesep this.filename '_ErrorIterations'],gcf);
-            saveas(gcf,[dirData filesep  this.filename '_ErrorIterations.fig']);
+                        
+            SaveCurrentFigure(this,[this.filename '_ErrorIterations']);                 
         end
         
         %Old
@@ -404,7 +399,7 @@ classdef DiffuseInterface < handle
                 z        = IP*phi;
             end    
         end
-        function theta = FindInterfaceAngle(this,phi)
+        function theta  = FindInterfaceAngle(this,phi)
 
             y2M = 0; y2P = 10;
           %  fsolveOpts   = optimset('Display','off');                
@@ -427,7 +422,7 @@ classdef DiffuseInterface < handle
             end    
         end   
         
-        [phi,muDelta] = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  
+        [phi,muDelta]  = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  
         [phi,uv]       = SolveFull(this,ic)
    end
     

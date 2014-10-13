@@ -1,7 +1,21 @@
 function TestAll(dirTest)
     global recomputeAll QuickOutput dirData dirDataOrg
 
-    recomputeAll = true;
+    
+    no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 4 seconds.');
+    if(getkeywait(4) == -1)
+        for ih = 1:no
+            fprintf('\b');
+        end                        
+        recomputeAll = false;
+    else
+        for ih = 1:no
+            fprintf('\b');
+        end
+        no = fprintf('Thanks. All matrices will be recomputed.\n');
+        recomputeAll = true;
+    end    
+        
     QuickOutput  = true;
     comments = 'All computation times given in seconds.';
         
@@ -33,8 +47,8 @@ function TestAll(dirTest)
         end
     end
     
-    no = fprintf('Do you want to rerun All files? (press any key), or wait for 2 seconds.');        
-    if(getkeywait(2) == -1)
+    no = fprintf('Do you want to rerun All files? (press any key), or wait for 4 seconds.');        
+    if(getkeywait(4) == -1)
         for ih = 1:no
             fprintf('\b');
         end                        

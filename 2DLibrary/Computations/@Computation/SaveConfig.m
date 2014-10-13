@@ -1,4 +1,4 @@
-function configName = SaveConfig(configuration,configDir)    
+function SaveConfig(this,configuration,configDir)    
     global dirData
 
     configDirFull = [dirData filesep configDir];
@@ -7,8 +7,7 @@ function configName = SaveConfig(configuration,configDir)
         mkdir(configDirFull);
     end
    
-   configName   = (['Config_',getTimeStr()]);
-
+    configName   = (['Config_',getTimeStr()]);
     
     index         = LoadIndexFiles([dirData filesep configDir]);
     resave        = true;
@@ -29,5 +28,7 @@ function configName = SaveConfig(configuration,configDir)
             ['Configuration ', configName]);
         disp(['Configuration saved in ' configDirFull filesep configName '.txt']);
     end
+    
+    this.configName = configName;
 
 end

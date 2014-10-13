@@ -1,4 +1,4 @@
-function ShearWithInterface()
+function ShearWithInterfaceSingleFluid()
 
     close all;
     
@@ -6,11 +6,9 @@ function ShearWithInterface()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');
     %% Parameters    
-    PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',[],'L1',10,... %12,80,50
-                      'NBorder',40,'y1Max',inf);
-
-    PlotArea = struct('y1Min',-10,'y1Max',10,'N1',80,...
-                      'y2Min',0,'y2Max',PhysArea.y2Max,'N2',80);   
+    PhysArea = struct('N',[40,30],'y2Min',0,'y2Max',[],'L1',10,...
+                      'IntInterval',[-10,10]);%,... %12,80,50
+    PlotArea = struct('y1Min',-10,'y1Max',10,'N1',80,'N2',80);   
 
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
     
@@ -18,7 +16,7 @@ function ShearWithInterface()
                       'zeta',10,'eta',1,...
                       'Cak',0.03,'Cn',1,...
                       'UWall',[1,-1],...
-                      'phi_m',1.5,...
+                      'phi_m',3,...
                       'nParticles',0);
                     
     config = v2struct(optsPhys,optsNum);   
