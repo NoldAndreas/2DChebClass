@@ -1,15 +1,6 @@
-function [u,v] = GetCartesianFromPolar(ur,utheta,theta)
+function [u,v] = GetCartesianFromPolar(ur,utheta,phi)
 
-% y
-% I
-% I
-% I
-% I------------> x
-% I
-% I
-% I
-
-    u = ur.*cos(theta)-utheta.*sin(theta);
-    v = ur.*sin(theta)+utheta.*cos(theta);
+    u = ur.*cos(phi)-utheta.*sin(phi);
+    v = ur.*sin(phi)+utheta.*cos(phi);
 
 end

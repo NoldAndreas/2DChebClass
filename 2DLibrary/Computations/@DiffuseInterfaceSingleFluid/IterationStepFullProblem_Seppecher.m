@@ -1,4 +1,4 @@
-function IterationStepFullProblem(this,noIterations)
+function IterationStepFullProblem_Seppecher(this,noIterations)
     %Continuitiy: 0 = div(uv)
     %Momentum:    0 = -Grad(p) + (G+s*phi)*grad(phi)/Cak + Lap(uv)
     %Phasefield   0 = m*Lap(G + s*phi) - u*grad(phi)
@@ -21,6 +21,7 @@ function IterationStepFullProblem(this,noIterations)
     phi_m          = this.optsPhys.phi_m;    
     nParticles     = this.optsPhys.nParticles;
     
+    PtsCart        = this.IC.GetCartPts();
     Diff           = this.IC.Diff;
     M              = this.IC.M;  
     Ind            = this.IC.Ind;
@@ -68,6 +69,10 @@ function IterationStepFullProblem(this,noIterations)
     function [v,A] = f(z)
         
         %[uv;phi;G;p] 
+        theta  = z(1);
+        a      = z(2);
+        deltaX = z(3);
+        z      = z(4:end);
         uv  = z([T;T;F;F]);
         phi = z([F;F;T;F]);
         G   = z([F;F;F;T]);        
@@ -121,19 +126,77 @@ function IterationStepFullProblem(this,noIterations)
                                 ((phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
         
         % (BC3) uv = uv_BC    
-        [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
-        A_mom(IBB,:)           = 0;
+        %[uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
+        [a,deltaX] = Get_a_deltaX(this,phi,theta);    
+        u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
+                                         PtsCart.y2_kv],1,0,0,theta);          
+        phiBorder2 = repmat(phi,2,1);
+        uvBound    = u_flow .*(1 + a*(phi(lbC)-phiBorder2).^2.*(phi(rbC)-phiBorder2).^2);   
+                        
+        A_mom(IBB,:)             = 0;
         A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
+        A_mom(IBB,[F;F;IBB;F]) = diag(u_flow(IBB).*(...
+                                       -2*a*(phi(lbC)-phiBorder2(IBB)).*(phi(rbC)-phiBorder2(IBB)).^2 ...
+                                       -2*a*(phi(lbC)-phiBorder2(IBB)).^2.*(phi(rbC)-phiBorder2(IBB))));
+        A_mom(IBB,[F;F;lbC;F]) = A_mom(IBB,[F;F;lbC;F;F]) + ...
+                                    u_flow(IBB).*(2*a*(phi(lbC)-phiBorder2(IBB)).*(phi(rbC)-phiBorder2(IBB)).^2);
+        A_mom(IBB,[F;F;rbC;F]) = A_mom(IBB,[F;F;rbC;F;F]) + ...
+                                    u_flow(IBB).*(2*a*(phi(lbC)-phiBorder2(IBB)).^2.*(phi(rbC)-phiBorder2(IBB)));
+        
+        A_bc_a                 = -u_flow(IBB).*((phi(lbC)-phiBorder2(IBB)).^2.*(phi(rbC)-phiBorder2(IBB)).^2);   
+        A_bc_delta_x           = -(repmat(Diff.Dy1(Ind.bound,:),2,1)*u_flow) .*...
+                                        (1 + a*(phi(lbC)-phiBorder2(IBB)).^2.*(phi(rbC)-phiBorder2(IBB)).^2); 
+                                    
+                                    
+        d_theta     = 0.05;
+        u_flow_d    = (u_flow - GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
+                                         PtsCart.y2_kv],1,0,0,theta+d_theta))/d_theta;
+        A_bc_theta  = u_flow_d(IBB).*(1 + a*(phi(lbC)-phiBorder2).^2.*(phi(rbC)-phiBorder2).^2);  
+        
+        A_momThree          = zeros(2*M,3);
+        A_momThree(IBB,:)   = [A_bc_a,A_bc_delta_x,A_bc_theta];
+        
         v_mom(IBB)             = uv(IBB) - uvBound(IBB);
         
         % (BC4) nu*grad(phi) = 0
-        A_mu(Ind.top|Ind.bottom,:)           = 0;
-        A_mu(Ind.top|Ind.bottom,[F;F;T;F;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
-        v_mu(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*phi;
+        A_mu(Ind.bottom,:)           = 0;
+        A_mu(Ind.bottom,[F;F;T;F])   = Diff.Dy2(Ind.bottom,:);    
+        v_mu(Ind.bottom)             = Diff.Dy2(Ind.bottom,:)*phi;
+        
+        a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
+        a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
+        A_mu(Ind.top,:)           = 0;
+        A_mu(Ind.top,[F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
+        
+        A_muThree                             = zeros(M,3);
+        A_muThree(Ind.top,[false,false,true]) = a_direction_theta(Ind.top,:)*(Diff.grad*phi_s);
+        v_mu(Ind.top)                         = a_direction(Ind.top,:)*(Diff.grad*phi_s);
+        
+        % Three extra conditions
+        v_a      = 
+        
+        InterpMatchPos       = ; CONTINUE HERE
+        A_deltaX             = zeros(1,4*M);
+        A_deltaX([F;F;T;F])  = InterpMatchPos;
+        A_deltaX = [0,x,x,A_deltaX];
+    
+        v_deltaX             = InterpMatchPos*phi;
+        
+        A_theta              = zeros(1,4*M);
+        A_theta([F;F;F;lbC]) = 1;
+        A_theta              = [0,0,0,A_theta];
+        v_theta              = G(lbC);
                                                 
         
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    
+        
+        
+        A_three = [A_momThree;zeros(M,3);A_muThree];
+        A_full  = [A_a;A_deltaX;A_theta;...
+                  [A_three,A]];              
+        v_full  = [v_a;v_deltaX;v_theta;v]
+                
         
         DisplayError(v);
     end    

@@ -37,6 +37,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         end  
         
         IterationStepFullProblem(this,noIterations)
+        IterationStepFullProblem_Seppecher(this,noIterations)
         function vec = GetInitialCondition(this) 
            
             if(~isempty(this.uv) && ...                

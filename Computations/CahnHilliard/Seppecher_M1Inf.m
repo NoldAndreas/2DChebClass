@@ -25,7 +25,7 @@ function Seppecher_M1Inf()
     %****************  Preprocess  ******************
     %************************************************
     
-    DI = DiffuseInterface(config);
+    DI = DiffuseInterfaceSingleFluid(config);
     DI.Preprocess();                  
                              
     %***********************************************
