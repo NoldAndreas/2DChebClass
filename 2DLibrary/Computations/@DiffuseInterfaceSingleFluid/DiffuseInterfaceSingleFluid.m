@@ -64,10 +64,10 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
                 mu     = this.GetMu();
              end
 
-             this.uv  = GetBoundaryCondition(this);%,theta,phi);                         
+             this.uv  = GetBoundaryCondition(this,theta,phi);                         
              this.mu  = zeros(M,1);
-             this.phi = phi;                   
-
+             this.phi = phi;
+             
              vec  = [this.uv;this.phi;this.mu];
        end
         

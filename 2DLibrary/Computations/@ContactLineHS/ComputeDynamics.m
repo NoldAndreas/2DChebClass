@@ -8,9 +8,8 @@ function ComputeDynamics(this)
 	I     = eye(N1*N2);   
     eyes  = repmat(I,1,2);    
 
-    
     disp('Compute dynamic 2D evolution ..');         
-    mark             = true(N1*N2,1);   
+    mark               = true(N1*N2,1);   
     optsNum.maxComp_y2 = inf;
     opts             = PhysArea;
     opts.optsPhys    = optsPhys;     
@@ -18,7 +17,7 @@ function ComputeDynamics(this)
     opts.optsNum     = rmfield(opts.optsNum,'PhysArea');     
     opts.Comments    = this.configName;
     [sol,rec,paramsDyn]   = DataStorage('DynamicSolutions',@ComputeDynamics,opts,x_ic);                     
-    plotTimes         = sol.outTimes;                
+    plotTimes         = sol.outTimes;
 
     %***************************************************************
     %*******************Postprocess Dynamics************************

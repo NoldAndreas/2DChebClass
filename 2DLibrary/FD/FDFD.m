@@ -22,7 +22,8 @@ function [Pts,Diff,Int,Ind,Interp] = FDFD(Maps,N1,N2,interpPts1,interpPts2)
     Interp   = FDFD_Interpolation(interpPts1,interpPts2,Pts,Maps);     
     
     Int      = GetIntegrationVector(); 
-    Ind      = GetIndicesBox(x1,x2);        
+    %Ind      = GetIndicesBox(x1,x2);        
+    Ind= [];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %

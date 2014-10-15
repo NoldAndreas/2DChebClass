@@ -5,7 +5,8 @@ function ShearWithInterfaceSingleFluid()
     global dirData
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');
-    %% Parameters    
+    
+    %% Parameters
     PhysArea = struct('N',[40,30],'y2Min',0,'y2Max',[],'L1',10,...
                       'IntInterval',[-10,10]);%,... %12,80,50
     PlotArea = struct('y1Min',-10,'y1Max',10,'N1',80,'N2',80);   
