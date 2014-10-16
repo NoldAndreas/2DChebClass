@@ -4,7 +4,8 @@ classdef DiffuseInterface < Computation
        IC                     
        IntSubArea
               
-       phi = [],uv  = [],theta=[],a
+       phi = [],uv  = []
+       theta=[]
        errors = []
        
        IsolineInterfaceY2=[],StagnationPoint=[]
@@ -315,6 +316,8 @@ classdef DiffuseInterface < Computation
             end
             
             this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
+            hold on;
+            this.IC.doPlotsFlux(uv);
             
             sp = this.StagnationPoint;
             if(~isempty(sp))          

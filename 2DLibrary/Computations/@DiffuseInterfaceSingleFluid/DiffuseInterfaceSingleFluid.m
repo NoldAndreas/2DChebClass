@@ -1,6 +1,7 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 	properties (Access = public)              
         mu
+        a=[],deltaX=[]
     end
          
     methods (Access = public) 

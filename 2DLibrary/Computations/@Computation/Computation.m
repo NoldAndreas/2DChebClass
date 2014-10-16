@@ -28,6 +28,7 @@ classdef Computation < handle
             global dirData
             print2eps([dirData filesep filename],gcf);
             saveas(gcf,[dirData filesep filename '.fig']);            
+            disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
         end
     end
 end
