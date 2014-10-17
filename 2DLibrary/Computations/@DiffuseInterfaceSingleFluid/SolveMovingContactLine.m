@@ -20,6 +20,7 @@ function SolveMovingContactLine(this,noIterations)
         
     this.phi   = res.phi;
     this.uv    = res.uv;
+    this.mu    = GetMu(this);
     this.theta = res.thetaIter(end);    
     
     this.errors.errorIterations = res.errorIterations;

@@ -9,7 +9,7 @@
     %PhysArea = struct('N',[70,40],'y2Min',0,'y2Max',20,'L1',7,... %12,80,50
     PhysArea = struct('N',[50,30],'y2Min',0,'y2Max',10,'L1',7,... %12,80,50    
                       'NBorder',200,...
-                      'y1Max',inf);
+                      'y1Max',inf,'IntInterval',[-15 15]);
 
     PlotArea = struct('y1Min',-20,'y1Max',20,'N1',80,...
                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',80);   
@@ -34,6 +34,7 @@
         config.optsNum.PlotArea.y2Max = y2M(j);
         DI = DiffuseInterfaceSingleFluid(config);
         DI.Preprocess();        
+        DI.SolveMovingContactLine(5);    
         if(y2M(j)>15)
             DI.SolveMovingContactLine(30);    
         else

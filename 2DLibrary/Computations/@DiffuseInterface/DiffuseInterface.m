@@ -239,8 +239,8 @@ classdef DiffuseInterface < Computation
                 plot(this.IsolineInterfaceY2,this.IC.Pts.y2,...
                                                     'k','linewidth',3);
             end
-            if(sum(this.IC.Ind.fluidInterface)>0)
-                this.PlotSeppecherSolution(theta,phi);
+            if(~isempty(this.theta))
+                this.PlotSeppecherSolution(this.theta,this.phi);
             end
         end        
         function PlotSeppecherSolution(this,theta,phi)

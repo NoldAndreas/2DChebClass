@@ -14,7 +14,7 @@
         cprintf('*r','GetDeltaX: Finding phi(y1,y_2max)=0: No solution found.\n');
         deltaX = NaN;
     else
-        deltaX    = y1Int - y2Max*cos(theta);
+        deltaX    = y1Int - y2Max/tan(theta);
         disp(['Delta x = ',num2str(deltaX)]);
     end  
 

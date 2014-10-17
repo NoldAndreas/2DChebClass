@@ -3,7 +3,7 @@ function Seppecher_M1Inf()
     close all;
     %% Parameters    
     PhysArea = struct('N',[60,30],'y2Min',0,'y2Max',20,'L1',10,... %12,80,50
-                      'NBorder',200);
+                      'NBorder',200,'IntInterval',[-15,15]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',100,...
                       'y2Min',0,'y2Max',PhysArea.y2Max,'N2',100);   
@@ -39,6 +39,7 @@ function Seppecher_M1Inf()
     theta     = DI.FindInterfaceAngle(rho);
     uv        = zeros(3*DI.IC.M,1);
     rho       = DI.GetEquilibriumDensity(0,theta,nParticles,uv,rho);
+    
     
     eps = 10^(-5);        
     DI.IC.doPlotFLine([2,100],[PhysArea.y2Max,PhysArea.y2Max],rho+1,'CART'); ylim([-eps,eps]);        
