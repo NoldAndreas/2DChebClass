@@ -50,7 +50,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
                   'Comments',this.configName);
               
     if(isempty(this.mu))
-        in = struct('initialGuess',[0;0;pi/2;GetInitialCondition(this)]);
+        in = struct('initialGuess',[0;0;pi/2;GetInitialCondition(this)]);        
     else
         in = struct('initialGuess',[this.a;...
                                     this.deltaX;...
@@ -77,7 +77,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
     
     
     function res = SolveSingleFluid(conf,in)
-        [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,0.4);    
+        [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-7,noIterations,0.8);    
     
         %[uv;phi;mu] 
         res.a      = vec(1);
@@ -124,14 +124,18 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
        % Momentum     %[uv;phi;G]  
        A_mom_phi      = -[diag(Diff.Dy1*G);diag(Diff.Dy2*G)]...
                        +diag(Diff.grad*phi)*repmat(diag(fWPP)-Cn*Diff.Lap,2,1)...
-                       +diag(repmat(fWP - Cn*Diff.Lap*phi - G,2,1))*Diff.grad;
-       
+                       +diag(repmat(fWP - Cn*Diff.Lap*phi - G,2,1))*Diff.grad;       
        A_mom          = [tauM,...
                          A_mom_phi,...
                          - diag(phiM2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]];
-
        v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
                         repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
+                    
+%        A_mom          = [tauM,...
+%                          -[diag(Diff.Dy1*G);diag(Diff.Dy2*G)],...
+%                          - diag(repmat(phi+phi_m,2,1))*Diff.grad];
+% 
+%        v_mom         = tauM*uv - repmat(phi+phi_m,2,1).*(Diff.grad*G);                    
                
         
        %% Boundary conditions [uv;phi;G]
@@ -171,32 +175,41 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
        A_mu(rbC,[F;F;F;rbC]) = A_mu(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
        A_mu(rbC,[F;F;F;lbC]) = A_mu(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
                     
-       A_mu(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
+       v_mu(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
                                    - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
                         + y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
                                  (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));                                                                         
         
         % (BC3.a) uv = uv_BC    
         %[uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);           
-        u_flow      = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
+        u_flow      = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
                                                 PtsCart.y2_kv],1,0,0,theta);                  
+                                            
+        y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
+        a_corr        = (1 + a./(1+y1_Interface.^2));
+        a_corr_a      = 1./(1+y1_Interface.^2);        
+        a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
+        a_corr_deltaX(Ind.left | Ind.right) = 0;
+        a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;
+        a_corr_phi    = zeros(M,M);
 
-        a_corr                = (1 + a*(phi(lbC)-phi).^2.*(phi(rbC)-phi).^2);
-
-        a_corr_phi            = diag(-2*a*(phi(lbC)-phi).*(phi(rbC)-phi).^2 ...
-                                     -2*a*(phi(lbC)-phi).^2.*(phi(rbC)-phi));
-        a_corr_phi(:,lbC)     =  a_corr_phi(:,lbC) + 2*a*(phi(lbC)-phi).*(phi(rbC)-phi).^2;
-        a_corr_phi(:,rbC)     =  a_corr_phi(:,rbC) + 2*a*(phi(rbC)-phi).*(phi(lbC)-phi).^2;
-        a_corr_a              = ((phi(lbC)-phi).^2).*(phi(rbC)-phi).^2;
+%         a_corr                = (1 + a*(phi(lbC)-phi).^2.*(phi(rbC)-phi).^2);
+%         a_corr_phi            = diag(-2*a*(phi(lbC)-phi).*(phi(rbC)-phi).^2 ...
+%                                      -2*a*(phi(lbC)-phi).^2.*(phi(rbC)-phi));
+%         a_corr_phi(:,lbC)     =  a_corr_phi(:,lbC) + 2*a*(phi(lbC)-phi).*(phi(rbC)-phi).^2;
+%         a_corr_phi(:,rbC)     =  a_corr_phi(:,rbC) + 2*a*(phi(rbC)-phi).*(phi(lbC)-phi).^2;
+%         a_corr_a              = ((phi(lbC)-phi).^2).*(phi(rbC)-phi).^2;
+%         a_corr_theta          = zeros(M,1);
+%         a_corr_deltaX         = zeros(M,1);
 
         uvBound        = u_flow .*repmat(a_corr,2,1);                
         uvBound_phi    = diag(u_flow)*repmat(a_corr_phi,2,1);                                 
         uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
-        uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1);
+        uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
         
         u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
         u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
-        uvBound_theta    = u_flow_d.*repmat(a_corr,2,1);                              
+        uvBound_theta    = u_flow_d.*repmat(a_corr,2,1) + u_flow.*repmat(a_corr_theta,2,1);
         
         A_mom(ITT,:)           = 0;
         A_mom(ITT,[T;T;F;F])   = EYMM(ITT,:);
@@ -257,12 +270,15 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         v_deltaX             = InterpMatchPos*phi;
         
         % (EX 3) mu(y1=-infty) = 0
+          A_theta              = zeros(1,4*M);
+%          A_theta([F;F;lbC;F]) = -G(lbC)+fWP(lbC);
+%          A_theta([F;F;F;lbC]) = -(phi(lbC)+phi_m);        
+%          A_theta              = [0,0,0,A_theta];
+%          v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
+
         A_theta              = zeros(1,4*M);
-        A_theta([F;F;lbC;F]) = -G(lbC)+fWP(lbC);
-        A_theta([F;F;F;lbC]) = -(phi(lbC)+phi_m);        
-        A_theta              = [0,0,0,A_theta];
-        v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
-                                                
+        A_theta = [0,0,1,A_theta];    
+        v_theta = theta - pi/2;
         
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    
