@@ -140,24 +140,41 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
        A_cont(Ind.left|Ind.right,:)         = 0;
        A_cont(Ind.left|Ind.right,[F;F;F;T]) = Diff.Dy2(Ind.left|Ind.right,:);
        v_cont(Ind.left|Ind.right,:)         = Diff.Dy2(Ind.left|Ind.right,:)*G;
-                               
-       A_cont(lbC,:)         = 0;
-       A_cont(lbC,[F;F;T;F]) = IntSubArea;
-       v_cont(lbC)           = IntSubArea*phi - nParticles;                 
+                            
+        % (BC4.a) nu*grad(phi) = 0
+        indBC4a = Ind.bottom;% & (~Ind.left) & (~Ind.right);        
+        A_cont(indBC4a,:)           = 0;
+        A_cont(indBC4a,[F;F;T;F])   = Diff.Dy2(indBC4a,:);    
+        v_cont(indBC4a)             = Diff.Dy2(indBC4a,:)*phi;
+        
+        % (BC4.b) a*grad(phi) = 0
+        indBC4b = Ind.top ;%& (~Ind.left) & (~Ind.right);
+        a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
+        a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
+        A_cont(indBC4b,:)           = 0;
+        A_cont(indBC4b,[F;F;T;F])   = a_direction(indBC4b,:)*Diff.grad;
+        
+        A_contThree                             = zeros(M,3);
+        A_contThree(indBC4b,[false,false,true]) = a_direction_theta(indBC4b,:)*(Diff.grad*phi);
+        v_cont(indBC4b)                         = a_direction(indBC4b,:)*(Diff.grad*phi);                            
+        
+       A_mu(lbC,:)         = 0;
+       A_mu(lbC,[F;F;T;F]) = IntSubArea;
+       v_mu(lbC)           = IntSubArea*phi - nParticles;  
                
-       % (BC2) [uv;phi;G]                   
-       A_cont(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;       
-       A_cont(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
+       % (BC2) [uv;phi;G]          
+       A_mu(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;
+       A_mu(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
        
-       A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(G(rbC) + fWP(rbC));
-       A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(G(lbC) + fWP(lbC));    
-       A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) + y2Max*(phi(rbC) + phi_m);
-       A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) - y2Max*(phi(lbC) + phi_m);
+       A_mu(rbC,[F;F;rbC;F]) = A_mu(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC));
+       A_mu(rbC,[F;F;lbC;F]) = A_mu(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
+       A_mu(rbC,[F;F;F;rbC]) = A_mu(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
+       A_mu(rbC,[F;F;F;lbC]) = A_mu(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
                     
-       v_cont(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
+       A_mu(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
                                    - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                        + y2Max*(((phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
-                                ((phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
+                        + y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
+                                 (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));                                                                         
         
         % (BC3.a) uv = uv_BC    
         %[uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);           
@@ -198,24 +215,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         
         A_mom(IBB & ~ITT,:)                = 0;
         A_mom(IBB & ~ITT,[IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
-        v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
-        
-        % (BC4.a) nu*grad(phi) = 0
-        indBC4a = Ind.bottom;% & (~Ind.left) & (~Ind.right);        
-        A_mu(indBC4a,:)           = 0;
-        A_mu(indBC4a,[F;F;T;F])   = Diff.Dy2(indBC4a,:);    
-        v_mu(indBC4a)             = Diff.Dy2(indBC4a,:)*phi;
-        
-        % (BC4.b) a*grad(phi) = 0
-        indBC4b = Ind.top ;%& (~Ind.left) & (~Ind.right);
-        a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
-        a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
-        A_mu(indBC4b,:)           = 0;
-        A_mu(indBC4b,[F;F;T;F])   = a_direction(indBC4b,:)*Diff.grad;
-        
-        A_muThree                             = zeros(M,3);
-        A_muThree(indBC4b,[false,false,true]) = a_direction_theta(indBC4b,:)*(Diff.grad*phi);
-        v_mu(indBC4b)                         = a_direction(indBC4b,:)*(Diff.grad*phi);
+        v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);       
 
 %         A_mu(Ind.top,[T;T;F;F]) = Cak*(zeta+4/3)*Diff.LapDiv(Ind.top,:);
 %         A_mu(Ind.top,[F;F;T;F]) = - Diff.Lap(Ind.top,:)*diag(G) ...
@@ -258,16 +258,16 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         
         % (EX 3) mu(y1=-infty) = 0
         A_theta              = zeros(1,4*M);
-        A_theta([F;F;lbC;F]) = G(lbC)+fWP(lbC);
-        A_theta([F;F;F;lbC]) = (phi(lbC)+phi_m);        
+        A_theta([F;F;lbC;F]) = -G(lbC)+fWP(lbC);
+        A_theta([F;F;F;lbC]) = -(phi(lbC)+phi_m);        
         A_theta              = [0,0,0,A_theta];
-        v_theta              = (phi(lbC)+phi_m)*G(lbC) + fW(lbC);
+        v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
                                                 
         
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    
         
-        A_three = [A_momThree;A_muThree;zeros(M,3)];
+        A_three = [A_momThree;zeros(M,3);A_contThree];
         
         A_full  = [A_a;...
                    A_deltaX;...

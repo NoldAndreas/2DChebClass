@@ -110,15 +110,15 @@ function IterationStepFullProblem(this,noIterations)
        A_cont(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;       
        A_cont(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
        
-       A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(G(rbC) + fWP(rbC));
-       A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(G(lbC) + fWP(lbC));    
-       A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) + y2Max*(phi(rbC) + phi_m);
-       A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) - y2Max*(phi(lbC) + phi_m);
+       A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC));
+       A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
+       A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
+       A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
                     
        v_cont(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
                               - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                        +y2Max*(((phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
-                                ((phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
+                        +y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
+                                (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
         
         % (BC3) uv = uv_BC    
         [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
