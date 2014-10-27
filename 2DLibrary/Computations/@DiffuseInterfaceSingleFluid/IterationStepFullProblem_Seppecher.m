@@ -103,83 +103,23 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         phi = z([F;F;T;F]);
         G   = z([F;F;F;T]);        
         
-        phiM2          = repmat(phi+phi_m,2,1);
-   
-        uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];        
-        [fWP,fW,fWPP]    = DoublewellPotential(phi,Cn);
-    
-
-        % Continuity   %[uv;phi;G]
-        A_cont         = [diag(phi+phi_m)*Diff.div + [diag(Diff.Dy1*phi),diag(Diff.Dy2*phi)],...
-                          diag(Diff.div*uv)+uvTdiag*Diff.grad,...
-                          Z];
-        v_cont         = Diff.div*(uv.*phiM2);
-        
-        % Chemical Potential %[uv;phi;G]                  
-       A_mu           = [Z,Z,...
-                         diag(fWPP)-Cn*Diff.Lap,...
-                         -EYM];
-       v_mu           = fWP - Cn*Diff.Lap*phi - G;
-
-       % Momentum     %[uv;phi;G]  
-       A_mom_phi      = -[diag(Diff.Dy1*G);diag(Diff.Dy2*G)]...
-                       +diag(Diff.grad*phi)*repmat(diag(fWPP)-Cn*Diff.Lap,2,1)...
-                       +diag(repmat(fWP - Cn*Diff.Lap*phi - G,2,1))*Diff.grad;       
-       A_mom          = [tauM,...
-                         A_mom_phi,...
-                         - diag(phiM2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]];
-       v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
-                        repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
-                    
-%        A_mom          = [tauM,...
-%                          -[diag(Diff.Dy1*G);diag(Diff.Dy2*G)],...
-%                          - diag(repmat(phi+phi_m,2,1))*Diff.grad];
-% 
-%        v_mom         = tauM*uv - repmat(phi+phi_m,2,1).*(Diff.grad*G);                    
-               
+        phiM2          = repmat(phi+phi_m,2,1);                   
+            
+        [v_cont,A_cont]  = Continuity(this,uv,phi,G);               
+        [v_mom,A_mom]    = Momentum(this,uv,phi,G);      
+        [v_mu,A_mu]      = ChemicalPotential(this,uv,phi,G);
         
        %% Boundary conditions [uv;phi;G]
-        
-       % (BC1) p = 0  at y1 = +/- infinity
-       A_cont(Ind.left|Ind.right,:)         = 0;
-       A_cont(Ind.left|Ind.right,[F;F;F;T]) = Diff.Dy2(Ind.left|Ind.right,:);
-       v_cont(Ind.left|Ind.right,:)         = Diff.Dy2(Ind.left|Ind.right,:)*G;
-                            
-        % (BC4.a) nu*grad(phi) = 0
-        indBC4a = Ind.bottom;% & (~Ind.left) & (~Ind.right);        
-        A_cont(indBC4a,:)           = 0;
-        A_cont(indBC4a,[F;F;T;F])   = Diff.Dy2(indBC4a,:);    
-        v_cont(indBC4a)             = Diff.Dy2(indBC4a,:)*phi;
-        
-        % (BC4.b) a*grad(phi) = 0
-        indBC4b = Ind.top ;%& (~Ind.left) & (~Ind.right);
+        % (BC4.b) a*grad(phi) = 0        
         a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
         a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
-        A_cont(indBC4b,:)           = 0;
-        A_cont(indBC4b,[F;F;T;F])   = a_direction(indBC4b,:)*Diff.grad;
+        A_cont(Ind.top,:)           = 0;
+        A_cont(Ind.top,[F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
         
         A_contThree                             = zeros(M,3);
-        A_contThree(indBC4b,[false,false,true]) = a_direction_theta(indBC4b,:)*(Diff.grad*phi);
-        v_cont(indBC4b)                         = a_direction(indBC4b,:)*(Diff.grad*phi);                            
-        
-       A_mu(lbC,:)         = 0;
-       A_mu(lbC,[F;F;T;F]) = IntSubArea;
-       v_mu(lbC)           = IntSubArea*phi - nParticles;  
-               
-       % (BC2) [uv;phi;G]          
-       A_mu(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;
-       A_mu(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
-       
-       A_mu(rbC,[F;F;rbC;F]) = A_mu(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC));
-       A_mu(rbC,[F;F;lbC;F]) = A_mu(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
-       A_mu(rbC,[F;F;F;rbC]) = A_mu(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
-       A_mu(rbC,[F;F;F;lbC]) = A_mu(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
-                    
-       v_mu(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
-                                   - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                        + y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
-                                 (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));                                                                         
-        
+        A_contThree(Ind.top,[false,false,true]) = a_direction_theta(Ind.top,:)*(Diff.grad*phi);
+        v_cont(Ind.top)                         = a_direction(Ind.top,:)*(Diff.grad*phi);                            
+                       
         % (BC3.a) uv = uv_BC    
         %[uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);           
         u_flow      = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
@@ -270,13 +210,13 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         v_deltaX             = InterpMatchPos*phi;
         
         % (EX 3) mu(y1=-infty) = 0
-          A_theta              = zeros(1,4*M);
+%          A_theta              = zeros(1,4*M);
 %          A_theta([F;F;lbC;F]) = -G(lbC)+fWP(lbC);
 %          A_theta([F;F;F;lbC]) = -(phi(lbC)+phi_m);        
 %          A_theta              = [0,0,0,A_theta];
 %          v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
 
-        A_theta              = zeros(1,4*M);
+        A_theta = zeros(1,4*M);
         A_theta = [0,0,1,A_theta];    
         v_theta = theta - pi/2;
         

@@ -76,8 +76,7 @@ classdef DiffuseInterface < Computation
             Cn         = this.optsPhys.Cn;
             
             phi        = tanh(PtsCart.y1_kv/Cn);
-        end                                                  
-                
+        end                                                                  
         deltaX                      = GetDeltaX(this,phi,theta)              
         function [a,deltaX]         = Get_a_deltaX(this,phi,theta)
             
@@ -424,6 +423,26 @@ classdef DiffuseInterface < Computation
                 z        = IP*phi;
             end    
         end   
+        
+        function AnalyzeScalarQuantity(this,v)
+            y2Max = this.optsNum.PhysArea.y2Max;
+            noCuts = 5;
+            
+            figure('Position',[0 0 1000 800]);
+            subplot(1,2,1);
+            leg = {};
+            for i= 0:1:(noCuts-1)
+                y2 = y2Max*i/(noCuts-1);
+                this.IC.doPlotFLine([-20,20],[y2 y2],v);
+                leg{end+1} = ['y2 = ',num2str(y2)];
+            end
+            legend(leg);
+            
+            subplot(1,2,2);
+            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],v);
+            this.IC.doPlotFLine([inf,inf],[0 y2Max],v);
+            legend({'-inf','inf'});
+        end
         
         [phi,muDelta]  = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  
         [phi,uv]       = SolveFull(this,ic)
