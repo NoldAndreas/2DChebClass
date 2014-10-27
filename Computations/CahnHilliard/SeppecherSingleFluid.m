@@ -5,8 +5,8 @@ function SeppecherSingleFluid()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
         
-    PhysArea = struct('N',[70,30],'y2Min',0,'y2Max',10,...
-                      'L1',10,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
+    PhysArea = struct('N',[50,30],'y2Min',0,'y2Max',10,...
+                      'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
 

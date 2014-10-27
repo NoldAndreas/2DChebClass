@@ -91,7 +91,18 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         
         function [v_cont,A_cont] = Continuity(this,uv,phi,G)
             
+            nParticles     = this.optsPhys.nParticles;            
+            Cn             = this.optsPhys.Cn;
+            Cak            = this.optsPhys.Cak; 
             Ind            = this.IC.Ind;
+            zeta           = this.optsPhys.zeta;
+            
+            IntSubArea     = this.IntSubArea;    
+            lbC            = Ind.left & Ind.bottom;
+            rbC            = Ind.right & Ind.bottom;
+            y2Max          = this.optsNum.PhysArea.y2Max;    
+            IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
+                        
             Diff           = this.IC.Diff;            
             phi_m          = this.optsPhys.phi_m; 
             M              = this.IC.M;
@@ -99,25 +110,67 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             T              = true(M,1);
             uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];
             
+            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
+            
             
             % Continuity   %[uv;phi;G]
             A_cont         = [diag(phi+phi_m)*Diff.div + [diag(Diff.Dy1*phi),diag(Diff.Dy2*phi)]...
                               diag(Diff.div*uv)+uvTdiag*Diff.grad,...
                               zeros(M)];
             v_cont         = Diff.div*(uv.*repmat(phi+phi_m,2,1));
+                        
             
+            % ************[uv;phi;G]
+            ys             = fWP - Cn*Diff.Lap*phi;    
+            ysP            = diag(fWPP) - Cn*Diff.Lap;
+            Cmu            = -Diff.Lap*diag(phi+phi_m);
+            
+            %-diag(phi + phi_m)*Diff.Lap - diag(Diff.Lap*phi) ...
+            %                 - 2*diag(Diff.Dy1*phi)*Diff.Dy1 ...
+            %                 - 2*diag(Diff.Dy2*phi)*Diff.Dy2;
+            Cuv            = Cak*(zeta + 4/3)*Diff.LapDiv; 
+            
+            A_cont(Ind.top|Ind.bottom,[T;T;F;F])  = Cuv(Ind.top|Ind.bottom,:);
+            A_cont_phi                            = -Diff.Lap*diag(G) ...
+                                                    + Diff.div*(diag(repmat(ys,2,1))*Diff.grad)...
+                                                    + Diff.div*(diag(Diff.grad*phi)*repmat(ysP,2,1));
+            %-diag(Diff.Lap*G) ...
+            %                                        - diag(G)*Diff.Lap ...
+            %                                        - 2*diag(Diff.Dy1*G)*Diff.Dy1 ...
+            %                                        - 2*diag(Diff.Dy2*G)*Diff.Dy2 ...
+                                                    
+            A_cont(Ind.top|Ind.bottom,[F;F;T;F])  = A_cont_phi(Ind.top|Ind.bottom,:);
+            A_cont(Ind.top|Ind.bottom,[F;F;F;T])  = Cmu(Ind.top|Ind.bottom,:);
+            
+            v_cont(Ind.top|Ind.bottom)    =   Cmu(Ind.top|Ind.bottom,:)*G ...
+                                            + Cuv(Ind.top|Ind.bottom,:)*uv ...
+                                            + Diff.div(Ind.top|Ind.bottom,:)*(repmat(ys,2,1).*(Diff.grad*phi));
+                                        
             % (BC1) y1 = +/- infinity
             A_cont(Ind.left|Ind.right,:)         = 0;
             A_cont(Ind.left|Ind.right,[F;F;F;T]) = Diff.Dy2(Ind.left|Ind.right,:);
-            v_cont(Ind.left|Ind.right,:)         = Diff.Dy2(Ind.left|Ind.right,:)*G;
+            v_cont(Ind.left|Ind.right,:)         = Diff.Dy2(Ind.left|Ind.right,:)*G;                                        
             
-            % (BC4.a) nu*grad(phi) = 0            
-            A_cont(Ind.bottom,:)           = 0;
-            A_cont(Ind.bottom,[F;F;T;F])   = Diff.Dy2(Ind.bottom,:);    
-            v_cont(Ind.bottom)             = Diff.Dy2(Ind.bottom,:)*phi;
+            % ************
+            A_cont(lbC,:)         = 0;
+            A_cont(lbC,[F;F;T;F]) = IntSubArea;
+            v_cont(lbC)           = IntSubArea*phi - nParticles; 
             
-        end
-        
+            % (BC2) [uv;phi;G]                   
+            A_cont(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;       
+            A_cont(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
+
+            A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC)); 
+            A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
+            A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
+            A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
+ 
+            v_cont(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
+                                  - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
+                            +y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
+                                    (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
+                
+        end        
         function [v_mom,A_mom] = Momentum(this,uv,phi,G)                
             %[uv;phi;G;p] 
             %
@@ -147,30 +200,18 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
                              repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
         end
-        
         function [v_mu,A_mu] = ChemicalPotential(this,uv,phi,G)
-            
-            nParticles     = this.optsPhys.nParticles;
-            phi_m          = this.optsPhys.phi_m;             
+                       
             Cn             = this.optsPhys.Cn;
-            Cak            = this.optsPhys.Cak; 
-            
-            
-            IntSubArea     = this.IntSubArea;    
-            
             Ind            = this.IC.Ind;
             
             M              = this.IC.M;
             F              = false(M,1);   
             T              = true(M,1);            
             Z              = zeros(M);
-            lbC            = Ind.left & Ind.bottom;
-            rbC            = Ind.right & Ind.bottom;
-            
             
             Diff           = this.IC.Diff;            
-            y2Max          = this.optsNum.PhysArea.y2Max;    
-            IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
+            
     
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
             % **************
@@ -180,24 +221,10 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
                               -eye(M)];
             v_mu           = fWP - Cn*Diff.Lap*phi - G;
             
-            
-            A_mu(lbC,:)         = 0;
-            A_mu(lbC,[F;F;T;F]) = IntSubArea;
-            v_mu(lbC)           = IntSubArea*phi - nParticles; 
-            
-            % (BC2) [uv;phi;G]                   
-            A_mu(rbC,[T;T;F;F])   = IntPathUpLow*[Diff.Dy2 , Diff.Dy1]*Cak;       
-            A_mu(rbC,[F;F;T;F])   = -Cn*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
-
-            A_mu(rbC,[F;F;rbC;F]) = A_mu(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC)); 
-            A_mu(rbC,[F;F;lbC;F]) = A_mu(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
-            A_mu(rbC,[F;F;F;rbC]) = A_mu(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
-            A_mu(rbC,[F;F;F;lbC]) = A_mu(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
- 
-            v_mu(rbC) = IntPathUpLow*(Cak*[Diff.Dy2 , Diff.Dy1]*uv ...
-                                  - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                            +y2Max*((-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) - ...
-                                    (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC)));
+            % (BC4.a) nu*grad(phi) = 0            
+            A_mu(Ind.bottom|Ind.top,:)         = 0;
+            A_mu(Ind.bottom|Ind.top,[F;F;T;F]) = Diff.Dy2(Ind.bottom|Ind.top,:);    
+            v_mu(Ind.bottom|Ind.top)           = Diff.Dy2(Ind.bottom|Ind.top,:)*phi;
        
         end
         

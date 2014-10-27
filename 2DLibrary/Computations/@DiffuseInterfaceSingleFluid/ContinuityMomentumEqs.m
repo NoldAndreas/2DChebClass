@@ -8,8 +8,7 @@ function [A,b] = ContinuityMomentumEqs(this,phi)
     % A*[mu;uv] = b corresponds to momentum and continuity Eq. for given phi               
     phi_m          = this.optsPhys.phi_m;
     Cn             = this.optsPhys.Cn;
-    Cak            = this.optsPhys.Cak;
-    eta            = this.optsPhys.eta;
+    Cak            = this.optsPhys.Cak;    
     zeta           = this.optsPhys.zeta;
     Diff           = this.IC.Diff;
     M              = this.IC.M;
@@ -28,7 +27,7 @@ function [A,b] = ContinuityMomentumEqs(this,phi)
 
     %A_mom_mu       = -diag(phi_f2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)];
     A_mom_mu       = - Diff.grad*diag(phi_f);
-    A_mom_uv       = Cak*(eta*Diff.LapVec + (zeta + eta/3)*Diff.gradDiv);
+    A_mom_uv       = Cak*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);
 
     A_cont         = [A_cont_mu,A_cont_uv];
     A_mom          = [A_mom_mu, A_mom_uv];

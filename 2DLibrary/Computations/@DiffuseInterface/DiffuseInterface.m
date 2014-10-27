@@ -433,7 +433,7 @@ classdef DiffuseInterface < Computation
             optsC  = {'b','g','m','k','r'};
             
             figure('Position',[0 0 1000 800]);
-            subplot(1,2,1);
+            subplot(2,1,1);
             leg = {};
             for i= 0:1:(noCuts-1)
                 y2 = y2Max*i/(noCuts-1);
@@ -451,7 +451,7 @@ classdef DiffuseInterface < Computation
             end
             legend(leg,'Location','eastoutside');
             
-            subplot(1,2,2);
+            subplot(2,1,2);
             this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r');
             this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b');
             legend({'-inf','inf'},'Location','eastoutside');

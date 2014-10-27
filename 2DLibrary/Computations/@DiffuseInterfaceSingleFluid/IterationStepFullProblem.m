@@ -79,12 +79,7 @@ function IterationStepFullProblem(this,noIterations)
         A_mom(IBB,:)           = 0;
         A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
         v_mom(IBB)             = uv(IBB) - uvBound(IBB);
-        
-        % (BC4) nu*grad(phi) = 0
-        A_cont(Ind.top,:)           = 0;
-        A_cont(Ind.top,[F;F;T;F;F]) = Diff.Dy2(Ind.top,:);    
-        v_cont(Ind.top)             = Diff.Dy2(Ind.top,:)*phi;
-        
+                
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    
         

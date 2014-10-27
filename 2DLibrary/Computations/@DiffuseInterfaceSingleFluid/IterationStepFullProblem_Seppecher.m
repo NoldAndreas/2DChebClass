@@ -113,12 +113,12 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         % (BC4.b) a*grad(phi) = 0        
         a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
         a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
-        A_cont(Ind.top,:)           = 0;
-        A_cont(Ind.top,[F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
+        A_mu(Ind.top,:)           = 0;
+        A_mu(Ind.top,[F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
         
-        A_contThree                             = zeros(M,3);
-        A_contThree(Ind.top,[false,false,true]) = a_direction_theta(Ind.top,:)*(Diff.grad*phi);
-        v_cont(Ind.top)                         = a_direction(Ind.top,:)*(Diff.grad*phi);                            
+        A_muThree                             = zeros(M,3);
+        A_muThree(Ind.top,[false,false,true]) = a_direction_theta(Ind.top,:)*(Diff.grad*phi);
+        v_mu(Ind.top)                         = a_direction(Ind.top,:)*(Diff.grad*phi);                            
                        
         % (BC3.a) uv = uv_BC    
         %[uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);           
@@ -224,7 +224,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    
         
-        A_three = [A_momThree;zeros(M,3);A_contThree];
+        A_three = [A_momThree;A_muThree;zeros(M,3)];
         
         A_full  = [A_a;...
                    A_deltaX;...

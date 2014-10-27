@@ -23,8 +23,7 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     M       = this.IC.M;    
     Ind     = this.IC.Ind;       
     Cn      = this.optsPhys.Cn;
-    Cak     = this.optsPhys.Cak;
-	eta     = this.optsPhys.eta;
+    Cak     = this.optsPhys.Cak;	
     zeta    = this.optsPhys.zeta;
     phi_m   = this.optsPhys.phi_m;
     Diff    = this.IC.Diff;
@@ -64,7 +63,7 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     Cmu            = -diag(phi + phi_m)*Diff.Lap - diag(Diff.Lap*phi) ...
                      - 2*diag(Diff.Dy1*phi)*Diff.Dy1 ...
                      - 2*diag(Diff.Dy2*phi)*Diff.Dy2;
-    Cuv            = Cak*(zeta + 4/3*eta)*Diff.LapDiv; 
+    Cuv            = Cak*(zeta + 4/3)*Diff.LapDiv; 
     C              = [Cmu,Cuv];
     bBound         = - repmat(ys,2,1).*(Diff.grad*phi); 
 
@@ -121,8 +120,8 @@ function [mu,uv,A,b,a] = GetVelocityAndChemPot(this,phi,theta)
     
     %Accuracy of force balance normal to the substrate:
     errorNormal = IntPathUpLow*Tt22*[mu;uv] + IntPathUpLow*Tb22;
-    disp(['Error of force balance normal to substate: ',num2str(errorNormal)])    
-
+    disp(['Error of force balance normal to substate: ',num2str(errorNormal)]);
+    
     
     %Accuracy of force balance normal to the substrate:    
     h         = WFull - (phi+phi_m).*mu;
