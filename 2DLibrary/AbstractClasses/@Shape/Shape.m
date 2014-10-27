@@ -527,7 +527,7 @@ classdef (Abstract) Shape < handle
             if((nargin > 5) && islogical(opts))
                 plain = opts;                
             elseif((nargin > 5) && (ischar(opts) || isnumeric(opts))) 
-                plain = true;
+                plain = false;%true;
                 color = opts;
             end
             
@@ -541,8 +541,20 @@ classdef (Abstract) Shape < handle
             
             xi        = (0:0.002:1)';
             
-            pts.y1_kv = y1P(1) + xi*(y1P(2)-y1P(1));
-            pts.y2_kv = y2P(1) + xi*(y2P(2)-y2P(1));
+            if(y1P(2) == y1P(1))
+                dy1 = 0;
+            else
+                dy1 = y1P(2) - y1P(1);
+            end
+            pts.y1_kv = y1P(1) + xi*dy1;
+            
+            if(y2P(2) == y2P(1))
+                dy2 = 0;
+            else
+                dy2 = y2P(2) - y2P(1);
+            end
+            
+            pts.y2_kv = y2P(1) + xi*dy2;
             
             if((y1P(1) == y1P(2)))
                 dist = sqrt( (xi*(y2P(2)-y2P(1))).^2);
@@ -585,7 +597,7 @@ classdef (Abstract) Shape < handle
                               (xmG2*(y2P(2)-y2P(1))).^2 );
 
             if((nargin < 5) || strcmp(CART,'CART'))
-                IP        = SubShapePtsCart(this,pts);
+                IP       = SubShapePtsCart(this,pts);
                 IPG1     = SubShapePtsCart(this,ptsG1);
                 IPG2     = SubShapePtsCart(this,ptsG2);
             elseif(strcmp(CART,'CO'))

@@ -424,24 +424,37 @@ classdef DiffuseInterface < Computation
             end    
         end   
         
-        function AnalyzeScalarQuantity(this,v)
+        function AnalyzeScalarQuantity(this,f,interval)
+            if(nargin == 2)
+                interval = [-10,10];
+            end
             y2Max = this.optsNum.PhysArea.y2Max;
             noCuts = 5;
+            optsC  = {'b','g','m','k','r'};
             
             figure('Position',[0 0 1000 800]);
             subplot(1,2,1);
             leg = {};
             for i= 0:1:(noCuts-1)
                 y2 = y2Max*i/(noCuts-1);
-                this.IC.doPlotFLine([-20,20],[y2 y2],v);
+                this.IC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
+                
+                IP       = this.IC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
+                plot(interval,[1,1]*(IP*f),[optsC{i+1},'--']); hold on;
+                IP       = this.IC.SubShapePtsCart(struct('y1_kv',inf,'y2_kv',y2));
+                plot(interval,[1,1]*(IP*f),[optsC{i+1},'-.']);  hold on;
+                
                 leg{end+1} = ['y2 = ',num2str(y2)];
+                leg{end+1} = '';
+                leg{end+1} = ['y2 = ',num2str(y2),'y1=-inf'];
+                leg{end+1} = ['y2 = ',num2str(y2),'y1=inf'];
             end
-            legend(leg);
+            legend(leg,'Location','eastoutside');
             
             subplot(1,2,2);
-            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],v);
-            this.IC.doPlotFLine([inf,inf],[0 y2Max],v);
-            legend({'-inf','inf'});
+            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r');
+            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b');
+            legend({'-inf','inf'},'Location','eastoutside');
         end
         
         [phi,muDelta]  = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  

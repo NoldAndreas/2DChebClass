@@ -120,7 +120,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
         
         function [v_mom,A_mom] = Momentum(this,uv,phi,G)                
             %[uv;phi;G;p] 
-            
+            %
             %        A_mom          = [tauM,...
             %                          -[diag(Diff.Dy1*G);diag(Diff.Dy2*G)],...
             %                          - diag(repmat(phi+phi_m,2,1))*Diff.grad];

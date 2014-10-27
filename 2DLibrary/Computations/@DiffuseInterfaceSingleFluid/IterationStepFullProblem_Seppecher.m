@@ -169,7 +169,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         A_mom(IBB & ~ITT,:)                = 0;
         A_mom(IBB & ~ITT,[IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
         v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);       
-
+%
 %         A_mu(Ind.top,[T;T;F;F]) = Cak*(zeta+4/3)*Diff.LapDiv(Ind.top,:);
 %         A_mu(Ind.top,[F;F;T;F]) = - Diff.Lap(Ind.top,:)*diag(G) ...
 %                                   + Diff.div(Ind.top,:)*(diag(repmat(G,2,1))*Diff.grad);
@@ -183,9 +183,10 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
 %         v_mu(Ind.top)   = Cak*(zeta+4/3)*Diff.LapDiv(Ind.top,:)*uv...
 %                           - Diff.Lap(Ind.top,:)*(G.*(phi+phi_m)) ...
 %                           + Diff.div(Ind.top,:)*(repmat(G,2,1).*(Diff.grad*phi));
-        
+%
         % Three extra conditions [uv;phi;G]
-        % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max        
+        % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max
+        
         A_a            = zeros(1,4*M);        
         
         A_a([T;T;F;F])   = IntNormalUp*diag(phiM2);
