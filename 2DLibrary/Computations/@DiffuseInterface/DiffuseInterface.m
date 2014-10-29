@@ -452,8 +452,13 @@ classdef DiffuseInterface < Computation
             legend(leg,'Location','eastoutside');
             
             subplot(2,1,2);
-            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r');
-            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b');
+            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
+            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
+            
+            this.IC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
+            this.IC.doPlotFLine([0 0],[0 y2Max],f);  hold on;
+            this.IC.doPlotFLine([4 4],[0 y2Max],f);  hold on;
+            
             legend({'-inf','inf'},'Location','eastoutside');
         end
         

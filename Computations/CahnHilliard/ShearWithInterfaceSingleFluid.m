@@ -7,7 +7,7 @@ function ShearWithInterfaceSingleFluid()
     ChangeDirData([dirData filesep 'CahnHilliard_ShearedInterface'],'ORG');
     
     %% Parameters
-    PhysArea = struct('N',[40,30],'y2Min',0,'y2Max',[],'L1',10,...
+    PhysArea = struct('N',[50,30],'y2Min',0,'y2Max',[],'L1',10,...
                       'IntInterval',[-10,10]);%,... %12,80,50
     PlotArea = struct('y1Min',-10,'y1Max',10,'N1',80,'N2',80);   
 
@@ -21,7 +21,7 @@ function ShearWithInterfaceSingleFluid()
                       'nParticles',0);
                     
     config = v2struct(optsPhys,optsNum);   
-                      
+                       
     for y2M = 15%30:5:40%15:2.5:30
         
         config.optsNum.PhysArea.y2Max = y2M;
@@ -30,7 +30,7 @@ function ShearWithInterfaceSingleFluid()
         DI = DiffuseInterfaceSingleFluid(config);
         DI.Preprocess();         
         DI.IterationStepFullProblem(20);
-        %DI.SolveMovingContactLine(20);    
+        DI.FindStagnationPoint();
         DI.SavePlotResults();
         DI.PlotErrorIterations();
         clear 'DI'

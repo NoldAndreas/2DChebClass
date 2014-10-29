@@ -102,8 +102,6 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
          end        
          function [v_cont,A_cont] = Continuity(this,uv,phi,G)
             
-            nParticles     = this.optsPhys.nParticles;            
-            IntSubArea     = this.IntSubArea;   
             Cn             = this.optsPhys.Cn;
             Cak            = this.optsPhys.Cak; 
             Ind            = this.IC.Ind;
@@ -169,13 +167,12 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             
             % ************            
             
-            A_m11 = zeros(M,4*M);
-            A_m11(:,[T;T;F;F]) = Cak*((zeta -2/3)*Diff.div + 2*[Diff.Dy1,zeros(M,M)]);
-            A_m11(:,[F;F;T;F]) = diag(fWP - G) + Cn*( -diag(Diff.Dy1*phi)*Diff.Dy1 + diag(Diff.Dy2*phi).*Diff.Dy2);
-            A_m11(:,[F;F;F;T]) = - diag(phi+phi_m);
+            A_m12 = zeros(M,4*M);
+            A_m12(:,[T;T;F;F]) = Cak*(zeta -2/3)*Diff.div + 2*[Diff.Dy1,zeros(M,M)];
+            A_m12(:,[F;F;R])
             
-            m11 =  Cak*((zeta -2/3)*Diff.div*uv + 2*Diff.Dy1*uv(1:end/2))...
-                 + (fW - G.*(phi+phi_m) + Cn/2*( -(Diff.Dy1*phi).^2 + (Diff.Dy2*phi).^2 ));
+            m11 =  Cak*(zeta -2/3)*Diff.div*uv + 2*Diff.Dy1*uv(1:end/2)...
+                 + (fW - G.*(phi+phi_m) + Cn/2*( (Diff.Dy1*phi).^2 + (Diff.Dy2*phi).^2 ));
             
             
             A_m12 = zeros(M,4*M);
@@ -184,23 +181,22 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             
             m12 = Cak*[Diff.Dy2 , Diff.Dy1]*uv - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi));
             
+            %v_cont(lbC) = IntPathRightUpLow*m12 +  IntPath_Half_RightLeft*m11;            
+            A_cont(lbC,:)         = 0;
+            A_cont(lbC,[F;F;T;F]) = IntSubArea;
+            v_cont(lbC)           = IntSubArea*phi - nParticles; 
+
             
-            A_cont(lbC,:) = IntPath_Half_UpLow*A_m12 +  IntPath_Half_RightLeft*A_m11;
-            v_cont(lbC)   = IntPath_Half_UpLow*m12   +  IntPath_Half_RightLeft*m11;            
             
-%             A_cont(lbC,:)         = 0;
-%             A_cont(lbC,[F;F;T;F]) = IntSubArea;
-%             v_cont(lbC)           = IntSubArea*phi - nParticles; 
-                         
             % (BC2) [uv;phi;G]                   
-            A_cont(rbC,:)   = IntPathUpLow*A_m12 + y2Max*(A_m11(rbC,:) - A_m11(lbC,:));
-            v_cont(rbC) = IntPathUpLow*m12 +y2Max*(m11(rbC) - m11(lbC));
-%             A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC)); 
-%             A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
-%             A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
-%             A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
+            A_cont(rbC,:)   = IntPathUpLow*A_m12;               
+
+            A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC)); 
+            A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
+            A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
+            A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
  
-            
+            v_cont(rbC) = IntPathUpLow*m12 +y2Max*(m11(rbC) - m11(lbC));
                 
          end        
          function [v_mom,A_mom] = Momentum(this,uv,phi,G)                

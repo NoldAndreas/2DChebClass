@@ -5,7 +5,7 @@ function SeppecherSingleFluid()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
         
-    PhysArea = struct('N',[50,30],'y2Min',0,'y2Max',10,...
+    PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',15,...
                       'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
@@ -23,7 +23,8 @@ function SeppecherSingleFluid()
             
     DI = DiffuseInterfaceSingleFluid(config);
     DI.Preprocess();                  
-    DI.IterationStepFullProblem_Seppecher(20);
+    DI.IterationStepFullProblem_Seppecher(40);
+    DI.FindStagnationPoint();
     DI.SavePlotResults();
 	DI.PlotErrorIterations();
                                      

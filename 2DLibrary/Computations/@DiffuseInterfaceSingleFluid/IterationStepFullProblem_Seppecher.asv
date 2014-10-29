@@ -235,7 +235,7 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
 %         A_theta([F;F;F;rbC]) = -(phi(rbC)+phi_m);        
 %         A_theta              = [0,0,0,A_theta];
 %         v_theta              =   (-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) ...
-                                - (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC));
+                       %         - (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC));
 
 %        A_theta = zeros(1,4*M);
 %        A_theta = [0,0,1,A_theta];    
