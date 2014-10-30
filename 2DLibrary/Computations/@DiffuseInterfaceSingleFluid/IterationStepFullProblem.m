@@ -60,8 +60,7 @@ function IterationStepFullProblem(this,noIterations)
         
         solveSquare = false;
         optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');
-        vec = fsolve(@f,vec,optsFS);
-        %errHistory = [];
+        vec = fsolve(@f,vec,optsFS);        
     
         %[uv;phi;mu] 
         res.uv  = vec([T;T;F;F;F]);

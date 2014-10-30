@@ -179,22 +179,8 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
         
         A_mom(IBB & ~ITT,:)                = 0;
         A_mom(IBB & ~ITT,[IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
-        v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);       
-%
-%         A_mu(Ind.top,[T;T;F;F]) = Cak*(zeta+4/3)*Diff.LapDiv(Ind.top,:);
-%         A_mu(Ind.top,[F;F;T;F]) = - Diff.Lap(Ind.top,:)*diag(G) ...
-%                                   + Diff.div(Ind.top,:)*(diag(repmat(G,2,1))*Diff.grad);
-% 
-%         A_mu(Ind.top,[F;F;F;T]) =  - Diff.Lap(Ind.top,:)*(diag(phi+phi_m))...
-%                                    + Diff.Dy1(Ind.top,:)*diag(Diff.Dy1*phi) ...
-%                                    + Diff.Dy2(Ind.top,:)*diag(Diff.Dy2*phi) ;                                   
-% 
-%         A_muThree               = zeros(M,3);
-% 
-%         v_mu(Ind.top)   = Cak*(zeta+4/3)*Diff.LapDiv(Ind.top,:)*uv...
-%                           - Diff.Lap(Ind.top,:)*(G.*(phi+phi_m)) ...
-%                           + Diff.div(Ind.top,:)*(repmat(G,2,1).*(Diff.grad*phi));
-%
+        v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
+
         % Three extra conditions [uv;phi;G]
         % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max
         
@@ -228,14 +214,6 @@ function IterationStepFullProblem_Seppecher(this,noIterations)
          A_theta              = [0,0,0,A_theta];
          v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
 
-%         A_theta              = zeros(1,4*M);
-%         A_theta([F;F;lbC;F]) = -(-G(lbC)+fWP(lbC));
-%         A_theta([F;F;F;lbC]) = (phi(lbC)+phi_m);        
-%         A_theta([F;F;rbC;F]) = -G(rbC)+fWP(rbC);
-%         A_theta([F;F;F;rbC]) = -(phi(rbC)+phi_m);        
-%         A_theta              = [0,0,0,A_theta];
-%         v_theta              =   (-(phi(rbC)+phi_m)*G(rbC) + fW(rbC)) ...
-                                - (-(phi(lbC)+phi_m)*G(lbC) + fW(lbC));
 
 %        A_theta = zeros(1,4*M);
 %        A_theta = [0,0,1,A_theta];    

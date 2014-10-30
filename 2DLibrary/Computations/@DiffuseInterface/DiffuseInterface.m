@@ -11,6 +11,7 @@ classdef DiffuseInterface < Computation
        IsolineInterfaceY2=[],StagnationPoint=[]
        %surfaceTension = 4/3;
        
+       RightCapillary
        filename
    end
    
@@ -70,6 +71,15 @@ classdef DiffuseInterface < Computation
             IntBx           = BX.ComputeIntegrationVector();
             this.IntSubArea = IntBx*this.IC.SubShapePts(BX.GetCartPts());
                      
+            
+                         Phys_Area = struct('L1',this.optsNum.PhysArea.L1,...
+                                'N',[50;40],...
+                                'y2Min',this.optsNum.PhysArea.y2Min,...
+                                'y2Max',this.optsNum.PhysArea.y2Max);
+    
+            this.RightCapillary  = HalfInfCapillary(Phys_Area);
+            this.RightCapillary.SetUpBorders(100);    
+
         end        
         function phi = InitialGuessRho(this)
             PtsCart    = this.IC.GetCartPts();

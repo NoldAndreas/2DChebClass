@@ -2,25 +2,13 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 	properties (Access = public)              
         mu
         a=[],deltaX=[]
-        RightCapillary
     end
          
     methods (Access = public) 
          function this = DiffuseInterfaceSingleFluid(config)           
              this@DiffuseInterface(config);
          end
-         
-         function Preprocess(this)
-             Preprocess@DiffuseInterface(this);
-             Phys_Area = struct('L1',this.optsNum.PhysArea.L1,...
-                                'N',[50;40],...
-                                'y2Min',this.optsNum.PhysArea.y2Min,...
-                                'y2Max',this.optsNum.PhysArea.y2Max);
-    
-            this.RightCapillary  = HalfInfCapillary(Phys_Area);
-            this.RightCapillary.SetUpBorders(100);    
-         end
-        
+                 
          SolveMovingContactLine(this,maxIterations)       
          [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
          [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,phi,theta)
@@ -102,8 +90,6 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
          end        
          function [v_cont,A_cont] = Continuity(this,uv,phi,G)
             
-            nParticles     = this.optsPhys.nParticles;            
-            IntSubArea     = this.IntSubArea;   
             Cn             = this.optsPhys.Cn;
             Cak            = this.optsPhys.Cak; 
             Ind            = this.IC.Ind;
@@ -114,7 +100,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             y2Max          = this.optsNum.PhysArea.y2Max;    
             IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
             
-            IP = this.IC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
+            IP                      = this.IC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
             IntPath_Half_UpLow      = (this.RightCapillary.borderTop.IntSc - this.RightCapillary.borderBottom.IntSc)*IP;
             IntPath_Half_RightLeft  = (this.RightCapillary.borderRight.IntSc - this.RightCapillary.borderLeft.IntSc)*IP;
             
@@ -141,19 +127,12 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             ysP            = diag(fWPP) - Cn*Diff.Lap;
             Cmu            = -Diff.Lap*diag(phi+phi_m);
             
-            %-diag(phi + phi_m)*Diff.Lap - diag(Diff.Lap*phi) ...
-            %                 - 2*diag(Diff.Dy1*phi)*Diff.Dy1 ...
-            %                 - 2*diag(Diff.Dy2*phi)*Diff.Dy2;
             Cuv            = Cak*(zeta + 4/3)*Diff.LapDiv; 
             
             A_cont(Ind.top|Ind.bottom,[T;T;F;F])  = Cuv(Ind.top|Ind.bottom,:);
             A_cont_phi                            = -Diff.Lap*diag(G) ...
                                                     + Diff.div*(diag(repmat(ys,2,1))*Diff.grad)...
                                                     + Diff.div*(diag(Diff.grad*phi)*repmat(ysP,2,1));
-            %-diag(Diff.Lap*G) ...
-            %                                        - diag(G)*Diff.Lap ...
-            %                                        - 2*diag(Diff.Dy1*G)*Diff.Dy1 ...
-            %                                        - 2*diag(Diff.Dy2*G)*Diff.Dy2 ...
                                                     
             A_cont(Ind.top|Ind.bottom,[F;F;T;F])  = A_cont_phi(Ind.top|Ind.bottom,:);
             A_cont(Ind.top|Ind.bottom,[F;F;F;T])  = Cmu(Ind.top|Ind.bottom,:);
@@ -188,22 +167,12 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             A_cont(lbC,:) = IntPath_Half_UpLow*A_m12 +  IntPath_Half_RightLeft*A_m11;
             v_cont(lbC)   = IntPath_Half_UpLow*m12   +  IntPath_Half_RightLeft*m11;            
             
-%             A_cont(lbC,:)         = 0;
-%             A_cont(lbC,[F;F;T;F]) = IntSubArea;
-%             v_cont(lbC)           = IntSubArea*phi - nParticles; 
-                         
             % (BC2) [uv;phi;G]                   
             A_cont(rbC,:)   = IntPathUpLow*A_m12 + y2Max*(A_m11(rbC,:) - A_m11(lbC,:));
-            v_cont(rbC) = IntPathUpLow*m12 +y2Max*(m11(rbC) - m11(lbC));
-%             A_cont(rbC,[F;F;rbC;F]) = A_cont(rbC,[F;F;rbC;F]) + y2Max*(-G(rbC) + fWP(rbC)); 
-%             A_cont(rbC,[F;F;lbC;F]) = A_cont(rbC,[F;F;lbC;F]) - y2Max*(-G(lbC) + fWP(lbC));    
-%             A_cont(rbC,[F;F;F;rbC]) = A_cont(rbC,[F;F;F;rbC]) - y2Max*(phi(rbC) + phi_m);
-%             A_cont(rbC,[F;F;F;lbC]) = A_cont(rbC,[F;F;F;lbC]) + y2Max*(phi(lbC) + phi_m);
- 
-            
-                
+            v_cont(rbC)     = IntPathUpLow*m12 +y2Max*(m11(rbC) - m11(lbC));
+                 
          end        
-         function [v_mom,A_mom] = Momentum(this,uv,phi,G)                
+         function [v_mom,A_mom]   = Momentum(this,uv,phi,G)                
             %[uv;phi;G;p] 
             %
             %        A_mom          = [tauM,...
