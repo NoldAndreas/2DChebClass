@@ -26,7 +26,7 @@ function ShearWithInterfaceBinaryFluid()
         
         DI = DiffuseInterfaceBinaryFluid(config);
         DI.Preprocess();                             
-        DI.SolveMovingContactLine(60);    
+        DI.SolveMovingContactLine(20);    
         DI.SavePlotResults();
         DI.PlotErrorIterations();
         clear 'DI'

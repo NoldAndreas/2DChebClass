@@ -2,8 +2,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
     
    properties (Access = public)
        p  % pressure       
-       mu % chemical potential
-       s = 0.
+       mu % chemical potential       
    end
        
 	methods (Access = public) 
@@ -89,7 +88,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              this.mu  = zeros(M,1);
              this.phi = phi;                   
 
-             G    = this.mu - this.s*this.phi;             
+             G    = this.mu;  
              vec  = [this.uv;this.phi;G;this.p];
        end
        
@@ -148,6 +147,54 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.uv(1+end/2:end));      
            title('$\Delta v$','Interpreter','Latex','fontsize',15);
            
+       end
+       
+       
+       function [v_mu,A_mu] = ChemicalPotential(this,uv,phi,G)
+           [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,uv,phi,G);
+           A_mu = [A_mu,zeros(this.IC.M)];
+       end
+       function [v_G,A_G] = Phasefield(this,uv,phi,G)
+           
+            m              = this.optsPhys.mobility;
+            Ind            = this.IC.Ind;
+            Diff           = this.IC.Diff;
+            M    = this.IC.M;
+            EYM  = eye(M); 
+            Z    = zeros(M);
+            F       = false(M,1);   T       = true(M,1);    
+            
+            uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];        
+            gradPhiMT      = [diag(Diff.Dy1*phi),diag(Diff.Dy2*phi)];
+   
+           
+            A_G            = [-gradPhiMT,-uvTdiag*Diff.grad,m*Diff.Lap,Z];
+            v_G            = m*Diff.Lap*G - gradPhiMT*uv;
+           
+            % (BC4) nu*grad(G) = 0        
+            A_G(Ind.top|Ind.bottom,:)           = 0;
+            A_G(Ind.top|Ind.bottom,[F;F;F;T;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
+            v_G(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*G;                                    
+
+
+            %(BC7) 
+            indBC7 = Ind.left | Ind.right;
+            A_G(indBC7,:)           = 0;
+            A_G(indBC7,[F;F;F;T;F]) = Diff.Dy2(indBC7,:);
+            v_G(indBC7,:)           = Diff.Dy2(indBC7,:)*G;
+
+            %(BC8) [uv;phi;G;p]        
+            hM  = - m*this.IC.borderBottom.IntSc*Diff.DDy2;        
+            A_G(Ind.right & Ind.bottom,:)           = 0;
+            A_G(Ind.right & Ind.bottom,[F;T;F;F;F]) = this.IC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
+            A_G(Ind.right & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) ...
+                                                      - EYM(Ind.left & Ind.bottom,:) ...                                              
+                                                      + this.IC.borderBottom.IntSc*(Diff.Dy2*(uv(1+end/2:end)));
+            A_G(Ind.right & Ind.bottom,[F;F;F;T;F]) = hM;
+            v_G(Ind.right & Ind.bottom)             = phi(Ind.right & Ind.bottom) ...
+                                                      - phi(Ind.left & Ind.bottom) ...
+                                                      + this.IC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
+                                                      + hM*G;
        end
        
    end

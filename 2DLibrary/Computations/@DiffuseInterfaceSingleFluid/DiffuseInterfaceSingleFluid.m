@@ -231,34 +231,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
                               - diag(phiM2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]];
             v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
                              repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
-        end
-        function [v_mu,A_mu] = ChemicalPotential(this,uv,phi,G)
-                       
-            Cn             = this.optsPhys.Cn;
-            Ind            = this.IC.Ind;
-            
-            M              = this.IC.M;
-            F              = false(M,1);   
-            T              = true(M,1);            
-            Z              = zeros(M);
-            
-            Diff           = this.IC.Diff;            
-            
-    
-            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
-            % **************
-            
-            A_mu           = [Z,Z,...
-                              diag(fWPP)-Cn*Diff.Lap,...
-                              -eye(M)];
-            v_mu           = fWP - Cn*Diff.Lap*phi - G;
-            
-            % (BC4.a) nu*grad(phi) = 0            
-            A_mu(Ind.bottom|Ind.top,:)         = 0;
-            A_mu(Ind.bottom|Ind.top,[F;F;T;F]) = Diff.Dy2(Ind.bottom|Ind.top,:);    
-            v_mu(Ind.bottom|Ind.top)           = Diff.Dy2(Ind.bottom|Ind.top,:)*phi;
-       
-        end
+         end        
         
         function [v,A] = FullEqsBcs(this,z)
         end
