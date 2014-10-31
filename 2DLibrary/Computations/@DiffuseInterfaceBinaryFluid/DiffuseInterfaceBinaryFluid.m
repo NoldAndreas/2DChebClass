@@ -10,7 +10,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              this@DiffuseInterface(config);
        end
        
-       IterationStepFullProblem(this,vec)
+       IterationStepFullProblem(this,noIterations)
+       IterationStepFullProblem_old(this,noIterations)
+
        [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
        [rho,theta]         = GetEquilibriumDensity_Flux(this,theta,phi,uv)
        
@@ -83,7 +85,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                 mu     = this.GetMu();
              end
 
-             this.uv  = GetBoundaryCondition(this);%,theta,phi);            
+             this.uv  = GetBoundaryCondition(this,theta,phi);            
              this.p   = zeros(M,1);
              this.mu  = zeros(M,1);
              this.phi = phi;                   
@@ -172,6 +174,16 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
            A_cont         = [Diff.div,Z,Z,Z];    
            v_cont         = Diff.div*uv;
+           
+           % (BC0) [uv;phi;G;p]
+           A_cont(Ind.bottom | Ind.top,[T;T;F;F;F]) = Diff.LapDiv(Ind.bottom | Ind.top,:);
+           A_cont(Ind.bottom | Ind.top,[F;F;T;F;F]) = Diff.div(Ind.bottom | Ind.top,:)*(diag(repmat(G,2,1))*Diff.grad)/Cak;
+           A_cont(Ind.bottom | Ind.top,[F;F;F;T;F]) = Diff.div(Ind.bottom | Ind.top,:)*([diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)])/Cak;
+           A_cont(Ind.bottom | Ind.top,[F;F;F;F;T]) = - Diff.Lap(Ind.bottom | Ind.top,:);
+           
+           v_cont(Ind.bottom | Ind.top) = - Diff.Lap(Ind.bottom | Ind.top,:)*p...
+                                          + Diff.LapDiv(Ind.bottom | Ind.top,:)*uv ...
+                                          + Diff.div(Ind.bottom | Ind.top,:)*(repmat(G,2,1).*(Diff.grad*phi))/Cak;
             
            % (BC1) p = 0  at y1 = +/- infinity
            A_cont(Ind.left,:)           = 0;
@@ -191,7 +203,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
 
            A_cont(indBC2,[T;T;F;F;F]) = IntPathUpLow*[Diff.Dy2 , Diff.Dy1];              
 
-           A_cont(indBC2,[F;F;T;F;F])                 = -Cn/Cak*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
+           A_cont(indBC2,[F;F;T;F;F]) = -Cn/Cak*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
            A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) = ...
                             A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) + ...
                             y2Max*fpW_pInf/Cak;
@@ -283,5 +295,67 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                               + repmat(G,2,1).*(Diff.grad*phi)/Cak ...
                               - Diff.grad*p;
        end
+       
+       function [v_mom_IBB,A_mom_IBB,v_mu_T,A_mu_T] = GetSeppecherBoundaryConditions(this,uv,phi,a,deltaX,theta)
+           M = this.IC.M;
+           
+           [v_mom_IBB,A_mom_IBB,v_mu_T,A_mu_T] = GetSeppecherBoundaryConditions@DiffuseInterface(this,uv,phi,a,deltaX,theta);
+           
+           A_mom_IBB = [A_mom_IBB,zeros(size(A_mom_IBB,1),M)];
+           A_mu_T    = [A_mu_T,zeros(size(A_mu_T,1),M)];
+       end
+       
+       
+        function [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta)
+
+            M              = this.IC.M;
+            Ind            = this.IC.Ind;
+            Diff           = this.IC.Diff;
+            IntNormalUp    = this.IC.borderTop.IntNormal;
+            Cn             = this.optsPhys.Cn;
+            y2Max          = this.optsNum.PhysArea.y2Max;
+            lbC            = Ind.left & Ind.bottom;
+            rbC            = Ind.right & Ind.bottom;
+            F              = false(M,1);
+            T              = true(M,1);   
+ 
+            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
+
+            % Three extra conditions [uv;phi;G]
+            % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max        
+            A_a              = zeros(1,4*M);        
+            A_a([T;T;F;F])   = IntNormalUp;            
+            A_a              = [0,0,0,A_a];        
+
+            v_a              = IntNormalUp*uv;
+
+
+            % (EX 2) phi(y2Max/tan(theta) + deltaX,y2Max) = 0
+            InterpMatchPos       = this.IC.SubShapePtsCart(...
+                                    struct('y1_kv',deltaX + y2Max/tan(theta),...
+                                           'y2_kv',y2Max));
+            A_deltaX             = zeros(1,4*M);
+            A_deltaX([F;F;T;F])  = InterpMatchPos;
+            A_deltaX_deltaX      = InterpMatchPos*(Diff.Dy1*phi);
+            A_deltaX_theta       = -y2Max*(1/sin(theta))^2*InterpMatchPos*(Diff.Dy1*phi);
+            A_deltaX             = [0,A_deltaX_deltaX,A_deltaX_theta,...
+                                    A_deltaX];    
+            v_deltaX             = InterpMatchPos*phi;
+
+            % (EX 3) mu(y1=-infty) = 0
+%             A_theta              = zeros(1,4*M);
+%             A_theta([F;F;F;lbC]) = 1;  
+%             A_theta              = [0,0,0,A_theta];
+%             v_theta              = G(lbC);
+
+                   A_theta = zeros(1,4*M);
+                    A_theta = [0,0,1,A_theta];    
+                    v_theta = theta - pi/2;
+
+             v_SeppAdd = [v_a;v_deltaX;v_theta];
+             A_SeppAdd = [A_a;A_deltaX;A_theta];
+             A_SeppAdd =  [A_SeppAdd,zeros(size(A_SeppAdd,1),M)];
+        end
+           
    end
 end

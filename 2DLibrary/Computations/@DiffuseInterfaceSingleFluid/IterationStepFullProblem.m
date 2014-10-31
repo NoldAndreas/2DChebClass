@@ -15,103 +15,151 @@ function IterationStepFullProblem(this,noIterations)
         noIterations = 20;
     end
     
+    if(length(this.optsPhys.thetaEq) == 1)
+        Seppecher   = true;
+    else
+        Seppecher   = false;
+    end
     solveSquare = true;
-    
-    Cn             = this.optsPhys.Cn;
-    Cak            = this.optsPhys.Cak;    
-    zeta           = this.optsPhys.zeta;
-    phi_m          = this.optsPhys.phi_m;            
-	nParticles     = this.optsPhys.nParticles;            
-	IntSubArea     = this.IntSubArea;   
-    
-    Diff           = this.IC.Diff;
+        
+    nParticles     = this.optsPhys.nParticles;            
     M              = this.IC.M;  
-    Ind            = this.IC.Ind;    
-    tauM           = Cak*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);
+    Ind            = this.IC.Ind;
+    IntSubArea     = this.IntSubArea;        
     
-    lbC = Ind.left & Ind.bottom;
-    rbC = Ind.right & Ind.bottom;
-
-    Z    = zeros(M);
-    IBB  = repmat(Ind.bound,2,1);  
-    EYMM  = eye(2*M);
-
-    F       = false(M,1);   T  = true(M,1);    
+    
+    IBB  = repmat(Ind.bound,2,1);      
+    F       = false(M,1);   T       = true(M,1);        
     
     opts = struct('optsNum',this.optsNum,...
                   'optsPhys',this.optsPhys,...
                   'Comments',this.configName);
+              
+    if(isempty(this.mu))
+        in = struct('initialGuess',GetInitialCondition(this));
+    else
+        in = struct('initialGuess',[this.uv;...
+                                    this.phi;...
+                                    this.mu]);
+    end
+
+    if(Seppecher)
+        if(isempty(this.mu))
+            in.initialGuess = [0;0;pi/2;in.initialGuess];
+        else
+            in.initialGuess = [this.a;...
+                               this.deltaX;...
+                               this.theta;...
+                               in.initialGuess];
+        end
+    end
     
     [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
-                    opts,struct('initialGuess',GetInitialCondition(this)));
+                    opts,in);
 	   
     this.uv       = res.uv;
     this.mu       = res.mu;
     this.phi      = res.phi;
-    this.filename = Parameters.Filename;
-    this.errors.errorIterations = res.errorHistory;
+    if(Seppecher)
+        this.a        = res.a;
+        this.deltaX   = res.deltaX;
+        this.theta    = res.theta;
+    end
     
-    %     this.errors.errorIterations = res.errorIterations;
+    this.filename = Parameters.Filename;
+    this.errors.errorIterations = res.errorHistory;        
     
     
     function res = SolveSingleFluid(conf,in)
+        
         solveSquare = true;
         [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,0.8);    
         
         solveSquare = false;
         optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');
-        vec = fsolve(@f,vec,optsFS);        
+        vec = fsolve(@f,vec,optsFS);    
     
+        
         %[uv;phi;mu] 
-        res.uv  = vec([T;T;F;F;F]);
-        res.phi = vec([F;F;T;F;F]);
-        res.mu  = vec([F;F;F;T;F]);
+        if(Seppecher)
+            res.a      = vec(1);
+            res.deltaX = vec(2);
+            res.theta  = vec(3);
+            vec        = vec(4:end);
+        end
+        res.uv     = vec([T;T;F;F]);
+        res.phi    = vec([F;F;T;F]);
+        res.mu     = vec([F;F;F;T]);
         
         res.errorHistory = errHistory;
     end    
     function [v,A] = f(z)
         
+        %[uv;phi;G;p]       
+        if(Seppecher)
+            a      = z(1);
+            deltaX = z(2);
+            theta  = z(3);
+            disp(['[a,deltaX,theta] = ',num2str(a),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
         
-        
-        %[uv;phi;G;p] 
+            z      = z(4:end);
+        end
+
         uv  = z([T;T;F;F]);
         phi = z([F;F;T;F]);
-        G   = z([F;F;F;T]);                           
-    
+        G   = z([F;F;F;T]);        
+            
         [v_cont,A_cont]  = Continuity(this,uv,phi,G);               
         [v_mom,A_mom]    = Momentum(this,uv,phi,G);      
         [v_mu,A_mu]      = ChemicalPotential(this,uv,phi,G);
-                        
-        
-       %% Boundary conditions [uv;phi;G]                              
-        
-        % (BC3) uv = uv_BC    
-        [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
-        A_mom(IBB,:)           = 0;
-        A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
-        v_mom(IBB)             = uv(IBB) - uvBound(IBB);
-        
-                
+       
         A_particles            = zeros(1,4*M);
         A_particles([F;F;T;F]) = IntSubArea;
         v_particles            = IntSubArea*phi - nParticles; 
-        if(solveSquare)
-            A_cont(lbC,:) = A_particles;
-            v_cont(lbC,:) = v_particles;
-            
-            A = [A_mom;A_mu;A_cont];
-            v = [v_mom;v_mu;v_cont];    
-        else
-            
-            A = [A_mom;A_mu;A_cont;A_particles];
-            v = [v_mom;v_mu;v_cont;v_particles];    
-        end
-                
         
+        if(solveSquare)
+            lbC            = Ind.left & Ind.bottom;                
+            A_cont(lbC,:)  = A_particles;
+            v_cont(lbC,:)  = v_particles;                           
+        end
+
+        if(Seppecher)    
+            A_cont = [zeros(M,3),A_cont];
+            A_mom  = [zeros(2*M,3),A_mom];
+            A_mu   = [zeros(M,3),A_mu];
+    
+            [v_mom(IBB),A_mom(IBB,:),v_mu(Ind.top),A_mu(Ind.top,:)]...        
+                    = GetSeppecherBoundaryConditions(this,uv,phi,a,deltaX,theta);               
+    
+            [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta);
+
+            A_particles = [0,0,0,A_particles];
+        end
+        
+        A = [A_mom;A_mu;A_cont];
+        v = [v_mom;v_mu;v_cont];    
+
+        if(Seppecher)
+            A  = [A_SeppAdd;A];
+            v  = [v_SeppAdd;v];
+        end
+
+        if(~solveSquare)
+            A = [A;A_particles];
+            v = [v;v_particles];                           
+        end
         
         DisplayError(v);
     end    
-    function DisplayError(error)        
+    function DisplayError(error)
+        
+        if(Seppecher)
+            PrintErrorPos(error(1),'consistent mass influx');
+            PrintErrorPos(error(2),'zero density at interface');        
+            PrintErrorPos(error(3),'chemical potential at -inf');
+        
+            error = error(4:end);
+        end
         PrintErrorPos(error([F;F;F;T]),'continuity equation',this.IC.Pts);
         PrintErrorPos(error([T;F;F;F]),'y1-momentum equation',this.IC.Pts);
         PrintErrorPos(error([F;T;F;F]),'y2-momentum equation',this.IC.Pts);                                    

@@ -1,4 +1,4 @@
-function IterationStepFullProblem(this,noIterations)
+function IterationStepFullProblem_old(this,noIterations)
     %Continuitiy: 0 = div(uv)
     %Momentum:    0 = -Grad(p) + (G+s*phi)*grad(phi)/Cak + Lap(uv)
     %Phasefield   0 = m*Lap(G + s*phi) - u*grad(phi)
@@ -15,10 +15,14 @@ function IterationStepFullProblem(this,noIterations)
         noIterations = 20;
     end
     
+    solveSquare = true;
+    
     Cn             = this.optsPhys.Cn;
     Cak            = this.optsPhys.Cak;    
     zeta           = this.optsPhys.zeta;
     phi_m          = this.optsPhys.phi_m;            
+	nParticles     = this.optsPhys.nParticles;            
+	IntSubArea     = this.IntSubArea;   
     
     Diff           = this.IC.Diff;
     M              = this.IC.M;  
@@ -51,10 +55,12 @@ function IterationStepFullProblem(this,noIterations)
     
     
     function res = SolveSingleFluid(conf,in)
-        %[vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,0.8);    
-        optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter');%,'Algorithm','levenberg-marquardt');
-        vec = fsolve(@f,in.initialGuess,optsFS);
-        errHistory = [];
+        solveSquare = true;
+        [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,0.8);    
+        
+        solveSquare = false;
+        optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');
+        vec = fsolve(@f,vec,optsFS);        
     
         %[uv;phi;mu] 
         res.uv  = vec([T;T;F;F;F]);
@@ -85,17 +91,23 @@ function IterationStepFullProblem(this,noIterations)
         A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
         v_mom(IBB)             = uv(IBB) - uvBound(IBB);
         
-        if(solveSquare)
-         nParticles     = this.optsPhys.nParticles;            
-         IntSubArea     = this.IntSubArea;   
-         A_particles            = zeros(1,4*M);
-         A_particles([F;F;T;F]) = IntSubArea;
-         v_particles            = IntSubArea*phi - nParticles; 
-        else
-            en
                 
-        A = [A_mom;A_mu;A_cont;A_particles];
-        v = [v_mom;v_mu;v_cont;v_particles];    
+        A_particles            = zeros(1,4*M);
+        A_particles([F;F;T;F]) = IntSubArea;
+        v_particles            = IntSubArea*phi - nParticles; 
+        if(solveSquare)
+            A_cont(lbC,:) = A_particles;
+            v_cont(lbC,:) = v_particles;
+            
+            A = [A_mom;A_mu;A_cont];
+            v = [v_mom;v_mu;v_cont];    
+        else
+            
+            A = [A_mom;A_mu;A_cont;A_particles];
+            v = [v_mom;v_mu;v_cont;v_particles];    
+        end
+                
+        
         
         DisplayError(v);
     end    

@@ -1,7 +1,6 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 	properties (Access = public)              
-        mu
-        a=[],deltaX=[]
+        mu        
     end
          
     methods (Access = public) 
@@ -37,8 +36,8 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             
          end  
         
+         IterationStepFullProblem_old(this,noIterations)
          IterationStepFullProblem(this,noIterations)
-         IterationStepFullProblem_Seppecher(this,noIterations)
          function vec = GetInitialCondition(this) 
            
             if(~isempty(this.uv) && ...                
@@ -71,7 +70,9 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
              
              vec  = [this.uv;this.phi;this.mu];
          end
-        
+
+        IterationStepFullProblem_Seppecher_old(this,noIterations)
+
          function [bulkError,bulkAverageError] = DisplayFullError(this,phi,uv)            
             M        = this.IC.M;
             
@@ -187,6 +188,10 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             Cak            = this.optsPhys.Cak;    
             Cn             = this.optsPhys.Cn;
             zeta           = this.optsPhys.zeta;
+            M              = this.IC.M;
+            EYMM           = eye(2*M);
+            IBB            = repmat(Ind.bound,2,1);  
+            F       = false(M,1);   T  = true(M,1);    
             
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
             tauM           = Cak*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);            
@@ -200,9 +205,69 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
                               - diag(phiM2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]];
             v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
                              repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
+
+
+            uvBound                = GetBoundaryCondition(this);%,theta,phi);   
+            A_mom(IBB,:)           = 0;
+            A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
+            v_mom(IBB)             = uv(IBB) - uvBound(IBB);
          end        
-        
-        function [v,A] = FullEqsBcs(this,z)
+           
+         function [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta)
+
+            M              = this.IC.M;
+            Ind            = this.IC.Ind;
+            Diff           = this.IC.Diff;
+            IntNormalUp    = this.IC.borderTop.IntNormal;
+            Cn             = this.optsPhys.Cn;
+            phi_m          = this.optsPhys.phi_m;    
+            phiM2          = repmat(phi+phi_m,2,1);       
+            y2Max          = this.optsNum.PhysArea.y2Max;
+            lbC            = Ind.left & Ind.bottom;
+            rbC            = Ind.right & Ind.bottom;
+            F              = false(M,1);
+            T              = true(M,1);   
+ 
+            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
+
+            % Three extra conditions [uv;phi;G]
+            % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max        
+            A_a            = zeros(1,4*M);        
+
+            A_a([T;T;F;F])   = IntNormalUp*diag(phiM2);
+            A_a([F;F;T;F])   = IntNormalUp*[diag(uv(1:end/2));diag(uv(1+end/2:end))];
+            A_a([F;F;rbC;F]) = A_a([F;F;rbC;F]) + y2Max;
+            A_a([F;F;lbC;F]) = A_a([F;F;lbC;F]) - y2Max;
+            A_a              = [0,0,0,A_a];        
+
+            v_a              = IntNormalUp*(phiM2.*uv) + (phi(rbC)-phi(lbC))*y2Max;
+
+
+            % (EX 2) phi(y2Max/tan(theta) + deltaX,y2Max) = 0
+            InterpMatchPos       = this.IC.SubShapePtsCart(...
+                                    struct('y1_kv',deltaX + y2Max/tan(theta),...
+                                           'y2_kv',y2Max));
+            A_deltaX             = zeros(1,4*M);
+            A_deltaX([F;F;T;F])  = InterpMatchPos;
+            A_deltaX_deltaX      = InterpMatchPos*(Diff.Dy1*phi);
+            A_deltaX_theta       = -y2Max*(1/sin(theta))^2*InterpMatchPos*(Diff.Dy1*phi);
+            A_deltaX             = [0,A_deltaX_deltaX,A_deltaX_theta,...
+                                    A_deltaX];    
+            v_deltaX             = InterpMatchPos*phi;
+
+            % (EX 3) mu(y1=-infty) = 0
+             A_theta              = zeros(1,4*M);
+             A_theta([F;F;lbC;F]) = -G(lbC)+fWP(lbC);
+             A_theta([F;F;F;lbC]) = -(phi(lbC)+phi_m);        
+             A_theta              = [0,0,0,A_theta];
+             v_theta              = -(phi(lbC)+phi_m)*G(lbC) + fW(lbC);
+
+            %        A_theta = zeros(1,4*M);
+            %        A_theta = [0,0,1,A_theta];    
+            %        v_theta = theta - pi/2;
+
+             v_SeppAdd = [v_a;v_deltaX;v_theta];
+             A_SeppAdd = [A_a;A_deltaX;A_theta];
         end
     end
 end
