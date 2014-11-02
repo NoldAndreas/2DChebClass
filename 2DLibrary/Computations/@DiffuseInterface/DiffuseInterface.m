@@ -4,7 +4,7 @@ classdef DiffuseInterface < Computation
        IC                     
        IntSubArea
               
-       phi = [],uv  = []
+       phi = [],uv  = [],mu=[]      
        theta=[],a=[],deltaX=[]
        errors = []
        
@@ -16,9 +16,7 @@ classdef DiffuseInterface < Computation
    end
    
    methods (Abstract = true, Access = public)
-       [A,b] = FullStressTensorIJ(this,phi,i,j)
-       [A,b] = ContinuityMomentumEqs(this,phi)
-       [bulkError,bulkAverageError] = DisplayFullError(this) 
+       [A,b] = FullStressTensorIJ(this,phi,i,j)       
    end
    
    methods (Access = public)          
@@ -80,76 +78,201 @@ classdef DiffuseInterface < Computation
             this.RightCapillary  = HalfInfCapillary(Phys_Area);
             this.RightCapillary.SetUpBorders(100);    
 
-        end        
+        end       
+        
+        function sepp  = IsSeppecher(this)
+            sepp = (length(this.optsPhys.thetaEq) == 1);
+        end
+        
+        function vec = GetInitialCondition(this) 
+           
+            if(~isempty(this.uv) && ...                
+                ~isempty(this.mu) && ...
+                ~isempty(this.phi))
+                vec  = [this.uv;this.phi;this.mu];                
+            else                       
+            
+                this.phi = InitialGuessRho(this);                             
+                this.uv  = InitialGuessUV(this);
+                this.mu  = zeros(this.IC.M,1);                          
+                vec      = [this.uv;this.phi;this.mu];
+             
+            end
+                        
+            if(IsSeppecher(this))
+                if(isempty(this.theta))
+                    vec = [0;0;pi/2;vec];
+                else
+                    vec = [this.a;this.deltaX;this.theta;vec];
+                end
+            end
+
+             
+         end
         function phi = InitialGuessRho(this)
             PtsCart    = this.IC.GetCartPts();
             Cn         = this.optsPhys.Cn;
             
             phi        = tanh(PtsCart.y1_kv/Cn);
-        end                                                                  
-        deltaX                      = GetDeltaX(this,phi,theta)              
-        function [a,deltaX]         = Get_a_deltaX(this,phi,theta)
-            
-            Ind              = this.IC.Ind;
+        end                         
+        function uv  = InitialGuessUV(this)
             UWall            = this.optsPhys.UWall;    
-            InterpOntoBorder = this.IC.borderTop.InterpOntoBorder;
-            ptsBorderTop     = this.IC.borderTop.Pts;
-            y2Max            = this.optsNum.PhysArea.y2Max;
-            phiL             = phi(Ind.top & Ind.left);
-            phiR             = phi(Ind.top & Ind.right);
-
-            
-            IntNormal_Path   = this.IC.borderTop.IntNormal_Path;       
-            phi_m            = this.optsPhys.phi_m;    
-            
-            deltaX              = GetDeltaX(this,phi,theta);
-            ptsBorderTop.y1_kv  = ptsBorderTop.y1_kv - deltaX;                        
-            u_flow              = GetSeppecherSolutionCart(ptsBorderTop,UWall,0,0,theta);                                    
-
-            phiBorder  = InterpOntoBorder*phi;
-            phiBorder2 = repmat(phiBorder,2,1);
-
-            massFlux   = ((phiR+phi_m)-(phiL+phi_m))*(y2Max-0)*UWall;      %due to mapping to infinity
-
-            fsolveOpts = optimset('Display','off');
-            [a,~,flag] = fsolve(@massInflux,0,fsolveOpts);            
-            if(flag < 1)
-                cprintf('*r','CorrectVelocityProfile: Finding parameter a: No solution found.\n');                                
-            else
-                disp(['a = ',num2str(a)]);
-            end         
-            
-            function m = massInflux(a)
-                u_corrected = u_flow .*(1 + a*(phiL-phiBorder2).^2.*(phiR-phiBorder2).^2);
-                m          = IntNormal_Path*(u_corrected.*(phiBorder2+phi_m)) + massFlux;    
-            end       
-        end                    
-        function [uvBound,a,deltaX] = GetBoundaryCondition(this,theta,phi)
-            UWall            = this.optsPhys.UWall;    
-            PtsCart          = this.IC.GetCartPts();
-            Ind              = this.IC.Ind;            
+            PtsCart          = this.IC.GetCartPts();            
             y2_kv            = PtsCart.y2_kv;
             y2Min            = this.optsNum.PhysArea.y2Min;
             y2Max            = this.optsNum.PhysArea.y2Max;
             M                = this.IC.M;
             
-            if(length(UWall) == 1)
-                phiL             = phi(Ind.top & Ind.left);
-                phiR             = phi(Ind.top & Ind.right);
-                
-                %[a,deltaX] = Get_a_deltaX(this,phi,theta);    
-                a = 0; deltaX = 0;
-                u_flow     = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...
-                                         PtsCart.y2_kv],UWall,0,0,theta);          
-                phiBorder2 = repmat(phi,2,1);
-                uvBound    = u_flow .*(1 + a*(phiL-phiBorder2).^2.*(phiR-phiBorder2).^2);   
-            else
-                a = [];  deltaX = [];
-                uvBound    = [UWall(1) + ...
+            if(IsSeppecher(this))
+                deltaX = 0; 
+                theta  = pi/2;
+                uv     = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
+                                                PtsCart.y2_kv],1,0,0,theta);                                
+            else                
+                uv     = [UWall(1) + ...
                             (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
                             zeros(M,1)];                
             end
-        end                         
+        end
+                                          
+        function [v_mu_T,A_mu_T] = GetSeppecherBoundaryConditions(this,phi,theta)
+            
+            %[uv;phi;G]
+            Ind            = this.IC.Ind;
+            Diff           = this.IC.Diff;
+            M              = this.IC.M;            
+            F              = false(M,1);   
+            T              = true(M,1);   
+            EYM            = eye(M);
+
+            %A_momThree            = [A_mom_a',A_mom_deltaX',A_mom_theta'];
+            a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
+            a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
+
+            
+            A_mu_T                                  = zeros(sum(Ind.top),3+4*M);
+            A_mu_T(:,[false;false;false;F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
+            A_mu_T(:,[false;false;true;F;F;F;F])    = a_direction_theta(Ind.top,:)*(Diff.grad*phi);
+
+            v_mu_T                                  = a_direction(Ind.top,:)*(Diff.grad*phi);                                                   
+            
+        end     
+        function [v_mom,A_mom] = GetVelBC(this,uv,a,deltaX,theta)
+            
+            UWall            = this.optsPhys.UWall;    
+            PtsCart          = this.IC.GetCartPts();            
+            y2_kv            = PtsCart.y2_kv;
+            y2Min            = this.optsNum.PhysArea.y2Min;
+            y2Max            = this.optsNum.PhysArea.y2Max;
+            M                = this.IC.M;
+            EYMM             = eye(2*M);            
+            Ind              = this.IC.Ind;
+            IBB              = repmat(Ind.bound,2,1); 
+            F                = false(M,1);   
+            T                = true(M,1);
+            
+            if(IsSeppecher(this))
+                [v_mom,A_mom] = GetSeppecher_Vel(this,uv,a,deltaX,theta);
+            else                
+                uvBound    = [UWall(1) + ...
+                             (UWall(2)-UWall(1))*(y2_kv-y2Min)/(y2Max-y2Min);...
+                              zeros(M,1)];                
+                                                
+                A_mom                = zeros(sum(IBB),4*M);
+                A_mom(:,[T;T;F;F])   = EYMM(IBB,:);
+                v_mom                = uv(IBB) - uvBound(IBB);
+            end            
+        end                                         
+        function [v_mom_IBB,A_mom_IBB] = GetSeppecher_Vel(this,uv,a,deltaX,theta)
+            
+            Ind            = this.IC.Ind;
+            Diff           = this.IC.Diff;
+            M              = this.IC.M;
+            PtsCart        = this.IC.GetCartPts();
+            y2Max          = this.IC.y2Max;
+            ITT            = repmat(Ind.top,2,1);  
+            IBB            = repmat(Ind.bound,2,1); 
+        	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
+            d_theta        = 0.01;
+            EYMM           = eye(2*M);
+            F              = false(M,1);   
+            T              = true(M,1);   
+            EYM            = eye(M);
+            
+            u_flow      = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
+                                                PtsCart.y2_kv],1,0,0,theta);                  
+                                            
+            y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
+            a_corr        = (1 + a./(1+y1_Interface.^2));
+            a_corr_a      = 1./(1+y1_Interface.^2);        
+            a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
+            a_corr_deltaX(Ind.left | Ind.right) = 0;
+            a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
+    
+            uvBound        = u_flow .*repmat(a_corr,2,1);                                        
+
+            uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
+            uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
+
+            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
+            u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
+            uvBound_theta    = u_flow_d.*repmat(a_corr,2,1) + u_flow.*repmat(a_corr_theta,2,1);
+
+            A_mom_ITT              = zeros(sum(ITT),4*M);            
+            A_mom_ITT(:,[T;T;F;F]) = EYMM(ITT,:);            
+
+            A_mom_a_ITT            = -uvBound_a(ITT);
+            A_mom_deltaX_ITT       = -uvBound_deltaX(ITT); 
+            A_mom_theta_ITT        = -uvBound_theta(ITT);        
+
+            A_mom(ITT,:)           = [A_mom_a_ITT,...
+                                     A_mom_deltaX_ITT,...
+                                     A_mom_theta_ITT,...
+                                     A_mom_ITT];
+                                 
+            v_mom(ITT)              = uv(ITT) - uvBound(ITT);
+            
+            u_Wall = [ones(M,1);zeros(M,1)];
+        
+            A_mom(IBB & ~ITT,:)                = 0;
+            A_mom(IBB & ~ITT,[false;false;false;IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
+            v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
+            
+            A_mom_IBB = A_mom(IBB,:);
+            v_mom_IBB = v_mom(IBB);
+        end        
+        function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
+            %[uv;phi;G]     
+            Cn             = this.optsPhys.Cn;
+            Ind            = this.IC.Ind;
+            
+            M              = this.IC.M;
+            F              = false(M,1);   
+            T              = true(M,1);            
+            Z              = zeros(M);
+            
+            Diff           = this.IC.Diff;            
+            
+    
+            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
+            % **************
+            
+            A_mu           = [Z,Z,...
+                              diag(fWPP)-Cn*Diff.Lap,...
+                              -eye(M)];
+            v_mu           = fWP - Cn*Diff.Lap*phi - G;
+            
+            % (BC4.a) nu*grad(phi) = 0            
+            A_mu(Ind.bottom|Ind.top,:)         = 0;
+            A_mu(Ind.bottom|Ind.top,[F;F;T;F]) = Diff.Dy2(Ind.bottom|Ind.top,:);    
+            v_mu(Ind.bottom|Ind.top)           = Diff.Dy2(Ind.bottom|Ind.top,:)*phi;
+       
+        end  
+        
+        %Auxiliary Cahn-Hilliard
+        [A,b] = Div_FullStressTensor(this,phi)
+                
+        %Plotting & Analysis functions
         function spt = FindStagnationPoint(this,iguess1,iguess2)
             
             uv = this.uv;
@@ -190,18 +313,6 @@ classdef DiffuseInterface < Computation
                 z   = [IP*uv(1:end/2);IP*uv(1+end/2:end)];
             end
         end
-        
-        %Auxiliary Cahn-Hilliard
-        [A,b] = Div_FullStressTensor(this,phi)
-        function mu_s = GetMu(this,phi)
-            if(nargin == 1)
-                phi = this.phi;
-            end
-            Cn       = this.optsPhys.Cn;
-            mu_s     = DoublewellPotential(phi,Cn) - Cn*(this.IC.Diff.Lap*phi);               
-        end                   
-        
-        %Analysis functions
         function ComputeInterfaceContour(this)
             y2           = this.IC.Pts.y2;
             phi          = this.phi; 
@@ -231,11 +342,46 @@ classdef DiffuseInterface < Computation
                 z  = IP*phi;
             end   
         end
-        
-        %Plotting                           
+        function AnalyzeScalarQuantity(this,f,interval)
+            if(nargin == 2)
+                interval = [-10,10];
+            end
+            y2Max = this.optsNum.PhysArea.y2Max;
+            noCuts = 5;
+            optsC  = {'b','g','m','k','r'};
+            
+            figure('Position',[0 0 1000 800]);
+            subplot(2,1,1);
+            leg = {};
+            for i= 0:1:(noCuts-1)
+                y2 = y2Max*i/(noCuts-1);
+                this.IC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
+                
+                IP       = this.IC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
+                plot(interval,[1,1]*(IP*f),[optsC{i+1},'--']); hold on;
+                IP       = this.IC.SubShapePtsCart(struct('y1_kv',inf,'y2_kv',y2));
+                plot(interval,[1,1]*(IP*f),[optsC{i+1},'-.']);  hold on;
+                
+                leg{end+1} = ['y2 = ',num2str(y2)];
+                leg{end+1} = '';
+                leg{end+1} = ['y2 = ',num2str(y2),'y1=-inf'];
+                leg{end+1} = ['y2 = ',num2str(y2),'y1=inf'];
+            end
+            legend(leg,'Location','eastoutside');
+            
+            subplot(2,1,2);
+            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
+            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
+            
+            this.IC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
+            this.IC.doPlotFLine([0 0],[0 y2Max],f);  hold on;
+            this.IC.doPlotFLine([4 4],[0 y2Max],f);  hold on;
+            
+            legend({'-inf','inf'},'Location','eastoutside');
+        end
         function PlotResultsMu(this)                         
             figure('Position',[0 0 800 600],'color','white');
-            this.IC.doPlots(GetMu(this),'contour');             
+            this.IC.doPlots(this.mu,'contour');             
             PlotU(this); hold on;             
         end
         function PlotResultsPhi(this)
@@ -249,46 +395,20 @@ classdef DiffuseInterface < Computation
                 plot(this.IsolineInterfaceY2,this.IC.Pts.y2,...
                                                     'k','linewidth',3);
             end
-            if(~isempty(this.theta))
-                this.PlotSeppecherSolution(this.theta,this.phi);
+            if(IsSeppecher(this))
+                PlotSeppecherSolution(this);
             end
         end        
-        function PlotSeppecherSolution(this,theta,phi)
-            if(nargin == 1)                
-                phi = this.phi;            
-                theta = this.theta;
-            end
-            UWall   = this.optsPhys.UWall;
-%            D_A     = this.optsPhys.D_A;                        
-%             u_flow = GetSeppecherSolutionCart(this.PlotBCShape.GetCartPts,...
-%                                               UWall,D_A,D_B,theta);                                                                        
-%             this.PlotBCShape.doPlots(u_flow,'flux',struct('reshape',false,'linecolor','m'));
-            
-            PtsCart = this.IC.GetCartPts(); 
-            if(nargin > 2)
-                deltaX = GetDeltaX(this,phi,theta);             
-                PtsCart.y1_kv = PtsCart.y1_kv - deltaX;
-            else
-                deltaX = 0;
-            end             
-             
-             %y2Max   = this.optsNum.PhysArea.y2Max;            
-                         
-             u_flow = GetSeppecherSolutionCart(PtsCart,UWall,0,0,theta);     
-%                         
-%             if(nargin >= 4)
-%                 figure('Position',[0 0 1800 600],'Color','white');            
-%                 subplot(1,2,1);  
+        function PlotSeppecherSolution(this)               
+            theta   = this.theta;            
+            UWall   = this.optsPhys.UWall;            
+            PtsCart = this.IC.GetCartPts();             
+                                      
+            u_flow = GetSeppecherSolutionCart(PtsCart,UWall,0,0,theta);     
             PlotU(this,u_flow);            hold on;                   
             
             y2Max = this.optsNum.PhysArea.y2Max;
-            plot([deltaX (deltaX+y2Max/tan(theta))],[0 y2Max],'k--','linewidth',2.5);
-%                 subplot(1,2,2);  this.IC.doPlotFLine([-100,100],[y2Max,y2Max],phi.*u_flow(end/2+1:end),'CART'); 
-%             else
-%                 figure('Position',[0 0 800 800],'Color','white');            
-%                 PlotU(this,u_flow);            
-%             end
-%             title('Check accuracy of map');
+            plot([this.deltaX (this.deltaX+y2Max/tan(theta))],[0 y2Max],'k--','linewidth',2.5);
         end         
         function AddStreamlines(this)
             for i = 1:3
@@ -394,24 +514,7 @@ classdef DiffuseInterface < Computation
             SaveCurrentFigure(this,[this.filename '_ErrorIterations']);                 
         end
         
-        %Old
-        D_B         = SetD_B(this,theta,phi,initialGuessDB)
-        function Interp = ResetOrigin(this,phi)
-            
-            pt.y2_kv  =  0;
-            DeltaY1   = fsolve(@phiX1,-1);%,fsolveOpts);
-            
-            ptsCartShift       = this.IC.GetCartPts();
-            ptsCartShift.y1_kv = ptsCartShift.y1_kv + DeltaY1;
-            
-            Interp = this.IC.SubShapePtsCart(ptsCartShift);                       
-            
-            function z = phiX1(y1)
-                pt.y1_kv = y1;
-                IP       = this.IC.SubShapePtsCart(pt);
-                z        = IP*phi;
-            end    
-        end
+        %Old                
         function theta  = FindInterfaceAngle(this,phi)
 
             y2M = 0; y2P = 10;
@@ -435,145 +538,6 @@ classdef DiffuseInterface < Computation
             end    
         end   
         
-        function AnalyzeScalarQuantity(this,f,interval)
-            if(nargin == 2)
-                interval = [-10,10];
-            end
-            y2Max = this.optsNum.PhysArea.y2Max;
-            noCuts = 5;
-            optsC  = {'b','g','m','k','r'};
-            
-            figure('Position',[0 0 1000 800]);
-            subplot(2,1,1);
-            leg = {};
-            for i= 0:1:(noCuts-1)
-                y2 = y2Max*i/(noCuts-1);
-                this.IC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
-                
-                IP       = this.IC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
-                plot(interval,[1,1]*(IP*f),[optsC{i+1},'--']); hold on;
-                IP       = this.IC.SubShapePtsCart(struct('y1_kv',inf,'y2_kv',y2));
-                plot(interval,[1,1]*(IP*f),[optsC{i+1},'-.']);  hold on;
-                
-                leg{end+1} = ['y2 = ',num2str(y2)];
-                leg{end+1} = '';
-                leg{end+1} = ['y2 = ',num2str(y2),'y1=-inf'];
-                leg{end+1} = ['y2 = ',num2str(y2),'y1=inf'];
-            end
-            legend(leg,'Location','eastoutside');
-            
-            subplot(2,1,2);
-            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
-            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
-            
-            this.IC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
-            this.IC.doPlotFLine([0 0],[0 y2Max],f);  hold on;
-            this.IC.doPlotFLine([4 4],[0 y2Max],f);  hold on;
-            
-            legend({'-inf','inf'},'Location','eastoutside');
-        end
-        
-        [phi,muDelta]  = GetEquilibriumDensityR(this,mu,theta,nParticles,phi,ptC)                  
-        [phi,uv]       = SolveFull(this,ic)        
-        
-        function [v_mu,A_mu] = ChemicalPotential(this,uv,phi,G)
-            %[uv;phi;G]     
-            Cn             = this.optsPhys.Cn;
-            Ind            = this.IC.Ind;
-            
-            M              = this.IC.M;
-            F              = false(M,1);   
-            T              = true(M,1);            
-            Z              = zeros(M);
-            
-            Diff           = this.IC.Diff;            
-            
-    
-            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
-            % **************
-            
-            A_mu           = [Z,Z,...
-                              diag(fWPP)-Cn*Diff.Lap,...
-                              -eye(M)];
-            v_mu           = fWP - Cn*Diff.Lap*phi - G;
-            
-            % (BC4.a) nu*grad(phi) = 0            
-            A_mu(Ind.bottom|Ind.top,:)         = 0;
-            A_mu(Ind.bottom|Ind.top,[F;F;T;F]) = Diff.Dy2(Ind.bottom|Ind.top,:);    
-            v_mu(Ind.bottom|Ind.top)           = Diff.Dy2(Ind.bottom|Ind.top,:)*phi;
-       
-        end        
-        function [v_mom_IBB,A_mom_IBB,v_mu_T,A_mu_T] = GetSeppecherBoundaryConditions(this,uv,phi,a,deltaX,theta)
-            
-            %[uv;phi;G]
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            M              = this.IC.M;
-            PtsCart        = this.IC.GetCartPts();
-            y2Max          = this.IC.y2Max;
-            ITT            = repmat(Ind.top,2,1);  
-            IBB            = repmat(Ind.bound,2,1); 
-        	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
-            d_theta        = 0.01;
-            EYMM           = eye(2*M);
-            F              = false(M,1);   
-            T              = true(M,1);   
-            EYM            = eye(M);
-
-            u_flow      = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
-                                                PtsCart.y2_kv],1,0,0,theta);                  
-                                            
-            y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
-            a_corr        = (1 + a./(1+y1_Interface.^2));
-            a_corr_a      = 1./(1+y1_Interface.^2);        
-            a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
-            a_corr_deltaX(Ind.left | Ind.right) = 0;
-            a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
-    
-            uvBound        = u_flow .*repmat(a_corr,2,1);                                        
-
-            uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
-            uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
-
-            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
-            u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
-            uvBound_theta    = u_flow_d.*repmat(a_corr,2,1) + u_flow.*repmat(a_corr_theta,2,1);
-
-            A_mom_ITT              = zeros(sum(ITT),4*M);            
-            A_mom_ITT(:,[T;T;F;F]) = EYMM(ITT,:);            
-
-            A_mom_a_ITT            = -uvBound_a(ITT);
-            A_mom_deltaX_ITT       = -uvBound_deltaX(ITT); 
-            A_mom_theta_ITT        = -uvBound_theta(ITT);        
-
-            A_mom(ITT,:)           = [A_mom_a_ITT,...
-                                     A_mom_deltaX_ITT,...
-                                     A_mom_theta_ITT,...
-                                     A_mom_ITT];
-                                 
-            v_mom(ITT)              = uv(ITT) - uvBound(ITT);
-            
-            u_Wall = [ones(M,1);zeros(M,1)];
-        
-            A_mom(IBB & ~ITT,:)                = 0;
-            A_mom(IBB & ~ITT,[false;false;false;IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
-            v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
-            
-            A_mom_IBB = A_mom(IBB,:);
-            v_mom_IBB = v_mom(IBB);
-
-            %A_momThree            = [A_mom_a',A_mom_deltaX',A_mom_theta'];
-            a_direction               = [cos(theta)*EYM,sin(theta)*EYM];            
-            a_direction_theta         = [-sin(theta)*EYM,cos(theta)*EYM];            
-
-            
-            A_mu_T                                  = zeros(sum(Ind.top),3+4*M);
-            A_mu_T(:,[false;false;false;F;F;T;F])   = a_direction(Ind.top,:)*Diff.grad;
-            A_mu_T(:,[false;false;true;F;F;F;F])    = a_direction_theta(Ind.top,:)*(Diff.grad*phi);
-
-            v_mu_T                                  = a_direction(Ind.top,:)*(Diff.grad*phi);                                                   
-            
-        end                         
    end
     
 end

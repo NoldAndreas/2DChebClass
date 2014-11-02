@@ -34,26 +34,9 @@ function IterationStepFullProblem(this,noIterations)
     opts = struct('optsNum',this.optsNum,...
                   'optsPhys',this.optsPhys,...
                   'Comments',this.configName);
-              
-    if(isempty(this.mu))
-        in = struct('initialGuess',GetInitialCondition(this));
-    else
-        in = struct('initialGuess',[this.uv;...
-                                    this.phi;...
-                                    this.mu]);
-    end
-
-    if(Seppecher)
-        if(isempty(this.mu))
-            in.initialGuess = [0;0;pi/2;in.initialGuess];
-        else
-            in.initialGuess = [this.a;...
-                               this.deltaX;...
-                               this.theta;...
-                               in.initialGuess];
-        end
-    end
-    
+        
+    in = struct('initialGuess',GetInitialCondition(this));
+     
     [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
                     opts,in);
 	   
@@ -111,7 +94,7 @@ function IterationStepFullProblem(this,noIterations)
             
         [v_cont,A_cont]  = Continuity(this,uv,phi,G);               
         [v_mom,A_mom]    = Momentum(this,uv,phi,G);      
-        [v_mu,A_mu]      = ChemicalPotential(this,uv,phi,G);
+        [v_mu,A_mu]      = ChemicalPotential(this,phi,G);
        
         A_particles            = zeros(1,4*M);
         A_particles([F;F;T;F]) = IntSubArea;
@@ -128,13 +111,19 @@ function IterationStepFullProblem(this,noIterations)
             A_mom  = [zeros(2*M,3),A_mom];
             A_mu   = [zeros(M,3),A_mu];
     
-            [v_mom(IBB),A_mom(IBB,:),v_mu(Ind.top),A_mu(Ind.top,:)]...        
-                    = GetSeppecherBoundaryConditions(this,uv,phi,a,deltaX,theta);               
+            [v_mu(Ind.top),A_mu(Ind.top,:)]...        
+                    = GetSeppecherBoundaryConditions(this,phi,theta);               
+            [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv,a,deltaX,theta);
     
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta);
 
             A_particles = [0,0,0,A_particles];
+            
+        else
+            [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv);
         end
+        
+        
         
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    

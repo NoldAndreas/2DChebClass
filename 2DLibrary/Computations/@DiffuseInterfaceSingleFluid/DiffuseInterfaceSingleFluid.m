@@ -1,94 +1,12 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
-	properties (Access = public)              
-        mu        
-    end
          
     methods (Access = public) 
          function this = DiffuseInterfaceSingleFluid(config)           
              this@DiffuseInterface(config);
          end
                  
-         SolveMovingContactLine(this,maxIterations)       
-         [phi,theta,muDelta] = GetEquilibriumDensity(this,mu,theta,phi,findTheta)
-         [mu,uv,A,b,a]       = GetVelocityAndChemPot(this,phi,theta)
-         [A,b]               = ContinuityMomentumEqs(this,phi)
-                        
-         [A,b]       = FullStressTensorIJ(this,phi,i,j)           
-         function p = GetPressure_from_ChemPotential(this,mu,phi_ig)
-            Cn     = this.optsPhys.Cn;
-            phi_m  = this.optsPhys.phi_m;
-            %for bulk
-            % 0 = W' - m
-            % p = - W + mu*(phi + phi_m)
-            
-            fsolveOpts = optimset('Display','off');
-            [phi,~,exitflag]   = fsolve(@f,phi_ig,fsolveOpts);
-            if(exitflag < 1)
-                cprintf('*r','No solution for density for given chemical potential found');
-            end
-            
-            [~,W] = DoublewellPotential(phi,Cn);
-            p     = - W + mu*(phi+phi_m);
-            
-            function y = f(phi)
-                y = DoublewellPotential(phi,Cn) - mu;
-            end
-            
-         end  
-        
-         IterationStepFullProblem_old(this,noIterations)
-         IterationStepFullProblem(this,noIterations)
-         function vec = GetInitialCondition(this) 
-           
-            if(~isempty(this.uv) && ...                
-                ~isempty(this.mu) && ...
-                ~isempty(this.phi))
-                vec  = [this.uv;this.phi;this.mu];
-                return;
-            end
-           
-            M = this.IC.M;
-            if(isempty(this.theta))
-                otherInput.thetaInitialGuess = pi/2;
-            else
-                otherInput.thetaInitialGuess = this.theta;
-            end            
-
-             if(otherInput.thetaInitialGuess == pi/2)
-                theta  = pi/2;
-                phi    = InitialGuessRho(this);
-                mu     = 0;
-             else
-                theta  = otherInput.thetaInitialGuess;
-                phi    = this.phi;
-                mu     = this.GetMu();
-             end
-
-             this.uv  = GetBoundaryCondition(this,theta,phi);                         
-             this.mu  = zeros(M,1);
-             this.phi = phi;
+         IterationStepFullProblem(this,noIterations)                
              
-             vec  = [this.uv;this.phi;this.mu];
-         end
-
-        IterationStepFullProblem_Seppecher_old(this,noIterations)
-
-         function [bulkError,bulkAverageError] = DisplayFullError(this,phi,uv)            
-            M        = this.IC.M;
-            
-            [Af,bf]  = ContinuityMomentumEqs(this,phi);                         
-            mu_s     = GetMu(this,phi);
-            
-            error    = Af*[mu_s;uv] - bf;
-            PrintErrorPos(error(1:M),'continuity equation',this.IC.Pts);            
-            PrintErrorPos(error(1+M:2*M),'y1-momentum equation',this.IC.Pts);            
-            PrintErrorPos(error(2*M+1:end),'y2-momentum equation',this.IC.Pts);                        
-            
-            PrintErrorPos(error(repmat(~this.IC.Ind.bound,2,1)),'bulk continuity and momentum equations');               
-            
-            bulkError        = max(abs(error(repmat(~this.IC.Ind.bound,2,1))));
-            bulkAverageError = mean(abs(error(repmat(~this.IC.Ind.bound,2,1))));
-         end        
          function [v_cont,A_cont] = Continuity(this,uv,phi,G)
             
             Cn             = this.optsPhys.Cn;
@@ -189,9 +107,6 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             Cn             = this.optsPhys.Cn;
             zeta           = this.optsPhys.zeta;
             M              = this.IC.M;
-            EYMM           = eye(2*M);
-            IBB            = repmat(Ind.bound,2,1);  
-            F       = false(M,1);   T  = true(M,1);    
             
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
             tauM           = Cak*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);            
@@ -205,14 +120,10 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
                               - diag(phiM2)*Diff.grad - [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]];
             v_mom         = tauM*uv - phiM2.*(Diff.grad*G) + ...
                              repmat(fWP - Cn*Diff.Lap*phi - G,2,1).*(Diff.grad*phi);
+                                                              
 
-
-            uvBound                = GetBoundaryCondition(this);%,theta,phi);   
-            A_mom(IBB,:)           = 0;
-            A_mom(IBB,[T;T;F;F])   = EYMM(IBB,:);
-            v_mom(IBB)             = uv(IBB) - uvBound(IBB);
+            
          end        
-           
          function [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta)
 
             M              = this.IC.M;
@@ -268,6 +179,9 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 
              v_SeppAdd = [v_a;v_deltaX;v_theta];
              A_SeppAdd = [A_a;A_deltaX;A_theta];
-        end
+         end
+        
+         %Old
+         [A,b]       = FullStressTensorIJ(this,phi,i,j)                    
     end
 end

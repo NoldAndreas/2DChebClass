@@ -71,16 +71,17 @@ function IterationStepFullProblem_old(this,noIterations)
         [v_cont,A_cont] = Continuity(this,uv,phi,G,p);
         [v_mom,A_mom]   = Momentum(this,uv,phi,G,p);
         [v_G,A_G]       = Phasefield(this,uv,phi,G);
-        [v_mu,A_mu]     = ChemicalPotential(this,uv,phi,G);
+        [v_mu,A_mu]     = ChemicalPotential(this,phi,G);
                 
        %% Boundary conditions [uv;phi;G;p]
         
 
         % (BC3) uv = uv_BC    
-        [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
-        A_mom(IBB,:)           = 0;
-        A_mom(IBB,[T;T;F;F;F]) = EYMM(IBB,:);
-        v_mom(IBB)             = uv(IBB) - uvBound(IBB);                
+        [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv);
+%         [uvBound,a]            = GetBoundaryCondition(this);%,theta,phi);   
+%         A_mom(IBB,:)           = 0;
+%         A_mom(IBB,[T;T;F;F;F]) = EYMM(IBB,:);
+%         v_mom(IBB)             = uv(IBB) - uvBound(IBB);                
         
         A_particles            = zeros(1,5*M);
         A_particles([F;F;T;F;F]) = IntSubArea;
