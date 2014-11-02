@@ -21,7 +21,7 @@ function SeppecherBinaryFluid()
     config = v2struct(optsPhys,optsNum);   
             
     DI = DiffuseInterfaceBinaryFluid(config);
-    DI.Preprocess();                  
+    DI.Preprocess();
     DI.IterationStepFullProblem(20);    
     DI.FindStagnationPoint();
     DI.SavePlotResults();

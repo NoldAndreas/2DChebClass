@@ -154,27 +154,23 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            Cn          = this.optsPhys.Cn;
            Cak         = this.optsPhys.Cak;
            y2Max       = this.optsNum.PhysArea.y2Max;
-           
-           phiM        = phi(Ind.left & Ind.top);
-           phiP        = phi(Ind.right & Ind.top);  
-        
-           pM          = p(Ind.left & Ind.top);
-           pP          = p(Ind.right & Ind.top);
-        
+                      
            IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc;     
+           [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
            
            A_cont         = [Diff.div,Z,Z,Z];    
            v_cont         = Diff.div*uv;
            
            % (BC0) [uv;phi;G;p]
-           A_cont(Ind.bottom | Ind.top,[T;T;F;F;F]) = Diff.LapDiv(Ind.bottom | Ind.top,:);
-           A_cont(Ind.bottom | Ind.top,[F;F;T;F;F]) = Diff.div(Ind.bottom | Ind.top,:)*(diag(repmat(G,2,1))*Diff.grad)/Cak;
-           A_cont(Ind.bottom | Ind.top,[F;F;F;T;F]) = Diff.div(Ind.bottom | Ind.top,:)*([diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)])/Cak;
-           A_cont(Ind.bottom | Ind.top,[F;F;F;F;T]) = - Diff.Lap(Ind.bottom | Ind.top,:);
+           indBC0 = Ind.top;
+           A_cont(indBC0,[T;T;F;F;F]) = Diff.LapDiv(indBC0,:);
+           A_cont(indBC0,[F;F;T;F;F]) = Diff.div(indBC0,:)*(diag(repmat(G,2,1))*Diff.grad)/Cak;
+           A_cont(indBC0,[F;F;F;T;F]) = Diff.div(indBC0,:)*([diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)])/Cak;
+           A_cont(indBC0,[F;F;F;F;T]) = - Diff.Lap(indBC0,:);
            
-           v_cont(Ind.bottom | Ind.top) = - Diff.Lap(Ind.bottom | Ind.top,:)*p...
-                                          + Diff.LapDiv(Ind.bottom | Ind.top,:)*uv ...
-                                          + Diff.div(Ind.bottom | Ind.top,:)*(repmat(G,2,1).*(Diff.grad*phi))/Cak;
+           v_cont(indBC0) = - Diff.Lap(indBC0,:)*p...
+                                          + Diff.LapDiv(indBC0,:)*uv ...
+                                          + Diff.div(indBC0,:)*(repmat(G,2,1).*(Diff.grad*phi))/Cak;
             
            % (BC1) p = 0  at y1 = +/- infinity
            A_cont(Ind.left,:)           = 0;
@@ -182,33 +178,29 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            v_cont(Ind.left)             = p(Ind.left);
 
             % (BC2) [uv;phi;G;p]
-
-           [fpW_mInf,fW_mInf] = DoublewellPotential(phiM,Cn);
-           [fpW_pInf,fW_pInf] = DoublewellPotential(phiP,Cn);
-
-           indBC2 = Ind.right & Ind.top;
-
+           
            A_cont(Ind.right,:)           = 0;
            A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
            v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
-
-           A_cont(indBC2,[T;T;F;F;F]) = IntPathUpLow*[Diff.Dy2 , Diff.Dy1];              
-
-           A_cont(indBC2,[F;F;T;F;F]) = -Cn/Cak*IntPathUpLow*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
-           A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) = ...
-                            A_cont(indBC2,[F;F;Ind.top&Ind.right;F;F]) + ...
-                            y2Max*fpW_pInf/Cak;
-           A_cont(indBC2,[F;F;Ind.top&Ind.left;F;F])  = ...
-                            A_cont(indBC2,[F;F;Ind.top&Ind.left;F;F]) - ...
-                            y2Max*fpW_mInf/Cak;
-
-           A_cont(indBC2,[F;F;F;F;Ind.top&Ind.right]) = -y2Max;  
-           A_cont(indBC2,[F;F;F;F;Ind.top&Ind.left])  = y2Max;  
-
-
-           v_cont(indBC2) = IntPathUpLow*([Diff.Dy2 , Diff.Dy1]*uv ...
-                                  - Cn/Cak*((Diff.Dy1*phi).*(Diff.Dy2*phi)))...
-                            +y2Max*((-pP + fW_pInf/Cak) - (-pM + fW_mInf/Cak));
+           
+           indBC2 = Ind.right & Ind.top;
+           
+           A_m11 = zeros(M,5*M);            
+           A_m11(:,[F;F;T;F;F]) = diag(fWP);
+           A_m11(:,[F;F;F;F;T]) = -Cak*eye(M);
+           m11 =  -p*Cak + fW;                 
+           
+           A_m12 = zeros(M,5*M);
+           A_m12(:,[T;T;F;F;F]) = Cak*[Diff.Dy2 , Diff.Dy1];
+           A_m12(:,[F;F;T;F;F]) = -Cn*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1); 
+           m12 = Cak*[Diff.Dy2 , Diff.Dy1]*uv - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi));                       
+           
+           A_cont(indBC2,:) = IntPathUpLow*A_m12  ...
+                                + y2Max*(A_m11(Ind.right & Ind.top,:) - ...
+                                         A_m11(Ind.left & Ind.top,:));           
+           v_cont(indBC2) = IntPathUpLow*m12...
+                                +y2Max*(m11(Ind.right & Ind.top) ...
+                                      - m11(Ind.left & Ind.top));                                
 
        end
        function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
@@ -233,9 +225,19 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             v_G            = m*Diff.Lap*G - gradPhiMT*uv;
            
             % (BC4) nu*grad(G) = 0        
-            A_G(Ind.top|Ind.bottom,:)           = 0;
-            A_G(Ind.top|Ind.bottom,[F;F;F;T;F]) = Diff.Dy2(Ind.top|Ind.bottom,:);    
-            v_G(Ind.top|Ind.bottom)             = Diff.Dy2(Ind.top|Ind.bottom,:)*G;                                    
+            A_G(Ind.bottom,:)           = 0;
+            A_G(Ind.bottom,[F;F;F;T;F]) = Diff.Dy2(Ind.bottom,:);    
+            v_G(Ind.bottom)             = Diff.Dy2(Ind.bottom,:)*G;                                    
+            
+            if(IsSeppecher(this))
+                A_G(Ind.top,:)           = 0;
+                A_G(Ind.top,[F;F;F;T;F]) = Diff.Dy1(Ind.top,:);  
+                v_G(Ind.top)             = Diff.Dy1(Ind.top,:)*G;                
+            else
+                A_G(Ind.top,:)           = 0;
+                A_G(Ind.top,[F;F;F;T;F]) = Diff.Dy2(Ind.top,:);  
+                v_G(Ind.top)             = Diff.Dy2(Ind.top,:)*G;
+            end
 
             %(BC7) 
             indBC7 = Ind.left | Ind.right;

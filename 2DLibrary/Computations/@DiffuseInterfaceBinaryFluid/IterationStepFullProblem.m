@@ -114,7 +114,7 @@ function IterationStepFullProblem(this,noIterations)
             A_mu   = [zeros(M,3),A_mu];
                         
             [v_mu(Ind.top),A_mu(Ind.top,:)]...        
-                    = GetSeppecherBoundaryConditions(this,uv,phi,a,deltaX,theta);               
+                    = GetSeppecherBoundaryConditions(this,phi,theta);               
             [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv,a,deltaX,theta);
     
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta);

@@ -399,16 +399,10 @@ classdef DiffuseInterface < Computation
                 PlotSeppecherSolution(this);
             end
         end        
-        function PlotSeppecherSolution(this)               
-            theta   = this.theta;            
-            UWall   = this.optsPhys.UWall;            
-            PtsCart = this.IC.GetCartPts();             
-                                      
-            u_flow = GetSeppecherSolutionCart(PtsCart,UWall,0,0,theta);     
-            PlotU(this,u_flow);            hold on;                   
-            
+        function PlotSeppecherSolution(this)                                                                 
+            PlotU(this);            hold on;                               
             y2Max = this.optsNum.PhysArea.y2Max;
-            plot([this.deltaX (this.deltaX+y2Max/tan(theta))],[0 y2Max],'k--','linewidth',2.5);
+            plot([this.deltaX (this.deltaX+y2Max/tan(this.theta))],[0 y2Max],'k--','linewidth',2.5);
         end         
         function AddStreamlines(this)
             for i = 1:3
