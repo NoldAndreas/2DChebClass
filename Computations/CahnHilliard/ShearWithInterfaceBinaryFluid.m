@@ -25,8 +25,15 @@ function ShearWithInterfaceBinaryFluid()
         config.optsNum.PhysArea.y2Max = y2M;        
         
         DI = DiffuseInterfaceBinaryFluid(config);
-        DI.Preprocess();                             
-        DI.IterationStepFullProblem(20);
+        DI.Preprocess();               
+        
+        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
+        DI.IterationStepFullProblem(opts);    
+	
+        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
+        DI.IterationStepFullProblem(opts);    
+        
+        %DI.IterationStepFullProblem(20);
         DI.SavePlotResults();
         DI.PlotErrorIterations();
         clear 'DI'

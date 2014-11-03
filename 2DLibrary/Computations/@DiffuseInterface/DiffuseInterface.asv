@@ -251,7 +251,7 @@ classdef DiffuseInterface < Computation
             
             A_mom_IBB = A_mom(IBB,:);
             v_mom_IBB = v_mom(IBB);
-        end
+        end        
         function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
             %[uv;phi;G]     
             Cn             = this.optsPhys.Cn;
@@ -404,7 +404,7 @@ classdef DiffuseInterface < Computation
             plot([this.deltaX (this.deltaX+y2Max/tan(this.theta))],[0 y2Max],'k--','linewidth',2.5);
             
             uSepp = GetSeppecherSolutionCart(this.IC.GetCartPts,1,0,0,this.theta);
-            PlotU(this,uSepp,struct('color','m'));
+            PlotU(this,uSepps);
         end         
         function AddStreamlines(this)
             for i = 1:3

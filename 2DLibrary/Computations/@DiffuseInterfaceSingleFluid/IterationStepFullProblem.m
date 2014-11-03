@@ -86,6 +86,8 @@ function IterationStepFullProblem(this,noIterations)
             disp(['[a,deltaX,theta] = ',num2str(a),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
         
             z      = z(4:end);
+        else
+            a = []; deltaX = []; theta = [];
         end
 
         uv  = z([T;T;F;F]);
@@ -107,23 +109,17 @@ function IterationStepFullProblem(this,noIterations)
         end
 
         if(Seppecher)    
-            A_cont = [zeros(M,3),A_cont];
-            A_mom  = [zeros(2*M,3),A_mom];
-            A_mu   = [zeros(M,3),A_mu];
-    
-            [v_mu(Ind.top),A_mu(Ind.top,:)]...        
-                    = GetSeppecherBoundaryConditions(this,phi,theta);               
-            [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv,a,deltaX,theta);
+            A_cont        = [zeros(M,3),A_cont];
+            A_mom         = [zeros(2*M,3),A_mom];
+            A_mu          = [zeros(M,3),A_mu];
+            A_particles   = [0,0,0,A_particles];            
     
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta);
-
-            A_particles = [0,0,0,A_particles];
             
-        else
-            [v_mom(IBB),A_mom(IBB,:)] = GetVelBC(this,uv);
         end
         
-        
+        [v_mu(Ind.top|Ind.bottom),A_mu(Ind.top|Ind.bottom,:)] = GetPhiBC(this,phi,theta);          
+        [v_mom(IBB),A_mom(IBB,:)]                             = GetVelBC(this,uv,a,deltaX,theta);                    
         
         A = [A_mom;A_mu;A_cont];
         v = [v_mom;v_mu;v_cont];    

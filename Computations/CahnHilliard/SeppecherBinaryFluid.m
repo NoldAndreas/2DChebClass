@@ -22,7 +22,16 @@ function SeppecherBinaryFluid()
             
     DI = DiffuseInterfaceBinaryFluid(config);
     DI.Preprocess();
-    DI.IterationStepFullProblem(20);    
+    
+    opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
+    DI.IterationStepFullProblem(opts);    
+	
+    opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
+    DI.IterationStepFullProblem(opts);    
+    
+	%opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
+    %DI.IterationStepFullProblem(opts);    
+    
     DI.FindStagnationPoint();
     DI.SavePlotResults();
 	DI.PlotErrorIterations();
