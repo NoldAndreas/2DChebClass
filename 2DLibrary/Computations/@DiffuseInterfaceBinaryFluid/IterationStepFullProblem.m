@@ -56,7 +56,7 @@ function IterationStepFullProblem(this,opts)
     this.phi      = res.phi;
     this.p        = res.p;
     if(Seppecher)
-        this.a        = res.a;
+        this.a        = res.a;        
         this.deltaX   = res.deltaX;
         this.theta    = res.theta;
     end
@@ -81,10 +81,10 @@ function IterationStepFullProblem(this,opts)
         
         %[uv;phi;mu] 
         if(Seppecher)
-            res.a      = vec(1);
-            res.deltaX = vec(2);
-            res.theta  = vec(3);
-            vec        = vec(4:end);
+            res.a      = vec(1:2);
+            res.deltaX = vec(3);
+            res.theta  = vec(4);
+            vec        = vec(5:end);
         end
         res.uv     = vec([T;T;F;F;F]);
         res.phi    = vec([F;F;T;F;F]);
@@ -97,12 +97,12 @@ function IterationStepFullProblem(this,opts)
         
         %[uv;phi;G;p]       
         if(Seppecher)
-            a      = z(1);
-            deltaX = z(2);
-            theta  = z(3);
-            disp(['[a,deltaX,theta] = ',num2str(a),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
+            a      = z(1:2);            
+            deltaX = z(3);
+            theta  = z(4);
+            disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
         
-            z      = z(4:end);
+            z      = z(5:end);
         else
             a = []; deltaX = []; theta = [];                    
         end
@@ -122,13 +122,13 @@ function IterationStepFullProblem(this,opts)
         v_particles              = IntSubArea*phi - nParticles;         
 
         if(Seppecher)    
-            A_cont      = [zeros(M,3),A_cont];
-            A_mom       = [zeros(2*M,3),A_mom];
-            A_G         = [zeros(M,3),A_G];
-            A_mu        = [zeros(M,3),A_mu];
-            A_particles = [0,0,0,A_particles];
+            A_cont      = [zeros(M,4),A_cont];
+            A_mom       = [zeros(2*M,4),A_mom];
+            A_G         = [zeros(M,4),A_G];
+            A_mu        = [zeros(M,4),A_mu];
+            A_particles = [0,0,0,0,A_particles];
             
-            [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,a,deltaX,theta);
+            [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
         end
         
         [v_mu(Ind.top|Ind.bottom),A_mu(Ind.top|Ind.bottom,:)] = GetPhiBC(this,phi,theta);          
@@ -147,7 +147,7 @@ function IterationStepFullProblem(this,opts)
         if(Seppecher)
             A  = [A_SeppAdd;A];
             v  = [v_SeppAdd;v];
-        end
+        end       
 
         if(~solveSquare)
             A = [A;A_particles];
@@ -155,15 +155,19 @@ function IterationStepFullProblem(this,opts)
         end
         
         DisplayError(v);
+                
+        %A = A(2:end,2:end);        
+        %v = v(2:end);
     end    
     function DisplayError(error)
         
         if(Seppecher)
-            PrintErrorPos(error(1),'consistent mass influx');
-            PrintErrorPos(error(2),'zero density at interface');        
-            PrintErrorPos(error(3),'chemical potential at -inf');
+            PrintErrorPos(error(1),'consistent phase mass');
+            PrintErrorPos(error(2),'consistent mass');
+            PrintErrorPos(error(3),'zero density at interface');        
+            PrintErrorPos(error(4),'chemical potential at -inf');
         
-            error = error(4:end);
+            error = error(5:end);
         end
         PrintErrorPos(error([F;F;F;F;T]),'continuity equation',this.IC.Pts);
         PrintErrorPos(error([T;F;F;F;F]),'y1-momentum equation',this.IC.Pts);

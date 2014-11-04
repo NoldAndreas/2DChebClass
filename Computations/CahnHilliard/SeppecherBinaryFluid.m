@@ -23,6 +23,9 @@ function SeppecherBinaryFluid()
     DI = DiffuseInterfaceBinaryFluid(config);
     DI.Preprocess();
     
+    opts = struct('noIterations',5,'lambda',0.2,'solveSquare',true);
+    DI.IterationStepFullProblem(opts);    
+    
     opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
     DI.IterationStepFullProblem(opts);    
 	
