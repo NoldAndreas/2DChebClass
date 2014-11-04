@@ -7,7 +7,7 @@ classdef ContactLineHS < DDFT_2D
         
         y1_SpectralLine        
         hII = [], hIII = [],hContour = []
-        disjoiningPressure_II
+        disjoiningPressure_II=[],disjoiningPressure_IV=[]
         y1_I = [], hI = []
         
         y2=[],Int_y2=[],DiffY2=[]
@@ -243,8 +243,9 @@ classdef ContactLineHS < DDFT_2D
         sol = Compute(this)        
         ComputeDynamics(this)        
         
-        %Compute disjoining pressure
+        %Compute disjoining pressure        
         Compute_DisjoiningPressure_II(this,y1Int)
+        Compute_DisjoiningPressure_IV(this)
         function SumRule_DisjoiningPressure_II(this,ST_LG)
 
             if(nargin < 2)
