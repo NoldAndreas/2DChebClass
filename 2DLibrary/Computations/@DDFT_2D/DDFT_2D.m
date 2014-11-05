@@ -76,7 +76,7 @@ classdef DDFT_2D < Computation
             if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 [this.optsPhys.rhoGas_sat,...
                      this.optsPhys.rhoLiq_sat,...
-                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                    this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
                 GetCriticalPoint(this.optsPhys);
                 % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
