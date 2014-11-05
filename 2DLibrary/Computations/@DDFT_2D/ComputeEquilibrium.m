@@ -71,6 +71,8 @@
     misc.FexNum     = this.optsNum.FexNum;
     misc.Int        = this.IDC.Int;
     
+    opts.Comments = this.configName;
+    
 	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
                             @ComputeEquilibriumCondition,opts,misc);
          

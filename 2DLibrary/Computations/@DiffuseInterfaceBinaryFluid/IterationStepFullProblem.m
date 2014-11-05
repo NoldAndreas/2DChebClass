@@ -81,10 +81,10 @@ function IterationStepFullProblem(this,opts)
         
         %[uv;phi;mu] 
         if(Seppecher)
-            res.a      = vec(1:2);
-            res.deltaX = vec(3);
-            res.theta  = vec(4);
-            vec        = vec(5:end);
+            res.a      = vec(1);
+            res.deltaX = vec(2);
+            res.theta  = vec(3);
+            vec        = vec(4:end);
         end
         res.uv     = vec([T;T;F;F;F]);
         res.phi    = vec([F;F;T;F;F]);
@@ -97,12 +97,12 @@ function IterationStepFullProblem(this,opts)
         
         %[uv;phi;G;p]       
         if(Seppecher)
-            a      = z(1:2);            
-            deltaX = z(3);
-            theta  = z(4);
+            a      = [z(1),0];
+            deltaX = z(2);
+            theta  = z(3);
             disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
         
-            z      = z(5:end);
+            z      = z(4:end);
         else
             a = []; deltaX = []; theta = [];                    
         end
@@ -156,8 +156,11 @@ function IterationStepFullProblem(this,opts)
         
         DisplayError(v);
                 
-        %A = A(2:end,2:end);        
-        %v = v(2:end);
+        A = A(2:end,2:end);
+        v = v(2:end);
+        
+        %A = A([1,3:end],[1,3:end]);
+        %v = v([1,3:end]);
     end    
     function DisplayError(error)
         

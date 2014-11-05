@@ -2,8 +2,8 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
                                  bounds1,bounds2,maxComp_y2)
 
     if(nargin == 0)
-        alpha_deg = 135;
-        epw       = 0.55;
+        alpha_deg = 60;
+        epw       = 1.25;
         bounds1   = [-10 10];
         bounds2   = [0.5 18];                
     end

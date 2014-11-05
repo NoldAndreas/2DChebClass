@@ -13,9 +13,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
        function vec = GetInitialCondition(this) 
             vec = GetInitialCondition@DiffuseInterface(this);           
-            if(length(vec) == this.IC.M*4+3)
-                vec = [0;vec];
-            end
+            %if(length(vec) == this.IC.M*4+3)
+%                vec = [0;vec];
+%            end
             if(isempty(this.p))
                 this.p   = zeros(this.IC.M,1);                
             end           
@@ -170,8 +170,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              %A_theta = [0,0,0,1,zeros(1,5*M)];    
              %v_theta = theta - pi/2;
 
-             v_SeppAdd = [v_a;v_b;v_deltaX;v_theta];
-             A_SeppAdd = [A_a;A_b;A_deltaX;A_theta];
+             v_SeppAdd = [v_b;v_a;v_deltaX;v_theta];
+             A_SeppAdd = [A_b;A_a;A_deltaX;A_theta];
              %A_SeppAdd =  [A_SeppAdd,zeros(size(A_SeppAdd,1),M)];
         end
        
@@ -357,20 +357,28 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                                             
             y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
             
+%             b_corr        = b*y1_Interface./(1+y1_Interface.^2);
+%             b_corr(Ind.left | Ind.right) = 0;
+%             b_corr_b      = y1_Interface./(1+y1_Interface.^2);        
+%             b_corr_b(Ind.left | Ind.right) = 0;
+%             b_corr_deltaX = -b*(1-y1_Interface.^2)./(1+y1_Interface.^2).^2;
+%             b_corr_deltaX(Ind.left | Ind.right) = 0;
+%             b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;            
+
+
+            b_corr        = b./(1+2*y1_Interface.^2);
+            b_corr_b      = 1./(1+2*y1_Interface.^2);        
+            b_corr_deltaX = 4*b*y1_Interface./(1+2*y1_Interface.^2).^2;
+            b_corr_deltaX(Ind.left | Ind.right) = 0;
+            b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;            
+            
+            
             a_corr        = a./(1+y1_Interface.^2);
             a_corr_a      = 1./(1+y1_Interface.^2);        
             a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
             a_corr_deltaX(Ind.left | Ind.right) = 0;
             a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
-            
-            b_corr        = b*y1_Interface./(1+y1_Interface.^2);
-            b_corr(Ind.left | Ind.right) = 0;
-            b_corr_b      = y1_Interface./(1+y1_Interface.^2);        
-            b_corr_b(Ind.left | Ind.right) = 0;
-            b_corr_deltaX = -b*(1-y1_Interface.^2)./(1+y1_Interface.^2).^2;
-            b_corr_deltaX(Ind.left | Ind.right) = 0;
-            b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;            
-            
+                        
             corr = 1 + a_corr + b_corr;
     
             uvBound        = u_flow .*repmat(corr,2,1);                                        

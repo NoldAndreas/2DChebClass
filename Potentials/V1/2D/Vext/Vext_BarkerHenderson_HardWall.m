@@ -36,7 +36,11 @@ function [VBack_S,VAdd_S]=Vext_BarkerHenderson_HardWall(y1,y2,t,opts)
         epsilon_w_end = opts.epsilon_w_end;
     end
     
-    [wall,dwall] = BarkerHendersonWall(y2 - 0.5,epsilon_w);
+    
+    [wall,dwall] = BarkerHendersonWall(y2 - 0.5,1);
+    
+    VAdd           = epsilon_w * wall;
+    dVAdd          = epsilon_w * dwall;
     
     if(isfield(opts,'epsilon_w_end'))        
         VAdd    = VAdd + wall*(epsilon_w_end - epsilon_w)*(1 -exp(-t^2));

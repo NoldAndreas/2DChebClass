@@ -64,8 +64,11 @@ function ComputeDynamics(this,x_ic,mu)
     if(isfield(optsNum,'PlotArea'))
         optsNumT = rmfield(optsNum,'PlotArea');
     end
+    
+    optsF          = v2struct(optsNumT,optsPhys);
+    optsF.Comments = this.configName;
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                            @ComputeDDFTDynamics,optsF,[]); %true
     this.FilenameDyn  = paramsEq.Filename;                        
                      
     function data = ComputeDDFTDynamics(params,misc)        

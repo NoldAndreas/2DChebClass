@@ -1,7 +1,7 @@
 function Compute_DisjoiningPressure_IV(this)    
        
     y1      = this.y1_SpectralLine.Pts.y;
-    PtsCart = this.IDC.PtsCart;
+    PtsCart = this.IDC.GetCartPts;
     Int     = this.IDC.Int;
     epw     = this.optsPhys.V1.epsilon_w;
 
@@ -10,7 +10,14 @@ function Compute_DisjoiningPressure_IV(this)
     
     fB            = zeros(size(y1));                   
     
+    
+    Phys_Area = struct('L1',3,'L2',2,'N',[20;20],...
+                       'y2Min',0);
+    HS = HalfSpace(Phys_Area);
+    
     hw = waitbar(0,'Computing disjoining pressure IV');
+    
+    
     for iy1 = 1:length(y1)
         y1i = y1(iy1);
         

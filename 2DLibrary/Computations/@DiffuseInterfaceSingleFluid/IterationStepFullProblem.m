@@ -39,8 +39,8 @@ function IterationStepFullProblem(this,noIterations)
      
     [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
                     opts,in);
-	   
-    this.uv       = res.uv;
+                
+	this.uv       = res.uv;
     this.mu       = res.mu;
     this.phi      = res.phi;
     if(Seppecher)
