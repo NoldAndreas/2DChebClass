@@ -10,8 +10,12 @@ function Compute_DisjoiningPressure_IV(this)
     
     fB        = zeros(size(y1));            
     
-    Phys_Area = struct('L1',3,'L2',2,'N',[20;20],'y2Min',0.5);
+    Phys_Area = struct('L1',3,'L2',2,'N',[51;50],'y2Min',0.5);
+    PlotArea       = struct('y1Min',-5,'y1Max',5,'y2Min',0.5,'y2Max',5,...
+                            'N2',100,'N1',100);
+
     HS        = HalfSpace(Phys_Area);
+    HS.ComputeAll(PlotArea);
     IntHS     = HS.ComputeIntegrationVector();
     
     HSPtsCart = HS.GetCartPts();

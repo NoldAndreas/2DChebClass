@@ -251,6 +251,8 @@ classdef ContactLineHS < DDFT_2D
             if(nargin < 2)
                 ST_LG = this.ST_1D.om_LiqGas;
             end
+            
+            anaDP = this.disjoiningPressure_IV;
 
             %******************************************
             %Check sum rule Eq. (11) in Henderson (2005)    
@@ -259,16 +261,16 @@ classdef ContactLineHS < DDFT_2D
             
             Int_y1  = this.y1_SpectralLine.Int;
             sinGamm = sin(this.alpha_YCA)*ST_LG;
-            err       = (Int_y1*this.disjoiningPressure_II + sinGamm);
+            err       = (Int_y1*anaDP + sinGamm);
             errPC     = err/sinGamm*100;            
-            disp(['Integral expression: ',num2str(Int_y1*this.disjoiningPressure_II),' +/- ',num2str(err) , ' or relative: ',num2str(errPC),' percent']);
+            disp(['Integral expression: ',num2str(Int_y1*anaDP),' +/- ',num2str(err) , ' or relative: ',num2str(errPC),' percent']);
 
-            h              = (-Int_y1*this.disjoiningPressure_II)/ST_LG;
+            h              = (-Int_y1*anaDP)/ST_LG;
             estTheta       = asin(h)*180/pi;
             if(IsDrying(this))
                 estTheta = 180 - estTheta;
             end
-            error_estTheta = 180/pi*sum(Int_y1)*max(abs(this.disjoiningPressure_II(1)),abs(this.disjoiningPressure_II(end)))/ST_LG/cos(estTheta*pi/180);%*(1/sqrt(1+h^2));
+            error_estTheta = 180/pi*sum(Int_y1)*max(abs(anaDP(1)),abs(anaDP(end)))/ST_LG/cos(estTheta*pi/180);%*(1/sqrt(1+h^2));
             disp(['Theta from Sum rule = ',num2str(estTheta),' [deg] +/- ',num2str(err/ST_LG/cos(estTheta*pi/180)*180/pi),' [deg]']);                            
             disp(['Error from numerical estimate : ',num2str(error_estTheta),' [deg]']);
             %disp(['Error from difference to integral estimate : ',num2str(err/ST_LG/cos(estTheta*pi/180)*180/pi),' [deg]']);

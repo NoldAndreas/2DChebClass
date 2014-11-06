@@ -11,6 +11,7 @@ function f2 = PlotDisjoiningPressures(this)
     
     plot([-10 35],[0 0],'k'); hold on;
     plot(y1,this.disjoiningPressure_II,'k--','linewidth',1.5);     
+    plot(y1,this.disjoiningPressure_IV,'r--','linewidth',1.5);     
     
     [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
     plot(this.y1_I+DeltaY1_II,disjoiningPressure1D(this.hI),'k-.','linewidth',1.5);
@@ -33,8 +34,8 @@ function f2 = PlotDisjoiningPressures(this)
     %set(gca,'YTick',-0.1:0.01:0);    
     
     global dirData
-    print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_DisjoiningPressures'],gcf);
-	saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_DisjoiningPressures.fig']);
+    print2eps([dirData filesep 'Equilibrium' filesep this.FilenameEq '_DisjoiningPressures'],gcf);
+	saveas(gcf,[dirData filesep 'Equilibrium' filesep this.FilenameEq '_DisjoiningPressures.fig']);
 
     function dP1D = disjoiningPressure1D(ell) 
         

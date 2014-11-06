@@ -1,4 +1,4 @@
-function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,OtherInputs,recompute)
+function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,OtherInputs,recompute,ignoreList)
 %Input: 
 %Name of Folder,List of Parameters
 %if file is to be written: Data
@@ -25,9 +25,8 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     DataFolder = [dirData filesep nameDir]; 	        
     index      = LoadIndexFiles(DataFolder);   
     
-	if((nargin == 4))
-        %set default value
-        recompute = true;
+	if(nargin == 4)
+        recompute = [];
     end
    
    
@@ -54,11 +53,17 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         else
             comments = '';
         end
+                        
         Parameters.Function = func2str(func);
         hname               = getFilename(Parameters);        
         filename            = [hname,'.mat'];
         fileParamTxtname    = [hname,'.txt'];
-                
+            
+        if(nargin >= 6)
+            Parameters_comp = RemoveIgnoreFromStruct(Parameters,ignoreList);
+        else
+            Parameters_comp = Parameters;
+        end
         for i=1:length(index)
             if(isfield(index{i},'Filename'))
                 par_i = rmfield(index{i},'Filename');
@@ -71,8 +76,13 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
               
 %             comp_struct(Parameters,par_i)
 %             pause
-            
-            if(isequaln(Parameters,par_i))%index{i}.Parameters))
+            if(nargin >= 6)
+                par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
+            else
+                par_i_comp = par_i;
+            end
+
+            if(isequaln(Parameters_comp,par_i_comp))%index{i}.Parameters))
                 
                 filename            = index{i}.Filename;
                 Parameters.Filename = filename(1:end-4);
@@ -83,9 +93,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 
                 if(recomputeAll)
                     recompute = true;
-                elseif((nargin == 4) && (~PersonalUserOutput))
+                elseif((isempty(recompute)) && (~PersonalUserOutput))
                     recompute = false;
-                elseif((nargin==4) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
+                elseif((isempty(recompute)) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
                     no = fprintf('Do you want to recompute Data (press any key), or wait for 2 seconds.');        
                     if(getkeywait(2) == -1)
                         for ih = 1:no
@@ -201,6 +211,14 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 %         end
 %        
 %     end
+
+    function s = RemoveIgnoreFromStruct(s,IgnoreList)
+        for j = 1:length(IgnoreList)
+            if(isfield(s,IgnoreList{j}))
+                s = rmfield(s,IgnoreList{j});
+            end
+        end
+    end
 
 end
 

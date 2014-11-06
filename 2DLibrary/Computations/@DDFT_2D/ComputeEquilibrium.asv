@@ -73,7 +73,7 @@
     
     opts.Comments = this.configName;
     
-    ignoreList = {'optsPhys_p','optsPhys_mu_sat','optsPhys_rhoLiq_sat','optsPhys_rhoGas_sat'};
+    ignoreList = {'optsPhys_p','optsPhys_mu_sat','optsPhys_rhoLiq_sat'};
 	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
                             @ComputeEquilibriumCondition,opts,misc,[],ignoreList);
          

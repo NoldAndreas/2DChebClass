@@ -60,10 +60,10 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
                           'sigmaS',1);      
                       
         configuration = v2struct(optsNum,optsPhys);
-        configName    = SaveConfig(configuration,'Configurations');
+        configName    = SaveConfig(configuration);
     elseif((nargin > 0) && isstruct(configIn))
         configuration = configIn;
-        configName    = SaveConfig(configuration,'Configurations');        
+        configName    = SaveConfig(configuration);        
     else
         if((nargin > 0) && (ischar(configIn)))% islogical(configIn))
             DataFolder = [dirData filesep 'Configurations' filesep];            
