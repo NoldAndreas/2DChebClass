@@ -106,6 +106,10 @@ function [fContour] =  PlotContourResults(this,plain)
     if(~isempty(this.hII))% && ((nargin == 1) || ~plain))
         plot(y1,this.hII+R+h0,'k--','linewidth',2.5);
     end  
+    
+    if(~isempty(this.hIV))% && ((nargin == 1) || ~plain))
+        plot(y1,this.hIV+R+h0,'r--','linewidth',2.5);
+    end  
 
     
     

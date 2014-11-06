@@ -1,7 +1,6 @@
 classdef DiffuseInterface < Computation
     
-   properties (Access = public)              
-       IC                     
+   properties (Access = public)                                          
        IntSubArea
               
        phi = [],uv  = [],mu=[]      
@@ -37,26 +36,26 @@ classdef DiffuseInterface < Computation
             end
         end       
         function Preprocess(this)                        
-            this.IC = InfCapillaryQuad(this.optsNum.PhysArea);    
+            this.IDC = InfCapillaryQuad(this.optsNum.PhysArea);    
             
-            this.IC.ComputeIndices();
-            this.IC.ComputeDifferentiationMatrix();
-            this.IC.ComputeIntegrationVector();
-            this.IC.InterpolationPlot(this.optsNum.PlotArea,true);                          
+            this.IDC.ComputeIndices();
+            this.IDC.ComputeDifferentiationMatrix();
+            this.IDC.ComputeIntegrationVector();
+            this.IDC.InterpolationPlot(this.optsNum.PlotArea,true);                          
             
             Sel = {'Dy1' ;'DDy1' ; 'Dy2'; 'DDy2';...
                    'DDDy2';'DDDy1';...
                    'Dy1Dy2'; 'DDy1Dy2'; 'Dy1DDy2';...
                    'Lap' ;'grad' ;'div'; ...
                    'gradLap' ;'gradDiv'; 'LapVec';'LapDiv';'Lap2'};
-            this.IC.ComputeDifferentiationMatrix(Sel);
+            this.IDC.ComputeDifferentiationMatrix(Sel);
                         
             
-            this.IC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
+            this.IDC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
             
-            this.IC.Ind.fluidInterface = [];
+            this.IDC.Ind.fluidInterface = [];
             if(isfield(this.optsPhys,'fluidInterface'))
-                this.IC.Ind.fluidInterface = this.IC.Ind.(this.optsPhys.fluidInterface);
+                this.IDC.Ind.fluidInterface = this.IDC.Ind.(this.optsPhys.fluidInterface);
             end
 
             bxArea          = struct('y1Min',this.optsNum.PhysArea.IntInterval(1),...
@@ -67,7 +66,7 @@ classdef DiffuseInterface < Computation
             
             BX              = Box(bxArea);
             IntBx           = BX.ComputeIntegrationVector();
-            this.IntSubArea = IntBx*this.IC.SubShapePts(BX.GetCartPts());
+            this.IntSubArea = IntBx*this.IDC.SubShapePts(BX.GetCartPts());
                      
             
                          Phys_Area = struct('L1',this.optsNum.PhysArea.L1,...
@@ -94,7 +93,7 @@ classdef DiffuseInterface < Computation
             
                 this.phi = InitialGuessRho(this);                             
                 this.uv  = InitialGuessUV(this);
-                this.mu  = zeros(this.IC.M,1);                          
+                this.mu  = zeros(this.IDC.M,1);                          
                 vec      = [this.uv;this.phi;this.mu];
              
             end
@@ -110,18 +109,18 @@ classdef DiffuseInterface < Computation
              
          end
         function phi = InitialGuessRho(this)
-            PtsCart    = this.IC.GetCartPts();
+            PtsCart    = this.IDC.GetCartPts();
             Cn         = this.optsPhys.Cn;
             
             phi        = tanh(PtsCart.y1_kv/Cn);
         end                         
         function uv  = InitialGuessUV(this)
             UWall            = this.optsPhys.UWall;    
-            PtsCart          = this.IC.GetCartPts();            
+            PtsCart          = this.IDC.GetCartPts();            
             y2_kv            = PtsCart.y2_kv;
             y2Min            = this.optsNum.PhysArea.y2Min;
             y2Max            = this.optsNum.PhysArea.y2Max;
-            M                = this.IC.M;
+            M                = this.IDC.M;
             
             if(IsSeppecher(this))
                 deltaX = 0; 
@@ -138,9 +137,9 @@ classdef DiffuseInterface < Computation
         function [v_mu_TB,A_mu_TB] = GetPhiBC(this,phi,theta)
             
             %[uv;phi;G]
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            M              = this.IC.M;            
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            M              = this.IDC.M;            
             F              = false(M,1);   
             T              = true(M,1);   
             EYM            = eye(M);
@@ -171,13 +170,13 @@ classdef DiffuseInterface < Computation
         function [v_mom,A_mom] = GetVelBC(this,uv,a,deltaX,theta)
             
             UWall            = this.optsPhys.UWall;    
-            PtsCart          = this.IC.GetCartPts();            
+            PtsCart          = this.IDC.GetCartPts();            
             y2_kv            = PtsCart.y2_kv;
             y2Min            = this.optsNum.PhysArea.y2Min;
             y2Max            = this.optsNum.PhysArea.y2Max;
-            M                = this.IC.M;
+            M                = this.IDC.M;
             EYMM             = eye(2*M);            
-            Ind              = this.IC.Ind;
+            Ind              = this.IDC.Ind;
             IBB              = repmat(Ind.bound,2,1); 
             F                = false(M,1);   
             T                = true(M,1);
@@ -196,11 +195,11 @@ classdef DiffuseInterface < Computation
         end                                         
         function [v_mom_IBB,A_mom_IBB] = GetSeppecher_Vel(this,uv,a,deltaX,theta)
             
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            M              = this.IC.M;
-            PtsCart        = this.IC.GetCartPts();
-            y2Max          = this.IC.y2Max;
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            M              = this.IDC.M;
+            PtsCart        = this.IDC.GetCartPts();
+            y2Max          = this.IDC.y2Max;
             ITT            = repmat(Ind.top,2,1);  
             IBB            = repmat(Ind.bound,2,1); 
         	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
@@ -255,9 +254,9 @@ classdef DiffuseInterface < Computation
         function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
             %[uv;phi;G]     
             Cn             = this.optsPhys.Cn;
-            M              = this.IC.M;
+            M              = this.IDC.M;
             Z              = zeros(M);
-            Diff           = this.IC.Diff;            
+            Diff           = this.IDC.Diff;            
             
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
             
@@ -277,7 +276,7 @@ classdef DiffuseInterface < Computation
                 iguess1 = [-2,2];
             end
             if(nargin < 3)
-                iguess2 = [-2,this.IC.y2Max-2];
+                iguess2 = [-2,this.IDC.y2Max-2];
             end
             
             fsolveOpts = optimset('Display','off');
@@ -308,19 +307,19 @@ classdef DiffuseInterface < Computation
             function z = ValueAtXY(xy)
                 pt.y1_kv = xy(1);
                 pt.y2_kv = xy(2);
-                IP  = this.IC.SubShapePtsCart(pt);
+                IP  = this.IDC.SubShapePtsCart(pt);
                 z   = [IP*uv(1:end/2);IP*uv(1+end/2:end)];
             end
         end
         function ComputeInterfaceContour(this)
-            y2           = this.IC.Pts.y2;
+            y2           = this.IDC.Pts.y2;
             phi          = this.phi; 
 
             fsolveOpts   = optimset('Display','off');
             interface    = zeros(size(y2));
 
-            y1Bottom = this.IC.GetCartPts.y1_kv(this.IC.Ind.bottom);
-            [~,j]    = min(abs(phi(this.IC.Ind.bottom)));
+            y1Bottom = this.IDC.GetCartPts.y1_kv(this.IDC.Ind.bottom);
+            [~,j]    = min(abs(phi(this.IDC.Ind.bottom)));
             y1I      = y1Bottom(j);
                         
             for i = 1:length(y2)
@@ -337,7 +336,7 @@ classdef DiffuseInterface < Computation
 
             function z = phiX1(y1)
                 pt.y1_kv = y1;
-                IP = this.IC.SubShapePtsCart(pt);
+                IP = this.IDC.SubShapePtsCart(pt);
                 z  = IP*phi;
             end   
         end
@@ -354,11 +353,11 @@ classdef DiffuseInterface < Computation
             leg = {};
             for i= 0:1:(noCuts-1)
                 y2 = y2Max*i/(noCuts-1);
-                this.IC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
+                this.IDC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
                 
-                IP       = this.IC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
+                IP       = this.IDC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
                 plot(interval,[1,1]*(IP*f),[optsC{i+1},'--']); hold on;
-                IP       = this.IC.SubShapePtsCart(struct('y1_kv',inf,'y2_kv',y2));
+                IP       = this.IDC.SubShapePtsCart(struct('y1_kv',inf,'y2_kv',y2));
                 plot(interval,[1,1]*(IP*f),[optsC{i+1},'-.']);  hold on;
                 
                 leg{end+1} = ['y2 = ',num2str(y2)];
@@ -369,29 +368,29 @@ classdef DiffuseInterface < Computation
             legend(leg,'Location','eastoutside');
             
             subplot(2,1,2);
-            this.IC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
-            this.IC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
+            this.IDC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
+            this.IDC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
             
-            this.IC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
-            this.IC.doPlotFLine([0 0],[0 y2Max],f);  hold on;
-            this.IC.doPlotFLine([4 4],[0 y2Max],f);  hold on;
+            this.IDC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
+            this.IDC.doPlotFLine([0 0],[0 y2Max],f);  hold on;
+            this.IDC.doPlotFLine([4 4],[0 y2Max],f);  hold on;
             
             legend({'-inf','inf'},'Location','eastoutside');
         end
         function PlotResultsMu(this)                         
             figure('Position',[0 0 800 600],'color','white');
-            this.IC.doPlots(this.mu,'contour');             
+            this.IDC.doPlots(this.mu,'contour');             
             PlotU(this); hold on;             
         end
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
             
             PlotU(this); hold on;             
-            this.IC.doPlots(this.phi,'contour');     
+            this.IDC.doPlots(this.phi,'contour');     
                         
             hold on;
             if(~isempty(this.IsolineInterfaceY2))
-                plot(this.IsolineInterfaceY2,this.IC.Pts.y2,...
+                plot(this.IsolineInterfaceY2,this.IDC.Pts.y2,...
                                                     'k','linewidth',3);
             end
             if(IsSeppecher(this))
@@ -403,13 +402,13 @@ classdef DiffuseInterface < Computation
             y2Max = this.optsNum.PhysArea.y2Max;
             plot([this.deltaX (this.deltaX+y2Max/tan(this.theta))],[0 y2Max],'k--','linewidth',2.5);
             
-            uSepp = GetSeppecherSolutionCart(this.IC.GetCartPts,1,0,0,this.theta);
+            uSepp = GetSeppecherSolutionCart(this.IDC.GetCartPts,1,0,0,this.theta);
             PlotU(this,uSepp,struct('color','m'));
         end         
         function AddStreamlines(this)
             for i = 1:3
                 [y10,y20] = ginput(1);   
-                this.IC.doPlotsStreamlines(this.uv,y10,y20); %IC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(this.uv,y10,y20); %IDC.doPlotsFlux(u_flow)(mu);
             end
         end
         function PlotU(this,uv,y1Pts,y2Pts,opts) 
@@ -442,12 +441,12 @@ classdef DiffuseInterface < Computation
             end
             
             if((nargin >= 5))
-                this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2,opts); %IC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.doPlotsFlux(u_flow)(mu);
             else
-                this.IC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IDC.doPlotsFlux(u_flow)(mu);
             end
             hold on;
-            this.IC.doPlotsFlux(uv);
+            this.IDC.doPlotsFlux(uv);
             
             sp = this.StagnationPoint;
             if(~isempty(sp))          
@@ -458,7 +457,7 @@ classdef DiffuseInterface < Computation
         end           
         function PlotInterfaceAnalysis(this)            
             
-            y2      = this.IC.Pts.y2;
+            y2      = this.IDC.Pts.y2;
             L       = this.optsNum.PhysArea.y2Max;
             
             Diff    = barychebdiff(y2,1);
@@ -533,7 +532,7 @@ classdef DiffuseInterface < Computation
 
             function z = phiX1(y1)
                 pt.y1_kv = y1;
-                IP       = this.IC.SubShapePtsCart(pt);
+                IP       = this.IDC.SubShapePtsCart(pt);
                 z        = IP*phi;
             end    
         end   

@@ -11,22 +11,22 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             
             Cn             = this.optsPhys.Cn;
             Cak            = this.optsPhys.Cak; 
-            Ind            = this.IC.Ind;
+            Ind            = this.IDC.Ind;
             zeta           = this.optsPhys.zeta;
                         
             lbC            = Ind.left & Ind.bottom;
             rbC            = Ind.right & Ind.bottom;
             y2Max          = this.optsNum.PhysArea.y2Max;    
-            IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc; 
+            IntPathUpLow   = this.IDC.borderTop.IntSc - this.IDC.borderBottom.IntSc; 
             
-            IP                      = this.IC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
+            IP                      = this.IDC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
             IntPath_Half_UpLow      = (this.RightCapillary.borderTop.IntSc - this.RightCapillary.borderBottom.IntSc)*IP;
             IntPath_Half_RightLeft  = (this.RightCapillary.borderRight.IntSc - this.RightCapillary.borderLeft.IntSc)*IP;
             
                         
-            Diff           = this.IC.Diff;            
+            Diff           = this.IDC.Diff;            
             phi_m          = this.optsPhys.phi_m; 
-            M              = this.IC.M;
+            M              = this.IDC.M;
             F              = false(M,1);   
             T              = true(M,1);
             uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];
@@ -100,13 +100,13 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
             % 
             %        v_mom         = tauM*uv - repmat(phi+phi_m,2,1).*(Diff.grad*G);
 
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;            
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;            
             phi_m          = this.optsPhys.phi_m;             
             Cak            = this.optsPhys.Cak;    
             Cn             = this.optsPhys.Cn;
             zeta           = this.optsPhys.zeta;
-            M              = this.IC.M;
+            M              = this.IDC.M;
             
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
             tauM           = Cak*(Diff.LapVec + (zeta + 1/3)*Diff.gradDiv);            
@@ -126,10 +126,10 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
          end        
          function [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,a,deltaX,theta)
 
-            M              = this.IC.M;
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            IntNormalUp    = this.IC.borderTop.IntNormal;
+            M              = this.IDC.M;
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            IntNormalUp    = this.IDC.borderTop.IntNormal;
             Cn             = this.optsPhys.Cn;
             phi_m          = this.optsPhys.phi_m;    
             phiM2          = repmat(phi+phi_m,2,1);       
@@ -155,7 +155,7 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 
 
             % (EX 2) phi(y2Max/tan(theta) + deltaX,y2Max) = 0
-            InterpMatchPos       = this.IC.SubShapePtsCart(...
+            InterpMatchPos       = this.IDC.SubShapePtsCart(...
                                     struct('y1_kv',deltaX + y2Max/tan(theta),...
                                            'y2_kv',y2Max));
             A_deltaX             = zeros(1,4*M);

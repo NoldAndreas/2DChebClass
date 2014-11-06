@@ -8,8 +8,8 @@ function [A,b] = FullStressTensorIJ(this,phi,i,j)
     Cak   = this.optsPhys.Cak;               
     zeta  = this.optsPhys.zeta;
     phi_m = this.optsPhys.phi_m;
-    Diff  = this.IC.Diff;
-    M     = this.IC.M;
+    Diff  = this.IDC.Diff;
+    M     = this.IDC.M;
 
     [~,W]   = DoublewellPotential(phi,Cn);
     bDiag   = W + Cn/2*((Diff.Dy1*phi).^2 + (Diff.Dy2*phi).^2); %CahnHilliardFreeEnergy(phi,Cn,Diff);    

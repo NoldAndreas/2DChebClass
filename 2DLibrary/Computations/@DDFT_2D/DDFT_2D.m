@@ -2,7 +2,7 @@ classdef DDFT_2D < Computation
     
     properties (Access = public)                    
         
-        IDC,subArea
+        subArea
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions

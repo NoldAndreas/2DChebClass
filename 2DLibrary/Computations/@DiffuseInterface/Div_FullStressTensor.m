@@ -1,6 +1,6 @@
  function [A,b] = Div_FullStressTensor(this,phi)
 
-    Diff      = this.IC.Diff;    
+    Diff      = this.IDC.Diff;    
 
     [A11,b11] = FullStressTensorIJ(this,phi,1,1); 
     [A12,b12] = FullStressTensorIJ(this,phi,1,2); 

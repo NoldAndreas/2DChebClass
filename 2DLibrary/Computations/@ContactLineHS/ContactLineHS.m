@@ -6,7 +6,7 @@ classdef ContactLineHS < DDFT_2D
         ST_1D  %1D surface tensions
         
         y1_SpectralLine        
-        hII = [], hIII = [],hContour = []
+        hII = [], hIII = [],hIV = [], hContour = []
         disjoiningPressure_II=[],disjoiningPressure_IV=[]
         y1_I = [], hI = []
         
@@ -246,13 +246,14 @@ classdef ContactLineHS < DDFT_2D
         %Compute disjoining pressure        
         Compute_DisjoiningPressure_II(this,y1Int)
         Compute_DisjoiningPressure_IV(this)
-        function SumRule_DisjoiningPressure_II(this,ST_LG)
+        function SumRule_DisjoiningPressure(this,anaDP)
 
             if(nargin < 2)
-                ST_LG = this.ST_1D.om_LiqGas;
+                anaDP = this.disjoiningPressure_II;
             end
             
-            anaDP = this.disjoiningPressure_IV;
+            ST_LG = this.ST_1D.om_LiqGas;
+            
 
             %******************************************
             %Check sum rule Eq. (11) in Henderson (2005)    
@@ -280,7 +281,7 @@ classdef ContactLineHS < DDFT_2D
         
         %Compute height profiles
         Compute_hI(this)
-        Compute_hII(this)
+        Compute_hII(this,II_or_IV)
         Compute_hIII(this)
         function Compute_hContour(this,level)
             rho_eq       = this.GetRhoEq(); 

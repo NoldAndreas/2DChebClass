@@ -2,6 +2,7 @@ classdef Computation < handle
     properties (Access = public)            
         optsNum,optsPhys
         configName
+        IDC
     end
     methods (Access = public)   
         function this = Computation(config)            
@@ -33,8 +34,7 @@ classdef Computation < handle
                     %load(filepath);
                     disp(['Using configuration ',filepath,' ...']);
                     this.configName = index{i}.Filename(1:end-4);
-                    resave = false;
-                    LoadSnapshot(this);
+                    resave = false;                    
                 end
             end
             if(resave)
@@ -64,27 +64,27 @@ classdef Computation < handle
             saveas(gcf,[dirData filesep filename '.fig']);            
             disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
         end
-        
-        function LoadSnapshot(this)
-            global dirDataOrg
-            
-            datafileName  = [this.configName '_Data'];
-            configDirFull = [dirDataOrg filesep 'Configurations' filesep  datafileName '.mat'];            
-            if(exist(configDirFull,'file'))
-                load(configDirFull);            
-                disp(['Data file ',configDirFull,' loaded.']);
-            end
-            
-        end
-        function SaveSnapshot(this)
-            global dirDataOrg
-            
-            datafileName  = [this.configName '_Data'];
-            configDirFull = [dirDataOrg filesep 'Configurations' filesep  datafileName '.mat'];            
-            
-            save(configDirFull,'this');
-            disp(['Data saved in ' configDirFull]);
-        end
+%         
+%         function LoadSnapshot(this)
+%             global dirDataOrg
+%             
+%             datafileName  = [this.configName '_Data'];
+%             configDirFull = [dirDataOrg filesep 'Configurations' filesep  datafileName '.mat'];            
+%             if(exist(configDirFull,'file'))
+%                 load(configDirFull);            
+%                 disp(['Data file ',configDirFull,' loaded.']);
+%             end
+%             
+%         end
+%         function SaveSnapshot(this)
+%             global dirDataOrg
+%             
+%             datafileName  = [this.configName '_Data'];
+%             configDirFull = [dirDataOrg filesep 'Configurations' filesep  datafileName '.mat'];            
+%             
+%             save(configDirFull,'this');
+%             disp(['Data saved in ' configDirFull]);
+%         end
         
     end
 end

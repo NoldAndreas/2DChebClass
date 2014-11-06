@@ -4,7 +4,7 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
     if(nargin == 0)
         alpha_deg = 60;
         epw       = 1.25;
-        bounds1   = [-10 10];
+        bounds1   = [-15 15];
         bounds2   = [0.5 18];                
     end
     if(nargin < 5)
@@ -56,13 +56,16 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
     CLT.Preprocess();
     CLT.ComputeEquilibrium();          	    
     
-%     %Load and compute disjoining pressures    
+%     %Load and compute disjoining pressures         
      CLT.ComputeAdsorptionIsotherm('load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
      CLT.Compute_DisjoiningPressure_II();
+     CLT.Compute_DisjoiningPressure_IV();
+     
 %     
 %     %Compute height profiles    
-     CLT.Compute_hII();
+     CLT.Compute_hII('II');
      CLT.Compute_hIII();
+     CLT.Compute_hII('IV');
      CLT.Compute_hI();
      CLT.Compute_hContour(0.5);
 %     

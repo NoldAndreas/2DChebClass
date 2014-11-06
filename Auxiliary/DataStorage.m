@@ -7,7 +7,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 
     %%*****************************
     %Check if there is a personal user!
-    global PersonalUserOutput recomputeAll
+    global PersonalUserOutput recomputeAll loadAll
     %*****************************
     %Trim numbers of parameters
     OriginalParameters = Parameters;
@@ -93,7 +93,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 
                 if(recomputeAll)
                     recompute = true;
-                elseif((isempty(recompute)) && (~PersonalUserOutput))
+                elseif((isempty(recompute)) && ((~PersonalUserOutput) || (loadAll)))
                     recompute = false;
                 elseif((isempty(recompute)) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
                     no = fprintf('Do you want to recompute Data (press any key), or wait for 2 seconds.');        

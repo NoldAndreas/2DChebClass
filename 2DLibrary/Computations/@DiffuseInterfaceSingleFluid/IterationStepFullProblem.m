@@ -23,8 +23,8 @@ function IterationStepFullProblem(this,noIterations)
     solveSquare = true;
         
     nParticles     = this.optsPhys.nParticles;            
-    M              = this.IC.M;  
-    Ind            = this.IC.Ind;
+    M              = this.IDC.M;  
+    Ind            = this.IDC.Ind;
     IntSubArea     = this.IntSubArea;        
     
     
@@ -145,10 +145,10 @@ function IterationStepFullProblem(this,noIterations)
         
             error = error(4:end);
         end
-        PrintErrorPos(error([F;F;F;T]),'continuity equation',this.IC.Pts);
-        PrintErrorPos(error([T;F;F;F]),'y1-momentum equation',this.IC.Pts);
-        PrintErrorPos(error([F;T;F;F]),'y2-momentum equation',this.IC.Pts);                                    
-        PrintErrorPos(error([F;F;T;F]),'mu equation',this.IC.Pts);
+        PrintErrorPos(error([F;F;F;T]),'continuity equation',this.IDC.Pts);
+        PrintErrorPos(error([T;F;F;F]),'y1-momentum equation',this.IDC.Pts);
+        PrintErrorPos(error([F;T;F;F]),'y2-momentum equation',this.IDC.Pts);                                    
+        PrintErrorPos(error([F;F;T;F]),'mu equation',this.IDC.Pts);
     end
 
 end

@@ -7,6 +7,7 @@ function AddPaths()
     global QuickOutput
     
     global recomputeAll
+    global loadAll
      
     if(exist('D:\','dir'))
         dirData    = 'D:\2DChebData';    
@@ -40,9 +41,13 @@ function AddPaths()
         recomputeAll = false;
     end
     
+	if(isempty(loadAll))
+        loadAll = true;
+    end
+    
     if(isempty(QuickOutput))
         QuickOutput = false;
-    end
+    end        
     
     if(recomputeAll)
         cprintf('*m','!!! No precomputed data will be used. recomputeAll = true !!!\n');

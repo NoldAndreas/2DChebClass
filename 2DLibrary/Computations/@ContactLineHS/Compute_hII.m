@@ -1,7 +1,12 @@
-function Compute_hII(this)
+function Compute_hII(this,II_or_IV)
 
     y1   = this.y1_SpectralLine.Pts.y;
-    DP   = this.disjoiningPressure_II;
+    if((nargin == 1) || strcmp(II_or_IV,'II'))
+        DP   = this.disjoiningPressure_II;
+    else
+        DP   = this.disjoiningPressure_IV;
+    end
+        
     ST   = this.ST_1D.om_LiqGas;
     
     if(this.optsNum.PhysArea.alpha_deg > 90)
@@ -35,7 +40,12 @@ function Compute_hII(this)
         h_2D     = flip(h_2D,1);
     end
     
-    this.hII   = h_2D;
+    if((nargin == 1) || strcmp(II_or_IV,'II'))
+        this.hII   = h_2D;
+    else
+        this.hIV   = h_2D;
+    end
+        
     
 	function y = f3(h)
         y    = Diff.Dx*h-hP;

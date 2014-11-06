@@ -13,16 +13,16 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
        function vec = GetInitialCondition(this) 
             vec = GetInitialCondition@DiffuseInterface(this);           
-            %if(length(vec) == this.IC.M*4+3)
+            %if(length(vec) == this.IDC.M*4+3)
 %                vec = [0;vec];
 %            end
             if(isempty(this.p))
-                this.p   = zeros(this.IC.M,1);                
+                this.p   = zeros(this.IDC.M,1);                
             end           
            vec      = [vec;this.p];
        end        
        function [v_mom,A_mom] = GetVelBC(this,uv,a,deltaX,theta)
-           M = this.IC.M;           
+           M = this.IDC.M;           
            if(nargin == 2)
                 [v_mom,A_mom] = GetVelBC@DiffuseInterface(this,uv);
            else
@@ -31,7 +31,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            A_mom         = [A_mom,zeros(size(A_mom,1),M)]; 
        end
        function [v_mu_T,A_mu_T] = GetPhiBC(this,phi,theta)
-           M = this.IC.M;           
+           M = this.IDC.M;           
            [v_mu_T,A_mu_T] = GetPhiBC@DiffuseInterface(this,phi,theta);                      
            A_mu_T    = [A_mu_T,zeros(size(A_mu_T,1),M)];
            if(IsSeppecher(this))
@@ -41,9 +41,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function [v_G_IBB,A_G_IBB] = GetChemPotBC(this,uv,phi,G,theta)
            
             m              = this.optsPhys.mobility;
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            M    = this.IC.M;
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            M    = this.IDC.M;
             EYM  = eye(M); 
             Z    = zeros(M);
             F       = false(M,1);   T       = true(M,1);    
@@ -77,19 +77,19 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
 
             %(BC8) [uv;phi;G;p]                    
             A_G(Ind.left & Ind.bottom,:)           = 0;
-            A_G(Ind.left & Ind.bottom,[F;T;F;F;F]) = this.IC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
+            A_G(Ind.left & Ind.bottom,[F;T;F;F;F]) = this.IDC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
             A_G(Ind.left & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) ...
                                                       - EYM(Ind.left & Ind.bottom,:) ...                                              
-                                                      + this.IC.borderBottom.IntSc*(diag(Diff.Dy2*(uv(1+end/2:end))));
-            A_G(Ind.left & Ind.bottom,[F;F;F;T;F]) = - m*this.IC.borderBottom.IntSc*Diff.DDy2;
+                                                      + this.IDC.borderBottom.IntSc*(diag(Diff.Dy2*(uv(1+end/2:end))));
+            A_G(Ind.left & Ind.bottom,[F;F;F;T;F]) = - m*this.IDC.borderBottom.IntSc*Diff.DDy2;
             v_G(Ind.left & Ind.bottom)             =    phi(Ind.right & Ind.bottom) ...
                                                       - phi(Ind.left & Ind.bottom) ...
-                                                      + this.IC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
-                                                      - m*this.IC.borderBottom.IntSc*Diff.DDy2*G;
+                                                      + this.IDC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
+                                                      - m*this.IDC.borderBottom.IntSc*Diff.DDy2*G;
                               
             % ****************
-            IP                      = this.IC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
-            IP0                     = this.IC.SubShapePtsCart(struct('y1_kv',0,'y2_kv',0));
+            IP                      = this.IDC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
+            IP0                     = this.IDC.SubShapePtsCart(struct('y1_kv',0,'y2_kv',0));
             IntPath_Half_Low        = this.RightCapillary.borderBottom.IntSc*IP;            
             
             A_G(Ind.right & Ind.bottom,:)           = 0;
@@ -112,10 +112,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
         end    
        function [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta)
 
-            M              = this.IC.M;
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            IntNormalUp    = this.IC.borderTop.IntNormal;
+            M              = this.IDC.M;
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            IntNormalUp    = this.IDC.borderTop.IntNormal;
             Cn             = this.optsPhys.Cn;
             m              = this.optsPhys.mobility;
             y2Max          = this.optsNum.PhysArea.y2Max;
@@ -146,7 +146,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             v_b                = IntNormalUp*uv;
 
             % (EX 2) phi(y2Max/tan(theta) + deltaX,y2Max) = 0
-            InterpMatchPos       = this.IC.SubShapePtsCart(...
+            InterpMatchPos       = this.IDC.SubShapePtsCart(...
                                     struct('y1_kv',deltaX + y2Max/tan(theta),...
                                            'y2_kv',y2Max));
             A_deltaX               = zeros(1,5*M);
@@ -180,7 +180,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
            figure('Position',[0 0 800 600],'color','white');
            PlotU(this); hold on;            
-           this.IC.doPlots(this.p,'contour');     
+           this.IDC.doPlots(this.p,'contour');     
            SaveCurrentFigure(this,[this.filename '_Pressure']);                
        end       
        function PlotU(this,uv,opts) 
@@ -194,7 +194,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             end
             
             if(isempty(this.StagnationPoint))
-               FindStagnationPoint(this,[-2,2],[-2,this.IC.y2Max-2]); 
+               FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
             end            
             
             y1Pts = [0;...
@@ -209,39 +209,39 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function CheckResultResolution(this)
            figure('Position',[0 0 1000 1000],'color','white');
            
-           y2M = this.IC.y2Max;
+           y2M = this.IDC.y2Max;
            
            subplot(2,2,1);           
-           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.mu);           
-           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.mu);
-           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.mu);
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.mu);           
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.mu);
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.mu);
            title('$\Delta \mu$','Interpreter','Latex','fontsize',15);
            
            subplot(2,2,2);
-           this.IC.doPlotFLine([-20 20],[0 0],this.mu);           
-           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.mu);
-           this.IC.doPlotFLine([-20 20],[y2M y2M],this.mu);
+           this.IDC.doPlotFLine([-20 20],[0 0],this.mu);           
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.mu);
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.mu);
            title('$\mu$','Interpreter','Latex','fontsize',15);
            
            subplot(2,2,3);
-           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.uv(1:end/2));
-           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.uv(1:end/2));
-           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.uv(1:end/2));
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1:end/2));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1:end/2));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1:end/2));
            title('$\Delta u$','Interpreter','Latex','fontsize',15);           
            
            subplot(2,2,4);
-           this.IC.doPlotFLine([-20 20],[0 0],this.IC.Diff.Lap*this.uv(1+end/2:end));
-           this.IC.doPlotFLine([-20 20],[y2M y2M]/2,this.IC.Diff.Lap*this.uv(1+end/2:end));
-           this.IC.doPlotFLine([-20 20],[y2M y2M],this.IC.Diff.Lap*this.uv(1+end/2:end));      
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1+end/2:end));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1+end/2:end));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1+end/2:end));      
            title('$\Delta v$','Interpreter','Latex','fontsize',15);
            
        end
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
-           Ind  = this.IC.Ind;
-           Diff = this.IC.Diff;
-           M    = this.IC.M;
+           Ind  = this.IDC.Ind;
+           Diff = this.IDC.Diff;
+           M    = this.IDC.M;
            EYM  = eye(M);
            Z    = zeros(M);
            
@@ -252,7 +252,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            Cak         = this.optsPhys.Cak;
            y2Max       = this.optsNum.PhysArea.y2Max;
                       
-           IntPathUpLow   = this.IC.borderTop.IntSc - this.IC.borderBottom.IntSc;     
+           IntPathUpLow   = this.IDC.borderTop.IntSc - this.IDC.borderBottom.IntSc;     
            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
            
            A_cont         = [Diff.div,Z,Z,Z];    
@@ -302,13 +302,13 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        end
        function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
            [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,phi,G);
-           A_mu = [A_mu,zeros(this.IC.M)];
+           A_mu = [A_mu,zeros(this.IDC.M)];
        end
        function [v_G,A_G] = Phasefield(this,uv,phi,G)
            
             m              = this.optsPhys.mobility;            
-            Diff           = this.IC.Diff;
-            M    = this.IC.M;            
+            Diff           = this.IDC.Diff;
+            M    = this.IDC.M;            
             Z    = zeros(M);            
             
             uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];        
@@ -320,7 +320,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function [v_mom,A_mom]   = Momentum(this,uv,phi,G,p)                
            
             %[uv;phi;G;p]         
-            Diff = this.IC.Diff;
+            Diff = this.IDC.Diff;
             Cak  = this.optsPhys.Cak;            
            
             A_mom          = [Diff.LapVec,...
@@ -338,11 +338,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             a = a(2);
             %b = 0;
             
-            Ind            = this.IC.Ind;
-            Diff           = this.IC.Diff;
-            M              = this.IC.M;
-            PtsCart        = this.IC.GetCartPts();
-            y2Max          = this.IC.y2Max;
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            M              = this.IDC.M;
+            PtsCart        = this.IDC.GetCartPts();
+            y2Max          = this.IDC.y2Max;
             ITT            = repmat(Ind.top,2,1);  
             IBB            = repmat(Ind.bound,2,1); 
         	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
