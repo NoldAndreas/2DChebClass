@@ -173,69 +173,106 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              v_SeppAdd = [v_b;v_a;v_deltaX;v_theta];
              A_SeppAdd = [A_b;A_a;A_deltaX;A_theta];
              %A_SeppAdd =  [A_SeppAdd,zeros(size(A_SeppAdd,1),M)];
-        end
-       
-       function SavePlotResults(this)           
-           SavePlotResults@DiffuseInterface(this);
-           
-           figure('Position',[0 0 800 600],'color','white');
-           PlotU(this); hold on;            
-           this.IDC.doPlots(this.p,'contour');     
-           SaveCurrentFigure(this,[this.filename '_Pressure']);                
-       end       
-       function PlotU(this,uv,opts) 
-           
-            if(nargin < 2)
-                opts = [];
-            end
-           
-            if(nargin == 1)
-                uv = [];
-            end
+       end 
+       function [v_mom_IBB,A_mom_IBB] = GetSeppecher_Vel(this,uv,a,deltaX,theta)
+
+            b = a(1);
+            a = a(2);
+            %b = 0;
             
-            if(isempty(this.StagnationPoint))
-               FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
-            end            
+            Ind            = this.IDC.Ind;
+            Diff           = this.IDC.Diff;
+            M              = this.IDC.M;
+            PtsCart        = this.IDC.GetCartPts();
+            y2Max          = this.IDC.y2Max;
+            ITT            = repmat(Ind.top,2,1);  
+            IBB            = repmat(Ind.bound,2,1); 
+        	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
+            d_theta        = 0.01;
+            EYMM           = eye(2*M);
+            F              = false(M,1);   
+            T              = true(M,1);   
+            EYM            = eye(M);
             
-            y1Pts = [0;...
-                     this.optsNum.PlotArea.y1Min+0.1;...
-                     this.optsNum.PlotArea.y1Max-0.1];
-            y2Pts = [this.optsNum.PlotArea.y2Max/2;...
-                     0.5;...
-                     this.optsNum.PlotArea.y2Max-0.5];
+            u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
+                                                PtsCart.y2_kv],1,0,0,theta);                  
+                                            
+            y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
             
-            PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
-        end       
-       function CheckResultResolution(this)
-           figure('Position',[0 0 1000 1000],'color','white');
-           
-           y2M = this.IDC.y2Max;
-           
-           subplot(2,2,1);           
-           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.mu);           
-           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.mu);
-           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.mu);
-           title('$\Delta \mu$','Interpreter','Latex','fontsize',15);
-           
-           subplot(2,2,2);
-           this.IDC.doPlotFLine([-20 20],[0 0],this.mu);           
-           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.mu);
-           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.mu);
-           title('$\mu$','Interpreter','Latex','fontsize',15);
-           
-           subplot(2,2,3);
-           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1:end/2));
-           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1:end/2));
-           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1:end/2));
-           title('$\Delta u$','Interpreter','Latex','fontsize',15);           
-           
-           subplot(2,2,4);
-           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1+end/2:end));
-           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1+end/2:end));
-           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1+end/2:end));      
-           title('$\Delta v$','Interpreter','Latex','fontsize',15);
-           
+            d = 4;
+            f_a  = exp(-(y1_Interface/d).^2);
+            fP_a = -2*y1_Interface/d.*exp(-(y1_Interface/d).^2);
+            %f_a  = 1./(1+y1_Interface.^2);
+            %fP_a = -2*y1_Interface./(1+y1_Interface.^2).^2;
+            fP_a(Ind.left | Ind.right) = 0;
+            
+            f_b  = y1_Interface.*exp(-(y1_Interface/d).^2);
+            fP_b = (1-2/d*(y1_Interface.^2)).*exp(-(y1_Interface/d).^2);
+            
+            %f_b  = y1_Interface./(1+y1_Interface.^2);
+            f_b(Ind.left | Ind.right) = 0;
+            %fP_b = (1-y1_Interface.^2)./(1+y1_Interface.^2).^2;
+            fP_b(Ind.left | Ind.right) = 0;
+            
+            b_corr        = b*f_b;   
+            b_corr_b      = f_b;
+            b_corr_deltaX = -b*fP_b;            
+            b_corr_theta  = b*fP_b*y2Max/(sin(theta)).^2;            
+
+% 
+%             b_corr        = b./(1+2*y1_Interface.^2);
+%             b_corr_b      = 1./(1+2*y1_Interface.^2);        
+%             b_corr_deltaX = 4*b*y1_Interface./(1+2*y1_Interface.^2).^2;
+%             b_corr_deltaX(Ind.left | Ind.right) = 0;
+%             b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;                       
+            
+            a_corr        = a*f_a;
+            a_corr_a      = f_a;  
+            a_corr_deltaX = -a*fP_a;
+            a_corr_deltaX(Ind.left | Ind.right) = 0;
+            a_corr_theta  = a*fP_a*y2Max/(sin(theta)).^2;            
+                        
+            corr = 1 + a_corr + b_corr;
+    
+            uvBound        = u_flow .*repmat(corr,2,1);                                        
+
+            uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
+            uvBound_b      = u_flow.*repmat(b_corr_b,2,1);               
+            uvBound_deltaX = -(Dy12*u_flow).*repmat(corr,2,1)+...
+                               u_flow .*repmat(a_corr_deltaX+b_corr_deltaX,2,1);
+
+            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
+            u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
+            uvBound_theta    = u_flow_d.*repmat(corr,2,1) +...
+                               u_flow.*repmat(a_corr_theta + b_corr_theta,2,1); 
+
+            A_mom_ITT              = zeros(sum(ITT),4*M);            
+            A_mom_ITT(:,[T;T;F;F]) = EYMM(ITT,:);            
+            
+            A_mom_a_ITT            = -uvBound_a(ITT);
+            A_mom_b_ITT            = -uvBound_b(ITT);
+            A_mom_deltaX_ITT       = -uvBound_deltaX(ITT); 
+            A_mom_theta_ITT        = -uvBound_theta(ITT);        
+
+            A_mom(ITT,:)           = [A_mom_b_ITT,...
+                                      A_mom_a_ITT,...
+                                      A_mom_deltaX_ITT,...
+                                      A_mom_theta_ITT,...
+                                      A_mom_ITT];
+                                 
+            v_mom(ITT)              = uv(ITT) - uvBound(ITT);
+            
+            u_Wall = [ones(M,1);zeros(M,1)];
+        
+            A_mom(IBB & ~ITT,:)                = 0;
+            A_mom(IBB & ~ITT,[false;false;false;false;IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
+            v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
+            
+            A_mom_IBB = A_mom(IBB,:);
+            v_mom_IBB = v_mom(IBB);
        end
+             
+       FindAB(this)
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
@@ -332,92 +369,68 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                               - Diff.grad*p;
        end
        
-       function [v_mom_IBB,A_mom_IBB] = GetSeppecher_Vel(this,uv,a,deltaX,theta)
-
-            b = a(1);
-            a = a(2);
-            %b = 0;
+         
+       function SavePlotResults(this)           
+           SavePlotResults@DiffuseInterface(this);
+           
+           figure('Position',[0 0 800 600],'color','white');
+           PlotU(this); hold on;            
+           this.IDC.doPlots(this.p,'contour');     
+           SaveCurrentFigure(this,[this.filename '_Pressure']);                
+       end       
+       function PlotU(this,uv,opts) 
+           
+            if(nargin < 2)
+                opts = [];
+            end
+           
+            if(nargin == 1)
+                uv = [];
+            end
             
-            Ind            = this.IDC.Ind;
-            Diff           = this.IDC.Diff;
-            M              = this.IDC.M;
-            PtsCart        = this.IDC.GetCartPts();
-            y2Max          = this.IDC.y2Max;
-            ITT            = repmat(Ind.top,2,1);  
-            IBB            = repmat(Ind.bound,2,1); 
-        	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
-            d_theta        = 0.01;
-            EYMM           = eye(2*M);
-            F              = false(M,1);   
-            T              = true(M,1);   
-            EYM            = eye(M);
+            if(isempty(this.StagnationPoint))
+               FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
+            end            
             
-            u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
-                                                PtsCart.y2_kv],1,0,0,theta);                  
-                                            
-            y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
+            y1Pts = [0;...
+                     this.optsNum.PlotArea.y1Min+0.1;...
+                     this.optsNum.PlotArea.y1Max-0.1];
+            y2Pts = [this.optsNum.PlotArea.y2Max/2;...
+                     0.5;...
+                     this.optsNum.PlotArea.y2Max-0.5];
             
-%             b_corr        = b*y1_Interface./(1+y1_Interface.^2);
-%             b_corr(Ind.left | Ind.right) = 0;
-%             b_corr_b      = y1_Interface./(1+y1_Interface.^2);        
-%             b_corr_b(Ind.left | Ind.right) = 0;
-%             b_corr_deltaX = -b*(1-y1_Interface.^2)./(1+y1_Interface.^2).^2;
-%             b_corr_deltaX(Ind.left | Ind.right) = 0;
-%             b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;            
-
-
-            b_corr        = b./(1+2*y1_Interface.^2);
-            b_corr_b      = 1./(1+2*y1_Interface.^2);        
-            b_corr_deltaX = 4*b*y1_Interface./(1+2*y1_Interface.^2).^2;
-            b_corr_deltaX(Ind.left | Ind.right) = 0;
-            b_corr_theta  = -b_corr_deltaX*y2Max/(sin(theta)).^2;            
-            
-            
-            a_corr        = a./(1+y1_Interface.^2);
-            a_corr_a      = 1./(1+y1_Interface.^2);        
-            a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
-            a_corr_deltaX(Ind.left | Ind.right) = 0;
-            a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
-                        
-            corr = 1 + a_corr + b_corr;
-    
-            uvBound        = u_flow .*repmat(corr,2,1);                                        
-
-            uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
-            uvBound_b      = u_flow.*repmat(b_corr_b,2,1);               
-            uvBound_deltaX = -(Dy12*u_flow).*repmat(corr,2,1)+...
-                               u_flow .*repmat(a_corr_deltaX+b_corr_deltaX,2,1);
-
-            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
-            u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
-            uvBound_theta    = u_flow_d.*repmat(corr,2,1) +...
-                               u_flow.*repmat(a_corr_theta + b_corr_theta,2,1); 
-
-            A_mom_ITT              = zeros(sum(ITT),4*M);            
-            A_mom_ITT(:,[T;T;F;F]) = EYMM(ITT,:);            
-            
-            A_mom_a_ITT            = -uvBound_a(ITT);
-            A_mom_b_ITT            = -uvBound_b(ITT);
-            A_mom_deltaX_ITT       = -uvBound_deltaX(ITT); 
-            A_mom_theta_ITT        = -uvBound_theta(ITT);        
-
-            A_mom(ITT,:)           = [A_mom_b_ITT,...
-                                      A_mom_a_ITT,...
-                                      A_mom_deltaX_ITT,...
-                                      A_mom_theta_ITT,...
-                                      A_mom_ITT];
-                                 
-            v_mom(ITT)              = uv(ITT) - uvBound(ITT);
-            
-            u_Wall = [ones(M,1);zeros(M,1)];
-        
-            A_mom(IBB & ~ITT,:)                = 0;
-            A_mom(IBB & ~ITT,[false;false;false;false;IBB & ~ITT;F;F]) = eye(sum(IBB & ~ITT));
-            v_mom(IBB & ~ITT)                  = uv(IBB & ~ITT) - u_Wall(IBB & ~ITT);
-            
-            A_mom_IBB = A_mom(IBB,:);
-            v_mom_IBB = v_mom(IBB);
-        end
-              
+            PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
+        end       
+       function CheckResultResolution(this)
+           figure('Position',[0 0 1000 1000],'color','white');
+           
+           y2M = this.IDC.y2Max;
+           
+           subplot(2,2,1);           
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.mu);           
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.mu);
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.mu);
+           title('$\Delta \mu$','Interpreter','Latex','fontsize',15);
+           
+           subplot(2,2,2);
+           this.IDC.doPlotFLine([-20 20],[0 0],this.mu);           
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.mu);
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.mu);
+           title('$\mu$','Interpreter','Latex','fontsize',15);
+           
+           subplot(2,2,3);
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1:end/2));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1:end/2));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1:end/2));
+           title('$\Delta u$','Interpreter','Latex','fontsize',15);           
+           
+           subplot(2,2,4);
+           this.IDC.doPlotFLine([-20 20],[0 0],this.IDC.Diff.Lap*this.uv(1+end/2:end));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M]/2,this.IDC.Diff.Lap*this.uv(1+end/2:end));
+           this.IDC.doPlotFLine([-20 20],[y2M y2M],this.IDC.Diff.Lap*this.uv(1+end/2:end));      
+           title('$\Delta v$','Interpreter','Latex','fontsize',15);
+           
+       end
+      
    end
 end
