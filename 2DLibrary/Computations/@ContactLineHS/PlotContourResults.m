@@ -97,26 +97,24 @@ function [fContour] =  PlotContourResults(this,plain)
         h0 = 0;
     end
 
-    if(~isempty(this.hI))% && ((nargin == 1) || ~plain))
+    if(~isempty(this.hI) && ((nargin == 1) || ~plain))
         [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();                
         plot(this.y1_I+DeltaY1_II,this.hI+R+h0,'k-.','linewidth',2.5); 
         plot(this.y1_I+DeltaY1_III,this.hI+R+h0,'k-.','linewidth',2.5); 
     end
     
-    if(~isempty(this.hII))% && ((nargin == 1) || ~plain))
+    if(~isempty(this.hII) && ((nargin == 1) || ~plain))
         plot(y1,this.hII+R+h0,'k--','linewidth',2.5);
     end  
     
-    if(~isempty(this.hIV))% && ((nargin == 1) || ~plain))
+    if(~isempty(this.hIV) && ((nargin == 1) || ~plain))
         plot(y1,this.hIV+R+h0,'r--','linewidth',2.5);
     end  
-
     
     
  %   pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 1]);
     if((nargin >= 2) && plain)
-        print2eps([dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour'],gcf);
-        saveas(gcf,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq '_contour.fig']);
+        SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_contour']);        
     end
     
   

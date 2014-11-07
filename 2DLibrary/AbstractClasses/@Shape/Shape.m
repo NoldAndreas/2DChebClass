@@ -523,24 +523,30 @@ classdef (Abstract) Shape < handle
                 I = w*f;
             end
         end        
-        function doPlotFLine(this,y1P,y2P,f,CART,opts)
+        function doPlotFLine(this,y1P,y2P,f,opts)
             
-            color   = 'k';
+            plain = false;
+            color = 'k';
+            dist0 = false;
+            CART  = true;
             
-            if((nargin > 5) && islogical(opts))
-                plain = opts;                
-            elseif((nargin > 5) && (ischar(opts) || isnumeric(opts))) 
-                plain = false;%true;
-                color = opts;
-            end
-            
-            if((nargin < 5) || isempty(CART))
-                CART = 'CART';
-            end
-                            
-            if((nargin < 6) || isempty(plain))
-                plain = false;
-            end
+            if((nargin > 4))
+                if(isfield(opts,'plain'))
+                    plain = opts.plain;
+                end
+                
+                if(isfield(opts,'color'))
+                    color = opts.color;
+                end
+                
+                if(isfield(opts,'dist0'))
+                    dist0 = opts.dist0;
+                end
+                
+                if(isfield(opts,'CART'))
+                    CART = opts.CART;
+                end
+            end                            
             
             xi        = (0:0.002:1)';
             
@@ -570,7 +576,7 @@ classdef (Abstract) Shape < handle
                         
             %Plot Grid Lines that are crossed:
             %(a) Get x-Values of initial points
-            if((nargin < 5) || strcmp(CART,'CART'))
+            if(CART)
                 ptY_start = GetInvCartPts(this,y1P(1),y2P(1));
                 ptY_end   = GetInvCartPts(this,y1P(2),y2P(2));
             else
@@ -599,20 +605,20 @@ classdef (Abstract) Shape < handle
             distG2        = sqrt( (xmG2*(y1P(2)-y1P(1))).^2 + ...
                               (xmG2*(y2P(2)-y2P(1))).^2 );
 
-            if((nargin < 5) || strcmp(CART,'CART'))
+            if(CART)
                 IP       = SubShapePtsCart(this,pts);
                 IPG1     = SubShapePtsCart(this,ptsG1);
                 IPG2     = SubShapePtsCart(this,ptsG2);
-            elseif(strcmp(CART,'CO'))
+            else
                 IP       = SubShapePts(this,pts);
                 IPG1     = SubShapePts(this,ptsG1);
                 IPG2     = SubShapePts(this,ptsG2);
             end
             
-            if(y1P(1) == y1P(2))
+            if((y1P(1) == y1P(2)) && ~dist0)
                 offset = y2P(1);
                 xLab_Txt = 'y_2';                
-            elseif(y2P(1) == y2P(2))
+            elseif(y2P(1) == y2P(2)  && ~dist0)
                 offset   = y1P(1);                
                 xLab_Txt = 'y_1';
             else

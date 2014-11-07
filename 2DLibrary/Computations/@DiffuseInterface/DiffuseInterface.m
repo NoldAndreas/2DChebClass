@@ -353,7 +353,7 @@ classdef DiffuseInterface < Computation
             leg = {};
             for i= 0:1:(noCuts-1)
                 y2 = y2Max*i/(noCuts-1);
-                this.IDC.doPlotFLine(interval,[y2 y2],f,[],optsC{i+1});  hold on;
+                this.IDC.doPlotFLine(interval,[y2 y2],f,struct('color',optsC{i+1}));  hold on;
                 
                 IP       = this.IDC.SubShapePtsCart(struct('y1_kv',-inf,'y2_kv',y2));
                 plot(interval,[1,1]*(IP*f),[optsC{i+1},'--']); hold on;
@@ -368,8 +368,8 @@ classdef DiffuseInterface < Computation
             legend(leg,'Location','eastoutside');
             
             subplot(2,1,2);
-            this.IDC.doPlotFLine([-inf,-inf],[0 y2Max],f,[],'r'); hold on;
-            this.IDC.doPlotFLine([inf,inf],[0 y2Max],f,[],'b'); hold on;
+            this.IDC.doPlotFLine([-inf,-inf],[0 y2Max],f,struct('color','r')); hold on;
+            this.IDC.doPlotFLine([inf,inf],[0 y2Max],f,struct('color','b')); hold on;
             
             this.IDC.doPlotFLine([-4 -4],[0 y2Max],f);  hold on;
             this.IDC.doPlotFLine([0 0],[0 y2Max],f);  hold on;

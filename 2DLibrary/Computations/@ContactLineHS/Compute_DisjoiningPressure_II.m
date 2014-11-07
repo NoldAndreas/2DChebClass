@@ -30,6 +30,6 @@ function Compute_DisjoiningPressure_II(this)
         
     this.disjoiningPressure_II = fB;    
     
-    SumRule_DisjoiningPressure(this,this.disjoiningPressure_II);
+    SumRule_DisjoiningPressure(this,'II');
             
 end

@@ -21,40 +21,14 @@
     opts.optsPhys    = this.optsPhys;    
     
     % Clean optsPhys from unnecessary information
-    if(isfield(opts.optsPhys,'gamma'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'gamma');
-    end
-    if(isfield(opts.optsPhys,'gammaS'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'gammaS');
-    end
-    if(isfield(opts.optsPhys,'D0'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'D0');
-    end
-    if(isfield(opts.optsPhys,'D0S'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'D0S');
-    end
     if(isfield(opts.optsPhys,'Inertial'))
         opts.optsPhys    = rmfield(opts.optsPhys,'Inertial');
     end    
     if(isfield(opts.optsPhys,'HI'))
         opts.optsPhys    = rmfield(opts.optsPhys,'HI');
     end
-    if(isfield(opts.optsPhys,'tMax'))
-        opts.optsPhys    = rmfield(opts.optsPhys,'tMax');
-    end
     if(isfield(opts.optsPhys,'nParticles'))
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
-    end
-
-    if(isfield(opts.optsPhys.V1,'epsilon_w_end'))
-        opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'epsilon_w_end');
-    elseif(isfield(opts.optsPhys.V1,'epsilon_w_Amplitude'))
-        opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'epsilon_w_Amplitude');
-    elseif(isfield(opts.optsPhys.V1,'epsilon_w_max'))
-        opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'epsilon_w_max');                
-    end
-    if(isfield(opts.optsPhys.V1,'tau'))
-        opts.optsPhys.V1 = rmfield(opts.optsPhys.V1,'tau');
     end
     
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
@@ -73,7 +47,14 @@
     
     opts.Comments = this.configName;
     
-    ignoreList = {'optsPhys_p','optsPhys_mu_sat','optsPhys_rhoLiq_sat','optsPhys_rhoGas_sat'};
+    ignoreList = {'optsPhys_p','optsPhys_mu_sat','optsPhys_rhoLiq_sat',...
+                  'optsPhys_rhoGas_sat',...
+                  'optsPhys_gamma','optsPhys_gammaS','optsPhys_D0'...
+                  'optsPhys_tMax','D0S',...
+                  'optsPhys_V1_epsilon_w_end',...
+                  'optsPhys_V1_epsilon_w_Amplitude',...
+                  'optsPhys_V1_epsilon_w_max',...
+                  'optsPhys_V1_tau'};
 	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
                             @ComputeEquilibriumCondition,opts,misc,[],ignoreList);
          

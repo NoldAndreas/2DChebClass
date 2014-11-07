@@ -1,28 +1,17 @@
 function PostProcess(this)
 
-	if(isfield(this.optsNum,'PlotAreaCart'))
-        shapeSL = struct('yMin',this.optsNum.PlotAreaCart.y1Min,...
-                         'yMax',this.optsNum.PlotAreaCart.y1Max,...
-                         'N',150);                       
-        this.y1_SpectralLine = SpectralLine(shapeSL);
-        this.y1_SpectralLine.ComputeAll();
-    end
-    
-    opts.shape_y1_Line = shapeSL;
-    opts.FilenameEq    = this.FilenameEq;
+    res = DataStorage('Equilibrium',@ComputePostProcess,);
 
-    res = DataStorage(['Equilibrium' filesep 'PostProcess'],@ComputePostProcess,opts,[]);
+    this.AdsorptionIsotherm    = this.AdsorptionIsotherm;
+    res.disjoiningPressure_II = this.disjoiningPressure_II;
+    res.disjoiningPressure_IV = this.disjoiningPressure_IV;
 
-    this.AdsorptionIsotherm    = res.AdsorptionIsotherm;
-    this.disjoiningPressure_II = res.disjoiningPressure_II;
-    this.disjoiningPressure_IV = res.disjoiningPressure_IV;
-
-    this.hII       = res.hII;
-    this.hIII      = res.hIII;
-    this.hIV       = res.hIV;
-    this.hContour  = res.hContour;
+    res.hII       = this.hII;
+    res.hIII      = this.hIII;
+    res.hIV       = this.hIV;
+    this.hContour  = this.hContour;
          
-    function res = ComputePostProcess(opts,misc)
+    function res = ComputePostProcess()
         
          ComputeAdsorptionIsotherm(this,'load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
          Compute_DisjoiningPressure_II(this);

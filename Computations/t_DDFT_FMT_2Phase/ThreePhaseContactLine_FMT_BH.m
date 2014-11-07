@@ -14,7 +14,7 @@ function CL = ThreePhaseContactLine_FMT_BH(configIn)
         optsNum = struct('PhysArea',PhysArea,...
                          'FexNum',Fex_Num,...
                          'maxComp_y2',10,...
-                         'y1Shift',0,...c 
+                         'y1Shift',0,...
                          'plotTimes_T',100,...
                          'plotTimes_Interval',0.1);
 
@@ -36,9 +36,9 @@ function CL = ThreePhaseContactLine_FMT_BH(configIn)
         CL  = ContactLine(configuration);
     elseif(nargin == 0)
         ChangeDirData([dirData filesep 'FMT_CLEq_BH_40X40_epw']);
-        CL  = ContactLine();
+        CL  = ContactLineHS();
     else
-        CL  = ContactLine(configIn);
+        CL  = ContactLineHS(configIn);
     end
 
     CL.GotoSubDir();    

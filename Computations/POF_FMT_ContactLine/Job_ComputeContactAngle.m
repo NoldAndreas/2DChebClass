@@ -1,48 +1,6 @@
-function Job_ComputeContactAngle(alpha_deg,epw,...
-                                 bounds1,bounds2,maxComp_y2)
-
-    if(nargin == 0)
-        alpha_deg = 60;
-        epw       = 1.25;
-        bounds1   = [-15 15];
-        bounds2   = [0.5 18];                
-    end
-    if(nargin < 5)
-        maxComp_y2 = 35;
-    end
-
-    global dirData
-    AddPaths();    
+function Job_ComputeContactAngle(opts)
     
-    ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
-
-    PhysArea = struct('N',[45,75],...
-                      'L1',4,'L2',2,'L2_AD',2.,...
-                      'y2wall',0.,...
-                      'N2bound',14,'h',1,...
-                      'alpha_deg',alpha_deg);
-                  
-    PlotArea = struct('y1Min',bounds1(1),'y1Max',bounds1(2),...
-                      'y2Min',bounds2(1),'y2Max',bounds2(2),...
-                      'N1',100,'N2',100);                  
-
-	V2Num   = struct('Fex','SplitDisk','L',1,'L2',[],'N',[34,34]);    
-    Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50); %35,34
- 
-    optsNum = struct('PhysArea',PhysArea,...
-                     'PlotAreaCart',PlotArea,...
-                     'FexNum',Fex_Num,...
-                     'V2Num',V2Num,...
-                     'maxComp_y2',maxComp_y2);
-
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);
-    V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-
-    optsPhys = struct('V1',V1,'V2',V2,...                   
-                      'kBT',0.75,'Dmu',0.0,'nSpecies',1,'sigmaS',1);      
-
-    config = v2struct(optsNum,optsPhys);                        
+    config = GetStandardConfig(opts);
     
     %***********************************************************        
     %filename   = [dirData,filesep,'Job40_DisjoiningPressure_',getTimeStr(),'.txt'];       
@@ -50,27 +8,15 @@ function Job_ComputeContactAngle(alpha_deg,epw,...
 
   %  ConvergenceSurfaceTensions(config);
     close all;
-    ChangeDirData();            
-        
+    
     CLT = ContactLineHS(config);     
     CLT.Preprocess();
-    CLT.ComputeEquilibrium();          	    
+    CLT.ComputeEquilibrium();          	        
+    CLT.PostProcess();
     
-%     %Load and compute disjoining pressures         
-     CLT.ComputeAdsorptionIsotherm('load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
-     CLT.Compute_DisjoiningPressure_II();
-     CLT.Compute_DisjoiningPressure_IV();
-     
-%     
-%     %Compute height profiles    
-     CLT.Compute_hII('II');
-     CLT.Compute_hIII();
-     CLT.Compute_hII('IV');
-     CLT.Compute_hI();
-     CLT.Compute_hContour(0.5);
-%     
-     CLT.PlotContourResults();
-     CLT.PlotDisjoiningPressures();
+    CLT.PlotDensityResult();
+    %CLT.PlotContourResults();
+	%CLT.PlotDisjoiningPressures();
 
     %     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
 %     CLT.PostProcess_2DDisjoiningPressure();

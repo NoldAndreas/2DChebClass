@@ -59,6 +59,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         filename            = [hname,'.mat'];
         fileParamTxtname    = [hname,'.txt'];
             
+        [h1s,Parameters.Function] = fileparts(Parameters.Function);
         if(nargin >= 6)
             Parameters_comp = RemoveIgnoreFromStruct(Parameters,ignoreList);
         else
@@ -70,8 +71,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             else
                 par_i = index{i};
             end
-            
-            [h1s,Parameters.Function] = fileparts(Parameters.Function);
+                        
             [h1s,par_i.Function]      = fileparts(par_i.Function);
               
 %             comp_struct(Parameters,par_i)
