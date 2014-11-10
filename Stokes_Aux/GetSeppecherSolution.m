@@ -18,7 +18,7 @@ function [u] = GetSeppecherSolution(Pts,Vc,D_A,D_B,theta)
     u_A        = [u_rA1 ; u_tA1];
     u_B        = [u_rB1 ; u_tB1];
 
-    mask_A     = Pts.y2_kv < theta;
+    mask_A     = Pts.y2_kv <= theta;
     mask_B     = Pts.y2_kv > theta;
 
     mask_A2    = repmat(mask_A,2,1);

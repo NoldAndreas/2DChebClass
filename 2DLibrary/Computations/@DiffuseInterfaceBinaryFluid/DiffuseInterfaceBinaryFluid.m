@@ -13,9 +13,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
        function vec = GetInitialCondition(this) 
             vec = GetInitialCondition@DiffuseInterface(this);           
-            %if(length(vec) == this.IDC.M*4+3)
-%                vec = [0;vec];
-%            end
+            if(length(vec) == this.IDC.M*4+3)
+                vec = [0;vec];
+            end
             if(isempty(this.p))
                 this.p   = zeros(this.IDC.M,1);                
             end           
@@ -206,8 +206,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             %fP_a = -2*y1_Interface./(1+y1_Interface.^2).^2;
             fP_a(Ind.left | Ind.right) = 0;
             
-            f_b  = y1_Interface.*exp(-(y1_Interface/d).^2);
-            fP_b = (1-2/d*(y1_Interface.^2)).*exp(-(y1_Interface/d).^2);
+            f_b  = (y1_Interface/d).*exp(-(y1_Interface/d).^2);
+            fP_b = ((1-2/d*(y1_Interface.^2))/d).*exp(-(y1_Interface/d).^2);
             
             %f_b  = y1_Interface./(1+y1_Interface.^2);
             f_b(Ind.left | Ind.right) = 0;

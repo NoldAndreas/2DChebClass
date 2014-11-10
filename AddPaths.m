@@ -42,7 +42,7 @@ function AddPaths()
     end
     
 	if(isempty(loadAll))
-        loadAll = true;
+        loadAll = false;
     end
     
     if(isempty(QuickOutput))

@@ -42,7 +42,7 @@ function [u,Psi,p] =  GetHuhScriven_Solution(Pts,theta)
 	% Merge
     %***********************
     
-    mask_A     = Pts.y2_kv < theta;
+    mask_A     = Pts.y2_kv <= theta;
     mask_B     = Pts.y2_kv > theta;
     
     Psi         = zeros(size(r));
