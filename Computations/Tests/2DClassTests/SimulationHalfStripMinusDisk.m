@@ -9,13 +9,13 @@ function SimulationHalfStripMinusDisk()
     R       = 3;
     L1      = 0.5;
     y2Wall  = 0;    
-    Origin  = [0;3];
+    Origin  = [0;1];
     N       = [N1;N2];
-    LeftRight = 'Left';%'Left';
+    LeftRight = 'Right';%'Left';
+    TopBottom = 'Bottom';
     %Rmax      = 5;
 
-
-    SMD                = HalfStripMinusDisk(v2struct(Origin,R,y2Wall,N,L1,LeftRight));
+    SMD                = HalfStripMinusDisk(v2struct(Origin,R,y2Wall,N,L1,LeftRight,TopBottom));
     [Pts,Diff,Int,Ind] = SMD.ComputeAll();    
     Interp             = SMD.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     

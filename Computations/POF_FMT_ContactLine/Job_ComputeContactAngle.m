@@ -1,6 +1,10 @@
 function Job_ComputeContactAngle(opts)
     
-    config = GetStandardConfig(opts);
+    if(nargin == 1)
+        config = GetStandardConfig(opts);
+    else
+        config = GetStandardConfig();
+    end
     
     %***********************************************************        
     %filename   = [dirData,filesep,'Job40_DisjoiningPressure_',getTimeStr(),'.txt'];       

@@ -5,7 +5,8 @@ R      = 1;
 bottom = 0;
 
 figure('color','white','Position',[0 0 800 500]);
-shape = struct('y2Min',bottom,'N',[10,10],'L1',1,'L2',2);
+shape = struct('y2Min',bottom,'N',[10,10],'L1',1,'L2',2);%,'alpha',90);
+%HS    = HalfSpaceSkewed(shape);
 HS    = HalfSpace(shape);
 plot([-10,10],[bottom,bottom],'b--','LineWidth',2);
 

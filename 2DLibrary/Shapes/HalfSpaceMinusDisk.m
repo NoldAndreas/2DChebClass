@@ -16,6 +16,7 @@ classdef HalfSpaceMinusDisk < handle
                             && ((Geometry.Origin(2)-Geometry.y2Wall) > 0))
                 Geometry.N(2)      = ceil(Geometry.N(2)/2);
                 Geometry.LeftRight = 'Left';
+                Geometry.TopBottom = 'Bottom';
                 this.SubShape{2}  = HalfStripMinusDisk(Geometry);
                 
                 Geometry.LeftRight = 'Right';

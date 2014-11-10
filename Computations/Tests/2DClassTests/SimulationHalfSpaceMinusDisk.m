@@ -8,7 +8,7 @@ function SimulationHalfSpaceMinusDisk()
     N1 =  15;   N2 = 15;
     R       = 1;
     L1      = 1;    
-    Origin  = [0.;3.];
+    Origin  = [0.;0.5];
     y2Wall  = 0;
     N       = [N1;N2];
     Rmax    = Inf;

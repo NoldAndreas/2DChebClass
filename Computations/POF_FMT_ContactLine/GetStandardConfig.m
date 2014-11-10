@@ -1,8 +1,7 @@
 function config = GetStandardConfig(opts)
 
     global dirData
-    AddPaths();
-    v2struct(opts);
+    AddPaths();    
     
     if(nargin == 0)
         alpha_deg = 60;
@@ -11,6 +10,8 @@ function config = GetStandardConfig(opts)
         bounds2   = [0.5 18];                
         maxComp_y2 = 35;
         N          = [45,75];
+    else
+        v2struct(opts);
     end    
 
     ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');        

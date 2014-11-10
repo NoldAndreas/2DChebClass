@@ -10,15 +10,16 @@ function CheckMeanfieldConvolution(this)
      if(isa(this.IDC,'HalfSpace'))
          
         marky2Inf = (this.IDC.Pts.y2_kv == inf);
+        y2MinCart = min(this.IDC.GetCartPts.y2_kv);
         PrintErrorPos(this.IntMatrV2.Conv(marky2Inf,:)*ones(M,1)- 2*a,'convolution at y2 = infinity',this.IDC.Pts.y1_kv(marky2Inf));          
          
          if(strcmp(this.optsPhys.V2.V2DV2,'Phi2DLongRange'))
-             y0R = this.IDC.GetCartPts.y2_kv - this.IDC.y2Min;
+             y0R = this.IDC.GetCartPts.y2_kv - y2MinCart;
              h   = conv_Phi2DLongRange(y0R);
              PrintErrorPos(h-this.IntMatrV2.Conv*ones(M,1),'Phi2DLongRange*1',this.IDC.GetCartPts);
          elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHenderson_2D'))                 
              conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
-             y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - this.IDC.y2Min;
+             y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
              check = conv_BarkerHenderson2D(y2_h);
 
              PrintErrorPos(conv*ones(M,1) - check','convolution at y1 = infinity',y2_h);                 

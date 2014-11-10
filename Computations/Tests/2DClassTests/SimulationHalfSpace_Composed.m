@@ -8,7 +8,7 @@ function data = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
     
     %Initialization
     if(nargin == 0)
-        N      = [30;20];
+        N      = [40;30];
         N2bound = 10;
         L1 = 2;    L2 = 1;        
         y2Min = 0; h = 1;        
