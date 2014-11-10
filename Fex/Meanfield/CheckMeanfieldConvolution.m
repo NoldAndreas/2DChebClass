@@ -7,13 +7,13 @@ function CheckMeanfieldConvolution(this)
      [h1,h2,a] = fMF(1,this.optsPhys.V2);
 
      %Convolution profile
-     if(isa(this,'HalfSpace'))
+     if(isa(this.IDC,'HalfSpace'))
          
         marky2Inf = (this.IDC.Pts.y2_kv == inf);
         PrintErrorPos(this.IntMatrV2.Conv(marky2Inf,:)*ones(M,1)- 2*a,'convolution at y2 = infinity',this.IDC.Pts.y1_kv(marky2Inf));          
          
          if(strcmp(this.optsPhys.V2.V2DV2,'Phi2DLongRange'))
-             y0R = PtsCart.y2_kv - this.IDC.y2Min;
+             y0R = this.IDC.GetCartPts.y2_kv - this.IDC.y2Min;
              h   = conv_Phi2DLongRange(y0R);
              PrintErrorPos(h-this.IntMatrV2.Conv*ones(M,1),'Phi2DLongRange*1',this.IDC.GetCartPts);
          elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHenderson_2D'))                 

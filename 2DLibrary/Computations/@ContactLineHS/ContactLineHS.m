@@ -27,8 +27,12 @@ classdef ContactLineHS < DDFT_2D
     end
     
     methods (Access = public)          
-        function this = ContactLineHS(configuration)             
-             configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';
+        function this = ContactLineHS(configuration)        
+             if(nargin == 0)
+                 configuration = [];
+             else
+                configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';                
+             end
              this@DDFT_2D(configuration);
         end                
         
@@ -39,8 +43,6 @@ classdef ContactLineHS < DDFT_2D
             Preprocess@DDFT_2D(this);     
             TestPreprocess(this);        
             
-            %            
-            %
             ComputeST(this);
         end        
         function TestPreprocess(this)                          
