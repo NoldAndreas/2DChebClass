@@ -15,22 +15,26 @@ function ComputeContactAngles_Consistent3DDensityPlots()
         ComputeEpw(alpha_deg,epwList(i));      
    end
       
-  ComputeEpw(40,1.375);       
-   opts.alpha_deg = 60;  opts.epw       = 1.25;   
-   Job_ComputeContactAngle(opts);                
+   ComputeEpw(40,1.375);       
+   ComputeEpw(60,1.25);       
+   ComputeEpw(90,1.0);
+   ComputeEpw(120,0.7);
+   ComputeEpw(135,0.55);
    
-   opts.alpha_deg = 90;  opts.epw       = 1.0;      
-   Job_ComputeContactAngle(opts);       
-   
-   opts.alpha_deg = 120;  opts.epw      = 0.7;   
-   Job_ComputeContactAngle(opts); 
-   
-   opts.alpha_deg = 135;  opts.epw      = 0.55;   
-   Job_ComputeContactAngle(opts); 
+%    opts.alpha_deg = 60;  opts.epw       = 1.25;   
+%    Job_ComputeContactAngle(opts);                
+%    
+%    opts.alpha_deg = 90;  opts.epw       = 1.0;      
+%    Job_ComputeContactAngle(opts);       
+%    
+%    opts.alpha_deg = 120;  opts.epw      = 0.7;   
+%    Job_ComputeContactAngle(opts); 
+%    
+%    opts.alpha_deg = 135;  opts.epw      = 0.55;   
+%    Job_ComputeContactAngle(opts); 
    
    %Job_ComputeContactAngle(20,1.47,bounds1,bounds2,25);    
    
-
     function ComputeEpw(alpha_deg,epw)
         opts.alpha_deg  = alpha_deg;  
         opts.epw        = epw;
@@ -42,13 +46,12 @@ function ComputeContactAngles_Consistent3DDensityPlots()
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
         CLT.ComputeEquilibrium();          	        
-        %CLT.PostProcess();        
-        CLT.PlotDensityResult();
+        CLT.PostProcess();        
+        CLT.PlotDensityResult('DP');        
         
         clear('CLT');
         close all;    
     end
-
     function alpha_deg = GetAlphaDeg(epw)
         opts.alpha_deg  = 90;  
         opts.epw        = epw;

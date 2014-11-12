@@ -1,9 +1,12 @@
  function [rho_cont,ell,par,OmEx,dmuCheck,pts] = FMT_1DContinuation(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,parCont,output)
     %parCont = {'mu'}
-    
+    global dirDataOrg
     if((nargin >= 7) && strcmp(output,'load'))
+        ChangeDirData([dirDataOrg filesep 'deg90']);
+        ignoreList = {'thetaDirection','rho_iguess'};
         res       = DataStorage('IterativeContinuationPostProcess',...
-                        @PostProcessAdsorptionIsotherm,optsPhys,[],2);      
+                        @PostProcessAdsorptionIsotherm,optsPhys,[],[],ignoreList);                  
+        ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
                             
         par         = res.dmu;
         ell         = res.ell;
@@ -21,6 +24,7 @@
         end        
         return;
     end
+
 
     close all;  
     disp('* FMT 1D HardWall Continuation *');

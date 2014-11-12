@@ -151,7 +151,8 @@ classdef ContactLineHS < DDFT_2D
         
         %Plot functions        
         PlotContourResults(this,plain)
-        function PlotDensityResult(this)                        
+        function PlotDensityResult(this,DP)                        
+            M        = this.IDC.M;
             rho      = GetRhoEq(this);
             PlotArea = this.optsNum.PlotAreaCart;
             
@@ -165,8 +166,46 @@ classdef ContactLineHS < DDFT_2D
             set(gca, 'CLim', [0, 1.0]);            
             pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
             view([-10 5 3]);
+            
+            if((nargin == 1) || ~strcmp(DP,'DP'))
+                SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq]);                        
+                return;
+            end
+            
+            %****** Plot disjoining pressures
+            %f2         = figure;
+            y1         = this.y1_SpectralLine.Pts.y;
+            My1        = length(y1);
+            baseline_z = 5;
+            factor_z   = 40;            
+            hold on;                                                
+            
+            plot3(y1,zeros(My1,1),baseline_z*ones(My1,1),'k','linewidth',1.5);
+            
+            [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
+            plot3(this.y1_I+DeltaY1_III,zeros(size(this.y1_I)),...
+                    baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
+                    'b','linewidth',1.5);
+            
+            plot3(y1,zeros(My1,1),...
+                baseline_z+factor_z*this.disjoiningPressure_II,...
+                'r','linewidth',1.5);     
+            
+            Pi_III = GetDisjoiningPressure_III(this);            
+            plot3(y1,zeros(My1,1),baseline_z+factor_z*Pi_III,'k','linewidth',1.5);
+            
+            plot3(y1,zeros(My1,1),...
+                baseline_z+factor_z*this.disjoiningPressure_IV,...
+                'g','linewidth',1.5);     
+            
+             zlim([0 baseline_z+1]);             
+             
+             %labelDP = '$\Pi \sigma^3/\varepsilon$';
+             %plot::Text3d(labelDP,[max(y1),0,baseline_z]);%,'Interpreter','Latex','fontsize',25);
+            
+    
 
-            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq]);                        
+            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_3D_DP']);                        
         end
         function PlotInterfaceResults(this)
             %*******************************************************
@@ -223,6 +262,24 @@ classdef ContactLineHS < DDFT_2D
                 IntM(i,:)   = vh;
             end                            
             V_I = -IntM*Pi_I;                
+        end        
+
+        function dP1D = GetDisjoiningPressure_I_ell(this,ell) 
+            fT   = abs(this.AdsorptionIsotherm.FT);
+            Pi_I = GetDisjoiningPressure_I(this);
+            
+            ellAD = min(fT)+ell;
+            IP    = barychebevalMatrix(fT,ellAD);
+            dP1D  = IP*Pi_I;
+            dP1D(ellAD<min(fT)) = 0;
+            dP1D(ellAD>max(fT)) = 0;
+        end
+        
+        function [Pi_III] = GetDisjoiningPressure_III(this)
+            D    = this.y1_SpectralLine.Diff.Dy;
+            D2   = this.y1_SpectralLine.Diff.DDy;
+                 
+            Pi_III  = -this.ST_1D.om_LiqGas*(D2*this.hIII)./((1+(D*this.hIII).^2).^1.5);            
         end
         function drying = IsDrying(this)
             drying = (min(this.AdsorptionIsotherm.FT) < 0);

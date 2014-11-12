@@ -214,8 +214,13 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 
     function s = RemoveIgnoreFromStruct(s,IgnoreList)
         for j = 1:length(IgnoreList)
+            for k = 1:length(s)
+                
+            end
+            
             if(isfield(s,IgnoreList{j}))
                 s = rmfield(s,IgnoreList{j});
+            
             end
         end
     end
