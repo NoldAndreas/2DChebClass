@@ -72,17 +72,7 @@ classdef DDFT_2D < Computation
                 end
             end
             
-            % Determine saturation point if a 2-Phase system is given
-            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
-                [this.optsPhys.rhoGas_sat,...
-                     this.optsPhys.rhoLiq_sat,...
-                    this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
-                GetCriticalPoint(this.optsPhys);
-                % BulkPhaseDiagram(this.optsPhys);
-                this.do2Phase = true;
-            end
-
-            % Determine number of species
+             % Determine number of species
             if(isfield(optsPhys,'nParticlesS'))
                 this.optsPhys.nSpecies = length(optsPhys.nParticlesS); 
             elseif(isfield(optsPhys,'Dmu'))
@@ -92,6 +82,18 @@ classdef DDFT_2D < Computation
             elseif(isfield(optsPhys,'nSpecies'))
                 this.optsPhys.nSpecies = optsPhys.nSpecies;
             end
+            
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap') && (this.optsPhys.nSpecies == 1))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
+                this.do2Phase = true;
+            end
+
+           
 
             Preprocess_HardSphereContribution(this);
             Preprocess_MeanfieldContribution(this);
@@ -107,7 +109,7 @@ classdef DDFT_2D < Computation
           
           if(nargin >= 2)
                 if(isscalar(rho_ig))
-                    rho_ig = rho_ig*ones(this.IDC.M,1);
+                    rho_ig = rho_ig*ones(this.IDC.M,this.optsPhys.nSpecies);
                 end
                 y0 = this.optsPhys.kBT*log(rho_ig) + this.Vext;
                 if(~isfield(optsPhys,'Dmu'))   

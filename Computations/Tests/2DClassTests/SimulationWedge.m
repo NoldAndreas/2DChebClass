@@ -9,7 +9,7 @@ function SimulationWedge
     %Initialization
     
     R                   = 2;
-    half_wedge_angle    = 4*pi/5;
+    half_wedge_angle    = pi/2;%4*pi/5;
     Geometry = struct('R_in',0,'R_out',R,...
                       'th1',-half_wedge_angle,...
                       'th2',half_wedge_angle,'N',[30,20]);

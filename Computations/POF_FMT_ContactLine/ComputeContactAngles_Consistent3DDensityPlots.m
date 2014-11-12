@@ -11,12 +11,11 @@ function ComputeContactAngles_Consistent3DDensityPlots()
    epwList = [0.6,0.8,0.9,1.1,1.2,1.3,0.65,0.75,0.85,0.95,1.05,1.15,1.35];   
    
    for i = 1:length(epwList)
-        ComputeEpw(epwList(i));      
+        alpha_deg = GetAlphaDeg(epw);
+        ComputeEpw(alpha_deg,epwList(i));      
    end
-   
-   opts.alpha_deg = 40;  opts.epw       = 1.375;   
-   Job_ComputeContactAngle(opts);    
-   
+      
+  ComputeEpw(40,1.375);       
    opts.alpha_deg = 60;  opts.epw       = 1.25;   
    Job_ComputeContactAngle(opts);                
    
@@ -32,7 +31,25 @@ function ComputeContactAngles_Consistent3DDensityPlots()
    %Job_ComputeContactAngle(20,1.47,bounds1,bounds2,25);    
    
 
-    function ComputeEpw(epw)
+    function ComputeEpw(alpha_deg,epw)
+        opts.alpha_deg  = alpha_deg;  
+        opts.epw        = epw;
+        opts.N          = [45,75];
+        opts.maxComp_y2 = 35;        
+
+        config = GetStandardConfig(opts);
+
+        CLT = ContactLineHS(config);     
+        CLT.Preprocess();
+        CLT.ComputeEquilibrium();          	        
+        %CLT.PostProcess();        
+        CLT.PlotDensityResult();
+        
+        clear('CLT');
+        close all;    
+    end
+
+    function alpha_deg = GetAlphaDeg(epw)
         opts.alpha_deg  = 90;  
         opts.epw        = epw;
         opts.maxComp_y2 = 15;
@@ -43,21 +60,10 @@ function ComputeContactAngles_Consistent3DDensityPlots()
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
         CLT.ComputeEquilibrium();          	        
-        %CLT.PostProcess();
-        close all;     
+        %CLT.PostProcess();        
 
-        opts.alpha_deg = round(CLT.MeasureContactAngle(2,[10,14]));
-        opts.N         = [45,75];
-
+        alpha_deg = round(CLT.MeasureContactAngle(2,[10,14]));
+        close all;
         clear('CLT');
-               
-        config = GetStandardConfig(opts);
-        CLT    = ContactLineHS(config);     
-        CLT.Preprocess();
-        CLT.ComputeEquilibrium();          	        
-        CLT.PlotDensityResult();
-
-        clear('CLT');
-        close all;    
     end
 end

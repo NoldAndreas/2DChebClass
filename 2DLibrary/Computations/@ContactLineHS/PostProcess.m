@@ -15,12 +15,18 @@ function PostProcess(this)
 
     this.AdsorptionIsotherm    = res.AdsorptionIsotherm;
     this.disjoiningPressure_II = res.disjoiningPressure_II;
-    this.disjoiningPressure_IV = res.disjoiningPressure_IV;
-
+    this.disjoiningPressure_IV = res.disjoiningPressure_IV;    
+    
     this.hII       = res.hII;
     this.hIII      = res.hIII;
     this.hIV       = res.hIV;
     this.hContour  = res.hContour;
+    
+    if(isfield(res,'hI'))
+        this.hI = res.hI;
+    else
+        Compute_hI(this);        
+    end
          
     function res = ComputePostProcess(opts,misc)
         
@@ -39,6 +45,7 @@ function PostProcess(this)
          res.disjoiningPressure_II = this.disjoiningPressure_II;
          res.disjoiningPressure_IV = this.disjoiningPressure_IV;
         
+         res.hI        = this.hI;
          res.hII       = this.hII;
          res.hIII      = this.hIII;
          res.hIV       = this.hIV;
