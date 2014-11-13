@@ -33,9 +33,9 @@ function PostProcess(this)
         
         % ComputeAdsorptionIsotherm(this,'load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
         if(this.optsNum.PhysArea.alpha_deg > 90)
-            ComputeAdsorptionIsotherm(this,'200','drying');
+            ComputeAdsorptionIsotherm(this,200,'drying');
         else
-            ComputeAdsorptionIsotherm(this,'200','wetting');
+            ComputeAdsorptionIsotherm(this,200,'wetting');
         end
         
         
@@ -43,9 +43,10 @@ function PostProcess(this)
          Compute_DisjoiningPressure_IV(this);
 
     %     %Compute height profiles    
-         Compute_hI(this);
+        
          Compute_hII(this,'II');
          Compute_hIII(this);
+          Compute_hI(this);
          Compute_hII(this,'IV');
          
          Compute_hContour(this,0.5);

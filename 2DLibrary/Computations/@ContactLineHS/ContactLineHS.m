@@ -182,17 +182,20 @@ classdef ContactLineHS < DDFT_2D
             
             plot3(y1,zeros(My1,1),baseline_z*ones(My1,1),'k','linewidth',1.5);
             
-            [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
-            plot3(this.y1_I+DeltaY1_III,zeros(size(this.y1_I)),...
-                    baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
-                    'b','linewidth',1.5);
+            if(abs(this.optsNum.PhysArea.alpha_deg-90)>10)
+                [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
+                plot3(this.y1_I+DeltaY1_III,zeros(size(this.y1_I)),...
+                        baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
+                        'b','linewidth',1.5);
+            end
             
             plot3(y1,zeros(My1,1),...
                 baseline_z+factor_z*this.disjoiningPressure_II,...
                 'r','linewidth',1.5);     
             
+            markIII = (this.hIII < PlotArea.y2Max);
             Pi_III = GetDisjoiningPressure_III(this);            
-            plot3(y1,zeros(My1,1),baseline_z+factor_z*Pi_III,'k','linewidth',1.5);
+            plot3(y1(markIII),zeros(sum(markIII),1),baseline_z+factor_z*Pi_III(markIII),'k','linewidth',1.5);
             
             plot3(y1,zeros(My1,1),...
                 baseline_z+factor_z*this.disjoiningPressure_IV,...
@@ -276,8 +279,8 @@ classdef ContactLineHS < DDFT_2D
         end
         
         function [Pi_III] = GetDisjoiningPressure_III(this)
-            D    = this.y1_SpectralLine.Diff.Dy;
-            D2   = this.y1_SpectralLine.Diff.DDy;
+            D       = this.y1_SpectralLine.Diff.Dy;
+            D2      = this.y1_SpectralLine.Diff.DDy;
                  
             Pi_III  = -this.ST_1D.om_LiqGas*(D2*this.hIII)./((1+(D*this.hIII).^2).^1.5);            
         end

@@ -10,8 +10,9 @@ function ComputeContactAngles_Consistent3DDensityPlots()
    opts    = v2struct(bounds1,bounds2,maxComp_y2,N);
    epwList = [0.6,0.8,0.9,1.1,1.2,1.3,0.65,0.75,0.85,0.95,1.05,1.15,1.35];   
    
+ %   ComputeEpw(130,0.6); 
    for i = 1:length(epwList)
-        alpha_deg = GetAlphaDeg(epw);
+        alpha_deg = GetAlphaDeg(epwList(i));
         ComputeEpw(alpha_deg,epwList(i));      
    end
       
@@ -39,14 +40,15 @@ function ComputeContactAngles_Consistent3DDensityPlots()
         opts.alpha_deg  = alpha_deg;  
         opts.epw        = epw;
         opts.N          = [45,75];
-        opts.maxComp_y2 = 35;        
+        opts.maxComp_y2 = 15;        
 
         config = GetStandardConfig(opts);
 
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
         CLT.ComputeEquilibrium();          	        
-        CLT.PostProcess();        
+        CLT.PostProcess();   
+        CLT.Compute_hI();
         CLT.PlotDensityResult('DP');        
         
         clear('CLT');
