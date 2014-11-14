@@ -63,7 +63,7 @@ function DiffusionClosedBox()
         t       = outTimes(i);
         
         subplot(2,2,1)
-        abox.doPlots(rho);
+        abox.plot(rho);
         title(['Interpolation of Solution at t = ', num2str(t)]);       
         zlim([0 max(rho_ic)]);
                 
@@ -88,7 +88,7 @@ function DiffusionClosedBox()
         
         subplot(2,2,3);
         fl   = GetFlux(rho,outTimes(i));
-        abox.doPlotsFlux(fl); hold on;%NormQuiverPlot(Pts,fl);
+        abox.plotFlux(fl); hold on;%NormQuiverPlot(Pts,fl);
         subBox.PlotBorders();
         
         subplot(2,2,4);   

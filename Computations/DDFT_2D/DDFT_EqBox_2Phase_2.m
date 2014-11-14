@@ -23,6 +23,6 @@ function [optsNum,optsPhys] = Test_DDFT_EqBox_2Phase_2()
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                     
-    EX.IDC.doPlots(EX.GetRhoEq());
+    EX.IDC.plot(EX.GetRhoEq());
 
 end                 

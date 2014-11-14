@@ -74,7 +74,7 @@ function PlotMultipleDDFTs2D(struct)
             %Plot densities
             for iSpecies=1:struct(iDDFT).nSpecies
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
-                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),'SC',struct(iDDFT).optsPlot); 
+                struct(iDDFT).data.shape.plot(rho(:,iSpecies),'SC',struct(iDDFT).optsPlot); 
                 hold on;     
             end
             if(iDDFT==nDDFT)
@@ -85,13 +85,13 @@ function PlotMultipleDDFTs2D(struct)
             axes(h2);
             for iSpecies=1:struct(iDDFT).nSpecies
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
-                struct(iDDFT).data.shape.doPlotsFlux(flux(:,iSpecies),struct(iDDFT).data.shape.Ind.bound,fl_norm,1.5, ...
+                struct(iDDFT).data.shape.plotFlux(flux(:,iSpecies),struct(iDDFT).data.shape.Ind.bound,fl_norm,1.5, ...
                             struct(iDDFT).optsPlot.lineColourDDFT{iSpecies});
                 hold on;               
-                struct(iDDFT).data.shape.doPlotsFlux(flux(:,iSpecies),~struct(iDDFT).data.shape.Ind.bound,fl_norm,0.5, ...
+                struct(iDDFT).data.shape.plotFlux(flux(:,iSpecies),~struct(iDDFT).data.shape.Ind.bound,fl_norm,0.5, ...
                             struct(iDDFT).optsPlot.lineColourDDFT{iSpecies});
                 hold on;
-                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),'contour', struct(iDDFT).optsPlot);
+                struct(iDDFT).data.shape.plot(rho(:,iSpecies),'contour', struct(iDDFT).optsPlot);
                 hold on;     
             end
             if(iDDFT==nDDFT)
@@ -105,7 +105,7 @@ function PlotMultipleDDFTs2D(struct)
 %                 struct(iDDFT).optsPlot.linestyle = '-';
 %                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
 %                 subplot(nRows,2,2+iSpecies+2*(ceil(iSpecies/2)-1));
-%                 struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),struct(iDDFT).optsPlot);
+%                 struct(iDDFT).data.shape.plot(rho(:,iSpecies),struct(iDDFT).optsPlot);
 %                 hold on;
 %                 if(iDDFT==nDDFT)
 %                     hold off;
@@ -120,7 +120,7 @@ function PlotMultipleDDFTs2D(struct)
 %                 struct(iDDFT).optsPlot.linestyle = '-';
 %                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
 %                 struct(iDDFT).optsPlot.dist = false;
-%                 struct(iDDFT).data.shape.doPlots(flux(:,iSpecies),struct(iDDFT).optsPlot);
+%                 struct(iDDFT).data.shape.plot(flux(:,iSpecies),struct(iDDFT).optsPlot);
 %                 hold on
 %                 if(iDDFT==nDDFT)
 %                     hold off;

@@ -19,18 +19,18 @@ function data = SimulationHalfSpace_Tref()
     [VP,VPDiff]        = vext(Interp.pts1,Interp.pts2);  
     
     
-    THS.doPlots(V,'SC');    
+    THS.plot(V,'SC');    
     figure
-    subplot(2,2,1); THS.doPlots(Vdiff.dy1,'SC');
-    subplot(2,2,2); THS.doPlots(Vdiff.dy2,'SC');
-    subplot(2,2,3); THS.doPlots(Vdiff.ddy1,'SC');
-    subplot(2,2,4); THS.doPlots(Vdiff.ddy2,'SC');
+    subplot(2,2,1); THS.plot(Vdiff.dy1,'SC');
+    subplot(2,2,2); THS.plot(Vdiff.dy2,'SC');
+    subplot(2,2,3); THS.plot(Vdiff.ddy1,'SC');
+    subplot(2,2,4); THS.plot(Vdiff.ddy2,'SC');
     
 	figure;
-    subplot(2,2,1); THS.doPlots(Diff.Dy1*V,'SC');
-    subplot(2,2,2); THS.doPlots(Diff.Dy2*V,'SC');
-    subplot(2,2,3); THS.doPlots(Diff.DDy1*V,'SC');
-    subplot(2,2,4); THS.doPlots(Diff.DDy2*V,'SC');   
+    subplot(2,2,1); THS.plot(Diff.Dy1*V,'SC');
+    subplot(2,2,2); THS.plot(Diff.Dy2*V,'SC');
+    subplot(2,2,3); THS.plot(Diff.DDy1*V,'SC');
+    subplot(2,2,4); THS.plot(Diff.DDy2*V,'SC');   
     
     %Check Differentiation
     vplot    = Interp.InterPol*V;        
@@ -49,7 +49,7 @@ function data = SimulationHalfSpace_Tref()
     disp(['Error of interpolation:',num2str(max(abs(V-Vt)))]);
         
     figure;
-    THS.doPlots(V,'SC'); 
+    THS.plot(V,'SC'); 
     THS.PlotLineOfPoles(V);
     
     displayErrorsPos(Pts,Interp.InterPol*V,VP,V,Vdiff,Diff,'cart');
@@ -65,7 +65,7 @@ function data = SimulationHalfSpace_Tref()
     disp(['Error of interpolation:',num2str(max(abs(V-Vt)))]);
     
     figure;
-    THS.doPlots(V,'SC'); 
+    THS.plot(V,'SC'); 
     THS.PlotLineOfPoles(V);    
 
     
@@ -77,7 +77,7 @@ function data = SimulationHalfSpace_Tref()
     disp(['Error of interpolation:',num2str(max(abs(V-Vt)))]);
     
     figure;
-    THS.doPlots(V,'SC'); 
+    THS.plot(V,'SC'); 
     THS.PlotLineOfPoles(V);    
 
     
@@ -90,20 +90,20 @@ function data = SimulationHalfSpace_Tref()
     disp(['Error of interpolation:',num2str(max(abs(V-Vt)))]);    
     
     figure;
-    THS.doPlots(V,'SC'); 
+    THS.plot(V,'SC'); 
     THS.PlotLineOfPoles(V);    
     
     figure;
-    subplot(2,2,1); THS.doPlots(Vdiff.dy1,'SC');
-    subplot(2,2,2); THS.doPlots(Vdiff.dy2,'SC');
-    subplot(2,2,3); THS.doPlots(Vdiff.ddy1,'SC');
-    subplot(2,2,4); THS.doPlots(Vdiff.ddy2,'SC');
+    subplot(2,2,1); THS.plot(Vdiff.dy1,'SC');
+    subplot(2,2,2); THS.plot(Vdiff.dy2,'SC');
+    subplot(2,2,3); THS.plot(Vdiff.ddy1,'SC');
+    subplot(2,2,4); THS.plot(Vdiff.ddy2,'SC');
     
     figure;
-    subplot(2,2,1); THS.doPlots(Diff.Dy1*V,'SC');
-    subplot(2,2,2); THS.doPlots(Diff.Dy2*V,'SC');
-    subplot(2,2,3); THS.doPlots(Diff.DDy1*V,'SC');
-    subplot(2,2,4); THS.doPlots(Diff.DDy2*V,'SC');    
+    subplot(2,2,1); THS.plot(Diff.Dy1*V,'SC');
+    subplot(2,2,2); THS.plot(Diff.Dy2*V,'SC');
+    subplot(2,2,3); THS.plot(Diff.DDy1*V,'SC');
+    subplot(2,2,4); THS.plot(Diff.DDy2*V,'SC');    
      
     %Check Differentiation 
     data    = displayErrorsPos(Pts,Interp.InterPol*V,VP,V,Vdiff,Diff,'cart');
@@ -125,12 +125,12 @@ function data = SimulationHalfSpace_Tref()
 %     set(gcf,'Color','white'); %Set background color    
 %     
 %     subplot(1,2,1);
-%     TS.doPlots(V);    
+%     TS.plot(V);    
 %     title('Interpolation');    
 %     pbaspect([1 1 1]);
 %     
 %     subplot(1,2,2);
-%     TS.doPlots(fConv(Interp.pts1,Interp.pts2));
+%     TS.plot(fConv(Interp.pts1,Interp.pts2));
 %     title('Convolution');
 %     pbaspect([1 1 1]);    
     

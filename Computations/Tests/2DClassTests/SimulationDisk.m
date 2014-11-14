@@ -40,7 +40,7 @@ function data = SimulationDisk(N1,N2,L1,L2,vext)
     data.InterPol = max(abs(Interp.InterPol*V - VP));       
     display([' Error in Interpolation: ', num2str(data.InterPol)]);
 
-    DC.doPlots(V);    
+    DC.plot(V);    
     
     %Check Integration
     data.Int = abs(Int*V-VInt);
@@ -58,12 +58,12 @@ function data = SimulationDisk(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    DC.doPlots(V); 
+    DC.plot(V); 
     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);
-    DC.doPlots(fP_Conv);     
+    DC.plot(fP_Conv);     
     title('Convolution');
     pbaspect([1 1 1]);
     

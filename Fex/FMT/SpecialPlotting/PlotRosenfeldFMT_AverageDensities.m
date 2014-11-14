@@ -12,7 +12,7 @@ function PlotRosenfeldFMT_AverageDensities(FMTShape,FMTMatrices,rho)
       %fields(i)
       %nStruct.(fields(i))      
         subplot(noRows,noCols,i);
-        FMTShape.AD.doPlots(nStruct.(fields{i})*rho);    
+        FMTShape.AD.plot(nStruct.(fields{i})*rho);    
         title(fields(i));    
     end
 

@@ -56,9 +56,9 @@ function PlotDDFT_SnapshotsShape(input,file_name)
         for iSpecies=1:nSpecies
              optsPlot.linecolor = lineColour{iSpecies};              
              
-             shape.doPlotsFlux(flux_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
-             shape.doPlotsFlux(flux_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
-             shape.doPlots(rho(:,iSpecies),'contour',optsPlot); hold on;            
+             shape.plotFlux(flux_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
+             shape.plotFlux(flux_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+             shape.plot(rho(:,iSpecies),'contour',optsPlot); hold on;            
              if(bool_subSp)
                 subArea.PlotBorders();
              end

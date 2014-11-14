@@ -43,7 +43,7 @@ function data = SimulationSegment2(N1,N2,vext)
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color            
-    SG.doPlots(V,true);        
+    SG.plot(V,true);        
     title('Interpolation');      
     
     figure 

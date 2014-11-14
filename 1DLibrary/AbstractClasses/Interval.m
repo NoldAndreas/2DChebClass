@@ -67,7 +67,7 @@ classdef (Abstract) Interval < handle
             this.Pts.N = this.N;
             this.Pts.y = PhysSpace(this,this.Pts.x);
         end              
-        function doPlots(this,V,options)
+        function plot(this,V,options)
             
             nSpecies = size(V,2);
             

@@ -21,7 +21,7 @@ function [fContour] =  PlotContourResults(this,plain)
         optDetails.clabel = true;        
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         optDetails.nContours = [0.1,0.3,0.5,0.6,0.7];        
-        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.plot(rho,'contour',optDetails);  hold on;  
         
         %Plot Young Contact Angle     
         y1MaxP = max(this.IDC.Interp.pts1);
@@ -61,15 +61,15 @@ function [fContour] =  PlotContourResults(this,plain)
         optDetails.nContours = rhoGas_sat + 0.1*drho;
         optDetails.linecolor = 'b';
         optDetails.linestyle = '--';
-        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.plot(rho,'contour',optDetails);  hold on;  
         
         optDetails.nContours = rhoGas_sat + 0.5*drho;
         optDetails.linecolor = [0 0.75 0];
-        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.plot(rho,'contour',optDetails);  hold on;  
         
         optDetails.nContours = rhoGas_sat + 0.9*drho;
         optDetails.linecolor = 'r';
-        this.IDC.doPlots(rho,'contour',optDetails);  hold on;  
+        this.IDC.plot(rho,'contour',optDetails);  hold on;  
         
         xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
         ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);

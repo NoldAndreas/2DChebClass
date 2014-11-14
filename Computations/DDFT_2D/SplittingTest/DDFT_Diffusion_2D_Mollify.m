@@ -153,7 +153,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_2D_Mollify(optsPhys,o
 %             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
 %         figure
 %         rho_ic  = exp((x_ic-Vext)/kBT);
-%         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+%         IDC.plot(rho_ic,'',optsPlot.lineColourDDFT);        
 %     end
 
     t_eqSol = toc;

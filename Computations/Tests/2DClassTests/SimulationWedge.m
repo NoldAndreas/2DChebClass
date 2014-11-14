@@ -34,7 +34,7 @@ function SimulationWedge
      VP             = vext(Interp.pts1,Interp.pts2);           
        
      %Check Interpolation
-     WDG.doPlots(V);
+     WDG.plot(V);
     
 	 %Check Differentiation
      vplot     = Interp.InterPol*V;
@@ -47,7 +47,7 @@ function SimulationWedge
      %Check Convolution
      figure
      fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
-     WDG.doPlots(fP_Conv);
+     WDG.plot(fP_Conv);
                           
     %***************************************************************
     %   Auxiliary functions:

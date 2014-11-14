@@ -33,8 +33,8 @@ function SymmetryClassification_Ib()
     for i = 1:length(t)
         subplot(2,2,i);
         p = Psi(Pts.y1_kv,Pts.y2_kv,t(i));
-        BX.doPlots(real(p),'contour',struct('clabel',true));    pbaspect([1 1 1]);  
-        %subplot(1,2,2);     BX.doPlots(imag(p),'contour',struct('clabel',true));    pbaspect([1 1 1]);
+        BX.plot(real(p),'contour',struct('clabel',true));    pbaspect([1 1 1]);  
+        %subplot(1,2,2);     BX.plot(imag(p),'contour',struct('clabel',true));    pbaspect([1 1 1]);
     end
     
     %% ****************************************************************
@@ -54,7 +54,7 @@ function SymmetryClassification_Ib()
     y2       = PtsHS.y2_kv;
     
     F = RHS(y1,y2);
-    HS.doPlots(F,'SC');
+    HS.plot(F,'SC');
     
    
           

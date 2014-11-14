@@ -31,7 +31,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
    
    
     %1st Step: Search for File and load if found
-    if((nargin == 5) && (recompute == 2))        
+    if((nargin >= 5) && ~(isempty(recompute)) && (recompute == 2))        
         %(1)First Option: Select Input File
             [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
             load([DataFolder,FileName]);  

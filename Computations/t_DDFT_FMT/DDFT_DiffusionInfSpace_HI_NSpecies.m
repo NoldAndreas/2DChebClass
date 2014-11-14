@@ -113,7 +113,7 @@ function output = DDFT_DiffusionInfSpace_HI_NSpecies(optsPhys,optsNum,optsPlot)
     if(optsPlot.doDDFTPlots)
         figure
         rho_ic  = exp((x_ic-Vext)/kBT);
-        IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+        IDC.plot(rho_ic,'',optsPlot.lineColourDDFT);        
     end
 
     t_eqSol = toc;

@@ -124,13 +124,18 @@ function PlotDDFT(input,Bool_Record)
 
             %Plot Interpolation
             hold off;
-            %shape.doPlots(rho,'contour');  hold on;
-            %shape.doPlotsFlux(flux_t(:,1,i),~shape.Ind.bound,fl_norm,0.5,'k'); hold on;            
+            %shape.plot(rho,'contour');  hold on;
+            %shape.plotFlux(flux_t(:,1,i),~shape.Ind.bound,fl_norm,0.5,'k'); hold on;            
             for iSpecies=1:nSpecies    
                 rho     = rho_t(:,iSpecies,i);
-                optsPlot.linecolor = lineColour{iSpecies}; 
-                shape.doPlotsFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
-                shape.doPlots(rho,'contour',optsPlot); hold on;                         
+                
+                shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+                if(nSpecies > 1)
+                    optsPlot.linecolor = lineColour{iSpecies}; 
+                else
+                    optsPlot.nContours = 5;
+                end                
+                shape.plot(rho,'contour',optsPlot); hold on;                                         
             end
             %plot([0;0],[i;i]);
             title(['t = ', num2str(t)]);               
@@ -178,9 +183,9 @@ function PlotDDFT(input,Bool_Record)
         cla(h1);
         for iSpecies=1:nSpecies
              optsPlot.linecolor = lineColour{iSpecies}; 
-             shape.doPlotsFlux(flux_t(:,iSpecies,i),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
-             shape.doPlotsFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
-             shape.doPlots(rho(:,iSpecies),'contour',optsPlot); hold on;            
+             shape.plotFlux(flux_t(:,iSpecies,i),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
+             shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+             shape.plot(rho(:,iSpecies),'contour',optsPlot); hold on;            
              if(bool_subSp)
                 subArea.PlotBorders();
              end                
@@ -205,7 +210,7 @@ function PlotDDFT(input,Bool_Record)
          hold off;
          for iSpecies=1:nSpecies
             subplot(nRows,2,2+iSpecies);
-            shape.doPlots(rho(:,iSpecies),'SC');
+            shape.plot(rho(:,iSpecies),'SC');
             %view([-2,5,2]);     
             view([2,-5,2]);     
             title(['Species ' num2str(iSpecies)]);

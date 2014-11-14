@@ -52,7 +52,7 @@ function CahnHilliard_InfCapillary()
     
     %% Equilibrium
     rho_ic    = fsolve(@f_eq,InitialGuess());    
-    IC.doPlots(rho_ic,'SC');
+    IC.plot(rho_ic,'SC');
     
     
     %% Dynamics   
@@ -70,11 +70,11 @@ function CahnHilliard_InfCapillary()
 %     %x        = fsolve(@f_dyn,x_iguess);    
 %     for i = 1:length(outTimes)
 %         subplot(1,2,1);
-%         IC.doPlots(rho_t(:,i),'contour'); hold on;
-%         IC.doPlotsFlux(flux_t(:,i)); title(['t=',num2str(outTimes(i)),' , max = ',num2str(max(abs(flux_t(:,i))))]); 
+%         IC.plot(rho_t(:,i),'contour'); hold on;
+%         IC.plotFlux(flux_t(:,i)); title(['t=',num2str(outTimes(i)),' , max = ',num2str(max(abs(flux_t(:,i))))]); 
 %         
 %         subplot(1,2,2);
-%         IC.doPlots(rho_t(:,i),'SC');
+%         IC.plot(rho_t(:,i),'SC');
 %         
 %         pause(0.1);
 %     end
@@ -196,8 +196,8 @@ function CahnHilliard_InfCapillary()
         vs        = x(:,3);
         
         figure;
-        subplot(1,2,1);     IC.doPlots(rhos);
-        subplot(1,2,2);     IC.doPlotsFlux([us;vs]);
+        subplot(1,2,1);     IC.plot(rhos);
+        subplot(1,2,2);     IC.plotFlux([us;vs]);
     end
 
     function th = UpperTheta(t)

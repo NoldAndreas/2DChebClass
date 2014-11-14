@@ -58,7 +58,7 @@ function FindAB(this)
                                               Pts.y2_kv],1,0,0,theta);                  
     
         disp(['Error of right part: ',num2str(Int*u_flow(1+end/2:end)+y2Max)]);
-        HIS.doPlots(u_flow(1+end/2:end)); hold on;
+        HIS.plot(u_flow(1+end/2:end)); hold on;
         
         u_flow    = GetSeppecherSolutionCart([2*y10-Pts.y1_kv,...
                                               Pts.y2_kv],1,0,0,theta);                  
@@ -80,7 +80,7 @@ function FindAB(this)
     
         disp(['Error of full part: ',num2str(Int*u_flow(1+end/2:end))]);
         v = u_flow(1+end/2:end);
-        ISL.doPlots(v); hold on;
+        ISL.plot(v); hold on;
         plot([y10,y10],[min(v) max(v)]);
     end
 end

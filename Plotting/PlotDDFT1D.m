@@ -43,7 +43,7 @@ function PlotDDFT1D(input,Bool_Record)
         optsPlot.dist = true;
         for iSpecies=1:nSpecies
              optsPlot.linecolor = lineColour{iSpecies};
-             shape.doPlots(rho(:,iSpecies),optsPlot); hold on;
+             shape.plot(rho(:,iSpecies),optsPlot); hold on;
         end
 
 
@@ -64,7 +64,7 @@ function PlotDDFT1D(input,Bool_Record)
             optsPlot.linecolor = lineColour{iSpecies};
             optsPlot.dist = true;
             subplot(nRows,2,2+iSpecies+2*(ceil(iSpecies/2)-1));
-            shape.doPlots(rho(:,iSpecies),optsPlot);
+            shape.plot(rho(:,iSpecies),optsPlot);
             hold off
             title(['Species ' num2str(iSpecies)]);
 
@@ -72,7 +72,7 @@ function PlotDDFT1D(input,Bool_Record)
             subplot(nRows,2,2+iSpecies+2*ceil(iSpecies/2));
             optsPlot.linestyle = '-';
             optsPlot.dist = false;
-            shape.doPlots(flux(:,iSpecies),optsPlot);
+            shape.plot(flux(:,iSpecies),optsPlot);
             hold off
             title(['Flux ' num2str(iSpecies)]);
          end

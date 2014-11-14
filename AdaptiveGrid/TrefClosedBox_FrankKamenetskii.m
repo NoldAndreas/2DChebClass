@@ -33,7 +33,7 @@ function TrefClosedBox_FrankKamenetskii()
     params.t_n = 0;
     u_n = zeros(size(Pts.y1_kv));
       
-    %TB.doPlots(u_n,'SC');
+    %TB.plot(u_n,'SC');
 
     %****************************************************************
     %****************  Compute time-dependent solution   ************

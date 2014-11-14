@@ -53,12 +53,12 @@ function data = SimulationHalfSpace(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    HS.doPlots(V,'SC');    
+    HS.plot(V,'SC');    
     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);
-    HS.doPlots(Conv*fP,'SC');    
+    HS.plot(Conv*fP,'SC');    
     title('Convolution');
     pbaspect([1 1 1]);
 

@@ -54,12 +54,12 @@ function data = SimulationInfiniteCapillarySkewed()
     set(gcf,'Color','white'); %Set background color    
     
     subplot(2,1,1);
-    IC.doPlots(V,'SC');    
+    IC.plot(V,'SC');    
     title('Interpolation');    
     %pbaspect([1 1 1]);
     
     subplot(2,1,2);
-    IC.doPlots(Conv(:,Pts.y1_kv < inf)*V(Pts.y1_kv < inf),'SC');
+    IC.plot(Conv(:,Pts.y1_kv < inf)*V(Pts.y1_kv < inf),'SC');
     title('Convolution');
     %pbaspect([1 1 1]);
                                     

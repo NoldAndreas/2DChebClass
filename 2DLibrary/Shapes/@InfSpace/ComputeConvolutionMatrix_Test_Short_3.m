@@ -91,19 +91,19 @@ function ComputeConvolutionMatrix_Test_Short_2(this)
 
 
     figure
-    this.doPlots([exact14 exact24 exact34]);
+    this.plot([exact14 exact24 exact34]);
     set(gcf,'Name','Exact');
 
     figure
-    this.doPlots(reshape(conv_New_M,N1*N2,4));
+    this.plot(reshape(conv_New_M,N1*N2,4));
     set(gcf,'Name','Pointwise Convolution Matrix');
     
     figure
-    this.doPlots(reshape(conv_New_M_2,N1*N2,4));
+    this.plot(reshape(conv_New_M_2,N1*N2,4));
     set(gcf,'Name','Split Convolution Matrix');
 
     figure
-    this.doPlots(reshape(conv_M,N1*N2,4));
+    this.plot(reshape(conv_M,N1*N2,4));
     set(gcf,'Name','Standard Convolution Matrix');
 
     disp(['InfSpace: ComputeConvolutionMatrix_Test Matrix ''pointwise'' error: ' ...

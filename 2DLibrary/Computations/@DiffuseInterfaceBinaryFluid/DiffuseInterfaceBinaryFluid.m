@@ -375,7 +375,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
            figure('Position',[0 0 800 600],'color','white');
            PlotU(this); hold on;            
-           this.IDC.doPlots(this.p,'contour');     
+           this.IDC.plot(this.p,'contour');     
            SaveCurrentFigure(this,[this.filename '_Pressure']);                
        end       
        function PlotU(this,uv,opts) 

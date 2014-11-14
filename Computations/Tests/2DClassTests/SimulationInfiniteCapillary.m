@@ -56,10 +56,10 @@ function data = SimulationInfiniteCapillary(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(2,1,1);
-    IC.doPlots(V,'SC');    title('Interpolation');    
+    IC.plot(V,'SC');    title('Interpolation');    
         
     subplot(2,1,2);
-    IC.doPlots(Conv(:,Pts.y1_kv < inf)*V(Pts.y1_kv < inf),'SC');
+    IC.plot(Conv(:,Pts.y1_kv < inf)*V(Pts.y1_kv < inf),'SC');
     title('Convolution');    
                                     
 

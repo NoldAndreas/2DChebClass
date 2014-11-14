@@ -104,7 +104,7 @@ function data = DDFT_DiffusionInfSpace_NSpecies(optsPhys,optsNum,optsPlot,name)
     %*****************************************************
 %      for k = 1:length(plotTimes)
 %          V =  getVAdd(y1S,y2S,plotTimes(k),optsPhys.V1);%Vext +
-%          HS.doPlots(V,true,false);
+%          HS.plot(V,true,false);
 %          title(['t = ',num2str(plotTimes(k))]);
 %          xlim([-5 5]);
 %          ylim([0.5 5]);
@@ -128,7 +128,7 @@ function data = DDFT_DiffusionInfSpace_NSpecies(optsPhys,optsNum,optsPlot,name)
     rho_ic         = exp((x_ic-Vext)/kBT);
         
     figure;    
-	IS.doPlots(rho_ic,'SC');
+	IS.plot(rho_ic,'SC');
 	%PlotRosenfeldFMT_AverageDensities(IS,IntMatrFex(1),rho_ic);        
     
     %****************************************************************

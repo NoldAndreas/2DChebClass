@@ -56,11 +56,11 @@ function data = SimulationBox(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    abox.doPlots(V,'SC');     title('Interpolation');    
+    abox.plot(V,'SC');     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);
-    abox.doPlots(fConv(Interp.pts1,Interp.pts2));
+    abox.plot(fConv(Interp.pts1,Interp.pts2));
     title('Convolution');
     pbaspect([1 1 1]);
 

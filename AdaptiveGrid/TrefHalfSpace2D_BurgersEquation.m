@@ -42,7 +42,7 @@ function TrefHalfSpace2D_BurgersEquation()
     
     THS.PlotXGrid();
     
-    THS.doPlots(u_n,'SC');
+    THS.plot(u_n,'SC');
     
     %****************************************************************
     %****************  Compute time-dependent solution   ************
@@ -60,11 +60,11 @@ function TrefHalfSpace2D_BurgersEquation()
         [u_n,Pts,Diff,Int,Ind,Interp] = THS.UpdatePadeValues(u_n,PlotArea);
         
         hold off;        
-        THS.doPlots(u_n,'SC');
+        THS.plot(u_n,'SC');
         THS.PlotLineOfPoles(u_n,PlotArea);
         view([1 1 1]);
 
-        %THS.doPlots(u_n,'contour');
+        %THS.plot(u_n,'contour');
         %THS.PlotLineOfPoles();
         title(['t = ',num2str(params.t_n)]);
         pause(0.05);                

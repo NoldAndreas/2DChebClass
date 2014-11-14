@@ -90,7 +90,7 @@ function data = FMT_2D_HardWall(optsPhys,optsNum,optsPlot)
         
     figure
     
-	HS.doPlots(rho_ic,'SC');
+	HS.plot(rho_ic,'SC');
 	%PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),rho_ic);        
     
     %****************************************************************

@@ -94,7 +94,7 @@
        function pts = GetInvCartPts(this,ptsCart_y1,ptsCart_y2)                                              
             [pts.y1_kv,pts.y2_kv] = InvSkewedGrid(ptsCart_y1,ptsCart_y2,this.alpha);            
         end              
-       function doPlots(this,V,opts)                      
+       function plot(this,V,opts)                      
            global PersonalUserOutput
            if(~PersonalUserOutput)
                 return;
@@ -114,11 +114,11 @@
            this.Sub_HalfSpace.InterpolationPlot(PlotArea,true);
            
            if((nargin > 2) && (ischar(opts)))
-                this.Sub_Strip.doPlots(V(this.mark_id(:,1)),opts); hold on;           
-                this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)),opts);
+                this.Sub_Strip.plot(V(this.mark_id(:,1)),opts); hold on;           
+                this.Sub_HalfSpace.plot(V(this.mark_id(:,2)),opts);
            else
-               this.Sub_Strip.doPlots(V(this.mark_id(:,1))); hold on;           
-               this.Sub_HalfSpace.doPlots(V(this.mark_id(:,2)));
+               this.Sub_Strip.plot(V(this.mark_id(:,1))); hold on;           
+               this.Sub_HalfSpace.plot(V(this.mark_id(:,2)));
            end
                       
            xlim(xl);

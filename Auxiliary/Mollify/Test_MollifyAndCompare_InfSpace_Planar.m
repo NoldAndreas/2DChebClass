@@ -24,9 +24,9 @@ function Test_MollifyAndCompare_InfSpace_Planar()
     
     z = TestFunction(IS.Pts);
     subplot(1,2,1);
-    IS.doPlots(z,'SC');
+    IS.plot(z,'SC');
     subplot(1,2,2);
-    IS.doPlots(AD*z,'SC');
+    IS.plot(AD*z,'SC');
     
     
     

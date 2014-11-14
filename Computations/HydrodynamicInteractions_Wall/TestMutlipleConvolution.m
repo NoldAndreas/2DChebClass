@@ -52,7 +52,7 @@ function TestMutlipleConvolution
     area.ComputeAll(areaPlot);
     
     figure('Name','Weight on Disc to be subtracted');
-    area.doPlots(HI_Weight_Test(area.Pts));       
+    area.plot(HI_Weight_Test(area.Pts));       
     title('Weight on Disc to be subtracted');
     
     ft            = f(PtsCart);
@@ -61,7 +61,7 @@ function TestMutlipleConvolution
     
     ConvFull = ConvMod - ConvDisc(:,:,2);
     figure('Name','Result of full convolution I');
-    HS.doPlots(ft.*(ConvFull*ft));              
+    HS.plot(ft.*(ConvFull*ft));              
     
     
     %% Auxiliary function 
@@ -86,13 +86,13 @@ function TestMutlipleConvolution
    % ConvAnn       = HS.ComputeConvolutionFiniteSupport(area,{'RotnePragner_f1','RotnePragner_f2','RotnePragner_f0'},HS.Pts);
 
 %     subplot(2,2,1);    
-%     HS.doPlots(ft);
+%     HS.plot(ft);
 %     subplot(2,2,2);    
-%     HS.doPlots(ConvAnn(:,:,2)*ft);
+%     HS.plot(ConvAnn(:,:,2)*ft);
 %     subplot(2,2,3);    
-%     HS.doPlots(ConvAnn(:,:,3)*ft);
+%     HS.plot(ConvAnn(:,:,3)*ft);
 %     subplot(2,2,4);    
-%     HS.doPlots(ConvAnn(:,:,4)*ft);
+%     HS.plot(ConvAnn(:,:,4)*ft);
 
 
 end

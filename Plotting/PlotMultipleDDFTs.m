@@ -69,7 +69,7 @@ function PlotMultipleDDFTs(struct)
             for iSpecies=1:struct(iDDFT).nSpecies
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
                 struct(iDDFT).optsPlot.dist = true;
-                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),struct(iDDFT).optsPlot); 
+                struct(iDDFT).data.shape.plot(rho(:,iSpecies),struct(iDDFT).optsPlot); 
                 hold on;     
             end
             if(iDDFT==nDDFT)
@@ -81,7 +81,7 @@ function PlotMultipleDDFTs(struct)
             for iSpecies=1:struct(iDDFT).nSpecies
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
                 struct(iDDFT).optsPlot.dist = false;
-                struct(iDDFT).data.shape.doPlots(flux(:,iSpecies),struct(iDDFT).optsPlot);
+                struct(iDDFT).data.shape.plot(flux(:,iSpecies),struct(iDDFT).optsPlot);
                 hold on;     
             end
             if(iDDFT==nDDFT)
@@ -92,7 +92,7 @@ function PlotMultipleDDFTs(struct)
 %             %Plot potentials
 %             for iSpecies=1:struct(iDDFT).nSpecies
 %                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
-%                 struct(iDDFT).data.shape.doPlots(V(:,iSpecies),struct(iDDFT).optsPlot); 
+%                 struct(iDDFT).data.shape.plot(V(:,iSpecies),struct(iDDFT).optsPlot); 
 %                 hold on;     
 %             end
 
@@ -117,7 +117,7 @@ function PlotMultipleDDFTs(struct)
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
                 struct(iDDFT).optsPlot.dist = true;
                 subplot(nRows,2,2+iSpecies+2*(ceil(iSpecies/2)-1));
-                struct(iDDFT).data.shape.doPlots(rho(:,iSpecies),struct(iDDFT).optsPlot);
+                struct(iDDFT).data.shape.plot(rho(:,iSpecies),struct(iDDFT).optsPlot);
                 hold on;
                 if(iDDFT==nDDFT)
                     hold off;
@@ -132,7 +132,7 @@ function PlotMultipleDDFTs(struct)
                 struct(iDDFT).optsPlot.linestyle = '-';
                 struct(iDDFT).optsPlot.linecolor = struct(iDDFT).optsPlot.lineColourDDFT{iSpecies};
                 struct(iDDFT).optsPlot.dist = false;
-                struct(iDDFT).data.shape.doPlots(flux(:,iSpecies),struct(iDDFT).optsPlot);
+                struct(iDDFT).data.shape.plot(flux(:,iSpecies),struct(iDDFT).optsPlot);
                 hold on
                 if(iDDFT==nDDFT)
                     hold off;

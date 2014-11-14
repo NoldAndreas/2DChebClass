@@ -25,7 +25,7 @@ function SimulationHalfInfiniteCapillary
     displayErrors(vplot,VP,V,Vdiff,Diff,'cart');
     
     %Check Interpolation    
-    HIC.doPlots(V,'SC');                    
+    HIC.plot(V,'SC');                    
     
     %Check Integration    
     display([' Error in Integration: ', num2str(Int(Int < inf)*V(Int < inf)-VInt)]);                

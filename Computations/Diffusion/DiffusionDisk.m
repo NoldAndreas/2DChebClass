@@ -23,8 +23,8 @@ function DiffusionDisk()
     rho_ic = AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,0);
     rho_IP = AnalyticalSolution(Interp.pts1,Interp.pts2,0);
 
-    subplot(2,1,1); DC.doPlots(rho_ic);
-    subplot(2,1,2); DC.doPlots(Interp.InterPol*rho_ic-rho_IP);
+    subplot(2,1,1); DC.plot(rho_ic);
+    subplot(2,1,2); DC.plot(Interp.InterPol*rho_ic-rho_IP);
     %doPlots_IP_Polar(Interp,rho_ic,rho_IP);
 
     %****************************************************************
@@ -43,7 +43,7 @@ function DiffusionDisk()
     figure
     for i=1:length(outTimes)
            
-        DC.doPlots(Rho_t(i,:)');        
+        DC.plot(Rho_t(i,:)');        
         title(['Interpolation of Solution at t = ', num2str(outTimes(i))]);       
         zlim([0 max(rho_ic)]);        
         

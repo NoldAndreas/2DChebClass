@@ -254,7 +254,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
         figure('Color','white','Position',[0 0 1200 800]);
         optDetails.clabel = true;        
         optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
-        HS.doPlots(rho,'contour',optDetails);  hold on;  
+        HS.plot(rho,'contour',optDetails);  hold on;  
         plot([pt1.y1_kv;pt2.y1_kv],[pt1.y2_kv;pt2.y2_kv],'o','MarkerSize',8,'MarkerEdgeColor','k','MarkerFaceColor','g');        
         plot((y2I-b)/slope,y2I,'--m','linewidth',1.5);
         
@@ -265,7 +265,7 @@ function sol = ThreePhaseContactLine_FMT_Dynamics(configIn,dirFolder)
         
         %***************************************************************
         figure('Color','white','Position',[0 0 1200 800]);
-        HS.doPlots(rho,'SC');
+        HS.plot(rho,'SC');
         zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
         colormap(hsv);
         set(gca, 'CLim', [0, 1.0]);

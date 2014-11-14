@@ -93,7 +93,7 @@ classdef InfDisc < Polar_SpectralFourier
 
            figure
            subShape.Interp=Interp;
-           subShape.doPlots(fP,'SC');
+           subShape.plot(fP,'SC');
 %            title('Interpolation of Convolution function'); drawnow;
 
             y1_kv=this.Pts.y1_kv;

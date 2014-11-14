@@ -54,7 +54,7 @@ function EX = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
     EX.Preprocess();
     EX.ComputeEquilibrium();%EX.optsPhys.rhoGas_sat);
     
-    EX.IDC.doPlots(EX.GetRhoEq,'SC');
+    EX.IDC.plot(EX.GetRhoEq,'SC');
     EX.ComputeDynamics();
     EX.PlotDynamics();
 end                 

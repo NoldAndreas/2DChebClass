@@ -112,7 +112,7 @@ function LubricationForcedWetting_old()
     h = figure('color','white');
 	shift = struct('xmin',0,'xmax',4,'ymin',0,'ymax',2.5,'yref',0,'xref',0);
 	PlotBackgroundImage(['Computations' filesep 'PDEs' filesep 'EggersPoF2005_Fig3_cut.gif'],shift);    
-    HIS.doPlots(hP);   
+    HIS.plot(hP);   
     %Outer solution:
     plot(y,thetaAP+(delta/thetaAP^2)*(log(y*c)),'r','linewidth',1.5); %C/thetaAP^2+
     plot(y,1 + delta*log(y/L),'g','linewidth',1.5);

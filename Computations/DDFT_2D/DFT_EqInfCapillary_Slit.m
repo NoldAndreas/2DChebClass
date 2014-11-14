@@ -32,6 +32,6 @@ function [optsNum,optsPhys] = DFT_EqInfCapillary_Slit()
     rhoIG = (rL+rG)/2 + (rL-rG)/2*tanh(EX.IDC.GetCartPts.y1_kv);
     
     EX.ComputeEquilibrium(rhoIG);
-    EX.IDC.doPlots(EX.GetRhoEq());
+    EX.IDC.plot(EX.GetRhoEq());
 end                 
 

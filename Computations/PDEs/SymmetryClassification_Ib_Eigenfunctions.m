@@ -24,7 +24,7 @@ function SymmetryClassification_Ib_Eigenfunctions()
 	IS                 = InfSpace(PhysArea);
     [Pts,Diff,Int,Ind] = IS.ComputeAll(PlotArea);    
     
-    IS.doPlots(rhs(Pts.y1_kv,Pts.y2_kv),'contour');
+    IS.plot(rhs(Pts.y1_kv,Pts.y2_kv),'contour');
     
     
           

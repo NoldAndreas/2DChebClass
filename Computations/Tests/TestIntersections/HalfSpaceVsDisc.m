@@ -1,6 +1,6 @@
 clear all; close all;
 
-R      = 1;
+R      = 0.5;
 bottom = 0;
 
 figure('color','white','Position',[0 0 800 500]);
@@ -39,11 +39,11 @@ while(y20 > bottom - R)
         %DC.PlotGrid();
     end
     
-	xlim([-5,5])
-    ylim([-1.3 2])
+	xlim([-3,3])
+    ylim([-1.5 1.5])
     ylim([bottom-R,bottom+3*R])
-    xlabel('$x$','Interpreter','Latex','fontsize',20);
-    ylabel('$y$','Interpreter','Latex','fontsize',20);
+    xlabel('$x/\sigma$','Interpreter','Latex','fontsize',20);
+    ylabel('$y/\sigma$','Interpreter','Latex','fontsize',20);
     set(gca,'fontsize',20);
     axis equal
 

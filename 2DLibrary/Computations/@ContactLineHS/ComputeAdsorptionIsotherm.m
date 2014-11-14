@@ -1,10 +1,14 @@
  function ComputeAdsorptionIsotherm(this,n,drying)           
 	optss              = this.optsPhys;   
     
-    if((nargin > 2) && strcmp(drying,'drying'))
-        optss.drying = drying;        
-    else
-        optss.drying  = 'wetting';
+    if((nargin > 2))
+            optss.drying = drying;        
+	else
+        if(IsDrying(this))
+            optss.drying = 'drying';        
+        else
+            optss.drying = 'wetting';
+        end 
     end
     
     optss.Dmu          = 0;

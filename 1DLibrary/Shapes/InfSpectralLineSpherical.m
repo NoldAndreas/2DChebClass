@@ -230,7 +230,7 @@ classdef InfSpectralLineSpherical < Spectral
  
         end        
         
-        function doPlots(this,V,options)
+        function plot(this,V,options)
         
             if(options.dist)
                 weight = diag(4*pi*this.Pts.y.^2);
@@ -239,7 +239,7 @@ classdef InfSpectralLineSpherical < Spectral
                 V(isnan(V)) = 0;
             end
             
-            doPlots@Interval(this,V,options)
+            plot@Interval(this,V,options)
             
         end
         

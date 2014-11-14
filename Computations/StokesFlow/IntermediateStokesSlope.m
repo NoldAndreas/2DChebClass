@@ -35,12 +35,12 @@ function theta = IntermediateStokesSlope(z,lambda)
         f1 =  figure('color','white','Position',[0 0 800 800]);
         plot(y,GHR(y),'b','linewidth',2); hold on;
         plotOpts.linecolor = 'r';
-        SL.doPlots(IntM*OneOverf(y,1),plotOpts); hold on; 
+        SL.plot(IntM*OneOverf(y,1),plotOpts); hold on; 
         plotOpts.linecolor = 'm';
-        SL.doPlots(IntM*OneOverf(y,10),plotOpts); hold on; 
+        SL.plot(IntM*OneOverf(y,10),plotOpts); hold on; 
         plotOpts.linecolor = 'k';
         plotOpts.linestyle = ':';
-        SL.doPlots(y.^3/9,plotOpts);
+        SL.plot(y.^3/9,plotOpts);
         ylim([0 max(IntM*f)]);
         set(gca,'xtick',[0,pi/2,pi],...
                 'xticklabel',{'0','90','180'});        
@@ -52,12 +52,12 @@ function theta = IntermediateStokesSlope(z,lambda)
         f2 =  figure('color','white','Position',[0 0 800 800]);
         plot(y,GHR(y),'b','linewidth',2); hold on;
         plotOpts.linecolor = 'r';
-        SL.doPlots(IntM*OneOverf(y,1),plotOpts); hold on; 
+        SL.plot(IntM*OneOverf(y,1),plotOpts); hold on; 
         plotOpts.linecolor = 'm';
-        SL.doPlots(IntM*OneOverf(y,10),plotOpts); hold on; 
+        SL.plot(IntM*OneOverf(y,10),plotOpts); hold on; 
         plotOpts.linecolor = 'k';
         plotOpts.linestyle = ':';
-        SL.doPlots(y.^3/9,plotOpts); 
+        SL.plot(y.^3/9,plotOpts); 
 
         ylim([0 max(IntM*f)]);        
         set(gca,'xtick',[0,pi/2,pi],...

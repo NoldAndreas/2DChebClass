@@ -44,8 +44,8 @@ function CahnHilliard_Box()
     disp(['Error: ',num2str(kappa*surfaceTension - deltaP)]);   
     
     figure('color','white','Position',[0 0 800 600]);    
-    abox.doPlots(rho); hold on;    
-    abox.doPlots(p);
+    abox.plot(rho); hold on;    
+    abox.plot(p);
     
     print2eps(['Capillary_',num2str(h)],gcf);        
 	saveas(gcf,['Capillary_',num2str(h),'.fig']);    

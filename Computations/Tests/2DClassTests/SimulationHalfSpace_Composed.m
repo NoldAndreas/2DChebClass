@@ -20,7 +20,7 @@ function data = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
     HSCCartPts  = HSC.GetCartPts();
     V           = vext(HSCCartPts.y1_kv,HSCCartPts.y2_kv);
         
-    HSC.doPlots(V,'SC');%,'SC'); 
+    HSC.plot(V,'SC');%,'SC'); 
     
     PhysAreaBX  = struct('y1Min',-3*L1,'y1Max',3*L1,...
                         'y2Min',0,'y2Max',10,...

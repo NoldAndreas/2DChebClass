@@ -4,19 +4,26 @@ function PlotDensitySlicesMovie(this)
     %% Initialization 
     n     = 50;
     y2Max = 15;
-    y1Min = 0;
-    y1Max = 15;
+    y1Min = min(this.y1_SpectralLine.Pts.y);
+    y1Max = max(this.y1_SpectralLine.Pts.y);
     
     rho_eq = this.GetRhoEq;
     
     rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
     rhoGas_sat     = this.optsPhys.rhoGas_sat;     
+    mu_sat         = this.optsPhys.mu_sat;     
     
     y1P = y1Min + (y1Max-y1Min)*(0:1:n)/n;
     this.optsNum.PlotArea = struct('y1Min',y1Min,'y1Max',y1Max,...
                                    'y2Min',0.5,'y2Max',y2Max,...
                                    'N1',100,'N2',100);
     %InitInterpolation(this);
+    
+    if(IsDrying(this))
+        rho_bulk = rhoLiq_sat;
+    else
+        rho_bulk = rhoGas_sat;
+    end
 
 
     k = 1; fileNames = [];
@@ -26,18 +33,20 @@ function PlotDensitySlicesMovie(this)
     for i = 1:n
         % get adsorption
 
-        ell      = this.IDC.doIntFLine([y1P(i) y1P(i)],[0.5 y2Max],rho_eq-rhoGas_sat,'CHEB')/(rhoLiq_sat-rhoGas_sat);
+        ell      = this.IDC.doIntFLine([y1P(i) y1P(i)],[0.5 y2Max],rho_eq-rho_bulk,'CHEB')/(rhoLiq_sat-rhoGas_sat);
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
         
         f1 = figure('Position',[0 0 800 800]);
-        plot(this.AdsorptionIsotherm.mu,this.AdsorptionIsotherm.FT,'b','linewidth',1.5); hold on;
-        plot(mu,ell,'or','MarkerSize',7,'MarkerFace','r');
+        plot(this.AdsorptionIsotherm.mu-mu_sat,this.AdsorptionIsotherm.FT,'b','linewidth',1.5); hold on;
+        plot(mu-mu_sat,ell,'or','MarkerSize',7,'MarkerFace','r');
         set(gca,'fontsize',15);                        
         set(gca,'linewidth',1.5);          
         xlabel('$\Delta \mu/\varepsilon$','Interpreter','Latex','fontsize',18);
         ylabel('$\ell/\sigma$','Interpreter','Latex','fontsize',18);
-        xlim([(min(this.AdsorptionIsotherm.mu)-0.02) (max(this.AdsorptionIsotherm.mu)+0.02)]);
         
+        xlim([(min(this.AdsorptionIsotherm.mu)-0.02) (max(this.AdsorptionIsotherm.mu)+0.02)]-mu_sat);        
+        xTic = [(min(this.AdsorptionIsotherm.mu)) (max(this.AdsorptionIsotherm.mu))]-mu_sat;
+        set(gca,'XTick',round(xTic*100)/100);        
         
         f2 = figure('color','white','Position',[0 0 1200 600]);   
         
@@ -52,7 +61,7 @@ function PlotDensitySlicesMovie(this)
         set(gca,'fontsize',20);                        
         set(gca,'linewidth',1.5);          
         pbaspect([(y1Max-y1Min) (y2Max) 1]);
-        
+        pbaspect([1 1 1]);
         
         
         %f3 =  figure('color','white','Position',[0 0 1200 600]);    

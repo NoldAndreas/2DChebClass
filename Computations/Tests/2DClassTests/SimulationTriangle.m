@@ -29,9 +29,9 @@ function data = SimulationTriangle(N1,N2,L1,L2,vext)
     vplot   = Interp.InterPol*V;        
     data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');    
         
-    subplot(2,2,1); TR.doPlots(Vdiff.dy1,'SC');
-    subplot(2,2,2); TR.doPlots(Diff.Dy1*V,'SC');
-    subplot(2,2,3); TR.doPlots(Diff.Dy1*V-Vdiff.dy1,'SC');    
+    subplot(2,2,1); TR.plot(Vdiff.dy1,'SC');
+    subplot(2,2,2); TR.plot(Diff.Dy1*V,'SC');
+    subplot(2,2,3); TR.plot(Diff.Dy1*V-Vdiff.dy1,'SC');    
     
     %Check Integration
     data.Int = abs(Int*V-VInt);
@@ -42,7 +42,7 @@ function data = SimulationTriangle(N1,N2,L1,L2,vext)
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color            
-    TR.doPlots(V,true);    
+    TR.plot(V,true);    
     title('Interpolation');    
     pbaspect([1 1 1]);  
     

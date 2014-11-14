@@ -51,7 +51,7 @@ function DiffusionAdvectionPolarInfinity()
         rho      = Rho_t(:,i);
         error    = max(abs( rho -  AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,outTimes(i))));
         
-        IDC.doPlots(rho,'SC');                
+        IDC.plot(rho,'SC');                
         title(['t = ', num2str(outTimes(i)),' Error: ',num2str(error,'%1.2e')]);
         zlim([0 max(rho_ic)]);
         hold off;

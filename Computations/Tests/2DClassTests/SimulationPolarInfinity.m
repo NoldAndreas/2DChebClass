@@ -61,12 +61,12 @@ function data = SimulationPolarInfinity(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    IDC.doPlots(V); 
+    IDC.plot(V); 
     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);    
-    IDC.doPlots(fP_Conv);
+    IDC.plot(fP_Conv);
     title('Convolution');
     pbaspect([1 1 1]);            
     

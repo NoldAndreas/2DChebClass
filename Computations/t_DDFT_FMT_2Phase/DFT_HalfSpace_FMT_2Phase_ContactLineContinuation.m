@@ -126,7 +126,7 @@ function data = DFT_HalfSpace_FMT_2Phase_ContactLineContinuation(optsPhys,optsNu
             
     [Vext,Vext_grad]  = getVBackDVBack(Pts.y1_kv,Pts.y2_kv,optsPhys.V1);  
     figure('color','white');
-    HS.doPlots(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
+    HS.plot(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
     I           = eye(N1*N2);  
     eyes        = [I I];
     t_preprocess = toc;
@@ -180,8 +180,8 @@ function data = DFT_HalfSpace_FMT_2Phase_ContactLineContinuation(optsPhys,optsNu
         optDetails.clabel = true;
         
         subplot(1,2,1);        
-        HS.doPlots(rho,'contour',optDetails);
-        %HS.doPlots(rho,'SC');
+        HS.plot(rho,'contour',optDetails);
+        %HS.plot(rho,'SC');
         
         subplot(1,2,2);        
         plot(par_cont,Gamma,'linewidth',1.5); hold on;

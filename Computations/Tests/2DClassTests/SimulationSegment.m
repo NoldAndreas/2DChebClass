@@ -30,17 +30,17 @@ function data = SimulationSegment(N1,N2,vext)
     data.Int = abs(Int*V-VInt);
     display([' Error in Integration: ', num2str(data.Int)]);                
         
-    subplot(2,2,1); SG.doPlots(Vdiff.dy1,'SC');
-    subplot(2,2,2); SG.doPlots(Diff.Dy1*V,'SC');
-    subplot(2,2,3); SG.doPlots(Diff.Dy1*V-Vdiff.dy1,'SC');    
-    subplot(2,2,4); SG.doPlots(V,'SC');
+    subplot(2,2,1); SG.plot(Vdiff.dy1,'SC');
+    subplot(2,2,2); SG.plot(Diff.Dy1*V,'SC');
+    subplot(2,2,3); SG.plot(Diff.Dy1*V-Vdiff.dy1,'SC');    
+    subplot(2,2,4); SG.plot(V,'SC');
                
     data.N1 = N1; data.N2 = N2;
     
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color            
-    SG.doPlots(V,'SC');    
+    SG.plot(V,'SC');    
     title('Interpolation');      
     figure
     SG.PlotGridLines(); %scatter(SG.Pts.y1_kv,SG.Pts.y2_kv,'.')

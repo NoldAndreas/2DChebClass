@@ -201,7 +201,7 @@ function ThreePhaseContactLine_HalfSpaceSkewed()
         
     
     theta = ComputeContactAngle(om_ex_wg,om_ex_wl,om_ex_lg);
-    disp(['The contact angle is: ',num2str(theta*180/pi),'°']);
+    disp(['The contact angle is: ',num2str(theta*180/pi),'Â°']);
     
     %****************************************************************
     %**************** Solve for equilibrium condition   ************
@@ -211,7 +211,7 @@ function ThreePhaseContactLine_HalfSpaceSkewed()
     
     rho_ig = kron(rho1D_lg,ones(N2,1));
     figure('Name','Initial Guess');
-    HS.doPlots(rho_ig,'SC');
+    HS.plot(rho_ig,'SC');
     x_ig = kBT*log(rho_ig)+Vext;
     
     opts             = PhysArea;
@@ -230,10 +230,10 @@ function ThreePhaseContactLine_HalfSpaceSkewed()
     rho_ic  = exp((x_ic-Vext)/kBT);
     figure('Color','white'); 
     subplot(1,2,1);
-    HS.doPlots(rho_ic,'SC');
+    HS.plot(rho_ic,'SC');
     subplot(1,2,2);
     opts.nContours = {0.1,0.2,0.3,0.4,0.5,0.6,0.7};
-    HS.doPlots(rho_ic,'contour',opts.nContours);
+    HS.plot(rho_ic,'contour',opts.nContours);
     t_eqSol = toc;
     fprintf([num2str(t_eqSol),'s']);
 

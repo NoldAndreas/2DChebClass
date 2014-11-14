@@ -65,8 +65,8 @@ function res = LubricationForcedWettingInnerFinite(delta)
         
         h3P  = fsolve(@ODE3,zeros(N,1));
         
-        SL.doPlots(h2P);
-        SL.doPlots(Dy*h2);
+        SL.plot(h2P);
+        SL.plot(Dy*h2);
         
         subplot(1,2,1);
         plot(y,Dy*h0,'-'); hold on;
@@ -78,7 +78,7 @@ function res = LubricationForcedWettingInnerFinite(delta)
         yP = (1:0.01:L)';
         plot(yP,(3*delta*log(yP)+1+3*delta).^(1/3),'r');
         subplot(1,2,2);
-        hold on; SL.doPlots(h3P);
+        hold on; SL.plot(h3P);
     
  
     end
@@ -104,7 +104,7 @@ function res = LubricationForcedWettingInnerFinite(delta)
         end    
 
         hP  = fsolve(@ODE,ones(N,1));
-        SL.doPlots(hP);
+        SL.plot(hP);
     end
 
     hold on;

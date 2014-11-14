@@ -69,15 +69,15 @@
             Interp   = this.ComputeInterpolationMatrix(rRange,(0:0.02:1)',true,false);
             
             figure
-            doPlots(this,exact2);
+            plot(this,exact2);
             set(gcf,'Name','Exact 2');
             
             figure
-            doPlots(this,conv2);
+            plot(this,conv2);
             set(gcf,'Name','Standard Convolution 2');
             
             figure
-            doPlots(this,conv_New2);
+            plot(this,conv_New2);
             set(gcf,'Name','Pointwise Convolution 2');
             
             disp(['InfDisc: ComputeConvolutionMatrix_Test ''standard'' error: ' ...
@@ -86,15 +86,15 @@
                       num2str( sum(abs(exact2-conv_New2).^2) / sum(abs(exact2).^2) )])
             
             figure
-            doPlots(this,exact3);
+            plot(this,exact3);
             set(gcf,'Name','Exact 3');
             
             figure
-            doPlots(this,conv3);
+            plot(this,conv3);
             set(gcf,'Name','Standard Convolution 3');
             
             figure
-            doPlots(this,conv_New3);
+            plot(this,conv_New3);
             set(gcf,'Name','Pointwise Convolution 3');
             
             disp(['InfDisc: ComputeConvolutionMatrix_Test ''standard'' error: ' ...

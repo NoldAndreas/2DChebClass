@@ -95,7 +95,7 @@ function data = DDFT_HalfSpace_FMT_2Phase_Sat_Continuation(optsPhys,optsNum)
             
     [Vext,Vext_grad]  = getVBackDVBack(Pts.y1_kv,Pts.y2_kv,optsPhys.V1);  
     figure('color','white');
-    HS.doPlots(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
+    HS.plot(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
     I           = eye(N1*N2);  
     eyes        = [I I];
     t_preprocess = toc;
@@ -147,7 +147,7 @@ function data = DDFT_HalfSpace_FMT_2Phase_Sat_Continuation(optsPhys,optsNum)
         optDetails.clabel = true;
         
         subplot(2,1,1);        
-        HS.doPlots(rho,'contour',optDetails);
+        HS.plot(rho,'contour',optDetails);
         
         subplot(2,1,2);        
         plot(par_cont,Gamma,'linewidth',1.5); hold on;

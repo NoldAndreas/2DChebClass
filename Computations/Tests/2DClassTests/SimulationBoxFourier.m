@@ -33,8 +33,8 @@ function SimulationBoxFourier
      %Check Differentiation and Interpolation
      displayErrorsPos(Pts,Interp.InterPol*V,VP,V,Vdiff,Diff,'cart');        
                  
-     subplot(2,1,1); PB.doPlots(V);
-     subplot(2,1,2); PB.doPlots(Interp.InterPol*V-VP);    
+     subplot(2,1,1); PB.plot(V);
+     subplot(2,1,2); PB.plot(Interp.InterPol*V-VP);    
      title('Error');
      set(gcf,'name','Interpolation');
      
@@ -44,8 +44,8 @@ function SimulationBoxFourier
      %Check Convolution               
      figure
      fC_fft     = Conv*f1(Pts.y1_kv,Pts.y2_kv);
-     subplot(2,1,1); PB.doPlots(fC_fft);
-     subplot(2,1,2); PB.doPlots(Interp.InterPol*fC_fft-fConv(Interp.pts1,Interp.pts2));          
+     subplot(2,1,1); PB.plot(fC_fft);
+     subplot(2,1,2); PB.plot(Interp.InterPol*fC_fft-fConv(Interp.pts1,Interp.pts2));          
      title('Error');
      set(gcf,'name','Convolution');                                                                
 

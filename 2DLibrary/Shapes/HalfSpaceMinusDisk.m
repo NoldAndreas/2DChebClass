@@ -63,7 +63,7 @@ classdef HalfSpaceMinusDisk < handle
             end
         end    
         
-        function doPlots(this,V,opts)
+        function plot(this,V,opts)
             if(nargin==2)
                 opts = [];
             end            
@@ -71,7 +71,7 @@ classdef HalfSpaceMinusDisk < handle
             for i = 1:length(this.SubShape)
                 this.SubShape{i}.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
                 m = mOld + this.SubShape{i}.N1*this.SubShape{i}.N2 - 1;
-                this.SubShape{i}.doPlots(V(mOld:m),opts);
+                this.SubShape{i}.plot(V(mOld:m),opts);
                 mOld = mOld + this.SubShape{i}.N1*this.SubShape{i}.N2;
                 hold on;
             end

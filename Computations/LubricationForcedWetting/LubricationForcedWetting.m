@@ -55,7 +55,7 @@ function LubricationForcedWetting()
 %     fig1 = figure('color','white');
 % 	shift = struct('xmin',0,'xmax',4,'ymin',0,'ymax',2.5,'yref',0,'xref',0);
 % 	PlotBackgroundImage(['Computations' filesep 'PDEs' filesep 'EggersPoF2005_Fig3_cut.gif'],shift);    
-%     HIS.doPlots(hP);            
+%     HIS.plot(hP);            
 %     ylim([0 2.5]);
 %     xlim([0 4]); 
 %     xlabel('$x$','Interpreter','Latex');
@@ -132,7 +132,7 @@ function LubricationForcedWetting()
                                delta*hIP_1(mark_h) + ...
                                delta^2*hIP_2(mark_h),'m-.','linewidth',lw);        
 
-        HIS.doPlots(hP,struct('plain',true,'linecolor','k','linewidth',lw));                           
+        HIS.plot(hP,struct('plain',true,'linecolor','k','linewidth',lw));                           
         plot(yInner,IP_In.InterPol*hP,'k','linewidth',lw); hold on;
         plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',lw);
 
@@ -173,7 +173,7 @@ function LubricationForcedWetting()
         plot(lambda*res.L500.y,res.L500.hP,'g-','linewidth',lw);    
         plot(lambda*res.L5000.y,res.L5000.hP,'g-','linewidth',lw);    
         
-        HIS.doPlots(hP,struct('plain',true,'linecolor','k','linewidth',2));    hold on;
+        HIS.plot(hP,struct('plain',true,'linecolor','k','linewidth',2));    hold on;
         plot(yInner,IP_In.InterPol*hP,'k','linewidth',2);
         plot(ySInner,IP_SIn.InterPol*hP,'k','linewidth',2);
 
@@ -206,7 +206,7 @@ function LubricationForcedWetting()
     function Ploth3Results()
         %% Plot h^3 - graph
         fig1 = figure('color','white','Position',[0 0 800 800]);
-        HIS.doPlots(hP.^3);    hold on;
+        HIS.plot(hP.^3);    hold on;
         plot(yInner,IP_In.InterPol*(hP.^3),'b');
         plot(ySInner,IP_SIn.InterPol*(hP.^3),'b');
         %yG = y(y>lambda/3);
@@ -250,7 +250,7 @@ function LubricationForcedWetting()
     end    
     function PlotFullResults()
         fig1 = figure('color','white','Position',[0 0 800 800]);
-        HIS.doPlots(hP);    hold on;
+        HIS.plot(hP);    hold on;
         plot(yInner,IP_In.InterPol*hP,'b');
         plot(ySInner,IP_SIn.InterPol*hP,'b');
         %yG = y(y>lambda/3);

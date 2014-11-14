@@ -71,10 +71,10 @@ function data = CahnHilliard_Polar(optsPhys,optsNum)
     mu                = 0;
     rho_ic            = fsolve(@f_eq,InitialGuess());
     
-    subplot(2,2,1); WDG.doPlots(rho_ic,'SC');
+    subplot(2,2,1); WDG.plot(rho_ic,'SC');
     [fE,dfE]          = f(rho_ic);
-    subplot(2,2,2); WDG.doPlots(-(rho_ic.^2).*dfE/Cn,'SC');
-    subplot(2,2,3); WDG.doPlots(rho_ic.*fE/Cn-mu*rho_ic,'SC');    
+    subplot(2,2,2); WDG.plot(-(rho_ic.^2).*dfE/Cn,'SC');
+    subplot(2,2,3); WDG.plot(rho_ic.*fE/Cn-mu*rho_ic,'SC');    
 %    t_eqSol = toc;
 %     %****************************************************************
 %     %****************  Compute time-dependent solution   ************

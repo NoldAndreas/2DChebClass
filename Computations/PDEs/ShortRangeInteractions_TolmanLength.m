@@ -56,8 +56,8 @@ function ShortRangeInteractions_TolmanLength()
     [V,lapV] = Vext(r);
     figure('Name','External Potential');
     subplot(1,2,1);  
-    IS.doPlots(V);
-    subplot(1,2,2);  IS.doPlots(lapV);    
+    IS.plot(V);
+    subplot(1,2,2);  IS.plot(lapV);    
     
     %% Solve ODE
     %
@@ -71,7 +71,7 @@ function ShortRangeInteractions_TolmanLength()
         rho = fsolve(@ODE,rho);
     
         %hold off;
-        IS.doPlots(rho,'plain'); hold on;
+        IS.plot(rho,'plain'); hold on;
         plot(Pts.y,rhoLiq_eq*ones(size(r)),'b');
         plot(Pts.y,rhoGas_eq*ones(size(r)),'b');
         %title(['dmu = ',num2str(dmu)]);        

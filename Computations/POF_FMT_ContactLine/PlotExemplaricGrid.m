@@ -57,7 +57,7 @@ function PlotExemplaricGrid()
     optDetails.nContours = rhoGas_sat + 0.5*drho;
     optDetails.linecolor = 'k';    
   
-    CLT.HS.doPlots(CLT.rho_eq,'contour',optDetails);  hold on;  
+    CLT.HS.plot(CLT.rho_eq,'contour',optDetails);  hold on;  
     
     optDetails.nthGridLines = 2;
     CLT.HS.PlotGridLines(optDetails); 

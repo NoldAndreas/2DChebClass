@@ -26,7 +26,7 @@ function DiffusionPeriodicSlit()
     n1     = length(Pts.x1);
     n2     = length(Pts.x2);
 
-    abox.doPlots(rho_ic);    
+    abox.plot(rho_ic);    
 
     %****************************************************************
     %****************  Compute time-dependent solution   ************
@@ -44,7 +44,7 @@ function DiffusionPeriodicSlit()
         z = Interp.InterPol*rho;
         
         subplot(2,1,1)
-        abox.doPlots(rho);
+        abox.plot(rho);
         title(['Interpolation of Solution at t = ', num2str(outTimes(i))]);       
         zlim([0 max(rho_ic)]);
         

@@ -63,37 +63,37 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     
    
 %    legend('r=0',['r=',num2str(Interp_r1.pts1(1))],['r=',num2str(Interp_r4.pts1(1))]);
-    WI.doPlots(V);
+    WI.plot(V);
     
-    subplot(2,2,1); WI.doPlots(Vdiff.dy1);
-    subplot(2,2,2); WI.doPlots(Diff.Dy1*V);
-    subplot(2,2,3); WI.doPlots((Diff.Dy1*V-Vdiff.dy1));
+    subplot(2,2,1); WI.plot(Vdiff.dy1);
+    subplot(2,2,2); WI.plot(Diff.Dy1*V);
+    subplot(2,2,3); WI.plot((Diff.Dy1*V-Vdiff.dy1));
     
     figure    
     
-    subplot(2,2,1); WI.doPlots(Vdiff.ddy1);
-    subplot(2,2,2); WI.doPlots(Diff.DDy1*V);
-    subplot(2,2,3); WI.doPlots((Diff.DDy1*V-Vdiff.ddy1));
+    subplot(2,2,1); WI.plot(Vdiff.ddy1);
+    subplot(2,2,2); WI.plot(Diff.DDy1*V);
+    subplot(2,2,3); WI.plot((Diff.DDy1*V-Vdiff.ddy1));
     
     figure
 
-    subplot(2,2,1); WI.doPlots(Vdiff.dy1dy2);
-    subplot(2,2,2); WI.doPlots(Diff.Dy1Dy2*V);
-    subplot(2,2,3); WI.doPlots((Diff.Dy1Dy2*V-Vdiff.dy1dy2));
+    subplot(2,2,1); WI.plot(Vdiff.dy1dy2);
+    subplot(2,2,2); WI.plot(Diff.Dy1Dy2*V);
+    subplot(2,2,3); WI.plot((Diff.Dy1Dy2*V-Vdiff.dy1dy2));
 
     rM0 = 1./Pts.y1_kv;
     rM0(rM0 == inf) = 0;   
     
     figure
         
-    subplot(2,2,1); WI.doPlots(Vdiff.ddy2);
-    subplot(2,2,2); WI.doPlots(Diff.DDy2*V);
-    subplot(2,2,3); WI.doPlots((Diff.DDy2*V-Vdiff.ddy2));
+    subplot(2,2,1); WI.plot(Vdiff.ddy2);
+    subplot(2,2,2); WI.plot(Diff.DDy2*V);
+    subplot(2,2,3); WI.plot((Diff.DDy2*V-Vdiff.ddy2));
 
     figure
-    subplot(2,2,1); WI.doPlots(Vdiff.Lap);
-    subplot(2,2,2); WI.doPlots(Diff.Lap*V);
-    subplot(2,2,3); WI.doPlots(Diff.Lap*V-Vdiff.Lap);
+    subplot(2,2,1); WI.plot(Vdiff.Lap);
+    subplot(2,2,2); WI.plot(Diff.Lap*V);
+    subplot(2,2,3); WI.plot(Diff.Lap*V-Vdiff.Lap);
 
     %Check Integration
     data.Int = abs(Int*V-VInt);
@@ -123,7 +123,7 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     set(gcf,'Color','white'); %Set background color    
     
     
-    WI.doPlots(V); 
+    WI.plot(V); 
     title('Interpolation');    
     pbaspect([1 1 1]);        
 

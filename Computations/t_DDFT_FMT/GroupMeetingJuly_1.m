@@ -91,7 +91,7 @@ function data = GroupMeetingJuly_1(optsPhys,optsNum,optsPlot,name)
 %      plotTimesV = 0:(5/optsNum.TN):5;
 %      for k = 1:length(plotTimesV)
 %          V =  getVAdd(y1S,y2S,plotTimesV(k),optsPhys.V1);%Vext +         
-%          HS.doPlots(V,true,false);
+%          HS.plot(V,true,false);
 %          title(['t = ',num2str(plotTimesV(k))]);
 %          xlim([-5 5]);
 %          ylim([0.5 5]);
@@ -150,7 +150,7 @@ function data = GroupMeetingJuly_1(optsPhys,optsNum,optsPlot,name)
     rho_fc         = exp((x_fc-Vext)/kBT);
         
     figure; set(gcf, 'Position', [0 0 1500 1000]);    set(gcf,'Color','white');
-    HS.doPlots(rho_fc); title('Final Condition'); view([2,5,2]);	
+    HS.plot(rho_fc); title('Final Condition'); view([2,5,2]);	
     save2pdf('3DFinalCondition.pdf',gcf);
 	%PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),rho_ic);    
     %****************************************************************
@@ -174,7 +174,7 @@ function data = GroupMeetingJuly_1(optsPhys,optsNum,optsPlot,name)
         
     figure; set(gcf, 'Position', [0 0 1500 1000]);    set(gcf,'Color','white');
 
-    HS.doPlots(rho_ic); title('Initial Condition'); view([2,5,2]);
+    HS.plot(rho_ic); title('Initial Condition'); view([2,5,2]);
     save2pdf('3DInitialCondition.pdf',gcf);
         
 	PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),rho_ic);                

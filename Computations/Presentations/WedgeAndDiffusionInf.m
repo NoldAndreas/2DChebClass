@@ -18,10 +18,10 @@ BX.ComputeAll(stPlot);
 
 y = cos(BX.Pts.y1_kv).*sin(BX.Pts.y2_kv);
 
-subplot(2,2,1);  BX.doPlots(y);
-subplot(2,2,2);  BX.doPlots(y,'contour');
-subplot(2,2,3);  BX.doPlots(BX.Diff.Dy2*y);
-subplot(2,2,4);  BX.doPlots(BX.Diff.Lap*y);
+subplot(2,2,1);  BX.plot(y);
+subplot(2,2,2);  BX.plot(y,'contour');
+subplot(2,2,3);  BX.plot(BX.Diff.Dy2*y);
+subplot(2,2,4);  BX.plot(BX.Diff.Lap*y);
 
 SimulationWedge();
 DiffusionAdvectionPolarInfinity();

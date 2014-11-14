@@ -96,7 +96,7 @@ function data = DDFT_HalfSpace_FMT_2Phase_Sat(optsPhys,optsNum)
             
     [Vext,Vext_grad]  = getVBackDVBack(Pts.y1_kv,Pts.y2_kv,optsPhys.V1);  
     figure('color','white');
-    HS.doPlots(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
+    HS.plot(Vext+getVAdd(Pts.y1_kv,Pts.y2_kv,0,optsPhys.V1),'SC');
     I           = eye(N1*N2);  
     eyes        = [I I];
     t_preprocess = toc;
@@ -152,25 +152,25 @@ function data = DDFT_HalfSpace_FMT_2Phase_Sat(optsPhys,optsNum)
         figure('Color','white','Position',[0 0 1200 600]);
         optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6];
         optDetails.clabel = true;
-        HS.doPlots(rho_ic,'contour',optDetails);
+        HS.plot(rho_ic,'contour',optDetails);
         
         print2eps('ContourPlotDroplet',gcf);    
         saveas(gcf,'ContourPlotDroplet.fig');   
         
         figure('Color','white','Position',[0 0 1200 700]); 
-        HS.doPlots(rho_ic);              
+        HS.plot(rho_ic);              
         view([6 1 0.5]);
         
         print2eps('DensityProfileDroplet',gcf);    
         saveas(gcf,'DensityProfileDroplet.fig'); 
     else
         figure('Color','white'); 
-        HS.doPlots(rho_ic,'SC');
+        HS.plot(rho_ic,'SC');
 
         figure('Color','white');
         optDetails.nContours = 10;
         optDetails.clabel = true;
-        HS.doPlots(rho_ic,'contour',optDetails);
+        HS.plot(rho_ic,'contour',optDetails);
     end
     
     t_eqSol   = toc;

@@ -43,6 +43,6 @@ function EX = Test_DDFT_Diffusion1D_HalfSpace_FMT(doHI)
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     
-    EX.IDC.doPlots(EX.GetRhoEq);
+    EX.IDC.plot(EX.GetRhoEq);
     
 end                 

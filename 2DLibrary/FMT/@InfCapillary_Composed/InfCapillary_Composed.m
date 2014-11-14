@@ -109,7 +109,7 @@
              pts.y2_kv = ptsCart_y2;             
         end              
          
-        function doPlots(this,V,opts)                      
+        function plot(this,V,opts)                      
            global PersonalUserOutput
            if(~PersonalUserOutput)
                 return;
@@ -133,13 +133,13 @@
            this.Top_Strip.InterpolationPlot(PlotArea,true);
            
            if((nargin > 2) && (ischar(opts)))
-                this.Bottom_Strip.doPlots(V(this.mark_id(:,1)),opts); hold on;           
-                this.Main_Strip.doPlots(V(this.mark_id(:,2)),opts);hold on;      
-                this.Top_Strip.doPlots(V(this.mark_id(:,3)),opts);
+                this.Bottom_Strip.plot(V(this.mark_id(:,1)),opts); hold on;           
+                this.Main_Strip.plot(V(this.mark_id(:,2)),opts);hold on;      
+                this.Top_Strip.plot(V(this.mark_id(:,3)),opts);
            else
-                this.Bottom_Strip.doPlots(V(this.mark_id(:,1))); hold on;
-                this.Main_Strip.doPlots(V(this.mark_id(:,2)));hold on;      
-                this.Top_Strip.doPlots(V(this.mark_id(:,3)));
+                this.Bottom_Strip.plot(V(this.mark_id(:,1))); hold on;
+                this.Main_Strip.plot(V(this.mark_id(:,2)));hold on;      
+                this.Top_Strip.plot(V(this.mark_id(:,3)));
            end
                       
            xlim(xl);

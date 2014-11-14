@@ -29,10 +29,10 @@ function LubricationDisjoiningPressure()
     
     figure('name','Equilibrium');
     subplot(1,2,1);
-    hShape.doPlots(hPEq);
+    hShape.plot(hPEq);
     subplot(1,2,2);
     plot(y,h0+IntM*hPEq); xlim([-10 10]);
-    %hShape.doPlots(h0+IntM*hP);
+    %hShape.plot(h0+IntM*hP);
     
     %% Dynamics
     %
@@ -52,7 +52,7 @@ function LubricationDisjoiningPressure()
         subplot(2,1,1);
         plot(y,h_); xlim([-30 10]);
         subplot(2,1,2);
-        hShape.doPlots(hP);  
+        hShape.plot(hP);  
         title(['t = ', num2str(outTimes(i))]);
         zlim([0 max(hPEq)]);
         hold off;     

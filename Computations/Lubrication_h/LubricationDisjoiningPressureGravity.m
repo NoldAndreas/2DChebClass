@@ -24,10 +24,10 @@ function LubricationDisjoiningPressureGravity()
     hP   = fsolve(@f,hP_iguess);%,opts);
     
     subplot(1,2,1);
-    hShape.doPlots(hP);
+    hShape.plot(hP);
     subplot(1,2,2);
     plot(y,h0+IntM*hP); xlim([-10 10]);
-    %hShape.doPlots(h0+IntM*hP);
+    %hShape.plot(h0+IntM*hP);
 
     %% Auxiliary Functions
     function y = f(hP)

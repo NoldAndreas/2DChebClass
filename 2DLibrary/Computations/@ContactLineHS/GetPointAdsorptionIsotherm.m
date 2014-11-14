@@ -1,9 +1,9 @@
 function [rho,mu] = GetPointAdsorptionIsotherm(this,ell)
 
     %planarDisjoiningPressure = -(this.AdsorptionIsotherm_Mu-mu_sat)*(rhoLiq_sat-rhoGas_sat);
-    ft = abs(this.AdsorptionIsotherm.FT);
+    ft    = abs(this.AdsorptionIsotherm.FT);
 
-    ellAD = ell;%min(this.AdsorptionIsotherm_FT);
+    ellAD = abs(ell);%min(this.AdsorptionIsotherm_FT);
 	IP    = barychebevalMatrix(ft,ellAD);
     
 	mu    = IP*this.AdsorptionIsotherm.mu;

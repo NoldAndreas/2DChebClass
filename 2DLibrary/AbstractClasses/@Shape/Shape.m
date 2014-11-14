@@ -204,7 +204,7 @@ classdef (Abstract) Shape < handle
                 set(h,'color',opts.color);
             end
         end        
-        function doPlotsFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
+        function plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -413,8 +413,8 @@ classdef (Abstract) Shape < handle
                 
                 if((nargin < 4) || ~isfield(optDetails,'reshape') || optDetails.reshape)
                     xlim(xl); ylim(yl);                    
-                    xlabel('$y_1$','Interpreter','Latex','fontsize',25);
-                    ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                    xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
+                    ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
                     pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
                     if(nSpecies > 1)
                         title(['Species ' num2str(iSpecies)]);

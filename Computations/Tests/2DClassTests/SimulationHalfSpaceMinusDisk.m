@@ -35,7 +35,7 @@ function SimulationHalfSpaceMinusDisk()
         
     %******** Plotting **********
     figure('Color','white')
-    SMD.doPlots(V,'SC'); 
+    SMD.plot(V,'SC'); 
     title('Interpolation');
     xlim([(Origin(1)-5) (Origin(1)+5)]);
     ylim([y2Wall (Origin(2) + 5)]);

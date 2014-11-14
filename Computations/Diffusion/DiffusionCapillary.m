@@ -27,7 +27,7 @@ function DiffusionCapillary()
     n1     = length(Pts.x1);
     n2     = length(Pts.x2);
 
-    abox.doPlots(rho_ic);
+    abox.plot(rho_ic);
     %****************************************************************
     %****************  Compute time-dependent solution   ************
     %****************************************************************
@@ -45,7 +45,7 @@ function DiffusionCapillary()
         rho = Rho_t(i,:)';
            
         subplot(2,1,1)
-        abox.doPlots(rho);        
+        abox.plot(rho);        
         title(['Interpolation of Solution at t = ', num2str(outTimes(i))]);               
         zlim([0 max(max(Rho_t))]);
         

@@ -33,7 +33,7 @@ function SimulationInfAnnulus()
         
     %******** Plotting **********
     figure('Color','white')
-    AS.doPlots(V,'SC'); 
+    AS.plot(V,'SC'); 
     title('Interpolation');
     
     %***************************************************************

@@ -19,18 +19,18 @@ function data = SimulationBox_Tref(N1,N2,L1,L2,vext)
     [V,Vdiff]   = vext(Pts.y1_kv,Pts.y2_kv);    
     [VP,VPDiff]        = vext(Interp.pts1,Interp.pts2);  
     
-    subplot(1,2,1); TS.doPlots(V,'SC');    
+    subplot(1,2,1); TS.plot(V,'SC');    
     
     [V,Pts,Diff,Int,Ind,Interp] = TS.UpdatePadeValues(V,PlotArea);
                                             
     [V,Vdiff]   = vext(Pts.y1_kv,Pts.y2_kv);    
     [VP]        = vext(Interp.pts1,Interp.pts2);                          
         
-    subplot(1,2,1); TS.doPlots(Vdiff.ddy2,'SC');
-    subplot(1,2,2); TS.doPlots(Vdiff.ddy1,'SC');
+    subplot(1,2,1); TS.plot(Vdiff.ddy2,'SC');
+    subplot(1,2,2); TS.plot(Vdiff.ddy1,'SC');
     
     subplot(1,2,2); 
-    TS.doPlots(V,'SC'); 
+    TS.plot(V,'SC'); 
     TS.PlotLineOfPoles(V);
      
     %Check Interpolation        
@@ -42,14 +42,14 @@ function data = SimulationBox_Tref(N1,N2,L1,L2,vext)
     data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');
     
     figure;
-    subplot(2,2,1); TS.doPlots(Vdiff.ddy2,'SC');
-    subplot(2,2,2); TS.doPlots(Diff.DDy2*V,'SC');
-    subplot(2,2,3); TS.doPlots(Diff.DDy2*V-Vdiff.ddy2,'SC');
+    subplot(2,2,1); TS.plot(Vdiff.ddy2,'SC');
+    subplot(2,2,2); TS.plot(Diff.DDy2*V,'SC');
+    subplot(2,2,3); TS.plot(Diff.DDy2*V-Vdiff.ddy2,'SC');
     
     figure;
-    subplot(2,2,1); TS.doPlots(Vdiff.dy1dy2,'SC');
-    subplot(2,2,2); TS.doPlots(Diff.Dy1Dy2*V,'SC');
-    subplot(2,2,3); TS.doPlots(Diff.Dy1Dy2*V-Vdiff.dy1dy2,'SC');
+    subplot(2,2,1); TS.plot(Vdiff.dy1dy2,'SC');
+    subplot(2,2,2); TS.plot(Diff.Dy1Dy2*V,'SC');
+    subplot(2,2,3); TS.plot(Diff.Dy1Dy2*V-Vdiff.dy1dy2,'SC');
         
     %Check Integration
     %data.Int = abs(Int*V-VInt);
@@ -68,12 +68,12 @@ function data = SimulationBox_Tref(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    TS.doPlots(V);    
+    TS.plot(V);    
     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);
-    TS.doPlots(fConv(Interp.pts1,Interp.pts2));
+    TS.plot(fConv(Interp.pts1,Interp.pts2));
     title('Convolution');
     pbaspect([1 1 1]);    
     %***************************************************************

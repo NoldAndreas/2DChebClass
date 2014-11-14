@@ -26,10 +26,10 @@ function DiffusionWedge()
     [rho_ic_IP,Lap_ic_IP] = AnalyticalSolution(Interp.pts1,Interp.pts2,0);    
     
     figure
-    WDG.doPlots(rho_ic);
+    WDG.plot(rho_ic);
     figure
-    subplot(2,1,1); WDG.doPlots(Lap_ic);
-    subplot(2,1,2); WDG.doPlots(Interp.InterPol*Lap_ic-Lap_ic_IP);    
+    subplot(2,1,1); WDG.plot(Lap_ic);
+    subplot(2,1,2); WDG.plot(Interp.InterPol*Lap_ic-Lap_ic_IP);    
     
     errIP = Interp.InterPol*rho_ic - rho_ic_IP;
     display(['error Interpolation: ' , num2str(max(abs(errIP)))]);
@@ -69,7 +69,7 @@ function DiffusionWedge()
         z_ana = AnalyticalSolution(Interp.pts1,Interp.pts2,outTimes(i));
         
         subplot(2,2,1)
-        WDG.doPlots(rho);        
+        WDG.plot(rho);        
         title(['Interpolation of Solution at t = ', num2str(t)]);       
         zlim([0 max(rho_ic)]);
         
@@ -86,7 +86,7 @@ function DiffusionWedge()
         
         subplot(2,2,3)
         flux = -Diff.grad*rho;
-        WDG.doPlotsFlux(flux); hold on;        
+        WDG.plotFlux(flux); hold on;        
         subShape.PlotBorders();
         
         subplot(2,2,4);   

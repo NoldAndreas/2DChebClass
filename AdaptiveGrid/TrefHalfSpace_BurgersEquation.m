@@ -32,7 +32,7 @@ function TrefHalfSpace_BurgersEquation()
     xh           = (1+Pts.x2_kv)/2;
     u_n          = (sin(2*pi*xh) + 0.5*sin(pi*xh));              
       
-    THS.doPlots(u_n,'SC');
+    THS.plot(u_n,'SC');
 
     %****************************************************************
     %****************  Compute time-dependent solution   ************
@@ -46,7 +46,7 @@ function TrefHalfSpace_BurgersEquation()
         %[u_n,t_n] = EulerForward(u_n,t_n,Dt);
         hold off;
         
-        THS.doPlots(u_n,'SC');
+        THS.plot(u_n,'SC');
         title(['t = ',num2str(t_n)]);
         
         %Adapt Grid

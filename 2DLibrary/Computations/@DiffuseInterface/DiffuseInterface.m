@@ -379,14 +379,14 @@ classdef DiffuseInterface < Computation
         end
         function PlotResultsMu(this)                         
             figure('Position',[0 0 800 600],'color','white');
-            this.IDC.doPlots(this.mu,'contour');             
+            this.IDC.plot(this.mu,'contour');             
             PlotU(this); hold on;             
         end
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
             
             PlotU(this); hold on;             
-            this.IDC.doPlots(this.phi,'contour');     
+            this.IDC.plot(this.phi,'contour');     
                         
             hold on;
             if(~isempty(this.IsolineInterfaceY2))
@@ -408,7 +408,7 @@ classdef DiffuseInterface < Computation
         function AddStreamlines(this)
             for i = 1:3
                 [y10,y20] = ginput(1);   
-                this.IDC.doPlotsStreamlines(this.uv,y10,y20); %IDC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(this.uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
             end
         end
         function PlotU(this,uv,y1Pts,y2Pts,opts) 
@@ -441,12 +441,12 @@ classdef DiffuseInterface < Computation
             end
             
             if((nargin >= 5))
-                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
             else
-                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IDC.doPlotsFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
             end
             hold on;
-            this.IDC.doPlotsFlux(uv);
+            this.IDC.plotFlux(uv);
             
             sp = this.StagnationPoint;
             if(~isempty(sp))          

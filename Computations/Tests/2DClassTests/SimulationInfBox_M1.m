@@ -21,7 +21,7 @@ function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
     [V,Vdiff]   = vext(Pts.y1_kv,Pts.y2_kv);    
     [VP]        = vext(Interp.pts1,Interp.pts2);                          
     
-    IC.doPlots(V);    
+    IC.plot(V);    
     
     %Check Interpolation        
     data.InterPol = max(abs(Interp.InterPol*V - VP));
@@ -31,15 +31,15 @@ function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
     vplot   = Interp.InterPol*V;        
     data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');
     
-    subplot(2,2,1); IC.doPlots(Vdiff.dy2,'SC');
-    subplot(2,2,2); IC.doPlots(Diff.Dy2*V,'SC');
-    subplot(2,2,3); IC.doPlots(Diff.Dy2*V-Vdiff.dy2,'SC');
+    subplot(2,2,1); IC.plot(Vdiff.dy2,'SC');
+    subplot(2,2,2); IC.plot(Diff.Dy2*V,'SC');
+    subplot(2,2,3); IC.plot(Diff.Dy2*V-Vdiff.dy2,'SC');
     
     figure;
     
-    subplot(2,2,1); IC.doPlots(Vdiff.ddy2);
-    subplot(2,2,2); IC.doPlots(Diff.DDy2*V,'SC');
-    subplot(2,2,3); IC.doPlots(Diff.DDy2*V-Vdiff.ddy2,'SC');
+    subplot(2,2,1); IC.plot(Vdiff.ddy2);
+    subplot(2,2,2); IC.plot(Diff.DDy2*V,'SC');
+    subplot(2,2,3); IC.plot(Diff.DDy2*V-Vdiff.ddy2,'SC');
        
     %Check Integration
     %data.Int = abs(Int*V-VInt);
@@ -57,7 +57,7 @@ function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
     figure
     set(gcf,'Color','white'); %Set background color    
 
-    IC.doPlots(V,'SC');     title('Interpolation');        
+    IC.plot(V,'SC');     title('Interpolation');        
     %***************************************************************
     %   Mapping functions:
     %***************************************************************         

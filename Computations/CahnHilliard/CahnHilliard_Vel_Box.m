@@ -85,11 +85,11 @@ function data = CahnHilliard_Vel_Box(optsPhys,optsNum)
     mu      = x_ic(1);
     rho_ic  = x_ic(2:end);
     
-    subplot(2,2,1); abox.doPlots(rho_ic);
+    subplot(2,2,1); abox.plot(rho_ic);
     [fE,dfE]    = f(rho_ic);
-    subplot(2,2,2);  abox.doPlots(-(rho_ic.^2).*dfE/Cn);
-    subplot(2,2,3);  abox.doPlots(rho_ic.*fE/Cn-mu*rho_ic);
-    subplot(2,2,4);  abox.doPlots(Diff.Lap*GetExcessChemPotential(rho_ic,0,mu));
+    subplot(2,2,2);  abox.plot(-(rho_ic.^2).*dfE/Cn);
+    subplot(2,2,3);  abox.plot(rho_ic.*fE/Cn-mu*rho_ic);
+    subplot(2,2,4);  abox.plot(Diff.Lap*GetExcessChemPotential(rho_ic,0,mu));
     
     t_eqSol = toc;
     %****************************************************************

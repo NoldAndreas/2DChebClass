@@ -68,9 +68,9 @@ function SymmetryClassification_1()
     f1 = figure('color','white','Position',[0 0 1000 900]);
     
     subplot(3,2,[1,3,5]);
-    IS.doPlots(f(:,1),'plain'); hold on;
-    IS.doPlots(f(:,ceil(end/2)),'plain');
-    IS.doPlots(f(:,ceil(end)),'plain');
+    IS.plot(f(:,1),'plain'); hold on;
+    IS.plot(f(:,ceil(end/2)),'plain');
+    IS.plot(f(:,ceil(end)),'plain');
     text(-4.5,-0.5,['$\eta= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',18);
     text(-4.5,-0.19,['$\eta= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',18);
     text(-4.5,-0.05,['$\eta= ',num2str(t(ceil(end))),'$'],'Interpreter','Latex','fontsize',18);
@@ -80,7 +80,7 @@ function SymmetryClassification_1()
     
     subplot(3,2,2);
     Psi = (y2.^k).*(IP*f(:,1));        
-    BX.doPlots(Psi,'contour',struct('clabel',false,'linecolor','k'));    
+    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));    
     title(['$\eta= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
@@ -88,14 +88,14 @@ function SymmetryClassification_1()
     
     subplot(3,2,4);    
     Psi = (y2.^k).*(IP*f(:,ceil(end/2)));
-    BX.doPlots(Psi,'contour',struct('clabel',false,'linecolor','k'));   
+    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     title(['$\eta= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
     
     subplot(3,2,6);    
     Psi = (y2.^k).*(IP*f(:,end));
-    BX.doPlots(Psi,'contour',struct('clabel',false,'linecolor','k'));   
+    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     title(['$\eta= ',num2str(t(end)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
@@ -108,7 +108,7 @@ function SymmetryClassification_1()
     figure('color','white');
     Psi = (y1 + y2*1i).^k;
     Psi = arctan(y1./y2);
-    BX.doPlots(Psi,'contour',struct('clabel',false,'linecolor','k'));   
+    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     
     
     
@@ -123,14 +123,14 @@ function SymmetryClassification_1()
         title(['t = ',num2str(t(i))])
         subplot(1,2,1);
         hold off;       
-        IS.doPlots(f(:,i));
+        IS.plot(f(:,i));
         
         %u    = k*(y2.^(k-1)).*fBox - k*(y2.^(k-2)).*y1.*fPBox;                
         %v    = - (y2.^(k-1)).*fPBox;
         %v(y2==0) = 0;        
         %vAbs = sqrt(u.^2 + v.^2);
         subplot(1,2,2);
-        BX.doPlots(Psi,'contour',struct('clabel',true));
+        BX.plot(Psi,'contour',struct('clabel',true));
         
         pause(0.1);
     end

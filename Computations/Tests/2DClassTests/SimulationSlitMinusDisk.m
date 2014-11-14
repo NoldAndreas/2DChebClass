@@ -38,7 +38,7 @@ function data = SimulationSlitMinusDisk(N1,N2,vext)
         
     %******** Plotting **********
     figure('Color','white')
-    SMD.doPlots(V,'SC');    
+    SMD.plot(V,'SC');    
     title('Interpolation');          
     
     %***************************************************************

@@ -33,7 +33,7 @@ function TrefClosedBox2D_BurgersEquation()
     A            = 0.5+x1h;
     u_n          = A.*(sin(2*pi*x2h) + 0.5*sin(pi*x2h));
                 
-	TB.doPlots(u_n,'SC');
+	TB.plot(u_n,'SC');
     %****************************************************************
     %****************  Compute time-dependent solution   ************
     %****************************************************************
@@ -46,7 +46,7 @@ function TrefClosedBox2D_BurgersEquation()
         %[u_n,t_n] = EulerForward(u_n,t_n,Dt);
         hold off;
         
-        TB.doPlots(u_n,'SC');
+        TB.plot(u_n,'SC');
         title(['t = ',num2str(t_n)]);
         
         %Adapt Grid

@@ -45,8 +45,8 @@ function SimulationInfinityWedge
     displayErrors(vplot,VP,V,Vdiff,Diff);
         
     %Check Interpolation   
-    subplot(2,1,1);  WDG.doPlots(V);
-    subplot(2,1,2);  WDG.doPlots(Interp.InterPol*V - VP);        
+    subplot(2,1,1);  WDG.plot(V);
+    subplot(2,1,2);  WDG.plot(Interp.InterPol*V - VP);        
 
     %Check Integration
     display([' Error in Integration: ', num2str(Int*V-VInt)]);                    
@@ -54,7 +54,7 @@ function SimulationInfinityWedge
     %Check Convolution
     figure
     fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
-    WDG.doPlots(fP_Conv);    
+    WDG.plot(fP_Conv);    
 
     %***************************************************************
     %   Auxiliary functions:

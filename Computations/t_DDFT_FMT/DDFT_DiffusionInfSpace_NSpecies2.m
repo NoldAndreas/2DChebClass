@@ -135,7 +135,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_DiffusionInfSpace_NSpecies2(opt
 %             || (isfield(optsNum,'doPlots') && optsNum.doPlots) )
 %         figure
 %         rho_ic  = exp((x_ic-Vext)/kBT);
-%         IDC.doPlots(rho_ic,'',optsPlot.lineColourDDFT);        
+%         IDC.plot(rho_ic,'',optsPlot.lineColourDDFT);        
 %     end
 
     t_eqSol = toc;

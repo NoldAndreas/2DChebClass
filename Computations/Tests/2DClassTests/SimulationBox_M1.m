@@ -25,7 +25,7 @@ function data = SimulationBox_M1(N1,N2,L1,L2,vext)
     [V,Vdiff,VInt]   = vext(Pts.y1_kv,Pts.y2_kv,intBound);    
     [VP]             = vext(Interp.pts1,Interp.pts2);                          
     
-    BI.doPlots(V,'SC');    
+    BI.plot(V,'SC');    
     
     %Check Interpolation        
     data.InterPol = max(abs(Interp.InterPol*V - VP));
@@ -35,9 +35,9 @@ function data = SimulationBox_M1(N1,N2,L1,L2,vext)
     vplot   = Interp.InterPol*V;        
     data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');
     
-    subplot(2,2,1); BI.doPlots(Vdiff.ddy2,'SC');
-    subplot(2,2,2); BI.doPlots(Diff.DDy2*V,'SC');
-    subplot(2,2,3); BI.doPlots(Diff.DDy2*V-Vdiff.ddy2,'SC');
+    subplot(2,2,1); BI.plot(Vdiff.ddy2,'SC');
+    subplot(2,2,2); BI.plot(Diff.DDy2*V,'SC');
+    subplot(2,2,3); BI.plot(Diff.DDy2*V-Vdiff.ddy2,'SC');
     
     
     %Check Integration
@@ -57,12 +57,12 @@ function data = SimulationBox_M1(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
     subplot(1,2,1);
-    BI.doPlots(V);    
+    BI.plot(V);    
     title('Interpolation');    
     pbaspect([1 1 1]);
     
     subplot(1,2,2);
-    BI.doPlots(fConv(Interp.pts1,Interp.pts2));
+    BI.plot(fConv(Interp.pts1,Interp.pts2));
     title('Convolution');
     pbaspect([1 1 1]);
     %***************************************************************

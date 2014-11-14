@@ -157,8 +157,8 @@ classdef ContactLineHS < DDFT_2D
             PlotArea = this.optsNum.PlotAreaCart;
             
             figure('Color','white','Position',[0 0 800 800]);
-            this.IDC.doPlots(rho);
-            zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
+            this.IDC.plot(rho);
+            zlabel('$n\sigma^3$','Interpreter','Latex','fontsize',26);
             if(isfield(PlotArea,'zMax'))
                 zlim([0 PlotArea.zMax]);
             end
@@ -178,13 +178,14 @@ classdef ContactLineHS < DDFT_2D
             My1        = length(y1);
             baseline_z = 5;
             factor_z   = 40;            
-            hold on;                                                
+            hold on;           
+            YL = 0.5*ones(My1,1);
             
-            plot3(y1,zeros(My1,1),baseline_z*ones(My1,1),'k','linewidth',1.5);
+            plot3(y1,YL,baseline_z*ones(My1,1),'k','linewidth',1.5);
             
             if(abs(this.optsNum.PhysArea.alpha_deg-90)>10)
                 [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
-                plot3(this.y1_I+DeltaY1_III,zeros(size(this.y1_I)),...
+                plot3(this.y1_I+DeltaY1_III,0.5*ones(size(this.y1_I)),...
                         baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
                         'b','linewidth',1.5);
             end
@@ -195,13 +196,13 @@ classdef ContactLineHS < DDFT_2D
             
             markIII = (this.hIII < PlotArea.y2Max);
             Pi_III = GetDisjoiningPressure_III(this);            
-            plot3(y1(markIII),zeros(sum(markIII),1),baseline_z+factor_z*Pi_III(markIII),'k','linewidth',1.5);
+            plot3(y1(markIII),YL(markIII),baseline_z+factor_z*Pi_III(markIII),'k','linewidth',1.5);
             
-            plot3(y1,zeros(My1,1),...
-                baseline_z+factor_z*this.disjoiningPressure_IV,...
+            plot3(y1,YL,baseline_z+factor_z*this.disjoiningPressure_IV,...
                 'g','linewidth',1.5);     
             
-             zlim([0 baseline_z+1]);             
+             zlim([0 baseline_z+1]);  
+             set(gca,'ZTick',[0,baseline_z]);
              
              %labelDP = '$\Pi \sigma^3/\varepsilon$';
              %plot::Text3d(labelDP,[max(y1),0,baseline_z]);%,'Interpreter','Latex','fontsize',25);

@@ -32,7 +32,7 @@ function DiffusionClosedBox_VariableMobility()
               
     rho_ic             = AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,0);               
     
-    abox.doPlots(rho_ic);
+    abox.plot(rho_ic);
     
     %Compute matrix of Integration over subspace
     shapeSub      = struct('y1Min',0,'y1Max',L/2,'y2Min',0,'y2Max',L,'N',[20,20]);

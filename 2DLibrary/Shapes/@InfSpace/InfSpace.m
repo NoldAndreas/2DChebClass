@@ -116,7 +116,7 @@ classdef InfSpace < SpectralSpectral
             M_conv = zeros(n1*n2,n1*n2,nf);  
                         
             figure
-            subShape.doPlots(fP);
+            subShape.plot(fP);
             title('Interpolation of Convolution function'); drawnow;
 
             
