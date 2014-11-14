@@ -291,7 +291,7 @@ classdef (Abstract) Shape < handle
             hold off;   
                                             
         end            
-        function doPlots(this,V,options,optDetails)
+        function plot(this,V,options,optDetails)
             
             %options: 'SC' , 'contour'
             global PersonalUserOutput

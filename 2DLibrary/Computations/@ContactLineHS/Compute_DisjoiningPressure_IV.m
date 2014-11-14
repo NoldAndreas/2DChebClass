@@ -14,17 +14,17 @@ function Compute_DisjoiningPressure_IV(this)
     
     Geometry = struct('R_in',0,'LR',2,...
                       'th1',0,'th2',pi,...
-                      'N',[40,20],...
+                      'N',[40,40],...
                       'Origin',[0,0.5]);    
         
     HS                = InfWedge(Geometry);
         
     %Phys_Area = struct('L1',2,'L2',2,'N',[51;50],'y2Min',0.5);
     PlotArea       = struct('y1Min',-5,'y1Max',5,'y2Min',0.5,'y2Max',5,...
-                            'N2',100,'N1',100);
+                            'N2',80,'N1',80);
 
    % HS        = HalfSpace(Phys_Area);
-    HS.ComputeAll(PlotArea);
+    HS.InterpolationPlotCart(PlotArea,true);
     IntHS     = HS.ComputeIntegrationVector();
     
     HSPtsCart = HS.GetCartPts();

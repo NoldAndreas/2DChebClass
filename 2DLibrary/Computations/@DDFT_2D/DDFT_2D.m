@@ -19,7 +19,10 @@ classdef DDFT_2D < Computation
     end
     
     methods (Access = public)          
-        function this = DDFT_2D(configuration)            
+        function this = DDFT_2D(configuration)      
+            if(nargin == 0)
+                 configuration = [];
+            end             
             this@Computation(configuration);            
             
             if(~isfield(this.optsPhys,'D0') && isfield(this.optsPhys,'mS') && isfield(this.optsPhys,'gammaS'))
