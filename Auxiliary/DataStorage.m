@@ -25,7 +25,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     DataFolder = [dirData filesep nameDir]; 	        
     index      = LoadIndexFiles(DataFolder);   
     
-	if(nargin == 4)
+	if(nargin <= 4)
         recompute = [];
     end
    
