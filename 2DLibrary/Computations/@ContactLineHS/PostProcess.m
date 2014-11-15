@@ -22,8 +22,9 @@ function PostProcess(this)
     this.hIV       = res.hIV;
     this.hContour  = res.hContour;
     
-    if(isfield(res,'hI'))
-        this.hI = res.hI;
+    if(isfield(res,'hI') && isfield(res,'y1_I'))
+        this.hI   = res.hI;
+        this.y1_I = res.y1_I;
     else
         Compute_hI(this);        
     end
@@ -43,7 +44,7 @@ function PostProcess(this)
         
          Compute_hII(this,'II');
          Compute_hIII(this);
-          Compute_hI(this);
+         Compute_hI(this);
          Compute_hII(this,'IV');
          
          Compute_hContour(this,0.5);
@@ -52,11 +53,14 @@ function PostProcess(this)
          res.disjoiningPressure_II = this.disjoiningPressure_II;
          res.disjoiningPressure_IV = this.disjoiningPressure_IV;
         
+         
          res.hI        = this.hI;
+         res.y1_I      = this.y1_I;
          res.hII       = this.hII;
          res.hIII      = this.hIII;
          res.hIV       = this.hIV;
          res.hContour  = this.hContour;        
+         
     end
 % 
 %     InitAnalysisGrid(this,y1Int,y2Int);

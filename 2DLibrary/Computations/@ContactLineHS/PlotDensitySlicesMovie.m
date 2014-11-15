@@ -24,8 +24,7 @@ function PlotDensitySlicesMovie(this)
     else
         rho_bulk = rhoGas_sat;
     end
-
-
+    
     k = 1; fileNames = [];
 
     %% Plotting
@@ -52,7 +51,7 @@ function PlotDensitySlicesMovie(this)
         
         subplot(1,2,1);
         hold off;
-        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,'b','linewidth',1.5); hold on;        
+        plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'b','linewidth',1.5); hold on;        
         this.IDC.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],rho_eq,struct('dist0',true,'plain',true));
         xlim([0 (y2Max-0.5)]);
         ylim([0 1.1]);%max(this.rho_eq)]);

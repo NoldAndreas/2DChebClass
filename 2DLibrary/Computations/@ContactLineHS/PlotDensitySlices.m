@@ -11,9 +11,10 @@ function PlotDensitySlices(this)
     y1P = y1Min + (y1Max-y1Min)*(0.5:1:(n-0.5))/n;
     col = distinguishable_colors_NoRedBlueGreen();
     %str = {'','','m','','c'};
-    
+        
     % Plotting
     f1 = figure('color','white','Position',[0 0 700 700]);    
+    
 
     for i = 1:n
         % get adsorption
@@ -22,7 +23,7 @@ function PlotDensitySlices(this)
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
         
         hold on;
-        plot(this.AdsorptionIsotherm.Pts.y2_kv-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
+        plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
         this.IDC.doPlotFLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,struct('CART',true,'color',col(i,:)));        
     end
     

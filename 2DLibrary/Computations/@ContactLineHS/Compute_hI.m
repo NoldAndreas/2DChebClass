@@ -8,7 +8,8 @@ function Compute_hI(this)
            
     [~,IntPot] = GetDisjoiningPressure_I(this);    
     
-	hmax = min(max(this.hII),max(this.hIII))-2;
+	hmax = min(max(this.AdsorptionIsotherm.FT),...
+           min(max(this.hII),max(this.hIII)))-2;
     
     yN = 0; hN = hmax;    
     yC = []; hC = [];

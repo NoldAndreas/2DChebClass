@@ -151,8 +151,7 @@ classdef ContactLineHS < DDFT_2D
         
         %Plot functions        
         PlotContourResults(this,plain)
-        function PlotDensityResult(this,DP)                        
-            M        = this.IDC.M;
+        function PlotDensityResult(this,DP)                                    
             rho      = GetRhoEq(this);
             PlotArea = this.optsNum.PlotAreaCart;
             
@@ -176,27 +175,32 @@ classdef ContactLineHS < DDFT_2D
             %f2         = figure;
             y1         = this.y1_SpectralLine.Pts.y;
             My1        = length(y1);
-            baseline_z = 5;
+            baseline_z = 7;
             factor_z   = 40;            
             hold on;           
             YL = 0.5*ones(My1,1);
             
             plot3(y1,YL,baseline_z*ones(My1,1),'k','linewidth',1.5);
             
-            if(abs(this.optsNum.PhysArea.alpha_deg-90)>10)
-                [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
+            %if(abs(this.optsNum.PhysArea.alpha_deg-90)>10)
+            if(this.optsNum.PhysArea.alpha_deg ~= 90)
+                [~,DeltaY1_III] = this.ComputeDeltaFit();
+            else
+                DeltaY1_III = 0;
+            end
                 plot3(this.y1_I+DeltaY1_III,0.5*ones(size(this.y1_I)),...
                         baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
                         'b','linewidth',1.5);
-            end
+            %end
             
-            plot3(y1,zeros(My1,1),...
-                baseline_z+factor_z*this.disjoiningPressure_II,...
+            plot3(y1,YL,baseline_z+factor_z*this.disjoiningPressure_II,...
                 'r','linewidth',1.5);     
             
-            markIII = (this.hIII < PlotArea.y2Max);
-            Pi_III = GetDisjoiningPressure_III(this);            
-            plot3(y1(markIII),YL(markIII),baseline_z+factor_z*Pi_III(markIII),'k','linewidth',1.5);
+            if(this.optsNum.PhysArea.alpha_deg ~= 90)
+                markIII = (this.hIII < PlotArea.y2Max);
+                Pi_III = GetDisjoiningPressure_III(this);            
+                plot3(y1(markIII),YL(markIII),baseline_z+factor_z*Pi_III(markIII),'k','linewidth',1.5);
+            end
             
             plot3(y1,YL,baseline_z+factor_z*this.disjoiningPressure_IV,...
                 'g','linewidth',1.5);     
@@ -245,21 +249,21 @@ classdef ContactLineHS < DDFT_2D
 
             plot([-10 35],[0 0],'k'); hold on;
             if(~isempty(this.disjoiningPressure_II))
-                plot(y1,this.disjoiningPressure_II,'k--','linewidth',1.5);     
+                plot(y1,this.disjoiningPressure_II,'r--','linewidth',1.5);     
             end
             if(~isempty(this.disjoiningPressure_IV))
-                plot(y1,this.disjoiningPressure_IV,'r--','linewidth',1.5);     
+                plot(y1,this.disjoiningPressure_IV,'g--','linewidth',1.5);     
             end    
+            
+            markFT = (this.hIII < 25);
+            hhFT   = GetDisjoiningPressure_III(this);
+            plot(y1(markFT),hhFT(markFT),'k','linewidth',1.5);
 
             [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
             dP1D                     = GetDisjoiningPressure_I_ell(this,this.hI);
             %plot(this.y1_I+DeltaY1_II,dP1D,'k-.','linewidth',1.5);
-            plot(this.y1_I+DeltaY1_III,dP1D,'k-.','linewidth',1.5);
+            plot(this.y1_I+DeltaY1_III,dP1D,'b','linewidth',1.5);
 
-            markFT = (this.hIII < 25);
-            hhFT   = GetDisjoiningPressure_III(this);
-
-            plot(y1(markFT),hhFT(markFT),'k','linewidth',1.5);
 
             xlim([min(y1) max(y1)]);
             %ylim([1.1*min(dp1D) 3*max(0.001,max(dp1D))]);%[-0.035 0.005])
