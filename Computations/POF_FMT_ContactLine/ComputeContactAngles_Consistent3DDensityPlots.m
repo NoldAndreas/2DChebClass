@@ -47,8 +47,7 @@ function ComputeContactAngles_Consistent3DDensityPlots()
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
         CLT.ComputeEquilibrium();          	        
-        CLT.PostProcess();   
-        CLT.Compute_hI();
+        CLT.PostProcess();          
         CLT.PlotDensityResult('DP');        
         
         clear('CLT');
