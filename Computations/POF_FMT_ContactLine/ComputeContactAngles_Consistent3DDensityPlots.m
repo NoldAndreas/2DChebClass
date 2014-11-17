@@ -8,19 +8,25 @@ function ComputeContactAngles_Consistent3DDensityPlots()
    N          = [45,75];
    
    opts    = v2struct(bounds1,bounds2,maxComp_y2,N);
-   epwList = [0.6,0.8,0.9,1.1,1.2,1.3,0.65,0.75,0.85,0.95,1.05,1.15,1.35];   
    
- %   ComputeEpw(130,0.6); 
+   epwList = [0.8,0.6,0.9,1.1,1.2,1.3,0.65,0.75,0.85,0.95,1.05,1.15,1.35];   
+   epwList1 = [1.32,1.285,1.211,1.715,1.13,1.407,1.431,];
+   
    for i = 1:length(epwList)
         alpha_deg = GetAlphaDeg(epwList(i));
         ComputeEpw(alpha_deg,epwList(i));      
    end
+   for i = 1:length(epwList1)
+        alpha_deg = GetAlphaDeg(epwList1(i));
+        ComputeEpw(alpha_deg,epwList1(i));      
+   end
+   
       
-   ComputeEpw(40,1.375);       
-   ComputeEpw(60,1.25);       
-   ComputeEpw(90,1.0);
-   ComputeEpw(120,0.7);
-   ComputeEpw(135,0.55);
+ %  ComputeEpw(40,1.375);       
+ %  ComputeEpw(60,1.25);       
+ %  ComputeEpw(90,1.0);
+ %  ComputeEpw(120,0.7);
+ %  ComputeEpw(135,0.55);
    
 %    opts.alpha_deg = 60;  opts.epw       = 1.25;   
 %    Job_ComputeContactAngle(opts);                

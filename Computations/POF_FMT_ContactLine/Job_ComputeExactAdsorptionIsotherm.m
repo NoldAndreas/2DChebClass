@@ -32,14 +32,21 @@ function Job_ComputeExactAdsorptionIsotherm()
     config = v2struct(optsNum,optsPhys);                        
     
     
-    config.optsPhys.V1.epsilon_w = 0.7;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+    epw = [0.75,0.8,0.85,0.9,0.95];
     
-    CL = ContactLineHS(config);
-	CL.Preprocess();    
-    CL.ComputeAdsorptionIsotherm(300,'drying');    
-    %CL.ComputeAdsorptionIsotherm(300,'wetting');    
-    CL.FittingAdsorptionIsotherm([10 14],1)
-    if(optsPhys.kBT == 0.75)
-        CL.SumRule_AdsorptionIsotherm(0.3463);
+    for i = 1:length(epw)
+        config.optsPhys.V1.epsilon_w = epw(i);%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+
+        CL = ContactLineHS(config);
+        CL.Preprocess();    
+        CL.ComputeAdsorptionIsotherm(300,'drying');    
+        %CL.ComputeAdsorptionIsotherm(300,'wetting');    
+        CL.FittingAdsorptionIsotherm([10 14],1)
+        if(optsPhys.kBT == 0.75)
+            CL.SumRule_AdsorptionIsotherm(0.3463);
+        end
+        
+        clear('CLT');
     end
+    
 end

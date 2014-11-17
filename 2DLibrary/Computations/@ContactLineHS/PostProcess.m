@@ -11,7 +11,7 @@ function PostProcess(this)
     opts.shape_y1_Line = shapeSL;
     opts.FilenameEq    = this.FilenameEq;
 
-    res = DataStorage(['Equilibrium' filesep 'PostProcess'],@ComputePostProcess,opts,[],true);%[]);
+    res = DataStorage(['Equilibrium' filesep 'PostProcess'],@ComputePostProcess,opts,[]);%[]);
 
     this.AdsorptionIsotherm    = res.AdsorptionIsotherm;
     this.disjoiningPressure_II = res.disjoiningPressure_II;

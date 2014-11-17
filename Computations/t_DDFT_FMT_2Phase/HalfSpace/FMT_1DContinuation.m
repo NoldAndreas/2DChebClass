@@ -305,8 +305,8 @@
     end
 
      function n = US_ScalarProduct(x,y)
-         int = zeros(size(Int_1D));
-         mark = (HS.Pts.y2 < 40);
+         int       = zeros(size(Int_1D));
+         mark      = (HS.Pts.y2 < 10);
          int(mark) = Int_1D(mark);
          x = x(:);
          %n = (x(1)).*y(1) + int*((x(2:end)-x(end)).*(y(2:end)-y(end)));

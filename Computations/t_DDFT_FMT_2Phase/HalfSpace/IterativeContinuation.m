@@ -18,8 +18,8 @@ function x = IterativeContinuation(func,Nosteps,theta,xInitial,params,user_scala
     
     theta       = abs(theta);
     thetaMin    = theta/32;    
-    thetaMax    = theta*32;
-    maxDistance = theta*5;
+    thetaMax    = theta*2;
+    maxDistance = theta*2;
     MaxLoopsWithoutProblems = 10;
     
     LoopsWithoutProblems = 0;

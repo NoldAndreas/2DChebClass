@@ -182,16 +182,16 @@ classdef ContactLineHS < DDFT_2D
             
             plot3(y1,YL,baseline_z*ones(My1,1),'k','linewidth',1.5);
             
-            %if(abs(this.optsNum.PhysArea.alpha_deg-90)>10)
-            if(this.optsNum.PhysArea.alpha_deg ~= 90)
+           % if((this.optsNum.PhysArea.alpha_deg<90) || (this.optsNum.PhysArea.alpha_deg>=120))
+            %if(this.optsNum.PhysArea.alpha_deg ~= 90)
                 [~,DeltaY1_III] = this.ComputeDeltaFit();
-            else
-                DeltaY1_III = 0;
-            end
+          %  else
+           %     DeltaY1_III = 0;
+           % end
                 plot3(this.y1_I+DeltaY1_III,0.5*ones(size(this.y1_I)),...
                         baseline_z+factor_z*GetDisjoiningPressure_I_ell(this,this.hI),...
                         'b','linewidth',1.5);
-            %end
+           % end
             
             plot3(y1,YL,baseline_z+factor_z*this.disjoiningPressure_II,...
                 'r','linewidth',1.5);     

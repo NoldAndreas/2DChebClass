@@ -1,6 +1,5 @@
 function [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
-    
-    global dirData
+        
     %********************************************************************
     %Film thickness            
     if((nargin == 1) && ~isempty(this.IsolineInterfaceY2))
