@@ -166,8 +166,8 @@ classdef ContactLineHS < DDFT_2D
             pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
             view([-10 5 3]);
             
-            if((nargin == 1) || ~strcmp(DP,'DP'))
-                SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq]);                        
+            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq]);                        
+            if((nargin == 1) || ~strcmp(DP,'DP'))                
                 return;
             end
             
