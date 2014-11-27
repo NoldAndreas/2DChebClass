@@ -134,11 +134,26 @@ function PlotDDFT(input,Bool_Record)
                     optsPlot.linecolor = lineColour{iSpecies}; 
                 else
                     optsPlot.nContours = 5;
+                                        
+                    drho = optsPhys.rhoLiq_sat - optsPhys.rhoGas_sat;
+                    
+                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.1*drho;
+                    optsPlot.linecolor = 'b';
+                    optsPlot.linestyle = '--';
+                    shape.plot(rho,'contour',optsPlot);  hold on;  
+        
+                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.5*drho;
+                    optsPlot.linecolor = [0 0.75 0];
+                    shape.plot(rho,'contour',optsPlot);  hold on;  
+        
+                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.9*drho;
+                    optsPlot.linecolor = 'r';
+                    shape.plot(rho,'contour',optsPlot);  hold on;  
                 end                
-                shape.plot(rho,'contour',optsPlot); hold on;                                         
+               % shape.plot(rho,'contour',optsPlot); hold on;                                         
             end
             %plot([0;0],[i;i]);
-            title(['t = ', num2str(t)]);               
+            title(['t = ', num2str(round(t))]);               
             set(gca,'fontsize',30);
             set(gca,'linewidth',3);
             %view([2,5,2]);
