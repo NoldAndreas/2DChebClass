@@ -130,6 +130,7 @@ function PlotDDFT(input,Bool_Record)
                 rho     = rho_t(:,iSpecies,i);
                 
                 shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+
                 if(nSpecies > 1)
                     optsPlot.linecolor = lineColour{iSpecies}; 
                 else
@@ -151,6 +152,36 @@ function PlotDDFT(input,Bool_Record)
                     shape.plot(rho,'contour',optsPlot);  hold on;  
                 end                
                % shape.plot(rho,'contour',optsPlot); hold on;                                         
+
+%                  if(nSpecies > 1)
+%                      optsPlot.linecolor = lineColour{iSpecies}; 
+%                      shape.plot(rho,'contour',optsPlot); hold on;                                         
+%                  else
+%                                      
+%                     optDetails.clabel      = false;  
+%                     optDetails.linewidth   = 3;%1.4;  
+% 
+%                     rhoLiq_sat    = optsPhys.rhoLiq_sat;
+%                     rhoGas_sat    = optsPhys.rhoGas_sat;
+% 
+%                     %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
+%                     drho = rhoLiq_sat - rhoGas_sat;
+% 
+%                     optDetails.nContours = rhoGas_sat + 0.1*drho;
+%                     optDetails.linecolor = 'b';
+%                     optDetails.linestyle = '--';
+%                     shape.plot(rho,'contour',optDetails);  hold on;  
+% 
+%                     optDetails.nContours = rhoGas_sat + 0.5*drho;
+%                     optDetails.linecolor = [0 0.75 0];
+%                     shape.plot(rho,'contour',optDetails);  hold on;  
+% 
+%                     optDetails.nContours = rhoGas_sat + 0.9*drho;
+%                     optDetails.linecolor = 'r';
+%                     shape.plot(rho,'contour',optDetails);  hold on;  
+% 
+%                  end                                
+
             end
             %plot([0;0],[i;i]);
             title(['t = ', num2str(round(t))]);               

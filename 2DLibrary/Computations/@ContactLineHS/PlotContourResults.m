@@ -1,6 +1,4 @@
 function [fContour] =  PlotContourResults(this,plain)
-
-    global dirData        
     
     rho           = GetRhoEq(this);
     rhoLiq_sat    = this.optsPhys.rhoLiq_sat;

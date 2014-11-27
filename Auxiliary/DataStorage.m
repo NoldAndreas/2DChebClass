@@ -96,8 +96,15 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 elseif((isempty(recompute)) && ((~PersonalUserOutput) || (loadAll)))
                     recompute = false;
                 elseif((isempty(recompute)) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
-                    no = fprintf('Do you want to recompute Data (press any key), or wait for 2 seconds.');        
-                    if(getkeywait(2) == -1)
+                    no = fprintf('Do you want to load data (press "l"), recompute Data (press any other key), or wait for 2 seconds.');        
+                    if(getkeywait(2) == 108)
+                        [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
+                        load([DataFolder,FileName]);  
+                        disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
+
+                        recompute = false;
+                        
+                    elseif(getkeywait(2) == -1)
                         for ih = 1:no
                             fprintf('\b');
                         end                        

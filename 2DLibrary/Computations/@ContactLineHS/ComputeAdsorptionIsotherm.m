@@ -19,13 +19,12 @@
         optss.NContIterations = n;        
     end
 
-    if(strcmp(n,'load'))                            
-       [rho,ell,mu,OmEx,dmuCheck,pts] = FMT_1DContinuation(this.IDC,...
+    if(strcmp(n,'load'))                             
+        [rho,ell,mu,OmEx,dmuCheck,pts] = FMT_1DContinuation(this.IDC,...
             this.IntMatrFex,optss,this.optsNum.FexNum,this.IntMatrV2.Conv,'mu','load');%,'Movie');            
     else
         [rho,ell,mu,OmEx,dmuCheck,pts] = FMT_1DContinuation(this.IDC,...
             this.IntMatrFex,optss,this.optsNum.FexNum,this.IntMatrV2.Conv,'mu');%,'load');%,'Movie');            
-
     end
 
     this.AdsorptionIsotherm = struct('FT',ell,...
