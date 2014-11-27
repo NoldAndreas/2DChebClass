@@ -81,26 +81,26 @@ classdef DiffuseInterface < Computation
         
         function sepp  = IsSeppecher(this)
             sepp = (length(this.optsPhys.thetaEq) == 1);
-        end
-        
-        function vec = GetInitialCondition(this) 
+        end        
+        function vec = GetInitialCondition(this,theta) 
+            if(nargin == 1)
+                theta = pi/2;
+            end
            
             if(~isempty(this.uv) && ...                
                 ~isempty(this.mu) && ...
                 ~isempty(this.phi))
                 vec  = [this.uv;this.phi;this.mu];                
-            else                       
-            
-                this.phi = InitialGuessRho(this);                             
-                this.uv  = InitialGuessUV(this);
+            else                                   
+                this.phi = InitialGuessRho(this,theta);                             
+                this.uv  = InitialGuessUV(this,theta);
                 this.mu  = zeros(this.IDC.M,1);                          
-                vec      = [this.uv;this.phi;this.mu];
-             
+                vec      = [this.uv;this.phi;this.mu];             
             end
                         
             if(IsSeppecher(this))
                 if(isempty(this.theta))
-                    vec = [0;0;pi/2;vec];
+                    vec = [0;0;theta;vec];
                 else
                     vec = [this.a;this.deltaX;this.theta;vec];
                 end
@@ -108,13 +108,18 @@ classdef DiffuseInterface < Computation
 
              
          end
-        function phi = InitialGuessRho(this)
+        function phi = InitialGuessRho(this,theta)
+            if(nargin == 1)
+                theta = pi/2;
+            end
             PtsCart    = this.IDC.GetCartPts();
             Cn         = this.optsPhys.Cn;
-            
-            phi        = tanh(PtsCart.y1_kv/Cn);
+            phi        = tanh((PtsCart.y1_kv-PtsCart.y2_kv/tan(theta))/Cn);            
         end                         
-        function uv  = InitialGuessUV(this)
+        function uv  = InitialGuessUV(this,theta)
+            if(nargin == 1)
+                theta = pi/2;
+            end
             UWall            = this.optsPhys.UWall;    
             PtsCart          = this.IDC.GetCartPts();            
             y2_kv            = PtsCart.y2_kv;
@@ -123,8 +128,7 @@ classdef DiffuseInterface < Computation
             M                = this.IDC.M;
             
             if(IsSeppecher(this))
-                deltaX = 0; 
-                theta  = pi/2;
+                deltaX = 0;                 
                 uv     = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
                                                 PtsCart.y2_kv],1,0,0,theta);                                
             else                
@@ -381,6 +385,7 @@ classdef DiffuseInterface < Computation
             figure('Position',[0 0 800 600],'color','white');
             this.IDC.plot(this.mu,'contour');             
             PlotU(this); hold on;             
+            SaveCurrentFigure(this,[this.filename '_ChemPot']);            
         end
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
@@ -396,6 +401,7 @@ classdef DiffuseInterface < Computation
             if(IsSeppecher(this))
                 PlotSeppecherSolution(this);
             end
+            SaveCurrentFigure(this,[this.filename '_Density']);            
         end        
         function PlotSeppecherSolution(this)                                                                 
             PlotU(this);            hold on;                               
@@ -476,13 +482,10 @@ classdef DiffuseInterface < Computation
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
             ylabel('$cos(\theta)$','Interpreter','Latex','fontsize',20);
         end
-        function SavePlotResults(this)                                
-            
-            PlotResultsPhi(this);
-            SaveCurrentFigure(this,[this.filename '_Density']);            
-            
+        function PlotResults(this)                                            
+            PlotResultsPhi(this);                       
             PlotResultsMu(this);
-            SaveCurrentFigure(this,[this.filename '_ChemPot']);            
+            PlotErrorIterations(this);        
         end        
         function PlotErrorIterations(this)           
             disp('*** Results ***');

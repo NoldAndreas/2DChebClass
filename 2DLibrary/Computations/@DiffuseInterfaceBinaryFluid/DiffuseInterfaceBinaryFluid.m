@@ -11,8 +11,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        
        IterationStepFullProblem(this,noIterations)       
             
-       function vec = GetInitialCondition(this) 
-            vec = GetInitialCondition@DiffuseInterface(this);           
+       function vec = GetInitialCondition(this,theta) 
+            if(nargin == 1)
+                theta = pi/2;
+            end
+            vec = GetInitialCondition@DiffuseInterface(this,theta);           
             if(length(vec) == this.IDC.M*4+3)
                 vec = [0;vec];
             end
@@ -33,7 +36,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function [v_mu_T,A_mu_T] = GetPhiBC(this,phi,theta)
            M = this.IDC.M;           
            [v_mu_T,A_mu_T] = GetPhiBC@DiffuseInterface(this,phi,theta);                      
-           A_mu_T    = [A_mu_T,zeros(size(A_mu_T,1),M)];
+           A_mu_T          = [A_mu_T,zeros(size(A_mu_T,1),M)];
            if(IsSeppecher(this))
                A_mu_T = [zeros(size(A_mu_T,1),1),A_mu_T];
            end
@@ -162,13 +165,14 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              %A_theta([F;F;F;lbC]) = 1;
              %A_theta              = [0,0,0,A_theta];
              %v_theta              = G(lbC);
-              A_theta              = zeros(1,5*M);
-              A_theta([F;F;F;F;rbC]) = 1;
-              A_theta              = [0,0,0,0,A_theta];
-              v_theta              = p(rbC);
+             
+             % A_theta              = zeros(1,5*M);
+%              A_theta([F;F;F;F;rbC]) = 1;
+%              A_theta              = [0,0,0,0,A_theta];
+%              v_theta              = p(rbC);
                    
-             %A_theta = [0,0,0,1,zeros(1,5*M)];    
-             %v_theta = theta - pi/2;
+             A_theta = [0,0,0,1,zeros(1,5*M)];    
+             v_theta = theta - pi/2;
 
              v_SeppAdd = [v_b;v_a;v_deltaX;v_theta];
              A_SeppAdd = [A_b;A_a;A_deltaX;A_theta];
@@ -271,8 +275,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             A_mom_IBB = A_mom(IBB,:);
             v_mom_IBB = v_mom(IBB);
        end
-             
-       FindAB(this)
+
+       vec_a  = FindAB(this,theta)
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
@@ -337,11 +341,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                                       - m11(Ind.left & Ind.top));                                
 
        end
-       function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
+       function [v_mu,A_mu]     = ChemicalPotential(this,phi,G)
            [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,phi,G);
            A_mu = [A_mu,zeros(this.IDC.M)];
        end
-       function [v_G,A_G] = Phasefield(this,uv,phi,G)
+       function [v_G,A_G]       = Phasefield(this,uv,phi,G)
            
             m              = this.optsPhys.mobility;            
             Diff           = this.IDC.Diff;
@@ -367,11 +371,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             v_mom          = Diff.LapVec*uv ...
                               + repmat(G,2,1).*(Diff.grad*phi)/Cak ...
                               - Diff.grad*p;
-       end
-       
+       end       
          
-       function SavePlotResults(this)           
-           SavePlotResults@DiffuseInterface(this);
+       function PlotResults(this)           
+           PlotResults@DiffuseInterface(this);
            
            figure('Position',[0 0 800 600],'color','white');
            PlotU(this); hold on;            

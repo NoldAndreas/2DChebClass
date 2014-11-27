@@ -12,7 +12,8 @@ function SeppecherBinaryFluid()
 
 	optsNum  = v2struct(PhysArea,PlotArea);                   	
     
-    optsPhys = struct('thetaEq',pi/2,...                         
+    optsPhys = struct('thetaEq',pi/2,...       
+                       'theta',97*pi/180,...
                        'Cak',0.01,'Cn',1,...
                        'UWall',1,...                       
                        'mobility',10,...
@@ -23,21 +24,19 @@ function SeppecherBinaryFluid()
     DI = DiffuseInterfaceBinaryFluid(config);
     DI.Preprocess();
     
-    opts = struct('noIterations',10,'lambda',0.5,'solveSquare',true);
+    opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
     DI.IterationStepFullProblem(opts);    
     
-    opts = struct('noIterations',5,'lambda',0.8,'solveSquare',true);
-    DI.IterationStepFullProblem(opts);    
+    %opts = struct('noIterations',5,'lambda',0.8,'solveSquare',true);
+    %DI.IterationStepFullProblem(opts);    
 	
-    opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
-    DI.IterationStepFullProblem(opts);    
+    %opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
+    %DI.IterationStepFullProblem(opts);    
     
 	%opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
     %DI.IterationStepFullProblem(opts);    
     
     DI.FindStagnationPoint();
-    DI.SavePlotResults();
-	DI.PlotErrorIterations();
-                                     
+    DI.PlotResults();	               
     
 end

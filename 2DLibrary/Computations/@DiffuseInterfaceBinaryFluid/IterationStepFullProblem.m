@@ -29,24 +29,32 @@ function IterationStepFullProblem(this,opts)
         solveSquare = opts.solveSquare;
     end
     
-    Seppecher   = IsSeppecher(this);    
+    Seppecher     = IsSeppecher(this);    
+    Seppecher_red = true;
     %solveSquare = true;
+    
+    if(Seppecher_red)               
+        theta = this.optsPhys.theta; %100*pi/180;
+        a     = FindAB(this,theta);
+    end
         
     nParticles     = this.optsPhys.nParticles;            
     M              = this.IDC.M;  
     Ind            = this.IDC.Ind;
-    IntSubArea     = this.IntSubArea;        
-    
+    IntSubArea     = this.IntSubArea;            
     
     IBB  = repmat(Ind.bound,2,1);      
-    F       = false(M,1);   T       = true(M,1);        
+    F    = false(M,1);   T       = true(M,1);        
     
     opts = struct('optsNum',this.optsNum,...
                   'optsPhys',this.optsPhys,...
-                  'Comments',this.configName);
-              
+                  'Comments',this.configName);              
     
-	in = struct('initialGuess',GetInitialCondition(this));
+ 	in = struct('initialGuess',GetInitialCondition(this,theta));
+    
+    if(Seppecher_red)
+        in.initialGuess = in.initialGuess([3,5:end]);
+    end
         
     [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
                     opts,in);
@@ -55,7 +63,11 @@ function IterationStepFullProblem(this,opts)
     this.mu       = res.mu;
     this.phi      = res.phi;
     this.p        = res.p;
-    if(Seppecher)
+    if(Seppecher_red)
+        this.a        = a;        
+        this.deltaX   = res.deltaX;
+        this.theta    = theta;    
+    elseif(Seppecher)
         this.a        = res.a;        
         this.deltaX   = res.deltaX;
         this.theta    = res.theta;
@@ -63,8 +75,7 @@ function IterationStepFullProblem(this,opts)
     
     this.filename = Parameters.Filename;
     this.errors.errorIterations = res.errorHistory;        
-    
-    
+        
     function res = SolveSingleFluid(conf,in)
         
         vec = in.initialGuess;
@@ -80,7 +91,10 @@ function IterationStepFullProblem(this,opts)
     
         
         %[uv;phi;mu] 
-        if(Seppecher)
+        if(Seppecher_red)
+            res.deltaX = vec(1);            
+            vec        = vec(2:end);
+        elseif(Seppecher)
             res.a      = vec(1:2);
             res.deltaX = vec(3);
             res.theta  = vec(4);
@@ -96,8 +110,12 @@ function IterationStepFullProblem(this,opts)
     function [v,A] = f(z)
         
         %[uv;phi;G;p]       
-        if(Seppecher)
-            a      = [z(1:2)];
+        if(Seppecher_red)                        
+            deltaX = z(1);            
+            disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
+            z      = z(2:end);
+        elseif(Seppecher)
+            a      = z(1:2);
             deltaX = z(3);
             theta  = z(4);
             disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
@@ -121,7 +139,17 @@ function IterationStepFullProblem(this,opts)
         A_particles([F;F;T;F;F]) = IntSubArea;
         v_particles              = IntSubArea*phi - nParticles;         
 
-        if(Seppecher)    
+        if(Seppecher_red)    
+            A_cont      = [zeros(M,1),A_cont];
+            A_mom       = [zeros(2*M,1),A_mom];
+            A_G         = [zeros(M,1),A_G];
+            A_mu        = [zeros(M,1),A_mu];
+            A_particles = [0,A_particles];
+            
+            [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
+            v_SeppAdd = v_SeppAdd(3);
+            A_SeppAdd = A_SeppAdd(3,[3,5:end]);
+        elseif(Seppecher)    
             A_cont      = [zeros(M,4),A_cont];
             A_mom       = [zeros(2*M,4),A_mom];
             A_G         = [zeros(M,4),A_G];
@@ -131,9 +159,19 @@ function IterationStepFullProblem(this,opts)
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
         end
         
-        [v_mu(Ind.top|Ind.bottom),A_mu(Ind.top|Ind.bottom,:)] = GetPhiBC(this,phi,theta);          
-        [v_mom(IBB),A_mom(IBB,:)]                             = GetVelBC(this,uv,a,deltaX,theta);                    
-        [v_G(Ind.bound),A_G(Ind.bound,:)]                     = GetChemPotBC(this,uv,phi,G,theta);
+        [v_mu(Ind.top|Ind.bottom),A_mu_BC] = GetPhiBC(this,phi,theta);          
+        [v_mom(IBB),A_mom_BC]              = GetVelBC(this,uv,a,deltaX,theta);                    
+        [v_G(Ind.bound),A_G_BC]            = GetChemPotBC(this,uv,phi,G,theta);
+        
+        if(Seppecher_red)
+            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[3,5:end]);
+            A_mom(IBB,:)               = A_mom_BC(:,[3,5:end]);
+            A_G(Ind.bound,:)           = A_G_BC(:,[3,5:end]);
+        else
+            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
+            A_mom(IBB,:)               = A_mom_BC;
+            A_G(Ind.bound,:)           = A_G_BC;
+        end
         
         if(solveSquare)
             rbC         = Ind.right & Ind.bottom;                
@@ -164,7 +202,11 @@ function IterationStepFullProblem(this,opts)
     end    
     function DisplayError(error)
         
-        if(Seppecher)
+        if(Seppecher_red)
+            PrintErrorPos(error(1),'zero density at interface');        
+            
+            error = error(2:end);        
+        elseif(Seppecher)
             PrintErrorPos(error(1),'consistent phase mass');
             PrintErrorPos(error(2),'consistent mass');
             PrintErrorPos(error(3),'zero density at interface');        

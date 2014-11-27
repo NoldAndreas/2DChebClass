@@ -1,4 +1,4 @@
-function FindAB(this)
+function vec_a = FindAB(this,theta)
     
     Ind     = this.IDC.Ind;
     M       = this.IDC.M;    
@@ -6,19 +6,22 @@ function FindAB(this)
     F       = false(M,1);
     ITT     = repmat(Ind.top,2,1);
     IBB     = repmat(Ind.bound,2,1);
+    PtsCart = this.IDC.GetCartPts();
     
-    deltaX  = 0;
-    theta   = 100*pi/180;
-    phi     = InitialGuessRho(this);
+    deltaX  = 0;                 
+    
+    phi     = InitialGuessRho(this,theta);
+    
+  
     G       = zeros(M,1);
     p       = zeros(M,1);
-    PtsCart = this.IDC.GetCartPts;
+    
         
   %  CheckHalfLineIntegral();
     
-    vec = fsolve(@f,[0;0])    
+    vec_a = fsolve(@f,[0;0])
         
-    uv(IBB)     = GetVelBC(this,zeros(2*M,1),a,deltaX,theta);
+    uv(IBB)     = GetVelBC(this,zeros(2*M,1),vec_a,deltaX,theta);
     uv_org(IBB) = GetVelBC(this,zeros(2*M,1),[0;0],deltaX,theta);
     
     plot(PtsCart.y1_kv(Ind.top),-uv([Ind.top;F]),'b'); hold on;
@@ -29,8 +32,8 @@ function FindAB(this)
     xlim([-40,40]);
     function v = f(x)
 
-        a        = x(1:2);        
-        uv_      = zeros(2*M,1);        
+        a       = x(1:2);        
+        uv_     = zeros(2*M,1);        
         
         uv_(IBB)   = GetVelBC(this,uv_,a,deltaX,theta);                
         v_SeppAdd  = GetSeppecherConditions(this,-uv_,phi,G,p,deltaX,theta);
