@@ -129,7 +129,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
  
             [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
 
-            % Three extra conditions [uv;phi;G,p]
+            % Three extra conditions 
+            % [uv;phi;G,p]
             % (EX 1) int((phi+rho_m)*u_y|_y2Max,y1=-infty..infty) = 2*y2Max        
             % Conservation of phase 1 matter
             A_a                = zeros(1,5*M);        
@@ -157,7 +158,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             A_deltaX_deltaX        = InterpMatchPos*(Diff.Dy1*phi);
             A_deltaX_theta         = -y2Max*(1/sin(theta))^2*InterpMatchPos*(Diff.Dy1*phi);
             A_deltaX               = [0,0,A_deltaX_deltaX,A_deltaX_theta,...
-                                      A_deltaX];    
+                                      A_deltaX];
             v_deltaX               = InterpMatchPos*phi;
 
             % (EX 3) mu(y1=-infty) = 0
@@ -166,13 +167,13 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
              %A_theta              = [0,0,0,A_theta];
              %v_theta              = G(lbC);
              
-             % A_theta              = zeros(1,5*M);
-%              A_theta([F;F;F;F;rbC]) = 1;
-%              A_theta              = [0,0,0,0,A_theta];
-%              v_theta              = p(rbC);
+              A_theta              = zeros(1,5*M);
+              A_theta([F;F;F;F;rbC]) = 1;
+              A_theta              = [0,0,0,0,A_theta];
+              v_theta              = p(rbC);
                    
-             A_theta = [0,0,0,1,zeros(1,5*M)];    
-             v_theta = theta - pi/2;
+          %   A_theta = [0,0,0,1,zeros(1,5*M)];    
+          %   v_theta = theta - pi/2;
 
              v_SeppAdd = [v_b;v_a;v_deltaX;v_theta];
              A_SeppAdd = [A_b;A_a;A_deltaX;A_theta];
@@ -276,7 +277,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             v_mom_IBB = v_mom(IBB);
        end
 
-       vec_a  = FindAB(this,theta)
+       vec_a  = FindAB(this)
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
@@ -345,7 +346,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,phi,G);
            A_mu = [A_mu,zeros(this.IDC.M)];
        end
-       function [v_G,A_G]       = Phasefield(this,uv,phi,G)
+       function [v_G,A_G]       = PhasefieldEq(this,uv,phi,G)
            
             m              = this.optsPhys.mobility;            
             Diff           = this.IDC.Diff;

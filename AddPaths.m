@@ -28,7 +28,7 @@ function AddPaths()
         disp('Unknown computer; using current directory to save data');
         dirData     = pwd;
         dirDDFT     = pwd;        
-    end        
+    end
     
     addpath(genpath(dirDDFT));        
     rmpath(genpath([pwd filesep 'NoClass']));       

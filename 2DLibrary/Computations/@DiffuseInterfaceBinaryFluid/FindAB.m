@@ -1,25 +1,42 @@
-function vec_a = FindAB(this,theta)
+function vec_a = FindAB(this)
     
     Ind     = this.IDC.Ind;
-    M       = this.IDC.M;    
-    T       = true(M,1);
-    F       = false(M,1);
-    ITT     = repmat(Ind.top,2,1);
+    M       = this.IDC.M;        
+    F       = false(M,1);    
     IBB     = repmat(Ind.bound,2,1);
-    PtsCart = this.IDC.GetCartPts();
+    PtsCart = this.IDC.GetCartPts();    
     
-    deltaX  = 0;                 
+    if(isempty(this.theta))
+        theta = pi/2;
+    else
+        theta = this.theta;
+    end
     
-    phi     = InitialGuessRho(this,theta);
+    if(isempty(this.phi))
+        phi     = InitialGuessRho(this,theta);        
+        G       = zeros(M,1);
+        p       = zeros(M,1);
+    else
+        phi = this.phi;
+        G   = this.mu;
+        p   = this.p;
+    end
     
-  
-    G       = zeros(M,1);
-    p       = zeros(M,1);
+    if(isempty(this.deltaX))       
+        deltaX  = 0;        
+    else
+        deltaX  = this.deltaX;
+    end
     
-        
+    if(~isempty(this.a))
+        a_ig    = this.a;
+    else
+        a_ig    = [0;0];
+    end            
+    
   %  CheckHalfLineIntegral();
     
-    vec_a = fsolve(@f,[0;0])
+    vec_a = fsolve(@f,a_ig)
         
     uv(IBB)     = GetVelBC(this,zeros(2*M,1),vec_a,deltaX,theta);
     uv_org(IBB) = GetVelBC(this,zeros(2*M,1),[0;0],deltaX,theta);
@@ -30,8 +47,8 @@ function vec_a = FindAB(this,theta)
     plot(PtsCart.y1_kv(Ind.top),-uv_org([Ind.top;F]),'b--'); hold on;
     plot(PtsCart.y1_kv(Ind.top),-uv_org([F;Ind.top]),'r--');
     xlim([-40,40]);
+    
     function v = f(x)
-
         a       = x(1:2);        
         uv_     = zeros(2*M,1);        
         

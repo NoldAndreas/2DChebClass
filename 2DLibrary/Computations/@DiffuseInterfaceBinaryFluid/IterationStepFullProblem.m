@@ -30,12 +30,21 @@ function IterationStepFullProblem(this,opts)
     end
     
     Seppecher     = IsSeppecher(this);    
-    Seppecher_red = true;
+    Seppecher_red = false;
     %solveSquare = true;
     
     if(Seppecher_red)               
         theta = this.optsPhys.theta; %100*pi/180;
-        a     = FindAB(this,theta);
+        this.theta = theta;
+        a     = FindAB(this);
+        in    = struct('initialGuess',GetInitialCondition(this,theta));
+        in.initialGuess = in.initialGuess([3,5:end]);
+    elseif(Seppecher)
+        in    = struct('initialGuess',GetInitialCondition(this));        
+        theta = in.initialGuess(4);
+        in.initialGuess = in.initialGuess([1:3,5:end]);
+    else
+        in = struct('initialGuess',GetInitialCondition(this));        
     end
         
     nParticles     = this.optsPhys.nParticles;            
@@ -49,12 +58,7 @@ function IterationStepFullProblem(this,opts)
     opts = struct('optsNum',this.optsNum,...
                   'optsPhys',this.optsPhys,...
                   'Comments',this.configName);              
-    
- 	in = struct('initialGuess',GetInitialCondition(this,theta));
-    
-    if(Seppecher_red)
-        in.initialGuess = in.initialGuess([3,5:end]);
-    end
+     	    
         
     [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
                     opts,in);
@@ -70,7 +74,8 @@ function IterationStepFullProblem(this,opts)
     elseif(Seppecher)
         this.a        = res.a;        
         this.deltaX   = res.deltaX;
-        this.theta    = res.theta;
+        this.theta    = theta;
+        %this.theta    = res.theta;
     end
     
     this.filename = Parameters.Filename;
@@ -117,10 +122,10 @@ function IterationStepFullProblem(this,opts)
         elseif(Seppecher)
             a      = z(1:2);
             deltaX = z(3);
-            theta  = z(4);
+            %theta  = z(4);
             disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
         
-            z      = z(5:end);
+            z      = z(4:end);
         else
             a = []; deltaX = []; theta = [];                    
         end
@@ -132,7 +137,7 @@ function IterationStepFullProblem(this,opts)
             
         [v_cont,A_cont] = Continuity(this,uv,phi,G,p);
         [v_mom,A_mom]   = Momentum(this,uv,phi,G,p);
-        [v_G,A_G]       = Phasefield(this,uv,phi,G);
+        [v_G,A_G]       = PhasefieldEq(this,uv,phi,G);
         [v_mu,A_mu]     = ChemicalPotential(this,phi,G);
        
         A_particles              = zeros(1,5*M);
@@ -150,13 +155,15 @@ function IterationStepFullProblem(this,opts)
             v_SeppAdd = v_SeppAdd(3);
             A_SeppAdd = A_SeppAdd(3,[3,5:end]);
         elseif(Seppecher)    
-            A_cont      = [zeros(M,4),A_cont];
-            A_mom       = [zeros(2*M,4),A_mom];
-            A_G         = [zeros(M,4),A_G];
-            A_mu        = [zeros(M,4),A_mu];
-            A_particles = [0,0,0,0,A_particles];
+            A_cont      = [zeros(M,3),A_cont];
+            A_mom       = [zeros(2*M,3),A_mom];
+            A_G         = [zeros(M,3),A_G];
+            A_mu        = [zeros(M,3),A_mu];
+            A_particles = [0,0,0,A_particles];
             
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
+            v_SeppAdd = v_SeppAdd(1:3);
+            A_SeppAdd = A_SeppAdd(1:3,[1:3,5:end]);
         end
         
         [v_mu(Ind.top|Ind.bottom),A_mu_BC] = GetPhiBC(this,phi,theta);          
@@ -168,9 +175,12 @@ function IterationStepFullProblem(this,opts)
             A_mom(IBB,:)               = A_mom_BC(:,[3,5:end]);
             A_G(Ind.bound,:)           = A_G_BC(:,[3,5:end]);
         else
-            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
-            A_mom(IBB,:)               = A_mom_BC;
-            A_G(Ind.bound,:)           = A_G_BC;
+            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[1:3,5:end]);
+            A_mom(IBB,:)               = A_mom_BC(:,[1:3,5:end]);
+            A_G(Ind.bound,:)           = A_G_BC(:,[1:3,5:end]);
+            %A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
+            %A_mom(IBB,:)               = A_mom_BC;
+            %A_G(Ind.bound,:)           = A_G_BC;
         end
         
         if(solveSquare)
@@ -210,9 +220,9 @@ function IterationStepFullProblem(this,opts)
             PrintErrorPos(error(1),'consistent phase mass');
             PrintErrorPos(error(2),'consistent mass');
             PrintErrorPos(error(3),'zero density at interface');        
-            PrintErrorPos(error(4),'chemical potential at -inf');
+            %PrintErrorPos(error(4),'chemical potential at -inf');
         
-            error = error(5:end);
+            error = error(4:end);
         end
         PrintErrorPos(error([F;F;F;F;T]),'continuity equation',this.IDC.Pts);
         PrintErrorPos(error([T;F;F;F;F]),'y1-momentum equation',this.IDC.Pts);
