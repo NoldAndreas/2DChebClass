@@ -1,4 +1,4 @@
-function vec_a = FindAB(this)
+function vec_a = FindAB(this,phi,mu,deltaX,a_ig)
     
     Ind     = this.IDC.Ind;
     M       = this.IDC.M;        
@@ -10,32 +10,36 @@ function vec_a = FindAB(this)
         theta = pi/2;
     else
         theta = this.theta;
-    end
-    
-    if(isempty(this.phi))
-        phi     = InitialGuessRho(this,theta);        
-        G       = zeros(M,1);
-        p       = zeros(M,1);
-    else
-        phi = this.phi;
-        G   = this.mu;
-        p   = this.p;
-    end
-    
-    if(isempty(this.deltaX))       
-        deltaX  = 0;        
-    else
-        deltaX  = this.deltaX;
-    end
-    
-    if(~isempty(this.a))
-        a_ig    = this.a;
-    else
-        a_ig    = [0;0];
     end            
     
-  %  CheckHalfLineIntegral();
+    if(nargin == 1)
+        if(isempty(this.phi))
+            phi     = InitialGuessRho(this,theta);                
+            mu       = zeros(M,1);
+            p       = zeros(M,1);
+        else
+            phi = this.phi;            
+            mu   = this.mu;
+            p   = this.p;
+        end
+
+        if(isempty(this.deltaX))       
+            deltaX  = 0;        
+        else
+            deltaX  = this.deltaX;
+        end
+
+        if(~isempty(this.a))
+            a_ig    = this.a;
+        else
+            a_ig    = [0;0];
+        end            
+    end
     
+  %  CheckHalfLineIntegral();
+    initialError = f(a_ig);
+    disp(['Initial value: ',num2str(a_ig(1)),',',num2str(a_ig(2)),'.']);
+    disp(['Initial error: ',num2str(initialError(1)),',',num2str(initialError(2)),'.']);
     vec_a = fsolve(@f,a_ig)
         
     uv(IBB)     = GetVelBC(this,zeros(2*M,1),vec_a,deltaX,theta);
@@ -53,7 +57,7 @@ function vec_a = FindAB(this)
         uv_     = zeros(2*M,1);        
         
         uv_(IBB)   = GetVelBC(this,uv_,a,deltaX,theta);                
-        v_SeppAdd  = GetSeppecherConditions(this,-uv_,phi,G,p,deltaX,theta);
+        v_SeppAdd  = GetSeppecherConditions(this,-uv_,phi,mu,zeros(M,1),deltaX,theta);
 
         v = v_SeppAdd(1:2);        
     end

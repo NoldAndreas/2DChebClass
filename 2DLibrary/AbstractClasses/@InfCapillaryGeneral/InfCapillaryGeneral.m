@@ -195,7 +195,7 @@ classdef (Abstract) InfCapillaryGeneral < SpectralSpectral & ConvolutionPointwis
         [X,checkSum] = InterpolateAndIntegratePtsOrigin(this,ptsOr,data,weights);       
         
         function do1DPlotNormal(this,V)
-            %doPlotFLine(this,[inf inf],[this.y2Min this.y2Max],rho);
+            %plotLine(this,[inf inf],[this.y2Min this.y2Max],rho);
             
             global PersonalUserOutput
             if(~PersonalUserOutput)

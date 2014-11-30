@@ -30,13 +30,14 @@ function IterationStepFullProblem(this,opts)
     end
     
     Seppecher     = IsSeppecher(this);    
-    Seppecher_red = false;
+    Seppecher_red = true;
     %solveSquare = true;
     
     if(Seppecher_red)               
         theta = this.optsPhys.theta; %100*pi/180;
         this.theta = theta;
-        a     = FindAB(this);
+       % a     = FindAB(this);
+        a = this.a;
         in    = struct('initialGuess',GetInitialCondition(this,theta));
         in.initialGuess = in.initialGuess([3,5:end]);
     elseif(Seppecher)
@@ -114,11 +115,12 @@ function IterationStepFullProblem(this,opts)
     end    
     function [v,A] = f(z)
         
+        
         %[uv;phi;G;p]       
         if(Seppecher_red)                        
             deltaX = z(1);            
             disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
-            z      = z(2:end);
+            z      = z(2:end);            
         elseif(Seppecher)
             a      = z(1:2);
             deltaX = z(3);
@@ -128,12 +130,16 @@ function IterationStepFullProblem(this,opts)
             z      = z(4:end);
         else
             a = []; deltaX = []; theta = [];                    
-        end
+        end                
 
         uv  = z([T;T;F;F;F]);
         phi = z([F;F;T;F;F]);
         G   = z([F;F;F;T;F]);
         p   = z([F;F;F;F;T]);               
+        
+        %if(Seppecher_red)
+%            a      = FindAB(this,phi,G,deltaX,a);
+%        end
             
         [v_cont,A_cont] = Continuity(this,uv,phi,G,p);
         [v_mom,A_mom]   = Momentum(this,uv,phi,G,p);

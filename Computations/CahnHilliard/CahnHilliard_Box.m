@@ -51,8 +51,8 @@ function CahnHilliard_Box()
 	saveas(gcf,['Capillary_',num2str(h),'.fig']);    
 
 	figure('color','white','Position',[0 0 600 600]);    
-    abox.doPlotFLine([PhysArea.y1Min PhysArea.y1Max],h/2*[1 1],rho,struct('color','b')); hold on;    
-    abox.doPlotFLine([PhysArea.y1Min PhysArea.y1Max],h/2*[1 1],p,struct('color','r')); hold on;        
+    abox.plotLine([PhysArea.y1Min PhysArea.y1Max],h/2*[1 1],rho,struct('color','b')); hold on;    
+    abox.plotLine([PhysArea.y1Min PhysArea.y1Max],h/2*[1 1],p,struct('color','r')); hold on;        
     xlabel('$y_1$','Interpreter','Latex','fontsize',20);
     ylabel('$\varrho,p-p_V$','Interpreter','Latex','fontsize',20);
     set(gca,'linewidth',1.5);

@@ -32,7 +32,7 @@ function CheckMeanfieldConvolution(this)
              title('Convolution of Barker-Henderson potential with rho=1');
              marky1Inf = (this.IDC.Pts.y1_kv == inf); 
              convOne   = this.IntMatrV2.Conv*ones(M,1);
-             this.IDC.doPlotFLine([0 0],[this.IDC.y2Min this.IDC.y2Max],convOne); hold on;
+             this.IDC.plotLine([0 0],[this.IDC.y2Min this.IDC.y2Max],convOne); hold on;
              
              %analytical comparison
              y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - this.IDC.y2Min;

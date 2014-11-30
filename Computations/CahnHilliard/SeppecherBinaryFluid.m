@@ -5,7 +5,7 @@ function SeppecherBinaryFluid()
     AddPaths();        
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
         
-    PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',10,...
+    PhysArea = struct('N',[60,50],'y2Min',0,'y2Max',10,...
                       'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
@@ -27,12 +27,24 @@ function SeppecherBinaryFluid()
     opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
     DI.IterationStepFullProblem(opts);    
     
+    opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
+	DI.IterationStepFullProblem(opts);    
+    
+    for i = 1:6
+        DI.a = DI.FindAB();
+    
+        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
+        DI.IterationStepFullProblem(opts);           
+        
+        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
+        DI.IterationStepFullProblem(opts);    
+    end    
     %opts = struct('noIterations',5,'lambda',0.8,'solveSquare',true);
     %DI.IterationStepFullProblem(opts);    
-	
+	%
     %opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
     %DI.IterationStepFullProblem(opts);    
-    
+    %
 	%opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
     %DI.IterationStepFullProblem(opts);    
     

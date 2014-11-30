@@ -523,7 +523,7 @@ classdef (Abstract) Shape < handle
                 I = w*f;
             end
         end        
-        function doPlotFLine(this,y1P,y2P,f,opts)
+        function plotLine(this,y1P,y2P,f,opts)
             
             plain = false;
             color = 'k';
