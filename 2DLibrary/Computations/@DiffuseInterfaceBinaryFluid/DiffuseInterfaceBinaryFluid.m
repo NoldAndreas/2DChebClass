@@ -195,6 +195,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             d_theta        = 0.01;            
             F              = false(M,1);   
             T              = true(M,1);   
+            Z              = zeros(M,1);
             
             
             u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
@@ -204,17 +205,17 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
             d = 4;
             
-            %f_a1  = (y1_Interface/d).*exp(-(y1_Interface/d).^2);
-            %fP_a1 = ((1-2/d*(y1_Interface.^2))/d).*exp(-(y1_Interface/d).^2);            
-            f_a1  = y1_Interface./(1+y1_Interface.^2);
-            fP_a1 = (1-y1_Interface.^2)./(1+y1_Interface.^2).^2;            
+            f_a1  = (y1_Interface/d).*exp(-(y1_Interface/d).^2);
+            fP_a1 = ((1-2/d*(y1_Interface.^2))/d).*exp(-(y1_Interface/d).^2);            
+            %f_a1  = y1_Interface./(1+y1_Interface.^2);
+            %fP_a1 = (1-y1_Interface.^2)./(1+y1_Interface.^2).^2;            
             f_a1(Ind.left | Ind.right) = 0;            
             fP_a1(Ind.left | Ind.right) = 0;
            
-            %f_a2  = exp(-(y1_Interface/d).^2);
-            %fP_a2 = -2*y1_Interface/d.*f_a2;
-            f_a2  = 1./(1+y1_Interface.^2);
-            fP_a2 = -2*y1_Interface./(1+y1_Interface.^2).^2;
+            f_a2  = exp(-(y1_Interface/d).^2);
+            fP_a2 = -2*y1_Interface/d.*f_a2;
+            %f_a2  = 1./(1+y1_Interface.^2);
+            %fP_a2 = -2*y1_Interface./(1+y1_Interface.^2).^2;
             fP_a2(Ind.left | Ind.right) = 0;
                        
             a1_corr        = a1*f_a1;   
@@ -230,17 +231,17 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                         
             corr = a1_corr + a2_corr; %1+
     
-            uvBound        = u_flow + repmat(corr,2,1);   
+            uvBound        = u_flow + [Z;corr];
 
-            uvBound_a1      = repmat(a1_corr_a1,2,1);     %u_flow.*
-            uvBound_a2      = repmat(a2_corr_a2,2,1);     %u_flow.*
+            uvBound_a1      = [Z;a1_corr_a1];     %u_flow.*
+            uvBound_a2      = [Z;a2_corr_a2];     %u_flow.*
             uvBound_deltaX = -(Dy12*u_flow)+...%.*repmat(corr,2,1)+...
-                               repmat(a1_corr_deltaX+a2_corr_deltaX,2,1); %u_flow .*
+                               [Z;a1_corr_deltaX+a2_corr_deltaX]; %u_flow .*
 
             u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
             u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
             uvBound_theta    = u_flow_d +... %repmat(corr,2,1)
-                               repmat(a1_corr_theta + a2_corr_theta,2,1);  %u_flow.*
+                               [Z;a1_corr_theta + a2_corr_theta];  %u_flow.*
 
             A_mom_ITT        = [-uvBound_a1,...
                                 -uvBound_a2,...
