@@ -29,16 +29,21 @@ function IterationStepFullProblem(this,opts)
         solveSquare = opts.solveSquare;
     end
     
-    Seppecher     = IsSeppecher(this);    
-    Seppecher_red = true;
+	if((nargin == 1) || ~isfield(opts,'Seppecher_red'))
+        Seppecher_red = false;
+    else
+        Seppecher_red = opts.Seppecher_red;
+    end
+    
+    Seppecher     = IsSeppecher(this);        
     %solveSquare = true;
     
     if(Seppecher_red)               
-        theta = this.optsPhys.theta; %100*pi/180;
+        theta      = this.optsPhys.theta; %100*pi/180;
         this.theta = theta;
        % a     = FindAB(this);
-        a = this.a;
-        in    = struct('initialGuess',GetInitialCondition(this,theta));
+        a          = this.a;
+        in         = struct('initialGuess',GetInitialCondition(this,theta));
         in.initialGuess = in.initialGuess([3,5:end]);
     elseif(Seppecher)
         in    = struct('initialGuess',GetInitialCondition(this));        
@@ -140,7 +145,7 @@ function IterationStepFullProblem(this,opts)
         %if(Seppecher_red)
 %            a      = FindAB(this,phi,G,deltaX,a);
 %        end
-            
+
         [v_cont,A_cont] = Continuity(this,uv,phi,G,p);
         [v_mom,A_mom]   = Momentum(this,uv,phi,G,p);
         [v_G,A_G]       = PhasefieldEq(this,uv,phi,G);
@@ -180,7 +185,7 @@ function IterationStepFullProblem(this,opts)
             A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[3,5:end]);
             A_mom(IBB,:)               = A_mom_BC(:,[3,5:end]);
             A_G(Ind.bound,:)           = A_G_BC(:,[3,5:end]);
-        else
+        elseif(Seppecher)
             A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[1:3,5:end]);
             A_mom(IBB,:)               = A_mom_BC(:,[1:3,5:end]);
             A_G(Ind.bound,:)           = A_G_BC(:,[1:3,5:end]);
