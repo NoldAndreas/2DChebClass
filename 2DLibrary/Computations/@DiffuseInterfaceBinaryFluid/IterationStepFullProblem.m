@@ -61,13 +61,11 @@ function IterationStepFullProblem(this,opts)
     IBB  = repmat(Ind.bound,2,1);      
     F    = false(M,1);   T       = true(M,1);        
     
-    opts = struct('optsNum',this.optsNum,...
-                  'optsPhys',this.optsPhys,...
-                  'Comments',this.configName);              
-     	    
-        
-    [res,~,Parameters] = DataStorage([],@SolveSingleFluid,...
-                    opts,in);
+    opts.optsNum    = this.optsNum;
+    opts.optsPhys   = this.optsPhys;
+    opts.configName = this.configName;    
+     	            
+    [res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,in,[],{'optsNum_SubArea','lambda','noIterations'});
 	   
     this.uv       = res.uv;
     this.mu       = res.mu;
@@ -189,9 +187,10 @@ function IterationStepFullProblem(this,opts)
             A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[1:3,5:end]);
             A_mom(IBB,:)               = A_mom_BC(:,[1:3,5:end]);
             A_G(Ind.bound,:)           = A_G_BC(:,[1:3,5:end]);
-            %A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
-            %A_mom(IBB,:)               = A_mom_BC;
-            %A_G(Ind.bound,:)           = A_G_BC;
+        else
+            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
+            A_mom(IBB,:)               = A_mom_BC;
+            A_G(Ind.bound,:)           = A_G_BC;
         end
         
         if(solveSquare)

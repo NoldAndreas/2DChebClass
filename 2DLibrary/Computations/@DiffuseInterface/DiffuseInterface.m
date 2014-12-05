@@ -35,22 +35,18 @@ classdef DiffuseInterface < Computation
                 this.optsNum.PlotArea.y2Max = this.optsNum.PhysArea.y2Max;
             end
         end       
-        function Preprocess(this)                        
-            this.IDC = InfCapillaryQuad(this.optsNum.PhysArea);    
+        function Preprocess(this)          
             
-            this.IDC.ComputeIndices();
-            this.IDC.ComputeDifferentiationMatrix();
-            this.IDC.ComputeIntegrationVector();
-            this.IDC.InterpolationPlot(this.optsNum.PlotArea,true);                          
+            this.optsNum.PhysArea.shape = 'InfCapillaryQuad';
+            Preprocess@Computation(this);                        
             
             Sel = {'Dy1' ;'DDy1' ; 'Dy2'; 'DDy2';...
-                   'DDDy2';'DDDy1';...
-                   'Dy1Dy2'; 'DDy1Dy2'; 'Dy1DDy2';...
-                   'Lap' ;'grad' ;'div'; ...
-                   'gradLap' ;'gradDiv'; 'LapVec';'LapDiv';'Lap2'};
+                    'DDDy2';'DDDy1';...
+                    'Dy1Dy2'; 'DDy1Dy2'; 'Dy1DDy2';...
+                    'Lap' ;'grad' ;'div'; ...
+                    'gradLap' ;'gradDiv'; 'LapVec';'LapDiv';'Lap2'};
             this.IDC.ComputeDifferentiationMatrix(Sel);
-                        
-            
+                                    
             this.IDC.SetUpBorders(this.optsNum.PhysArea.NBorder);            
             
             this.IDC.Ind.fluidInterface = [];
@@ -76,7 +72,6 @@ classdef DiffuseInterface < Computation
     
             this.RightCapillary  = HalfInfCapillary(Phys_Area);
             this.RightCapillary.SetUpBorders(100);    
-
         end       
         
         function sepp  = IsSeppecher(this)
@@ -213,7 +208,7 @@ classdef DiffuseInterface < Computation
             T              = true(M,1);   
             EYM            = eye(M);
             
-            u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
+            u_flow         = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...%_Blurred
                                                 PtsCart.y2_kv],1,0,0,theta);                  
                                             
             y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
@@ -405,11 +400,16 @@ classdef DiffuseInterface < Computation
         end        
         function PlotSeppecherSolution(this)                                                                 
             PlotU(this);            hold on;                               
-            y2Max = this.optsNum.PhysArea.y2Max;
+            y2Max   = this.optsNum.PhysArea.y2Max;
+            PtsCart = this.IDC.GetCartPts;
             plot([this.deltaX (this.deltaX+y2Max/tan(this.theta))],[0 y2Max],'k--','linewidth',2.5);
             
-            uSepp = GetSeppecherSolutionCart(this.IDC.GetCartPts,1,0,0,this.theta);
-            PlotU(this,uSepp,struct('color','m'));
+            %u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
+%                                                PtsCart.y2_kv],1,0,0,theta);                  
+                                    
+            uSepp = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - this.deltaX,...
+                                                PtsCart.y2_kv],1,0,0,this.theta);
+            PlotU(this,uSepp,struct('color','m','linewidth',2.5));
         end         
         function AddStreamlines(this)
             for i = 1:3

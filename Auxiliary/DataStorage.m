@@ -220,15 +220,13 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 %     end
 
     function s = RemoveIgnoreFromStruct(s,IgnoreList)
+        names = fieldnames(s);
         for j = 1:length(IgnoreList)
-            for k = 1:length(s)
-                
-            end
-            
-            if(isfield(s,IgnoreList{j}))
-                s = rmfield(s,IgnoreList{j});
-            
-            end
+            for k = 1:length(names)
+               if(~isempty(strfind(names{k},IgnoreList{j})))
+                    s = rmfield(s,names{k});              
+               end
+            end           
         end
     end
 

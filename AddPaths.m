@@ -38,7 +38,7 @@ function AddPaths()
     dirDataOrg = dirData;
     
     if(isempty(recomputeAll))
-        recomputeAll = true;
+        recomputeAll = false;
     end
     
 	if(isempty(loadAll))

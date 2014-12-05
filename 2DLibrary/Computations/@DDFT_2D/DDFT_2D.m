@@ -2,20 +2,18 @@ classdef DDFT_2D < Computation
     
     properties (Access = public)                    
         
-        subArea
+
         IntMatrV2  % integration matrix for mean field two-particle interactions
         IntMatrHI  % integration matrices for hydrodynamic interactions
         IntMatrFex % integration matrix for FMT (hard-sphere) interactions
-        Int_of_path
-        IP
-        
+               
         Vext,Vext_grad,VAdd
         
         x_eq,mu
         FilenameEq,FilenameDyn
         dynamicsResult
         
-        doHI,doHIWall,doSubArea,do2Phase
+        doHI,doHIWall,do2Phase
     end
     
     methods (Access = public)          
@@ -34,38 +32,10 @@ classdef DDFT_2D < Computation
         end        
         function Preprocess(this)
             
-            optsNum  = this.optsNum;
+            Preprocess@Computation(this);
+                        
             optsPhys = this.optsPhys;
-            
-            shape    = optsNum.PhysArea;
-            if(isfield(optsNum,'V2Num'))
-                shape.Conv = optsNum.V2Num;
-            else                
-                shape.Conv = [];
-            end
-
-            if(~isfield(this.optsPhys,'sigmaS') && isfield(this.optsPhys.V2,'sigmaS'))
-                this.optsPhys.sigmaS = this.optsPhys.V2.sigmaS;
-            end
-                
-            % Special Case: HalfSpace_FMT
-            if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT') || ...
-               strcmp(optsNum.PhysArea.shape,'InfCapillary_FMT'))
-                shape.R = this.optsPhys.sigmaS/2;
-            end
-            
-            % Construct main object for geometry IDC
-            shapeClass = str2func(optsNum.PhysArea.shape);
-            this.IDC   = shapeClass(shape);
-            if(isfield(optsNum,'PlotArea'))
-                this.IDC.ComputeAll(optsNum.PlotArea);             
-            elseif(isfield(optsNum,'PlotAreaCart'))
-                this.IDC.ComputeAll();
-                this.IDC.InterpolationPlotCart(optsNum.PlotAreaCart,true);
-            else
-                this.IDC.ComputeAll();
-            end
-            
+           
             % Determine hard-sphere contribution to bulk free energy
             if(~isfield(this.optsPhys,'HSBulk'))
                 if(isfield(this.optsNum,'FexNum'))
@@ -95,15 +65,12 @@ classdef DDFT_2D < Computation
                 % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
             end
-
            
-
             Preprocess_HardSphereContribution(this);
             Preprocess_MeanfieldContribution(this);
             Preprocess_HIContribution(this);           
-            Preprocess_ExternalPotential(this);                        
+            Preprocess_ExternalPotential(this);                                   
             Preprocess_SubArea(this);
-            
         end                
         function y0  = getInitialGuess(this,rho_ig)
             
@@ -264,27 +231,7 @@ classdef DDFT_2D < Computation
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
         end
-        function Preprocess_SubArea(this)
-            
-            optsNum  = this.optsNum;
-            optsPhys = this.optsPhys;
-
-            this.doSubArea = isfield(optsNum,'SubArea');
-
-            if(this.doSubArea)    
-                subshapeClass = str2func(optsNum.SubArea.shape);
-                this.subArea       = subshapeClass(optsNum.SubArea);
-                
-                plotSubShape   = optsNum.SubArea;
-                plotSubShape.N = [80,80];
-                this.subArea.ComputeAll(plotSubShape); 
-                
-                this.IP            = this.IDC.SubShapePtsCart(this.subArea.GetCartPts());
-                this.Int_of_path   = this.subArea.IntFluxThroughDomain(100)*blkdiag(this.IP,this.IP);
-            else
-                this.Int_of_path   =  zeros(1,2*this.IDC.M);
-            end
-        end        
+  
         
         function PlotDynamics(this,rec)
             if(nargin == 1)

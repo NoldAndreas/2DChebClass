@@ -421,6 +421,16 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            title('$\Delta v$','Interpreter','Latex','fontsize',15);
            
        end
+       
+       function PostProcess_Flux(this)
+           Diff = this.IDC.Diff;
+           m    = this.optsPhys.mobility;
+           uv   = this.uv;
+           
+           flux = repmat(this.phi,2,1).*uv - m*Diff.grad*this.mu;
+           disp(['Error of flux through subArea: ',num2str(this.Int_of_path*uv)]);
+           disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*flux)]);
+       end
       
    end
 end
