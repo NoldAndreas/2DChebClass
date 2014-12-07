@@ -385,7 +385,7 @@ classdef DiffuseInterface < Computation
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
             
-            PlotU(this); hold on;             
+       %     PlotU(this); hold on;             
             this.IDC.plot(this.phi,'contour');     
                         
             hold on;
@@ -393,13 +393,13 @@ classdef DiffuseInterface < Computation
                 plot(this.IsolineInterfaceY2,this.IDC.Pts.y2,...
                                                     'k','linewidth',3);
             end
-            if(IsSeppecher(this))
-                PlotSeppecherSolution(this);
-            end
+      %      if(IsSeppecher(this))
+%                PlotSeppecherSolution(this);
+%            end
             SaveCurrentFigure(this,[this.filename '_Density']);            
         end        
         function PlotSeppecherSolution(this)                                                                 
-            PlotU(this);            hold on;                               
+           % PlotU(this);            hold on;                               
             y2Max   = this.optsNum.PhysArea.y2Max;
             PtsCart = this.IDC.GetCartPts;
             plot([this.deltaX (this.deltaX+y2Max/tan(this.theta))],[0 y2Max],'k--','linewidth',2.5);
@@ -411,10 +411,13 @@ classdef DiffuseInterface < Computation
                                                 PtsCart.y2_kv],1,0,0,this.theta);
             PlotU(this,uSepp,struct('color','m','linewidth',2.5));
         end         
-        function AddStreamlines(this)
+        function AddStreamlines(this,uv)
+            if(nargin == 1)
+                uv = this.uv;
+            end
             for i = 1:3
                 [y10,y20] = ginput(1);   
-                this.IDC.doPlotsStreamlines(this.uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
+                this.IDC.doPlotsStreamlines(uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
             end
         end
         function PlotU(this,uv,y1Pts,y2Pts,opts) 

@@ -390,7 +390,32 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                      this.optsNum.PlotArea.y2Max-0.5];
             
             PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
-        end       
+       end       
+       function PlotComponentVelocities(this)
+           uv       = this.uv;
+           mu       = this.mu;
+           phi      = repmat(this.phi,2,1);
+           
+           m        = this.optsPhys.mobility;
+           Diff     = this.IDC.Diff;
+           
+           flux     = m*(Diff.grad*mu);
+           
+           uv_1 = uv - flux./(1+phi);
+           uv_2 = uv + flux./(1-phi);
+                       
+           opts = struct('color','g','linewidth',2.5);
+          % PlotU(this,flux,struct('color','m','linewidth',2.5));
+          subplot(2,1,1);
+           PlotResultsPhi(this);   
+           PlotU(this,uv_1,opts);
+           
+           subplot(2,1,2);
+           PlotResultsPhi(this);   
+%           AddStreamlines(this,uv_1);           
+%           AddStreamlines(this,uv_2);
+           PlotU(this,uv_2.*(1-phi),opts);                      
+       end
        function CheckResultResolution(this)
            figure('Position',[0 0 1000 1000],'color','white');
            
