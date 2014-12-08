@@ -417,7 +417,7 @@ classdef DiffuseInterface < Computation
             end
             for i = 1:3
                 [y10,y20] = ginput(1);   
-                this.IDC.doPlotsStreamlines(uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
+                this.IDC.plotStreamlines(uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
             end
         end
         function PlotU(this,uv,y1Pts,y2Pts,opts) 
@@ -450,9 +450,9 @@ classdef DiffuseInterface < Computation
             end
             
             if((nargin >= 5))
-                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
+                this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
             else
-                this.IDC.doPlotsStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
+                this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
             end
             hold on;
             this.IDC.plotFlux(uv);

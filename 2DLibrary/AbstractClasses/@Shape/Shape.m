@@ -174,7 +174,7 @@ classdef (Abstract) Shape < handle
                 IP = ComputeInterpolationMatrix(this,y1Plot,y2Plot,true,false);           
             end
         end                   
-        function doPlotsStreamlines(this,flux,startMask,startMask2,opts)
+        function plotStreamlines(this,flux,startMask1,startMask2,opts)
             mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
                                (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
                                (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
@@ -191,17 +191,31 @@ classdef (Abstract) Shape < handle
             y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
             y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);                               
             
-            if(nargin < 4)
+            if((nargin == 2) || isempty(startMask1))
+                startMask1 = this.Ind.bound;           
+                startMask2 = this.Ind.bound;
+            elseif((nargin == 3) || isempty(startMask2))
+                startMask2 = startMask1;
+            end
+            
+            if(islogical(startMask1))
                 h = streamline(y1M,y2M,fl_y1,fl_y2,...
-                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
+                       PtsYCart.y1_kv(mask&startMask1),...
+                       PtsYCart.y2_kv(mask&startMask2));
+            else
+                 h = streamline(y1M,y2M,fl_y1,fl_y2,startMask1,startMask2);                                       
+            end
 %                hold on;
 %                streamline(y1M,y2M,-fl_y1,-fl_y2,...
 %                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
-            else
-                h = streamline(y1M,y2M,fl_y1,fl_y2,startMask,startMask2);                                       
-            end
+%            else
+%               
+%            end
             if((nargin >= 5) && isfield(opts,'color'))
                 set(h,'color',opts.color);
+            end
+            if((nargin >= 5) && isfield(opts,'linewidth'))
+                set(h,'linewidth',opts.linewidth);
             end
         end        
         function plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)

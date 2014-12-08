@@ -22,7 +22,7 @@ optsPhys = struct('thetaEq',pi/2,...
 
 config = v2struct(optsPhys,optsNum);   
 
-opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true,'Seppecher_red',true);
+opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true,'Seppecher_red',1);
 
 DI = DiffuseInterfaceBinaryFluid(config);
 DI.Preprocess();
@@ -30,7 +30,11 @@ DI.Preprocess();
 DI.a = [0;0];
 DI.IterationStepFullProblem(opts);    
 
-opts.solveSquare = false;
+opts.Seppecher_red = 2;
+opts.lambda        = 0.6;
+DI.IterationStepFullProblem(opts);    
+
+opts.solveSquare   = false;
 DI.IterationStepFullProblem(opts);    
 
 DI.optsNum.SubArea = SubArea;

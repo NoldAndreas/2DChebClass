@@ -13,6 +13,6 @@ function PlotIntermediateRegionStokes
     [u,Psi,p] =  GetHuhScriven_Solution(Cart2PolPts(IC.GetCartPts),pi/2);
 
     figure; IC.plotFlux(u);
-    figure; IC.doPlotsStreamlines(u,IC.Ind.finite)
+    figure; IC.plotStreamlines(u,IC.Ind.finite)
     figure; IC.plot(p);
 end

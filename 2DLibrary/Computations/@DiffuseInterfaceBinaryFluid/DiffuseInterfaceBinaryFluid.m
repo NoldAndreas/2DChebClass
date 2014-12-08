@@ -392,6 +392,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
        end       
        function PlotComponentVelocities(this)
+           
            uv       = this.uv;
            mu       = this.mu;
            phi      = repmat(this.phi,2,1);
@@ -401,20 +402,54 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
            flux     = m*(Diff.grad*mu);
            
+           n      = 20;
+           y2Min  = this.optsNum.PhysArea.y2Min;
+            y2Max = this.optsNum.PhysArea.y2Max;
+            
+            y1Min = this.optsNum.PlotArea.y1Min;
+            y1Max = this.optsNum.PlotArea.y1Max;
+                        
+            y2L = y2Min + (y2Max-y2Min)*(0:n-1)'/(n-1);            
+            y1L = y1Min + (y1Max-y1Min)*(0:n-1)'/(n-1);            
+            
+            startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
+                         y1Min*ones(size(y2L))+0.1;...
+                         y1L];
+            startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
+           
            uv_1 = uv - flux./(1+phi);
            uv_2 = uv + flux./(1-phi);
-                       
-           opts = struct('color','g','linewidth',2.5);
-          % PlotU(this,flux,struct('color','m','linewidth',2.5));
-          subplot(2,1,1);
-           PlotResultsPhi(this);   
-           PlotU(this,uv_1,opts);
            
-           subplot(2,1,2);
-           PlotResultsPhi(this);   
-%           AddStreamlines(this,uv_1);           
+           PlotRightArea  = struct('N',[40,40],...
+                                   'y1Min',0,'y1Max',10,...
+                                   'y2Min',0,'y2Max',this.IDC.y2Max);   	
+                       
+           bxRight        = Box(PlotRightArea);    
+           PlotRightArea.N1 = 90;
+           PlotRightArea.N2 = 90;
+           bxRight.ComputeIndices();
+           bxRight.InterpolationPlotCart(PlotRightArea,true);     
+           IPRight        = this.IDC.SubShapePtsCart(bxRight.GetCartPts());
+           IPR2           = blkdiag(IPRight,IPRight);
+           
+           uv_1_Right     = IPR2*uv - (IPR2*flux)./(1+IPR2*phi);
+           
+           figure('color','white','Position',[0 0 1000 1000]);
+           opts = struct('color','g','linewidth',2.5);
+           bxRight.plotStreamlines(uv_1_Right,startPtsy1,startPtsy2,opts); hold on;
+           bxRight.plotFlux(uv_1_Right); hold on;
+           this.IDC.plot(this.phi,'contour');        hold on;                                      
+ %          PlotU(this);
+          % PlotU(this,flux,struct('color','m','linewidth',2.5));
+           
+           
+           
+           
+          % subplot(2,1,2);
+%           this.IDC.plot(this.phi,'contour');                
+%%           AddStreamlines(this,uv_1);           
 %           AddStreamlines(this,uv_2);
-           PlotU(this,uv_2.*(1-phi),opts);                      
+%           PlotU(this,uv_2,opts);                      
        end
        function CheckResultResolution(this)
            figure('Position',[0 0 1000 1000],'color','white');
@@ -446,7 +481,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            title('$\Delta v$','Interpreter','Latex','fontsize',15);
            
        end
-       
        function PostProcess_Flux(this)
            Diff = this.IDC.Diff;
            m    = this.optsPhys.mobility;
