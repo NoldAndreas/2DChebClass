@@ -23,44 +23,50 @@ function IterationStepFullProblem(this,opts)
         lambda = opts.lambda;
     end
     
-	if((nargin == 1) || ~isfield(opts,'solveSquare'))
-        solveSquare = true;
-    else
-        solveSquare = opts.solveSquare;
-    end
-    
-	if((nargin == 1) || ~isfield(opts,'Seppecher_red'))
-        Seppecher_red = 0;
-    else
-        Seppecher_red = opts.Seppecher_red;
-    end
-    
+    solveSquare   = [];
+%    Seppecher_red = [];
+%     
+% 	if((nargin == 1) || ~isfield(opts,'solveSquare'))
+%         solveSquare = true;
+%     else
+%         solveSquare = opts.solveSquare;
+%     end
+%     
+ 	if((nargin == 1) || ~isfield(opts,'Seppecher_red'))
+         Seppecher_red = 0;
+     else
+         Seppecher_red = opts.Seppecher_red;
+     end
+     
     Seppecher     = IsSeppecher(this);        
     %solveSquare = true;
     
-    if(isempty(this.theta))
+    if(isfield(this.optsPhys,'theta'))
         theta = this.optsPhys.theta; %100*pi/180;]
-    else
+    elseif(~isempty(this.theta))
         theta = this.theta;
+    else
+        theta = pi/2;
     end
     
-    if(Seppecher_red == 1)                       
-       % a     = FindAB(this);
-        a          = this.a;
-        in         = struct('initialGuess',GetInitialCondition(this,theta));
-        in.initialGuess = in.initialGuess([3,5:end]);
-    elseif(Seppecher_red == 2)        
-       % a     = FindAB(this);
-        a          = this.a;
-        in         = struct('initialGuess',GetInitialCondition(this,theta));
-        in.initialGuess = in.initialGuess([3:end]);
-    elseif(Seppecher)
-        in    = struct('initialGuess',GetInitialCondition(this));        
-        theta = in.initialGuess(4);
-        in.initialGuess = in.initialGuess([1:3,5:end]);
-    else
-        in = struct('initialGuess',GetInitialCondition(this));        
-    end
+    if(Seppecher)            
+        a      = [0;0];
+        this.a = a;          
+	end
+    
+     if(Seppecher_red == 1)
+         iGuess          = GetInitialCondition(this,theta);
+         in.initialGuess = iGuess([3,5:end]);
+     elseif(Seppecher_red == 2)        
+%        % a     = FindAB(this);     
+         iGuess          = GetInitialCondition(this,theta);
+         in.initialGuess = iGuess([3:end]);
+     elseif(Seppecher)
+         iGuess          = GetInitialCondition(this,theta);
+         in.initialGuess = iGuess([1:3,5:end]);
+     else
+         in = struct('initialGuess',GetInitialCondition(this));        
+     end
         
     nParticles     = this.optsPhys.nParticles;            
     M              = this.IDC.M;  
@@ -74,7 +80,7 @@ function IterationStepFullProblem(this,opts)
     opts.optsPhys   = this.optsPhys;
     opts.configName = this.configName;    
      	            
-    [res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,in,[],{'optsNum_SubArea','noIterations'});
+	[res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,in,[],{'optsNum_SubArea','noIterations'});    
 	   
     this.uv       = res.uv;
     this.mu       = res.mu;
@@ -98,19 +104,16 @@ function IterationStepFullProblem(this,opts)
     this.filename = Parameters.Filename;
     this.errors.errorIterations = res.errorHistory;        
         
-    function res = SolveSingleFluid(conf,in)
-        
-        vec = in.initialGuess;
-        %solveSquare = true;
-        if(solveSquare)
-            [vec,errHistory] = NewtonMethod(vec,@f,1e-6,noIterations,lambda);    
-        else        
-            %solveSquare = false;
-            optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');
-            vec = fsolve(@f,vec,optsFS);    
-            errHistory = [];
-        end
-    
+    function res = SolveSingleFluid(conf,otherInput)                
+                
+        %solveSquare = true;        
+            
+        solveSquare      = true;
+        [vec,errHistory] = NewtonMethod(in.initialGuess,@f,1e-6,noIterations,lambda);
+
+        solveSquare = false;
+        optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');
+        vec = fsolve(@f,vec,optsFS);                    
         
         %[uv;phi;mu] 
         if(Seppecher_red == 1)
@@ -134,18 +137,17 @@ function IterationStepFullProblem(this,opts)
         res.errorHistory = errHistory;
     end    
     function [v,A] = f(z)
-        
-        
+                
         %[uv;phi;G;p]       
         if(Seppecher_red == 1)                        
             deltaX = z(1);            
-            disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
+            disp(['[deltaX,theta] = ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
             z      = z(2:end);            
         elseif(Seppecher_red == 2)
             deltaX = z(1);
             theta  = z(2);
-            disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
-            z      = z(3:end);            
+            disp(['[deltaX,theta] = ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
+            z      = z(3:end);                        
         elseif(Seppecher)
             a      = z(1:2);
             deltaX = z(3);

@@ -297,7 +297,9 @@ classdef (Abstract) Shape < handle
                     h = xlabel('$y_1$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
                     h = ylabel('$y_2$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
                     pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                
-                    title(['Species ' num2str(iSpecies)]);
+                    if(nSpecies > 1)
+                        title(['Species ' num2str(iSpecies)]);
+                    end
                     set(gca,'fontsize',20);                        
                     set(gca,'linewidth',1.5);                                                             
                 end

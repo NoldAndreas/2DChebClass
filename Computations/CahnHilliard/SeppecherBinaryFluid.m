@@ -14,7 +14,7 @@ SubArea  = struct('shape','Box','N',[60,60],...
 optsNum  = v2struct(PhysArea,PlotArea);                   	
 
 optsPhys = struct('thetaEq',pi/2,...       
-                   'theta',100*pi/180,...
+                   'theta',90*pi/180,...
                    'Cak',0.01,'Cn',1,...
                    'UWall',1,...                       
                    'mobility',10,...
@@ -22,20 +22,23 @@ optsPhys = struct('thetaEq',pi/2,...
 
 config = v2struct(optsPhys,optsNum);   
 
-opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true,'Seppecher_red',1);
+opts = struct('noIterations',20,'lambda',0.8,'Seppecher_red',1);
 
 DI = DiffuseInterfaceBinaryFluid(config);
 DI.Preprocess();
 
-DI.a = [0;0];
 DI.IterationStepFullProblem(opts);    
 
-opts.Seppecher_red = 2;
-opts.lambda        = 0.6;
-DI.IterationStepFullProblem(opts);    
-
-opts.solveSquare   = false;
-DI.IterationStepFullProblem(opts);    
+ opts.Seppecher_red = 2;
+ opts.lambda        = 0.6;
+for m = 10:10:100
+    DI.optsPhys.mobility = m;
+    DI.IterationStepFullProblem(opts);    
+    DI.PlotResults();	  
+end
+% 
+% opts.solveSquare   = false;
+% DI.IterationStepFullProblem(opts);    
 
 DI.optsNum.SubArea = SubArea;
 DI.Preprocess_SubArea();
@@ -43,5 +46,5 @@ DI.PostProcess_Flux;
 DI.IDC.SetUpBorders([30,1000,30,200]);
 DI.FindAB();
 
-DI.FindStagnationPoint();
+%DI.FindStagnationPoint();
 DI.PlotResults();	               

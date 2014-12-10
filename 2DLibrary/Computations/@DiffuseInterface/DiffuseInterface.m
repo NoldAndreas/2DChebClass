@@ -100,7 +100,6 @@ classdef DiffuseInterface < Computation
                     vec = [this.a;this.deltaX;this.theta;vec];
                 end
             end
-
              
          end
         function phi = InitialGuessRho(this,theta)
@@ -471,19 +470,25 @@ classdef DiffuseInterface < Computation
             
             Diff    = barychebdiff(y2,1);
             thetaY2 = pi/2 + atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
-            
-            A = -0.34; k = 0.2; 
-            analytic_BriantYeomans = A* (-(1+exp(-k*L)) + (exp(-k*y2) + exp(-k*(L-y2))));            
-            
+                        
             %maxthetaY2 = max(ab
             
             figure('color','white','Position',[0 0 800 800]);
             
-            plot(y2,cos(thetaY2),'k','linewidth',2); hold on;
-            plot(y2,analytic_BriantYeomans,'k--','linewidth',2);
             
-            xlabel('$y_2$','Interpreter','Latex','fontsize',20);
-            ylabel('$cos(\theta)$','Interpreter','Latex','fontsize',20);
+            if(IsSeppecher(this))                
+                plot(y2,thetaY2*180/pi,'ok','linewidth',2); hold on;
+                ylabel('$\theta$','Interpreter','Latex','fontsize',20);
+            else
+                A = -0.34; k = 0.2; 
+	            analytic_BriantYeomans = A* (-(1+exp(-k*L)) + (exp(-k*y2) + exp(-k*(L-y2))));            
+
+                plot(y2,cos(thetaY2),'k','linewidth',2); hold on;
+                plot(y2,analytic_BriantYeomans,'k--','linewidth',2);
+                ylabel('$\cos(\theta)$','Interpreter','Latex','fontsize',20);
+            end
+            
+            xlabel('$y_2$','Interpreter','Latex','fontsize',20);            
         end
         function PlotResults(this)                                            
             PlotResultsPhi(this);                       
