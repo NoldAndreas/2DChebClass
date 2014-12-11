@@ -698,6 +698,8 @@ classdef Tree < ClassGroup
             system(eps2pdfCmd);
             this.saveFile = saveFilePDF;
             
+            disp(['UML diagram saved in ',saveFilePDF,'/.eps']);
+            
         end
 
         %------------------------------------------------------------------

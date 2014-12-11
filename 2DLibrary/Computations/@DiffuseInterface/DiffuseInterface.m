@@ -489,11 +489,17 @@ classdef DiffuseInterface < Computation
             end
             
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);            
+                        
+            SaveCurrentFigure(this,[this.filename '_InterfaceSlope']);           
+            
         end
         function PlotResults(this)                                            
             PlotResultsPhi(this);                       
             PlotResultsMu(this);
-            PlotErrorIterations(this);        
+            PlotErrorIterations(this);     
+            
+            ComputeInterfaceContour(this);
+            PlotInterfaceAnalysis(this);
         end        
         function PlotErrorIterations(this)           
             disp('*** Results ***');
