@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionWedge_Case1()
+function [EX,res] = DDFT_DiffusionWedge_Case1()
     %Numerical Parameters    
     Phys_Area = struct('shape','Wedge','N',[40,30],...
                        'y1Min',0,'y1Max',6,'L1',2,...
@@ -28,6 +28,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionWedge_Case1()
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,'nParticlesS',50);
 
-	DDFTDynamics(optsPhys,optsNum);
+    
+	[EX,res] = DDFTDynamics(optsPhys,optsNum);
 
 end

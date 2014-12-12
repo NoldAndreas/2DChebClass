@@ -233,7 +233,7 @@ classdef DDFT_2D < Computation
         end
   
         
-        function PlotDynamics(this,rec)
+        function fig_h = PlotDynamics(this,rec)
             if(nargin == 1)
                 rec = false;
             end                                                
@@ -244,7 +244,7 @@ classdef DDFT_2D < Computation
             plotData.filename = this.FilenameDyn;
 
             figure('Position',[0 0 1000 1000]);
-            PlotDDFT(plotData,rec);
+            fig_h = PlotDDFT(plotData,rec);
         end            
         function ResetTemperature(this,T)
             if(nargin > 1)

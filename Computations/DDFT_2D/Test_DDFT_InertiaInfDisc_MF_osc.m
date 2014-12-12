@@ -1,4 +1,4 @@
-function EX = Test_DDFT_InertiaInfDisc_MF_osc(inertial)
+function [EX,res] = Test_DDFT_InertiaInfDisc_MF_osc(inertial)
 
     if(nargin==0)
         inertial = true;
@@ -37,6 +37,6 @@ function EX = Test_DDFT_InertiaInfDisc_MF_osc(inertial)
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
       
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 end                 
 

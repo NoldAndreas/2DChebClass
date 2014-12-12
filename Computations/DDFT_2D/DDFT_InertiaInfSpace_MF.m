@@ -1,4 +1,4 @@
-function EX = Test_DDFT_InertiaInfSpace_MF()
+function [EX,res] = DDFT_InertiaInfSpace_MF()
 
     Phys_Area = struct('shape','InfSpace','N',[20;20], ...
                        'y1Min',-inf,'y1Max',inf,'L1',4,...
@@ -32,6 +32,6 @@ function EX = Test_DDFT_InertiaInfSpace_MF()
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
       
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 end                 
 

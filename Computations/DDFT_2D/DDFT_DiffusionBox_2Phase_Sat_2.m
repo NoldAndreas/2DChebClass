@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_Sat_2()
+function [config,res] = DDFT_DiffusionBox_2Phase_Sat_2()
     
     Phys_Area = struct('shape','Box','N',[30,40],...
                        'y1Min',0,'y1Max',10,...
@@ -28,12 +28,14 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_Sat_2()
     optsPhys = struct('V1',V1,'V2',V2,...
                       'HSBulk','CarnahanStarling',...
                       'kBT',0.7,'Dmu',0);
+
+    config = v2struct(optsPhys,optsNum);
     
     AddPaths();
-    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX     = DDFT_2D(config);
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();    
-    EX.PlotDynamics();
+    res.fig_handles = EX.PlotDynamics();
 end                 
 

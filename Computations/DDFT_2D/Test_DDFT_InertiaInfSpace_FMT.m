@@ -1,4 +1,4 @@
-function EX = Test_DDFT_InertiaInfSpace_FMT(doHI)
+function [EX,res] = Test_DDFT_InertiaInfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -47,7 +47,7 @@ function EX = Test_DDFT_InertiaInfSpace_FMT(doHI)
                   
     optsPlot.doDDFTPlots=true;
     
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 
 end                 
 

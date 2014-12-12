@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionPolarDisk()        
+function [EX,res] = DDFT_DiffusionPolarDisk()        
 
     Phys_Area = struct('shape','Disc','N',[20,20],'R',2);
 
@@ -29,7 +29,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionPolarDisk()
     optsPlot.doDDFTPlots = true;    
     
     AddPaths();
-    DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
    
 end
     

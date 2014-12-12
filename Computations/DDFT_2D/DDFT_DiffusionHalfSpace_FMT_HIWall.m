@@ -1,4 +1,4 @@
-function EX = DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
+function [EX,res] = DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
 
     if(nargin<1)
         doHI     = false;
@@ -54,7 +54,7 @@ function EX = DDFT_DiffusionHalfSpace_FMT_HIWall(doHI,doHIWall)
                   
     optsPlot.doDDFTPlots=true;
 
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
     
 end                 
 

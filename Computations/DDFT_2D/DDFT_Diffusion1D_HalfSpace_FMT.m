@@ -1,4 +1,4 @@
-function EX = Test_DDFT_Diffusion1D_HalfSpace_FMT(doHI)
+function [EX,res] = DDFT_Diffusion1D_HalfSpace_FMT(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -44,5 +44,6 @@ function EX = Test_DDFT_Diffusion1D_HalfSpace_FMT(doHI)
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     
     EX.IDC.plot(EX.GetRhoEq);
+    res.fig_handles{1} = gcf;
     
 end                 

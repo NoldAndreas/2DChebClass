@@ -1,4 +1,4 @@
-  function CheckFMTComputation()
+  function [EX,res] = CheckFMTComputation()
 
     disp('** CheckFMTComputationSkewed **');
     
@@ -37,5 +37,5 @@
     CheckAverageDensities_Rosenfeld_3D(EX.IDC,EX.IntMatrFex);
 	optsPhys.rho_iguess = optsPhys.eta*6/pi;
     FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
-    
+    res.fig_handles{1} = gcf; 
 end

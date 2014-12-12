@@ -1,4 +1,4 @@
-function DDFT_DiffusionWedgeInfinity_Case1()
+function [EX,res] = DDFT_DiffusionWedgeInfinity_Case1()
     
     Phys_Area = struct('shape','InfWedge','N',[30,20],...
                        'R_in',1,'LR',2,...
@@ -30,6 +30,5 @@ function DDFT_DiffusionWedgeInfinity_Case1()
                      'kBT',0.7,...                     
                      'nParticlesS',50);
                  
-    DDFTDynamics(optsPhys,optsNum);
-                 
+    [EX,res] = DDFTDynamics(optsPhys,optsNum);                 
 end

@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_Sat_1()
+function [config,res] = DDFT_DiffusionBox_2Phase_Sat_1()
     
     Phys_Area = struct('shape','Box','N',[20,30],...
                        'y1Min',0,'y1Max',10,...
@@ -38,6 +38,6 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_Sat_1()
     EX.ComputeEquilibrium(EX.optsPhys.rhoLiq_sat);
     EX.IDC.plot(EX.GetRhoEq)    
     EX.ComputeDynamics();    
-    EX.PlotDynamics();
+    res.fig_handles = EX.PlotDynamics();
 end                 
 

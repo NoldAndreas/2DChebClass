@@ -1,4 +1,4 @@
-function DDFT_InfiniteCapillary_LDA_Case1()
+function [EX,res] = DDFT_InfiniteCapillary_LDA_Case1()
     %Numerical Parameters    
     Phys_Area = struct('shape','InfCapillary',...
                        'y1Min',-inf,'y1Max',inf,'L1',3,'N',[20;20],...
@@ -26,6 +26,6 @@ function DDFT_InfiniteCapillary_LDA_Case1()
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,'nParticlesS',50);
     
-	DDFTDynamics(optsPhys,optsNum);
+	[EX,res] = DDFTDynamics(optsPhys,optsNum);
 
 end       

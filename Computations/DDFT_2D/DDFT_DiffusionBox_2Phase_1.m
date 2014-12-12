@@ -1,5 +1,5 @@
                  
-function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_1()
+function [config,res] = DDFT_DiffusionBox_2Phase_1()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','Box','N',[25,25],...
@@ -39,6 +39,6 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Phase_1()
     EX.Preprocess();
     EX.ComputeEquilibrium( EX.optsPhys.rhoGas_sat);
     EX.ComputeDynamics();    
-    EX.PlotDynamics();
+    res.fig_handles = EX.PlotDynamics();
 
 end                 

@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionInfCapillary_MF()
+function [EX,res] = DDFT_DiffusionInfCapillary_MF()
 
     Phys_Area = struct('shape','InfCapillary','y1Min',-inf,'y1Max',inf,'L1',3,'N',[30;20],...
                        'y2Min',-2,'y2Max',2);
@@ -26,6 +26,6 @@ function EX = Test_DDFT_DiffusionInfCapillary_MF()
                  
     optsPlot.doDDFTPlots=true;
 
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 
 end       

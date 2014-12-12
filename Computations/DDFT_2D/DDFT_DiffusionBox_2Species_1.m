@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionBox_2Species_1()
+function [config,res] = DDFT_DiffusionBox_2Species_1()
 
  
     Phys_Area    = struct('shape','Box','N',[30,30],...
@@ -49,9 +49,7 @@ function [optsNum,optsPhys] = DDFT_DiffusionBox_2Species_1()
     EX.Preprocess();
     EX.ComputeEquilibrium(0.5);%EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();           
-    EX.PlotDynamics();    
+    res.fig_handles = EX.PlotDynamics();    
     
-    
-
 end                 
 

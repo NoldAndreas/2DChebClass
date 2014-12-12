@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DFT_EqInfCapillary_Slit()
+function [EX,res] = DFT_EqInfCapillary_Slit()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','InfCapillary','N',[25,20],...
@@ -33,5 +33,6 @@ function [optsNum,optsPhys] = DFT_EqInfCapillary_Slit()
     
     EX.ComputeEquilibrium(rhoIG);
     EX.IDC.plot(EX.GetRhoEq());
+    res.fig_handles{1} = gcf;
 end                 
 

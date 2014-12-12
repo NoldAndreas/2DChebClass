@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionHalfSpace_2Phase_Sat_1()
+function [config,res] = DDFT_DiffusionHalfSpace_2Phase_Sat_1()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','HalfSpace','N',[10,40],...
@@ -31,12 +31,14 @@ function [optsNum,optsPhys] = DDFT_DiffusionHalfSpace_2Phase_Sat_1()
                       'kBT',0.7,...                      
                       'Dmu',-0.05);
 
+    config = v2struct(optsPhys,optsNum);
+
     AddPaths();
-    EX     = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX     = DDFT_2D(config);
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                     
     EX.IDC.plot(EX.GetRhoEq());
     EX.ComputeDynamics();
-    EX.PlotDynamics();
+    res.fig_handles = EX.PlotDynamics();
 end                 
 

@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionHalfSpace_MF
+function [EX,res] = DDFT_DiffusionHalfSpace_MF
 
 
     Phys_Area = struct('shape','HalfSpace','N',[40;30],'L1',8,'L2',8,'y2wall',0);
@@ -28,6 +28,6 @@ function EX = Test_DDFT_DiffusionHalfSpace_MF
                   
     optsPlot.doDDFTPlots=true;
     
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 end                 
 

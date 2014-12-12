@@ -1,4 +1,4 @@
- function EX = DDFT_DiffusionBox_MF()
+ function [EX,res] = DDFT_DiffusionBox_MF()
 
     Phys_Area = struct('shape','Box','N',[20;20], ...
                        'y1Min',0,'y1Max',10,...
@@ -44,6 +44,7 @@
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
+
 end                 
 

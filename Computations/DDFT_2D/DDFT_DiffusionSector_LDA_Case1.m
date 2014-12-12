@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = DDFT_DiffusionSector_LDA_Case1()
+function [EX,res] = DDFT_DiffusionSector_LDA_Case1()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','Wedge',...
@@ -32,5 +32,5 @@ function [optsNum,optsPhys] = DDFT_DiffusionSector_LDA_Case1()
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,'nParticlesS',50);
                  
-    DDFTDynamics(optsPhys,optsNum);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum);
 end

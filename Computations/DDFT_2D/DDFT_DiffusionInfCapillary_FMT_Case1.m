@@ -1,4 +1,4 @@
-function EX = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
+function [EX,res] = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -56,5 +56,5 @@ function EX = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
     
     EX.IDC.plot(EX.GetRhoEq,'SC');
     EX.ComputeDynamics();
-    EX.PlotDynamics();
+    res.fig_handles = EX.PlotDynamics();
 end                 

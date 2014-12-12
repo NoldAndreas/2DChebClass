@@ -1,4 +1,4 @@
-function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
+function [EX,res] = DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
 
     if(nargin==0)
         doHI = false;
@@ -45,7 +45,7 @@ function EX = Test_DDFT_DiffusionHalfSpace_FMT_Triangle(doHI)
                   
     optsPlot.doDDFTPlots=true;
 
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
     
 end                 
 

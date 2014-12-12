@@ -1,4 +1,4 @@
-function [optsNum,optsPhys] = Test_DDFT_EqBox_2Phase_2()
+function [EX,res] = DDFT_EqBox_2Phase_2()
     
     Phys_Area = struct('shape','Box','N',[30,30],...
                        'y1Min',-4,'y1Max',4,...
@@ -23,6 +23,6 @@ function [optsNum,optsPhys] = Test_DDFT_EqBox_2Phase_2()
     EX     = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
     EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                     
-    EX.IDC.plot(EX.GetRhoEq());
-
+    EX.IDC.plot(EX.GetRhoEq());    
+    res.fig_handles{1} = gcf;
 end                 

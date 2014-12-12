@@ -1,4 +1,4 @@
-function DDFT_DiffusionBox_LDA_Case1()
+function [config,res] = DDFT_DiffusionBox_LDA_Case1()
 
     %Numerical Parameters    
     Phys_Area = struct('shape','Box',...
@@ -26,8 +26,10 @@ function DDFT_DiffusionBox_LDA_Case1()
     
     optsPhys = struct('V1',V1,'V2',V2,...
                      'kBT',0.7,'nParticlesS',50);
-    
-	DDFTDynamics(optsPhys,optsNum);
 
+    config = v2struct(optsPhys,optsNum);
+    
+	[~,res] = DDFTDynamics(optsPhys,optsNum);
+    
 end                 
 

@@ -1,24 +1,24 @@
 # ************************************************************ 
-# Computed at: 13-Oct-2014 11:20:14 Cumulative computation time: 02:47:12.00 (hrs:min:sec) All computation times given in seconds. 
+# Computed at: 12-Dec-2014 14:02:22 Cumulative computation time: 02:32:20.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
-CheckFMTComputation : 7
-CheckFMTComputation_InfCapillary : 12
-DDFT_Diffusion1D_HalfSpace_FMT : 7
-DDFT_DiffusionBox_2Phase_1 : 14
-DDFT_DiffusionBox_2Phase_2 : 18
-DDFT_DiffusionBox_2Phase_3 : 18
-DDFT_DiffusionBox_2Phase_Sat_1 : 24
-DDFT_DiffusionBox_2Phase_Sat_2 : 185
-DDFT_DiffusionBox_LDA_Case1 : 16
-DDFT_DiffusionBox_MF : 32
-DDFT_DiffusionDisc_MF : 51
-DDFT_DiffusionHalfSpace_2Phase_Sat_1 : 18
-DDFT_DiffusionHalfSpace_2Phase_Sat_2 : 54
-DDFT_DiffusionHalfSpace_FMT : 114
-DDFT_DiffusionHalfSpace_FMT_HIWall : 36
-DDFT_DiffusionHalfSpace_FMT_Triangle : 36
-DDFT_DiffusionHalfSpace_MF : 37
-DDFT_DiffusionInfCapillary_FMT : 805
+CheckFMTComputation : 23
+CheckFMTComputation_InfCapillary : -2
+DDFT_Diffusion1D_HalfSpace_FMT : -2
+DDFT_DiffusionBox_2Phase_1 : 38
+DDFT_DiffusionBox_2Phase_2 : 138
+DDFT_DiffusionBox_2Phase_3 : 32
+DDFT_DiffusionBox_2Phase_Sat_1 : 30
+DDFT_DiffusionBox_2Phase_Sat_2 : 32
+DDFT_DiffusionBox_LDA_Case1 : 24
+DDFT_DiffusionBox_MF : -2
+DDFT_DiffusionDisc_MF : -2
+DDFT_DiffusionHalfSpace_2Phase_Sat_1 : 59
+DDFT_DiffusionHalfSpace_2Phase_Sat_2 : 66
+DDFT_DiffusionHalfSpace_FMT : 69
+DDFT_DiffusionHalfSpace_FMT_HIWall : 32
+DDFT_DiffusionHalfSpace_FMT_Triangle : 23
+DDFT_DiffusionHalfSpace_MF : 31
+DDFT_DiffusionInfCapillary_FMT : 145
 DDFT_DiffusionInfCapillary_FMT_Case1 : 6563
 DDFT_DiffusionInfCapillary_MF : 22
 DDFT_DiffusionInfDisc_MF : 29
@@ -41,6 +41,7 @@ Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New : 76
 Test_DDFT_InertiaInfDisc_MF_osc : 35
 Test_DDFT_InertiaInfSpace_FMT : 97
 Test_DDFT_InertiaInfSpace_MF_osc : 167
-DDFT_DiffusionHalfSpace_FMT_HIWall_1 : 124
-DDFT_DiffusionHalfSpace_FMT_HIWall_2 : 126
+DDFT_DiffusionHalfSpace_FMT_HIWall_1 : 29
+DDFT_DiffusionHalfSpace_FMT_HIWall_2 : 29
 Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New2 : 505
+DDFT_DiffusionBox_2Species_1 : 42

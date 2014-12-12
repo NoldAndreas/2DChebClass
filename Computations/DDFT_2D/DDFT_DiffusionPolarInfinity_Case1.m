@@ -1,4 +1,4 @@
-function DDFT_DiffusionPolarInfinity_Case1()        
+function [EX,res] = DDFT_DiffusionPolarInfinity_Case1()        
 
     Phys_Area = struct('shape','InfDisc','N',[20,20],...
                        'y1Min',0,'y1Max',inf,'L',4,...
@@ -22,6 +22,6 @@ function DDFT_DiffusionPolarInfinity_Case1()
                      'kBT',0.7,...
                      'nParticlesS',50);                                          
 
-	DDFTDynamics(optsPhys,optsNum);
+	[EX,res] = DDFTDynamics(optsPhys,optsNum);
 end
     

@@ -223,10 +223,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         names = fieldnames(s);
         for k = 1:length(names)
             for j = 1:length(IgnoreList)            
-               if(strcmp(names{k},IgnoreList{j}))
-                    s = rmfield(s,names{k});
-               elseif(~isempty(strfind(names{k},[IgnoreList{j},'_'])))
-                    s = rmfield(s,[names{k},'_']);              
+               if(~isempty(strfind(names{k},IgnoreList{j})))
+               elseif(~isempty(strfind(names{k},IgnoreList{j})))
+                    s = rmfield(s,names{k},/);              
                end
             end           
         end

@@ -1,4 +1,4 @@
-function EX = DDFT_DiffusionDisc_MF()
+function [EX,h,res] = DDFT_DiffusionDisc_MF()
 
     Phys_Area = struct('shape','Disc','N',[20;20],'R',4);
     
@@ -48,7 +48,7 @@ function EX = DDFT_DiffusionDisc_MF()
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
-    
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    h = [];
 end                 
 

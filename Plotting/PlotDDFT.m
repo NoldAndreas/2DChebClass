@@ -1,4 +1,4 @@
-function PlotDDFT(input,Bool_Record)
+function fig_h = PlotDDFT(input,Bool_Record)
     
     global QuickOutput dirData
 
@@ -68,7 +68,8 @@ function PlotDDFT(input,Bool_Record)
     if(~isempty(gifFile))%QuickOutput || (islogical(Bool_Record) && Bool_Record) || ischar(Bool_Record))
         
         %(a) Plot Snapshots        
-        PlotDDFT_SnapshotsShape(input,[gifFile(1:end-4) '_Snapshots']);                
+        PlotDDFT_SnapshotsShape(input,[gifFile(1:end-4) '_Snapshots']); 
+        fig_h{1} = gcf;
         
         %(b1) Plot Mass evolution
         figure('Color','white','Position', [0 0 800 800]); %Set background color                

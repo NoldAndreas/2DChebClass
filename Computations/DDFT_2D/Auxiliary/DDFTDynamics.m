@@ -1,4 +1,4 @@
-function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
+function [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot)
 
     AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
@@ -17,7 +17,7 @@ function EX = DDFTDynamics(optsPhys,optsNum,optsPlot)
     if( (nargin < 3) || ...
         (isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots) || ...
         (isfield(optsNum,'doPlots') && optsNum.doPlots) )
-        EX.PlotDynamics();
+        res.fig_handles = EX.PlotDynamics();
     end
     
 end

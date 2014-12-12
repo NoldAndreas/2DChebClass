@@ -1,4 +1,4 @@
- function EX = GravityBox_MF(theta)
+ function [EX,res] = GravityBox_MF(theta)
 
     if(nargin==0)
         theta = 0;
@@ -34,6 +34,6 @@
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
                   
-    EX = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 end                 
 

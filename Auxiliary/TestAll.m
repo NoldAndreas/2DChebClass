@@ -2,8 +2,8 @@ function TestAll(dirTest)
     global recomputeAll QuickOutput dirData dirDataOrg
 
     
-    no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 4 seconds.');
-    if(getkeywait(4) == -1)
+    no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 3 seconds.');
+    if(getkeywait(3) == -1)
         for ih = 1:no
             fprintf('\b');
         end                        
@@ -17,21 +17,29 @@ function TestAll(dirTest)
     end    
         
     QuickOutput  = true;
-    comments = 'All computation times given in seconds.';
+    comments = 'values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.';
         
     
     dirResOld  = dirData;
-    dirData    = [dirDataOrg,dirTest,'\'];
-    
+    dirData    = [dirDataOrg filesep dirTest,'\'];    
     if(~exist(dirData,'dir'))            
         disp('Folder not found. Creating new path..');            
         mkdir(dirData);
-   end
-    
+    end           
 
     dirDDFT_2D  = [pwd,'/Computations/',dirTest];
     MFiles      = dir(fullfile(dirDDFT_2D,'*.m'));
-
+    
+    
+    dirDDFT_2D_LatexReport  = [dirData,'LatexReport'];    
+    if(~exist(dirDDFT_2D_LatexReport,'dir'))            
+        disp('Folder not found. Creating new path..');            
+        mkdir(dirDDFT_2D_LatexReport);
+    end           
+    filenameLatexDoc = [dirDDFT_2D_LatexReport,'/LatexReport.tex'];
+    InitLatexDoc();
+    
+    
     Parameters = LoadIndexFiles(dirDDFT_2D);
     if(isempty(Parameters))
         Parameters = struct();
@@ -47,8 +55,8 @@ function TestAll(dirTest)
         end
     end
     
-    no = fprintf('Do you want to rerun All files? (press any key), or wait for 4 seconds.');        
-    if(getkeywait(4) == -1)
+    no = fprintf('Do you want to rerun All files? (press any key), or wait for 3 seconds.');        
+    if(getkeywait(3) == -1)
         for ih = 1:no
             fprintf('\b');
         end                        
@@ -65,6 +73,8 @@ function TestAll(dirTest)
     for i = 1:length(MFiles)
         strf = MFiles(i).name;
         strf = strf(1:end-2);
+        
+        AddToLatexDoc([strf,'.m']);
 
         if(rerun ||...
            ~isfield(Parameters,strf) || ...
@@ -74,8 +84,14 @@ function TestAll(dirTest)
             cprintf('*Blue',['** Running ',strf,' **\n']);            
             f = str2func(strf);
             
-            try                
-                f();            
+            try     
+                if(nargout(f)>=2)
+                    [~,res] = f();
+                    print2eps([dirDDFT_2D_LatexReport filesep strf],res.fig_handles{1});
+                    saveas(res.fig_handles{1},[dirData filesep strf '.fig']);                                
+                else
+                    f();
+                end
                 Parameters.(strf) = num2str(round(toc(tStart)));
             catch err
                 cprintf('*Red',['Error in ',strf,'\n']);
@@ -85,11 +101,57 @@ function TestAll(dirTest)
         else
             cprintf('*Blue',['** Skipping ',strf,' **\n']);
         end
+                
+        AddToLatexFig([strf,'.eps']);                
         
-        WriteReport();
+        WriteReport();        
     end
     
+    FinishLatexDoc();
     dirData = dirResOld;
+    recomputeAll = false;
+    
+    function InitLatexDoc()
+        fileID = fopen(filenameLatexDoc,'w');
+    
+        fprintf(fileID,'\\documentclass[a4paper,10pt]{article}\n');
+        fprintf(fileID,'\\usepackage{listings}\n');
+        fprintf(fileID,'\\usepackage[utf8]{inputenc}\n');
+        fprintf(fileID,'\\usepackage{graphicx}\n');        
+        fprintf(fileID,'\\usepackage[pagebackref,hyperindex=true,colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}');
+        fprintf(fileID,['\\title{ Code for \\lstinline{',dirTest,'} files}\n']);         
+        fprintf(fileID,'\\date{\\today}\n');         
+        fprintf(fileID,'\\begin{document}\n'); 
+        fprintf(fileID,'\\maketitle\n');         
+        fprintf(fileID,'\\tableofcontents\n');        
+        fclose(fileID);
+    end
+    
+    function AddToLatexDoc(addFile)
+         fileID = fopen(filenameLatexDoc,'a');
+         fprintf(fileID,['\\section{\\lstinline{',addFile,'}}\n']);      
+         
+         fprintf(fileID,['{\\scriptsize \\lstinputlisting[language=Matlab]{',replaceBackslash([dirDDFT_2D,'/',addFile]),'}}\n']);
+         fclose(fileID);         
+    end
+
+    function AddToLatexFig(addFile)
+         filePath = [dirDDFT_2D_LatexReport filesep addFile];
+         if(~exist(filePath,'file'))
+             return;
+         end
+         fileID = fopen(filenameLatexDoc,'a');                  
+         fprintf(fileID,['\\includegraphics[width=12cm]{',replaceBackslash(filePath),'}\n']);
+         fclose(fileID);         
+    end
+
+
+    function FinishLatexDoc()
+        fileID = fopen(filenameLatexDoc,'a');
+        fprintf(fileID,'\\end{document}\n');
+        fclose(fileID); 
+    end
+    
 
     function WriteReport()
         tc = 0;
@@ -106,6 +168,18 @@ function TestAll(dirTest)
                         ' Cumulative computation time: ',sec2hms(tc), ' (hrs:min:sec) ',comments]);
 
     end
-                    
-    recomputeAll = false;
+
+    function outStr = replaceBackslash(tStr)
+        special = '\';
+        %tStr = 'Hi, I''m a Big (Not So Big) MATLAB addict; Since my school days!';
+
+        outStr = '';
+        for l = tStr
+            if (length(find(special == l)) > 0)
+                outStr = [outStr, '/'];
+            else
+                outStr = [outStr, l];
+            end
+        end
+    end                        
 end
