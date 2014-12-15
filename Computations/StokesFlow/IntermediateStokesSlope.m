@@ -1,4 +1,9 @@
 function theta = IntermediateStokesSlope(z,lambda)
+
+    global dirData
+
+    fulldir = [dirData filesep 'StokesFlow' filesep];
+    
     if(nargin == 0)
         z      = (0.01:0.02:0.2)';
         lambda = 0;        
@@ -71,8 +76,8 @@ function theta = IntermediateStokesSlope(z,lambda)
         inset2(f1,f2,0.6,[0.25,0.35]);        
         close(f2);          
         
-        print2eps('theta_G',gcf);  
-        saveas(gcf,'theta_G.fig');    
+        print2eps([fulldir,'theta_G'],gcf);  
+        saveas(gcf,[fulldir,'theta_G.fig']);    
         
         figure('color','white','Position',[0 0 800 800]);
         plot(exp(IntM*f/Ca),y*180/pi,'b','linewidth',2); hold on;
@@ -82,8 +87,8 @@ function theta = IntermediateStokesSlope(z,lambda)
         ylabel('$\theta(r)[^\circ]$','Interpreter','Latex','fontsize',20);
         set(gca,'fontsize',15);
         
-        print2eps('r_theta',gcf);
-        saveas(gcf,'r_theta.fig');
+        print2eps([fulldir,'r_theta'],gcf);
+        saveas(gcf,[fulldir,'r_theta.fig']);
         %subplot(1,2,2); plot(theta,z,'ko','markersize',6,'MarkerFaceColor','r');
     end
  
