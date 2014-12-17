@@ -20,7 +20,7 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
     end
     
     methods (Access = public)            
-        function Int = ComputeIntegrationVector(this,t1Odd)
+       function Int = ComputeIntegrationVector(this,t1Odd)
             
             N1 = this.N1;
             N2 = this.N2;
@@ -70,7 +70,7 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
             Int      = kron( (dy1New'.*wIntPos) *  M3 * M2 ,M1);
             this.Int = Int;
         end
-        function Ind = ComputeIndices(this)
+       function Ind = ComputeIndices(this)
 
             x1_kv    = kron(this.Pts.x1,ones(size(this.Pts.x2)));
             outR    = (x1_kv == 1);        
@@ -105,7 +105,7 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
                    
             this.Ind = Ind;
         end
-        function Diff = ComputeDifferentiationMatrix(this)            
+       function Diff = ComputeDifferentiationMatrix(this)            
             pts    = this.Pts;
             pts.x1 = this.Pts.x1full;
             mMask  = 1:(this.N1*this.N2);
@@ -130,7 +130,7 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
             Diff   = PolarDiffOperators(DiffPolar_h,this.Pts);            
             this.Diff = Diff;
         end                        
-        function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
+       function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
 
             N1 = this.N1;       N2 = this.N2;
             

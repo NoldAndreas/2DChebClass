@@ -1,4 +1,4 @@
-function SimulationHalfSpaceMinusHalfDisk()
+function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
 
     disp('** Simulation HalfSpace Minus HalfDisk **');
     AddPaths();    
@@ -16,10 +16,14 @@ function SimulationHalfSpaceMinusHalfDisk()
     [Pts,Diff,Int,Ind] = SMD.ComputeAll();    
     Interp             = SMD.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     
+    figure;
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
     xlim([(Origin(1)-5) (Origin(1)+5)]);
     ylim([(Origin(2)) (Origin(2) + 5)]);
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     
     PtsCart = SMD.GetCartPts();
         

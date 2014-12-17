@@ -28,7 +28,7 @@ classdef (Abstract) SpectralEvenFourier < SpectralFourier
             this.Int  = int;             
             
          end         
-        function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
+         function Interp = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)
             if(nargin < 5)
                 saveBool = false;
             end

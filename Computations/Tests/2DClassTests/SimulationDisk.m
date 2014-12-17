@@ -1,4 +1,4 @@
-function data = SimulationDisk(N1,N2,L1,L2,vext)
+function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
 
     disp('** Simulation Disk **');
 
@@ -52,6 +52,14 @@ function data = SimulationDisk(N1,N2,L1,L2,vext)
 %    display([' Error in Convolution: ', num2str(data.Conv)]);        
     
     data.N1 = N1; data.N2 = N2;            
+    
+    figure;
+    DC.PlotGridLines();    
+    DC.PlotGrid();
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     
     %******** Plotting **********
     figure

@@ -1,4 +1,4 @@
-function SimulationEvenBoxFourier
+function [PB,res] = SimulationEvenBoxFourier
 
     disp('** Simulation Even Box Fourier **');
     
@@ -48,6 +48,15 @@ function SimulationEvenBoxFourier
      subplot(2,1,2); PB.plot(Interp.InterPol*fC_fft-fConv(Interp.pts1,Interp.pts2));          
      title('Error');
      set(gcf,'name','Convolution');                                                                
+     
+    figure;
+    PB.PlotGridLines();    
+    PB.PlotGrid();
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+
 
     %***************************************************************
     %   Auxiliary functions:

@@ -21,7 +21,7 @@ function TestAll(dirTest)
         
     
     dirResOld  = dirData;
-    dirData    = [dirDataOrg filesep dirTest,'\'];    
+    dirData    = [dirDataOrg filesep dirTest filesep];    
     if(~exist(dirData,'dir'))            
         disp('Folder not found. Creating new path..');            
         mkdir(dirData);
@@ -87,8 +87,15 @@ function TestAll(dirTest)
             try     
                 if(nargout(f)>=2)
                     [~,res] = f();
-                    print2eps([dirDDFT_2D_LatexReport filesep strf],res.fig_handles{1});
-                    saveas(res.fig_handles{1},[dirData filesep strf '.fig']);                                
+                    
+                    fh = res.fig_handles{1};
+                    ax = get(fh,'children');
+                    xlim = get(ax,'xlim');
+                    ylim = get(ax,'ylim');
+                    pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+                    
+                    print2eps([dirDDFT_2D_LatexReport filesep strf],fh);
+                    saveas(fh,[dirDDFT_2D_LatexReport filesep strf '.fig']);                                
                 else
                     f();
                 end
@@ -109,7 +116,7 @@ function TestAll(dirTest)
     
     FinishLatexDoc();
     dirData = dirResOld;
-    recomputeAll = false;
+    recomputeAll = false;      
     
     function InitLatexDoc()
         fileID = fopen(filenameLatexDoc,'w');
@@ -150,6 +157,8 @@ function TestAll(dirTest)
         fileID = fopen(filenameLatexDoc,'a');
         fprintf(fileID,'\\end{document}\n');
         fclose(fileID); 
+        
+        system(['latex ',filenameLatexDoc]);
     end
     
 

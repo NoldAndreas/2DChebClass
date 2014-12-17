@@ -1,4 +1,4 @@
-function SimulationHalfSpaceMinusDisk()
+function [SMD,res] = SimulationHalfSpaceMinusDisk()
 
     disp('** Simulation HalfSpace Minus Disk **');
     AddPaths();    
@@ -16,10 +16,14 @@ function SimulationHalfSpaceMinusDisk()
     SMD                = HalfSpaceMinusDisk(v2struct(Origin,R,N,L1,Rmax,y2Wall));
     Int                = SMD.ComputeIntegrationVector();
     
+    figure;
     SMD.PlotGridLines();    
     SMD.PlotGrid();
-    xlim([(Origin(1)-8) (Origin(1)+8)]);
-    ylim([y2Wall (Origin(2) + 20)]);
+    xlim([(Origin(1)-3) (Origin(1)+3)]);
+    ylim([y2Wall (Origin(2) + 4)]);
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     
     PtsCart = SMD.GetCartPts();
         
@@ -40,6 +44,9 @@ function SimulationHalfSpaceMinusDisk()
     xlim([(Origin(1)-5) (Origin(1)+5)]);
     ylim([y2Wall (Origin(2) + 5)]);
     pbaspect([10 (Origin(2) + 5 - y2Wall) 5]);
+    
+                                                       
+ 
     
     %***************************************************************
     %   Auxiliary functions:

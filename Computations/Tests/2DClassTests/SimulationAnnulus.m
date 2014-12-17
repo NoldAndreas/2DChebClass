@@ -1,4 +1,4 @@
-function SimulationAnnulus()
+function [data,res] = SimulationAnnulus()
 
     disp('** Simulation Annulus **');
     AddPaths();    
@@ -15,8 +15,14 @@ function SimulationAnnulus()
     [Pts,Diff,Int,Ind] = AS.ComputeAll();    
     Interp             = AS.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
     
-    AS.PlotGridLines();  hold on;
+    
+    figure;
+    AS.PlotGridLines();    
     AS.PlotGrid();
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;    
  
     Origin = [2;3];
     AS.Origin = Origin;

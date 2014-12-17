@@ -125,7 +125,10 @@ classdef BigSegment < handle
                                         num2str(area-sum(this.Int))]);   
             end
         end
-        
+        function PlotGridLines(this)
+            this.W.PlotGridLines(); hold on;
+            this.T.PlotGridLines();
+        end
         function PlotGrid(this)
             this.W.PlotGrid(); hold on;
             this.T.PlotGrid();

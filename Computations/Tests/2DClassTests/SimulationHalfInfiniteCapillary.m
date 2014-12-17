@@ -1,4 +1,4 @@
-function SimulationHalfInfiniteCapillary
+function [HIC,res] = SimulationHalfInfiniteCapillary
 
     disp('** Simulation Half Infinite Capillary **');
 
@@ -30,7 +30,15 @@ function SimulationHalfInfiniteCapillary
     %Check Integration    
     display([' Error in Integration: ', num2str(Int(Int < inf)*V(Int < inf)-VInt)]);                
             
-                                                                     
+    figure;
+    HIC.PlotGridLines();    
+    HIC.PlotGrid();
+    xlim([0 20]);
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+                                                       
  
     %***************************************************************
     %   Auxiliary functions:

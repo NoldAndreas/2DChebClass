@@ -1,4 +1,4 @@
-function data = SimulationSegment(N1,N2,vext)
+function [data,res] = SimulationSegment(N1,N2,vext)
 
     disp('** Simulation Segment M1 **');
     AddPaths();
@@ -10,7 +10,7 @@ function data = SimulationSegment(N1,N2,vext)
         N1 =  20;   N2 = 20;
         vext  = @VTest;
         R     = 3;
-        h     = -1; 
+        h     = -2; 
         Origin = [0;0];
         N      = [N1;N2];
     end        
@@ -52,7 +52,11 @@ function data = SimulationSegment(N1,N2,vext)
     shape.sphere = true;
     SG_Sph = Segment(shape);
     intSph = SG_Sph.ComputeIntegrationVector();    
-    SG_Sph.PlotGrid();
+    
+    SG_Sph.PlotGrid();        
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
+    res.fig_handles{1} = gcf;    
     
     %***************************************************************
     %   Check integration of spherical cap:
@@ -63,6 +67,7 @@ function data = SimulationSegment(N1,N2,vext)
     intSph       = PSG_Sph.ComputeIntegrationVector();    
     figure; PSG_Sph.PlotGrid();
 
+    
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         

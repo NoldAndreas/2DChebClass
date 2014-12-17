@@ -1,4 +1,4 @@
-function SimulationStripMinusDisk()
+function [SMD,res] = SimulationStripMinusDisk()
 
     disp('** Simulation Strip Minus Disk **');
     AddPaths();    
@@ -17,9 +17,13 @@ function SimulationStripMinusDisk()
     [Pts,Diff,Int,Ind] = SMD.ComputeAll();    
     Interp             = SMD.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     
+    figure;
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
     xlim([-5 5]);
+	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
+    res.fig_handles{1} = gcf;    
     
     PtsCart = SMD.GetCartPts();
         

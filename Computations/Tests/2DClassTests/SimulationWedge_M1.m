@@ -1,4 +1,4 @@
-function data = SimulationWedge_M1(N1,N2,R,vext)
+function [data,res] = SimulationWedge_M1(N1,N2,R,vext)
 
     disp('** Simulation Wedge M1 **');
     AddPaths();
@@ -46,6 +46,14 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
 %     subplot(2,2,2);  doPlots_SC_Polar(Interp,Pts,dH2(:,1,2));
 %     subplot(2,2,3);  doPlots_SC_Polar(Interp,Pts,dH2(:,2,1));
 %     subplot(2,2,4);  doPlots_SC_Polar(Interp,Pts,dH2(:,2,2));
+
+    figure;
+    WI.PlotGridLines();  hold on;
+    WI.PlotGrid();
+    xlim([-5 5]);
+	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
+    res.fig_handles{1} = gcf;    
     
 %    [V,Vdiff,VInt]   = vext(Pts.y1_kv,Pts.y2_kv,intBound);    
     [V,Vdiff]   = vext(Pts.y1_kv,Pts.y2_kv);    
@@ -63,6 +71,7 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     
    
 %    legend('r=0',['r=',num2str(Interp_r1.pts1(1))],['r=',num2str(Interp_r4.pts1(1))]);
+    figure;
     WI.plot(V);
     
     subplot(2,2,1); WI.plot(Vdiff.dy1);
@@ -96,8 +105,8 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     subplot(2,2,3); WI.plot(Diff.Lap*V-Vdiff.Lap);
 
     %Check Integration
-    data.Int = abs(Int*V-VInt);
-    display([' Error in Integration: ', num2str(data.Int)]);                
+    %data.Int = abs(Int*V-VInt);
+    %display([' Error in Integration: ', num2str(data.Int)]);                
         
     %Check Convolution
     %fP = f1(Pts.y1_kv,Pts.y2_kv);
@@ -109,14 +118,14 @@ function data = SimulationWedge_M1(N1,N2,R,vext)
     
 %    Plot1DComp_r(V,1);
 %    Plot1DComp_r(V,4);
-    Plot1DComp_r(V,11,0);
-    Plot1DComp_r(V,11,1);
-    Plot1DComp_r(V,11,2);
-    
-    figure
-    Plot1DComp_t(V,1);
-    Plot1DComp_t(V,4);
-    Plot1DComp_t(V,10);
+%     Plot1DComp_r(V,11,0);
+%     Plot1DComp_r(V,11,1);
+%     Plot1DComp_r(V,11,2);
+%     
+%     figure
+%     Plot1DComp_t(V,1);
+%     Plot1DComp_t(V,4);
+%     Plot1DComp_t(V,10);
 
     %******** Plotting **********
     figure
