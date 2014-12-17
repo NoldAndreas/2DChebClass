@@ -4,7 +4,6 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
         RMin
         L        
     end
-    
     methods        
         function this = InfAnnulus(Geometry)
             this@Polar_SpectralFourierNoOrigin(Geometry.N(1),Geometry.N(2));
@@ -19,8 +18,7 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
         end                         
     end
     
-    methods (Access = public)
-        
+    methods (Access = public)     
         function [r,dr,dx,ddx,dddx,ddddx] = PhysSpace1(this,x)
             [r,dr,dx,ddx,dddx,ddddx] = QuotientMap(x,this.L,this.RMin,inf);
         end 
@@ -33,7 +31,6 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
         function xf = CompSpace2(this,th)
             xf = th/(2*pi);
         end                
-        
         function [int,area] = ComputeIntegrationVector(this)
             int  = ComputeIntegrationVector@Polar_SpectralFourierNoOrigin(this);            
             area = Inf;
@@ -113,7 +110,6 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
 %             doPlots_SC_Polar(Interp, this.Pts, f1)
                    
                    
-        end  
-        
+        end          
     end
 end

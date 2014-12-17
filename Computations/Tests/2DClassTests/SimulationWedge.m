@@ -8,11 +8,11 @@ function [WDG,res] = SimulationWedge
     
     %Initialization
     
-    R                   = 2;
-    half_wedge_angle    = pi/2;%4*pi/5;
+    R                   = 1;
+    half_wedge_angle    = pi/4;%4*pi/5;
     Geometry = struct('R_in',0,'R_out',R,...
-                      'th1',-half_wedge_angle,...
-                      'th2',half_wedge_angle,'N',[30,20]);
+                      'th1',pi/2-half_wedge_angle,...
+                      'th2',pi/2+half_wedge_angle,'N',[20,20]);
     
     vext              = @Vext7;
     
@@ -27,7 +27,7 @@ function [WDG,res] = SimulationWedge
     figure;
     WDG.PlotGridLines();  hold on;
     WDG.PlotGrid();
-    xlim([-5 5]);
+   % xlim([-5 5]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
     res.fig_handles{1} = gcf;    

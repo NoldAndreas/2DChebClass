@@ -95,7 +95,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     y0 = y0(markComp);
     
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
-    fsolveOpts=optimset('MaxFunEvals',2000000,'MaxIter',200000,'Display','off');    
+    fsolveOpts=optimset('MaxFunEvals',2000000,'MaxIter',200000,...
+                        'Display','off','TolFun',1e-8);
     [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
     if(flag ~= 1)
         cprintf('red','Error in fsolve, FMT_1D_Interface');
@@ -111,6 +112,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     checkContactDensity = (p + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
     %checkContactDensity = (p)/kBT;
     PrintErrorPos(rho_ic1D(1)-checkContactDensity,'First Sum Rule - for Contact Density');
+    PrintErrorPos((rho_ic1D(1)-checkContactDensity)/checkContactDensity*100,'First Sum Rule - for contact density (in per cent)');
     
     %****************************
     %********** Plot   **********

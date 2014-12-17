@@ -8,7 +8,7 @@ function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
     N1 =  20;   N2 = 20;
     R       = 3;
     L1      = 1;    
-    Origin  = [2;2];
+    Origin  = [2;0.5];
     N       = [N1;N2];
     Rmax    = Inf;
 

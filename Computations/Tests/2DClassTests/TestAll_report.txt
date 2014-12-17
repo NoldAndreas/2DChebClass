@@ -1,5 +1,5 @@
 # ************************************************************ 
-# Computed at: 16-Dec-2014 18:49:28 Cumulative computation time: 00:03:11.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 17-Dec-2014 17:40:50 Cumulative computation time: 00:03:13.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 Simulation1DInterpolation : -2
 SimulationAnnulus : 8
@@ -22,7 +22,7 @@ SimulationHalfSpace_Composed : 1
 SimulationHalfSpace_Tref : 6
 SimulationHalfStripMinusDisk : 2
 SimulationHoleHalfSpace : 2
-SimulationInfAnnulus : 1
+SimulationInfAnnulus : 2
 SimulationInfBox_M1 : 3
 SimulationInfiniteCapillary : 1
 SimulationInfiniteCapillarySkewed : 8
@@ -34,7 +34,8 @@ SimulationSegment_Wall : 1
 SimulationSlitMinusDisk : 2
 SimulationSplitDisk_BarkerHenderson : 47
 SimulationStripMinusDisk : 3
-SimulationTriangle : 1
-SimulationWedge : 4
+SimulationTriangle : 2
+SimulationWedge : 2
 SimulationWedge_M1 : 5
 SimulationBigSegmentAlternative : 7
+SimulationHalfSpaceMinusDisk_RG1 : 2
