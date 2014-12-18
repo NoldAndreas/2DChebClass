@@ -17,8 +17,8 @@ function ComputeConvolutionMatrix_Test_Short_1(this)
     sigmax1 = 1 ;  sigmay1  = 1;
     sigmax2 = 0.5;  sigmay2  = 0.5;
     sigmax3 = 1;  sigmay3  = 1;
-    %sigmax4 = 1;  sigmay4  = 1;
-    sigmax4 = 10;  sigmay4  = 10;
+    sigmax4 = 1;  sigmay4  = 1;
+    %sigmax4 = 10;  sigmay4  = 10;
 
     x01 = -1 ; y01 = 0;
     x02 = 0  ; y02 = 0; 
