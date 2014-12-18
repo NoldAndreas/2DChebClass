@@ -38,7 +38,7 @@ DDError = L1norm(Dy*(Dy*u0Full)-DDuExact(y,0))/L1norm(DDuExact(y,0));
 
 IntError = abs(L1norm(u0Full) - 1);
 
-opts = odeset('RelTol',10^-12,'AbsTol',10^-12);
+opts = odeset('RelTol',5*10^-14,'AbsTol',5*10^-14);
 
 [~,U_t] =  ode15s(@du_dt,plotTimes,u0,opts);
 t=toc

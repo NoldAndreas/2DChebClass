@@ -1,7 +1,7 @@
 close all
 
 Nvals = 10:10:100;
-Lvals = 1:2:20;
+Lvals = 1:1:10;
 
 maxRelErr = zeros(length(Nvals),length(Lvals));
 t         = maxRelErr;
@@ -42,6 +42,14 @@ set(hStrings,{'Color'},num2cell(textColors,2));  %# Change the text colors
 
 set(hStrings,{'FontSize'},num2cell(20*ones(size(hStrings)),2));
 
+
+figure
+
+for iL=1:length(Lvals)
+    plot(Nvals,log10(DErr(:,iL)));
+    hold all
+end
+legend(num2str(Lvals'))
 % figure
 % 
 % imagesc(log10(DErr))
