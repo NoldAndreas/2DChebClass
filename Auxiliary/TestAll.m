@@ -39,7 +39,6 @@ function TestAll(dirTest)
     filenameLatexDoc = [dirDDFT_2D_LatexReport,'/LatexReport.tex'];
     InitLatexDoc();
     
-    
     Parameters = LoadIndexFiles(dirDDFT_2D);
     if(isempty(Parameters))
         Parameters = struct();
@@ -88,14 +87,17 @@ function TestAll(dirTest)
                 if(nargout(f)>=2)
                     [~,res] = f();
                     
-                    fh = res.fig_handles{1};
-                    ax = get(fh,'children');
-                    xlim = get(ax,'xlim');
-                    ylim = get(ax,'ylim');
-                    pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
-                    
-                    print2eps([dirDDFT_2D_LatexReport filesep strf],fh);
-                    saveas(fh,[dirDDFT_2D_LatexReport filesep strf '.fig']);                                
+                    for k = 1:length(res.fig_handles)
+                        fh = res.fig_handles{k};
+                        ax = get(fh,'children');
+                        xlim = get(ax,'xlim');
+                        ylim = get(ax,'ylim');
+                        pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+
+                        str_fig = [strf,num2str(k)];
+                        print2eps([dirDDFT_2D_LatexReport filesep str_fig],fh);
+                        saveas(fh,[dirDDFT_2D_LatexReport filesep str_fig '.fig']);                                
+                    end
                 else
                     f();
                 end
@@ -141,18 +143,22 @@ function TestAll(dirTest)
          fprintf(fileID,['{\\scriptsize \\lstinputlisting[language=Matlab]{',replaceBackslash([dirDDFT_2D,'/',addFile]),'}}\n']);
          fclose(fileID);         
     end
-
     function AddToLatexFig(addFile)
+        
          filePath = [dirDDFT_2D_LatexReport filesep addFile];
-         if(~exist(filePath,'file'))
-             return;
-         end
          fileID = fopen(filenameLatexDoc,'a');                  
-         fprintf(fileID,['\\includegraphics[width=12cm]{',replaceBackslash(filePath),'}\n']);
+         if(exist(filePath,'file'))
+             fprintf(fileID,['\\includegraphics[width=8cm]{',replaceBackslash(filePath),'}\n']);
+         end
+         n = 1;
+         while(exist([filePath(1:end-4),num2str(n),'.eps'],'file'))
+             fprintf(fileID,['\\includegraphics[width=12cm]{',...
+                 replaceBackslash([filePath(1:end-4),num2str(n),'.eps']),'}\n']);
+             n = n+1;
+         end
          fclose(fileID);         
+         
     end
-
-
     function FinishLatexDoc()
         fileID = fopen(filenameLatexDoc,'a');
         fprintf(fileID,'\\end{document}\n');
@@ -160,8 +166,6 @@ function TestAll(dirTest)
         
         system(['latex ',filenameLatexDoc]);
     end
-    
-
     function WriteReport()
         tc = 0;
         for j = 1:length(MFiles)
@@ -177,7 +181,6 @@ function TestAll(dirTest)
                         ' Cumulative computation time: ',sec2hms(tc), ' (hrs:min:sec) ',comments]);
 
     end
-
     function outStr = replaceBackslash(tStr)
         special = '\';
         %tStr = 'Hi, I''m a Big (Not So Big) MATLAB addict; Since my school days!';

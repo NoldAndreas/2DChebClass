@@ -1,4 +1,4 @@
-function data = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
+function [data,res] = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
 
     disp('** Simulation Half Space Composed**');
     if(length(dbstack) == 1)
@@ -8,7 +8,7 @@ function data = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
     
     %Initialization
     if(nargin == 0)
-        N      = [40;30];
+        N      = [20;20];
         N2bound = 10;
         L1 = 2;    L2 = 1;        
         y2Min = 0; h = 1;        
@@ -19,7 +19,18 @@ function data = SimulationHalfSpace_Composed()%N1,N2,L1,L2,vext)
     HSC         = HalfSpace_Composed(v2struct(L1,L2,N,N2bound,y2Min,h,alpha));            
     HSCCartPts  = HSC.GetCartPts();
     V           = vext(HSCCartPts.y1_kv,HSCCartPts.y2_kv);
-        
+    
+    figure;
+    HSC.PlotGridLines(); 
+    HSC.PlotGrid();
+    ylim([0 5]);
+    xlim([-5 5]);
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+    
+    figure;
     HSC.plot(V,'SC');%,'SC'); 
     
     PhysAreaBX  = struct('y1Min',-3*L1,'y1Max',3*L1,...

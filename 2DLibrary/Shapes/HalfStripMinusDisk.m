@@ -4,8 +4,7 @@
         y2Wall
         L1        
         LeftRight
-        TopBottom
-        Rmax = Inf
+        TopBottom       
     end
     
     methods
@@ -16,8 +15,7 @@
             this.R          = Geometry.R;
             this.Origin     = Geometry.Origin;
             this.y2Wall     = Geometry.y2Wall;
-            this.LeftRight  = Geometry.LeftRight;
-            %this.Rmax       = Geometry.Rmax;
+            this.LeftRight  = Geometry.LeftRight;                        
             if(isfield(Geometry,'TopBottom'))
                 this.TopBottom = Geometry.TopBottom;
             end
@@ -30,10 +28,10 @@
         %***************************************************************             
         function [y1_kv,y2_kv,J,dH1,dH2] = PhysSpace(this,x1,x2)        
             
-            O = ones(size(x1));
+            O    = ones(size(x1));
+            d_th = asin(abs(this.Origin(2)-this.y2Wall)/this.R);
             
             if(strcmp(this.LeftRight,'Left'))
-                d_th = asin(abs(this.Origin(2)-this.y2Wall)/this.R);
                 if(strcmp(this.TopBottom,'Bottom'))
                     thMin = pi;
                     thMax = pi + d_th;
@@ -41,8 +39,7 @@
                     thMin = pi - d_th;
                     thMax = pi;
                 end
-            elseif(strcmp(this.LeftRight,'Right'))
-                d_th = asin(abs(this.Origin(2)-this.y2Wall)/this.R);
+            elseif(strcmp(this.LeftRight,'Right'))                
                 if(strcmp(this.TopBottom,'Bottom'))
                     thMin = 2*pi - d_th;
                     thMax = 2*pi;
@@ -56,12 +53,11 @@
             end
             
             [y2_kv,dy2] = LinearMap(x2,thMin,thMax);
-            rMax        = max(abs((this.Origin(2)-this.y2Wall)./sin(y2_kv)),this.R);
-            rMax        = min(rMax,this.Rmax);
+            rMax        = max(abs((this.Origin(2)-this.y2Wall)./sin(y2_kv)),this.R);            
             if(strcmp(this.LeftRight,'Left'))
-                rMax(y2_kv == pi) = this.Rmax;
+                rMax(y2_kv == pi) = inf;
             else
-                rMax((y2_kv == 2*pi) | (y2_kv == 0)) = this.Rmax;
+                rMax((y2_kv == 2*pi) | (y2_kv == 0)) = inf;
             end
             rd                = rMax-this.R;
             %L1_r              = min(O*this.L1,rd/3);

@@ -16,8 +16,7 @@ function [data,res] = SimulationHalfSpace(N1,N2,L1,L2,vext)
         PlotArea       = struct('y1Min',-5,'y1Max',5,'L1',3,'L2',2,...
                            'N2',100,'N1',100,'y2Min',0,'y2Max',4);    
 
-        Phys_Area.Conv      = struct('L',3,'L2',1,'N',[30,30]);%'ep2Conv',0.1                       
-        
+        Phys_Area.Conv      = struct('L',3,'L2',1,'N',[30,30]);%'ep2Conv',0.1
     else
         N = [N1;N2];
     end        
@@ -65,6 +64,9 @@ function [data,res] = SimulationHalfSpace(N1,N2,L1,L2,vext)
     figure;
     HS.PlotGridLines();    
     HS.PlotGrid();
+    HS.PlotIsoline(0,'y2');
+    HS.PlotIsoline(-1/sqrt(2),'y1');
+    HS.PlotIsoline(1/sqrt(2),'y1');
     ylim([0 10]);
     xlim([-10 10]);
     	

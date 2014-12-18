@@ -461,7 +461,21 @@ classdef (Abstract) Shape < handle
                 pbaspect([(y1lim(2)-y1lim(1)) (y2lim(2)-y2lim(1)) 1]);
                 set(gca,'fontsize',15);
             end
-        end            
+        end     
+        function PlotIsoline(this,x,y1y2)
+               %xI = (-1:0.01:1)';
+               if(strcmp(y1y2,'y1'))
+                   xI = (min(this.Pts.x1):0.01:1)';                   
+                   [y1_kv,y2_kv] = PhysSpace(this,x*ones(size(xI)),xI);
+               elseif(strcmp(y1y2,'y2'))
+                   xI = (min(this.Pts.x2):0.01:1)';
+                   [y1_kv,y2_kv] = PhysSpace(this,xI,x*ones(size(xI)));
+               else
+                   return;
+               end
+              ptsC = GetCartPts(this,y1_kv,y2_kv);
+              plot(ptsC.y1_kv,ptsC.y2_kv,'r','linewidth',1.5); hold on;
+        end
         function PlotGridLines(this,optDetails)
             
             if((nargin >= 2) && isfield(optDetails,'y2CartShift'))
@@ -477,8 +491,8 @@ classdef (Abstract) Shape < handle
             end            
             
             xI = (-1:0.01:1)';
-            x1I = (min(this.Pts.x1):0.01:max(this.Pts.x1))';
-            x2I = (min(this.Pts.x2):0.01:max(this.Pts.x2))';
+            x1I = (min(this.Pts.x1):0.01:1)';
+            x2I = (min(this.Pts.x2):0.01:1)';
             
             O  = ones(size(xI));
             O1  = ones(size(x1I));
@@ -493,11 +507,12 @@ classdef (Abstract) Shape < handle
             %(2) Plot x2-isolines
             for i2=1:nthGridLines:this.N2
                 [y1_kv,y2_kv] = PhysSpace(this,x1I,this.Pts.x2(i2)*O1);
-                GL_CartPts = GetCartPts(this,y1_kv,y2_kv);
+                GL_CartPts    = GetCartPts(this,y1_kv,y2_kv);
                 plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift,'linewidth',1.); hold on;                
             end            
             
-        end        
+        end     
+        
         function [I,w,weights,IP,pts] = doIntFLine(this,y1P,y2P,f,TRAP_CHEB)
             
             N         = 500;

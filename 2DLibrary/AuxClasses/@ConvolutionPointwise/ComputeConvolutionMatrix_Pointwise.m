@@ -18,7 +18,6 @@ function M_conv  = ComputeConvolutionMatrix_Pointwise(this,f)
 %*********************************************************************
 
     disp('Computing Convolution matrices...'); 
-    boolPlot = false;
 
     N1  = this.N1;  
     N2  = this.N2;   
@@ -39,41 +38,41 @@ function M_conv  = ComputeConvolutionMatrix_Pointwise(this,f)
         
         %Analyze epsilon
         
-        if(boolPlot)
-            figure('Color','white');
-            subplot(1,2,1);
-            [y2D,dy2D,d_Pade,ep_Pade] = PhysSpace2_Sub(this,y10,y20,x2,x2,@fy2);
-            fP                        = fy2(y2D);            
-            
-            yy = (max(-5,this.y2Min-y20):0.01:5)';
-            plot(y2D,fP,'o','MarkerSize',10,'MarkerFace','b'); hold on;
-            AInterp = barychebevalMatrix(x2,CompSpace2_Sub(this,y10,y20,yy,d_Pade,ep_Pade));
-            plot(yy,AInterp*fP,'b');
-            
-            fAna = fy2(yy);
-            plot(yy,fAna,'--g');
-            if(~isempty(d_Pade))
-                d_y = PhysSpace2_Sub(this,y10,y20,InvTref(d_Pade,d_Pade,ep_Pade),x2,@fy2);
-                plot([d_y,d_y],[min(fAna),max(fAna)],'-.k');
-            end
-            xlim([min(yy)  max(yy)]);
-            
-            subplot(1,2,2);            
-            xx = (-1:0.01:1)';
-            AInterp = barychebevalMatrix(x2,xx);
-            plot(x2,fP,'o','MarkerSize',5,'MarkerFace','r'); hold on;
-            plot(xx,AInterp*fP,'r');
-
-            %Plot the actual function
-            y2Inter  = PhysSpace2_Sub(this,y10,y20,xx,x2,@fy2);
-            fAna     = f(zeros(size(y2Inter)),y2Inter);
-            plot(xx,fAna,'--g','LineWidth',1);            
-        end
-        if(y20 ~= inf)
-            [y2D,dy2D]     = PhysSpace2_Sub(this,y10,y20,x2,x2,@fy2);
+%         if(boolPlot)
+%             figure('Color','white');
+%             subplot(1,2,1);
+%             [y2D,dy2D,d_Pade,ep_Pade] = PhysSpace2_Sub(this,y10,y20,x2,x2,@fy2);
+%             fP                        = fy2(y2D);            
+%             
+%             yy = (max(-5,this.y2Min-y20):0.01:5)';
+%             plot(y2D,fP,'o','MarkerSize',10,'MarkerFace','b'); hold on;
+%             AInterp = barychebevalMatrix(x2,CompSpace2_Sub(this,y10,y20,yy,d_Pade,ep_Pade));
+%             plot(yy,AInterp*fP,'b');
+%             
+%             fAna = fy2(yy);
+%             plot(yy,fAna,'--g');
+%             if(~isempty(d_Pade))
+%                 d_y = PhysSpace2_Sub(this,y10,y20,InvTref(d_Pade,d_Pade,ep_Pade),x2,@fy2);
+%                 plot([d_y,d_y],[min(fAna),max(fAna)],'-.k');
+%             end
+%             xlim([min(yy)  max(yy)]);
+%             
+%             subplot(1,2,2);            
+%             xx = (-1:0.01:1)';
+%             AInterp = barychebevalMatrix(x2,xx);
+%             plot(x2,fP,'o','MarkerSize',5,'MarkerFace','r'); hold on;
+%             plot(xx,AInterp*fP,'r');
+% 
+%             %Plot the actual function
+%             y2Inter  = PhysSpace2_Sub(this,y10,y20,xx,x2,@fy2);
+%             fAna     = f(y2Inter);
+%             plot(xx,fAna,'--g','LineWidth',1);            
+%         end
+        [y2D,dy2D] = PhysSpace2_Sub(this,y10,y20,x2,x2,f);
+        if(y20 ~= inf)            
             y2             = y2D + y20;
             xx2            = CompSpace2(this,y2);
-            Interp2 = barychebevalMatrix(Pts.x2,xx2);  
+            Interp2        = barychebevalMatrix(Pts.x2,xx2);  
             
             if(sum(isnan(y2D)) > 0)            
                 %result will be ignored with all other Nan numbers
@@ -85,12 +84,10 @@ function M_conv  = ComputeConvolutionMatrix_Pointwise(this,f)
         else
             y2         = y20*ones(size(y2D));
             Interp2    = barychebevalMatrix(Pts.x2,CompSpace2(this,y2));  
-            
-            [y2D,dy2D] = PhysSpace2_Sub(this,y10,y20,x2,x2,@fy2);
         end
         
         %2a) Compute points in subgrid        
-        [y1D,dy1D]  = PhysSpace1_Sub(this,y10,y20,x1,x1,@fy1);        
+        [y1D,dy1D]  = PhysSpace1_Sub(this,y10,y20,x1,x1,f);        
         y1D_kv      = kronecker(y1D,ones(size(y2D)));
         y2D_kv      = kronecker(ones(size(y1D)),y2D);
         
@@ -119,14 +116,14 @@ function M_conv  = ComputeConvolutionMatrix_Pointwise(this,f)
     if(nargin < 3)
         return;
     end    
-    
-    function y = fy2(y2)
-        y = f(GetDistance(this,zeros(size(y2)),y2));
-    end
-
-    function y = fy1(y1)
-        y = f(GetDistance(this,y1,zeros(size(y1))));
-    end
+%     
+%     function y = fy2(y2)
+%         y = f(GetDistance(this,zeros(size(y2)),y2));
+%     end
+% 
+%     function y = fy1(y1)
+%         y = f(GetDistance(this,y1,zeros(size(y1))));
+%     end
 
 end
 

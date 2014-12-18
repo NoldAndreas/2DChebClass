@@ -18,6 +18,7 @@ function [AS,res] = SimulationInfAnnulus()
     figure;
     AS.PlotGridLines();  hold on;
     AS.PlotGrid();
+    AS.PlotIsoline(0,'y1');
     xlim([-5 5]);
     ylim([-5 5]);
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);

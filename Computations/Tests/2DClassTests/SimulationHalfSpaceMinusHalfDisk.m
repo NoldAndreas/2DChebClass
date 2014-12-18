@@ -6,9 +6,9 @@ function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
     
     %Initialization
     N1 =  20;   N2 = 20;
-    R       = 3;
+    R       = 1;
     L1      = 1;    
-    Origin  = [2;0.5];
+    Origin  = [0;0];
     N       = [N1;N2];
     Rmax    = Inf;
 
@@ -19,8 +19,9 @@ function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
     figure;
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
-    xlim([(Origin(1)-5) (Origin(1)+5)]);
-    ylim([(Origin(2)) (Origin(2) + 5)]);
+    SMD.PlotIsoline(0,'y1');
+    xlim([(Origin(1)-2) (Origin(1)+2)]);
+    ylim([(Origin(2)-0.5) (Origin(2) + 3)]);
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
     res.fig_handles{1} = gcf;
