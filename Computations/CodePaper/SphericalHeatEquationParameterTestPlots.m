@@ -15,7 +15,7 @@ for iL=1:length(Lvals)
 end
 legend(num2str(Lvals'))
 xlabel('$N$','interpreter','latex');
-ylabel('$\log \frac{ \| Du - u''\| }{ \| u'' \| }$','interpreter','latex');
+ylabel('$\log ( \| Du - u''\| / \| u'' \| )$','interpreter','latex');
 
 save2pdf([saveDir 'DErrDecay.pdf'],hDErrDecay);
 
@@ -27,7 +27,7 @@ for iL=1:length(Lvals)
 end
 legend(num2str(Lvals'))
 xlabel('$N$','interpreter','latex');
-ylabel('$\log \frac{ \| D^2u - u''''\| }{ \| u'''' \| }$','interpreter','latex');
+ylabel('$\log (\| D^2u - u''''\| / \| u'''' \| )$','interpreter','latex');
 save2pdf([saveDir 'D2ErrDecay.pdf'],hD2ErrDecay);
 
 hDDErrDecay = figure('Position',defaultPos);
@@ -38,7 +38,7 @@ for iL=1:length(Lvals)
 end
 legend(num2str(Lvals'))
 xlabel('$N$','interpreter','latex');
-ylabel('$\log \frac{ \| DDu - u''''\| }{ \| u'''' \| }$','interpreter','latex');
+ylabel('$\log (\| DDu - u''''\| / \| u'''' \|)$','interpreter','latex');
 save2pdf([saveDir 'DDErrDecay.pdf'],hDDErrDecay);
 
 hIntErrDecay = figure('Position',defaultPos);
@@ -49,7 +49,7 @@ for iL=1:length(Lvals)
 end
 legend(num2str(Lvals'))
 xlabel('$N$','interpreter','latex');
-ylabel('$\log \frac{ \| Iu - \int \!\!\!\! u \| }{ \| \int \!\!\!\! u \| }$','interpreter','latex');
+ylabel('$\log (|Iu - \int u|/|\int u |)$','interpreter','latex');
 save2pdf([saveDir 'IntErrDecay.pdf'],hIntErrDecay);
 
 
