@@ -1,12 +1,12 @@
 function Check_FMT_SumRule()
 
-    PhysArea = struct('N',[1,100],...
+    PhysArea = struct('N',[1,60],...
                       'L1',5,'L2',4,'L2_AD',4.,...
                       'y2wall',0.,...
                       'N2bound',24,'h',1,...
                       'alpha_deg',90);
 
-    V2Num   = struct('Fex','SplitDisk','N',[34,34]);
+    V2Num   = struct('Fex','SplitDisk','N',[20,20]);
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
@@ -22,27 +22,19 @@ function Check_FMT_SumRule()
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
                       'kBT',0.75,...                                                    
-                      'Dmu',0.03,'nSpecies',1,...
+                      'Dmu',-0.01,'nSpecies',1,...
                       'sigmaS',1);      
 
     config = v2struct(optsNum,optsPhys);                        
     
     
-    epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
-    
-    for i = 1:length(epw)
-        config.optsPhys.V1.epsilon_w = epw(i);%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+    %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
+       
+    config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
 
-        CL = ContactLineHS(config);
-        CL.Preprocess();    
-        CL.ComputeAdsorptionIsotherm(300,'drying');    
-        %CL.ComputeAdsorptionIsotherm(300,'wetting');    
-        CL.FittingAdsorptionIsotherm([10 14],1)
-        if(optsPhys.kBT == 0.75)
-            CL.SumRule_AdsorptionIsotherm(0.3463);
-        end
-        
-        clear('CLT');
-    end
+    CL = ContactLineHS(config);
+    CL.Preprocess();    
+
+     
     
 end
