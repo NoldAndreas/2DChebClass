@@ -50,9 +50,9 @@ function ConvolutionTest
 %     yTest = y(geom.N-20);
 %     shiftedKernel = Gaussian1(y-yTest);
 %     figure('Position',defaultPos);
-%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'r');
+%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');
 %     hold on
-%     plot(y,shiftedKernel,'or');
+%     plot(y,shiftedKernel,'ok');
 %     xlim([-10,10]);
 %     ylim([-0.5,1.7]);
 %     xlabel('$y$','interpreter','latex');
@@ -62,9 +62,9 @@ function ConvolutionTest
 %     yTest = y(geom.N-10);
 %     shiftedKernel = Gaussian1(y-yTest);
 %     figure('Position',defaultPos);
-%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'b');
+%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');
 %     hold on
-%     plot(y,shiftedKernel,'ob');
+%     plot(y,shiftedKernel,'ok');
 %     xlim([-10,10]);
 %     ylim([-0.5,1.7]);
 %     xlabel('$y$','interpreter','latex');
@@ -74,9 +74,9 @@ function ConvolutionTest
 %     yTest = y(geom.N-6);
 %     shiftedKernel = Gaussian1(y-yTest);
 % 	figure('Position',defaultPos);
-%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'m');
+%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');
 %     hold on
-%     plot(y,shiftedKernel,'om');
+%     plot(y,shiftedKernel,'ok');
 %     xlim([-10,10]);
 %     ylim([-0.5,1.7]);
 %     xlabel('$y$','interpreter','latex');
@@ -92,7 +92,7 @@ function ConvolutionTest
     gConv12 = GaussianConv12(y);
     gConv13 = GaussianConv13(y);
     
-    shapeParams.N  = 200;
+    shapeParams.N  = 50;
     shapeParams.L  = 2;
     
     % false gives pointwise convolution
@@ -107,39 +107,39 @@ function ConvolutionTest
     gPtwise3 = convMatrixPtwise*g3;
     gBasic3 = convMatrixBasic*g3;
 
-    
-    figure('Position',defaultPos);
-    plot(Interp.pts,Interp.InterPol*g1,'r');
-    hold on
-    plot(Interp.pts,Interp.InterPol*g2,'b');
-    plot(Interp.pts,Interp.InterPol*g3,'m');
-    plot(y,g1,'or');
-    plot(y,g2,'ob');
-    plot(y,g3,'om');
-    xlim([-20,20]);
-    xlabel('$y$','interpreter','latex');
-    ylabel('$g_j$','interpreter','latex');
-    save2pdf([saveDir 'convolutionGaussians.pdf'],gcf);
-    
-    figure('Position',defaultPos);
-    plot(Interp.pts,Interp.InterPol*gPtwise2,'b');
-    hold on
-    plot(y,gPtwise2,'ob');
-    plot(Interp.pts,Interp.InterPol*gBasic2,'--b');
-    plot(y,gBasic2,'xb');
-
-    plot(Interp.pts,Interp.InterPol*gPtwise3,'m');
-    hold on
-    plot(y,gPtwise3,'om');
-    plot(Interp.pts,Interp.InterPol*gBasic3,'--m');
-    plot(y,gBasic3,'xm');
-
-    
-    %plot(y,gConv,'og');
-    xlim([-20,20]);
-    xlabel('$y$','interpreter','latex');
-    ylabel('$g_1 \ast g_2$','interpreter','latex');
-    save2pdf([saveDir 'convolutionResults.pdf'],gcf);
+     
+%     figure('Position',defaultPos);
+%     plot(Interp.pts,Interp.InterPol*g1,'r');
+%     hold on
+%     plot(Interp.pts,Interp.InterPol*g2,'b');
+%     plot(Interp.pts,Interp.InterPol*g3,'m');
+%     plot(y,g1,'or');
+%     plot(y,g2,'ob');
+%     plot(y,g3,'om');
+%     xlim([-20,20]);
+%     xlabel('$y$','interpreter','latex');
+%     ylabel('$g_j$','interpreter','latex');
+%     save2pdf([saveDir 'convolutionGaussians.pdf'],gcf);
+%     
+%     figure('Position',defaultPos);
+%     plot(Interp.pts,Interp.InterPol*gPtwise2,'b');
+%     hold on
+%     plot(y,gPtwise2,'ob');
+%     plot(Interp.pts,Interp.InterPol*gBasic2,'--b');
+%     plot(y,gBasic2,'xb');
+% 
+%     plot(Interp.pts,Interp.InterPol*gPtwise3,'m');
+%     hold on
+%     plot(y,gPtwise3,'om');
+%     plot(Interp.pts,Interp.InterPol*gBasic3,'--m');
+%     plot(y,gBasic3,'xm');
+% 
+%     
+%     %plot(y,gConv,'og');
+%     xlim([-20,20]);
+%     xlabel('$y$','interpreter','latex');
+%     ylabel('$g_1 \ast g_2$','interpreter','latex');
+%     save2pdf([saveDir 'convolutionResults.pdf'],gcf);
     
     ptwiseErr2 = L2norm(gPtwise2-gConv12)/L2norm(gConv12)
     basicErr2  = L2norm(gBasic2-gConv12)/L2norm(gConv12)
