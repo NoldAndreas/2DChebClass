@@ -9,12 +9,24 @@ classdef InfAnnulus < Polar_SpectralFourierNoOrigin
             this@Polar_SpectralFourierNoOrigin(Geometry.N(1),Geometry.N(2));
             
             this.RMin = Geometry.RMin; 
-            this.L    = Geometry.L; 
+            
+            if(isfield(Geometry,'L'))
+                this.L    = Geometry.L; 
+            elseif(isfield(Geometry,'f'))
+                this.L = FindOptimalL(@RadMap,this.Pts.x1,@Geometry.f,10);
+            else
+                error('InfAnnulus: No L or f given in input.');
+            end
+            
             if(isfield(Geometry,'Origin'))
                 this.Origin = Geometry.Origin;
             end
             
-            InitializationPts(this);                                    
+            InitializationPts(this);   
+            
+            function r = RadMap(x,L)
+                r = QuotientMap(x,L,this.RMin,inf);
+            end
         end                         
     end
     

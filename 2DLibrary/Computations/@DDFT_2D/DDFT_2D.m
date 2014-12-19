@@ -66,8 +66,8 @@ classdef DDFT_2D < Computation
                 this.do2Phase = true;
             end
            
-            Preprocess_HardSphereContribution(this);
             Preprocess_MeanfieldContribution(this);
+            Preprocess_HardSphereContribution(this);            
             Preprocess_HIContribution(this);           
             Preprocess_ExternalPotential(this);                                   
             Preprocess_SubArea(this);
@@ -230,9 +230,7 @@ classdef DDFT_2D < Computation
                 this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);                
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
-        end
-  
-        
+        end       
         function fig_h = PlotDynamics(this,rec)
             if(nargin == 1)
                 rec = false;
@@ -262,7 +260,6 @@ classdef DDFT_2D < Computation
         end
         
         ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
-        ComputeDynamics(this)        
-        
+        ComputeDynamics(this)           
     end
 end
