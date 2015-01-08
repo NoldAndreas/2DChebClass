@@ -1,4 +1,4 @@
-function SymmetryClassification_1()
+function SymmetryClassificationIb_Inhomogenous()
 %%  Solution I.a for a linear shear flow
 
 %% ODE to solve
@@ -11,11 +11,10 @@ function SymmetryClassification_1()
     ChangeDirData([dirData filesep 'SymmetryClassification'],'ORG');
 
     %% Parameters
-    k = 0.5;
+    k = 2;
     N = 100;
     L = 4;       
     
-
     %% Initialization
     %     
     % # for computation of similarity solution
@@ -71,17 +70,17 @@ function SymmetryClassification_1()
     IS.plot(f(:,1),'plain'); hold on;
     IS.plot(f(:,ceil(end/2)),'plain');
     IS.plot(f(:,ceil(end)),'plain');
-    text(-4.5,-0.5,['$\eta= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',18);
-    text(-4.5,-0.19,['$\eta= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',18);
-    text(-4.5,-0.05,['$\eta= ',num2str(t(ceil(end))),'$'],'Interpreter','Latex','fontsize',18);
+    text(-4.5,-0.5,['$t= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',18);
+    text(-4.5,-0.19,['$t= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',18);
+    text(-4.5,-0.05,['$t= ',num2str(t(ceil(end))),'$'],'Interpreter','Latex','fontsize',18);
     
-    xlabel('$\xi$','Interpreter','Latex','fontsize',25);
-    ylabel('$f^{(I.a)}$','Interpreter','Latex','fontsize',25);
+    xlabel('$x/y$','Interpreter','Latex','fontsize',25);
+    ylabel('$f^{(I.b)}$','Interpreter','Latex','fontsize',25);
     
     subplot(3,2,2);
     Psi = (y2.^k).*(IP*f(:,1));        
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));    
-    title(['$\eta= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',16);
+    title(['$t= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
     
@@ -89,25 +88,25 @@ function SymmetryClassification_1()
     subplot(3,2,4);    
     Psi = (y2.^k).*(IP*f(:,ceil(end/2)));
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
-    title(['$\eta= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',16);
+    title(['$t= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
     
     subplot(3,2,6);    
     Psi = (y2.^k).*(IP*f(:,end));
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
-    title(['$\eta= ',num2str(t(end)),'$'],'Interpreter','Latex','fontsize',16);
+    title(['$t= ',num2str(t(end)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);
     
-    print2eps([dirData filesep 'SelfSimilarSolution_Ia_1'],f1);
-    saveas(f1,[dirData filesep 'SelfSimilarSolution_Ia_1.fig']);
+    print2eps([dirData filesep 'SelfSimilarSolution_Ib_Inh'],f1);
+    saveas(f1,[dirData filesep 'SelfSimilarSolution_Ib_Inh.fig']);
     
     
     %% Homogeneous solutions
     figure('color','white');
     Psi = (y1 + y2*1i).^k;
-    Psi = arctan(y1./y2);
+    Psi = atan(y1./y2);
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     
     
