@@ -233,7 +233,11 @@
        function PlotGridLines(this)
             this.Sub_HalfSpace.PlotGridLines(); hold on;
             this.Sub_Strip.PlotGridLines();
-       end        
+       end           
+       function PlotGrid(this)
+            this.Sub_HalfSpace.PlotGrid(); hold on;
+            this.Sub_Strip.PlotGrid();
+       end           
        
 %        function PlotGrid(this)
 %             scatter(this.Sub_Strip.Pts.y1_kv,...

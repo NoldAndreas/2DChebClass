@@ -1,4 +1,4 @@
-function data = SimulationHalfSpace_Tref()
+function [data,res] = SimulationHalfSpace_Tref()
 
     disp('** Simulation HalfSpace Tref **');
     AddPaths();    
@@ -18,7 +18,7 @@ function data = SimulationHalfSpace_Tref()
     [V,Vdiff]          = vext(Pts.y1_kv,Pts.y2_kv);    
     [VP,VPDiff]        = vext(Interp.pts1,Interp.pts2);  
     
-    
+    figure;
     THS.plot(V,'SC');    
     figure
     subplot(2,2,1); THS.plot(Vdiff.dy1,'SC');
@@ -47,6 +47,17 @@ function data = SimulationHalfSpace_Tref()
     [VP]        = vext(Interp.pts1,Interp.pts2);                          
     
     disp(['Error of interpolation:',num2str(max(abs(V-Vt)))]);
+    
+    figure;
+    THS.PlotGridLines(); 
+    THS.PlotGrid();
+    ylim([0 10]);
+    xlim([-7 7]);
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+    
         
     figure;
     THS.plot(V,'SC'); 

@@ -10,12 +10,13 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     
     shapeAnn.RMin = params.LJsigma;
     if(isfield(optsPhys,'FexNum'))
-        shapeAnn.L    = optsPhys.FexNum.L;
+        shapeAnn.f    = str2func(fstr);%optsPhys.FexNum.L;
         shapeAnn.N    = optsPhys.FexNum.N;
     else    
         shapeAnn.L    = optsPhys.optsNum.PhysArea.Conv.L;
         shapeAnn.N    = optsPhys.optsNum.PhysArea.Conv.N;
     end
+    
     annulusArea       = InfAnnulus(shapeAnn);
 
     shapeDisc.R = params.LJsigma;

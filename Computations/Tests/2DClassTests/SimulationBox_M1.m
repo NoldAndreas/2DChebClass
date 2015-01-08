@@ -1,4 +1,4 @@
-function data = SimulationBox_M1(N1,N2,L1,L2,vext)
+function [data,res] = SimulationBox_M1(N1,N2,L1,L2,vext)
 
     disp('** Simulation Box M1 **');
     AddPaths();
@@ -65,6 +65,14 @@ function data = SimulationBox_M1(N1,N2,L1,L2,vext)
     BI.plot(fConv(Interp.pts1,Interp.pts2));
     title('Convolution');
     pbaspect([1 1 1]);
+    
+    figure;
+    BI.PlotGridLines();    
+    BI.PlotGrid();
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     %***************************************************************
     %   Mapping functions:
     %***************************************************************         

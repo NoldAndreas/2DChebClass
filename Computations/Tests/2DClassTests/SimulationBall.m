@@ -1,4 +1,4 @@
-function data = SimulationBall(N1,N2,vext)
+function [data,res] = SimulationBall(N1,N2,vext)
 
     disp('** Simulation Ball **');
     AddPaths();
@@ -10,8 +10,8 @@ function data = SimulationBall(N1,N2,vext)
         N1 = 20;   N2 = 20;
         vext  = @VTest;
         R     = 3;
-        theta1 = 0;
-        theta2 = pi;
+        theta1 = pi/5;
+        theta2 = 3/4*pi;
         Origin = [0;0];
         N      = [N1;N2];
     end        
@@ -41,13 +41,17 @@ function data = SimulationBall(N1,N2,vext)
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color                
-    SG.plot(V,true);        
+     SG.plot(V,true);        
     title('Interpolation');   
     
-    figure
+    figure;
     SG.PlotGridLines();    
     SG.PlotGrid();
-        
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+    
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         

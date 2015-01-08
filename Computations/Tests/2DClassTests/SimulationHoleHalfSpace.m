@@ -1,11 +1,11 @@
-function SimulationHoleHalfSpace()
+function [HHS,res] = SimulationHoleHalfSpace()
 
     disp('** Simulation Hole Half Space **');
     AddPaths();    
     close all;
     
     %Initialization    
-    N1 =  30;   N2 = 30;
+    N1 =  20;   N2 = 20;
     R   = 1;
     L   = 4;        
     OriginHole  = [2;5];
@@ -17,9 +17,14 @@ function SimulationHoleHalfSpace()
     
     [V,VInt] = VTest(HHS.Pts.y1_kv,HHS.Pts.y2_kv);
     
-    HHS.PlotGrid();
-    xlim([-6 12]);
-    ylim([0 15]);
+    figure;
+    HHS.PlotGrid(); hold on;
+    HHS.PlotGridLines();
+    xlim([-6 10]);
+    ylim([0 10]);
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     
     PrintErrorPos(Int*V-VInt,'Integration');   
     

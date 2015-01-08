@@ -1,4 +1,4 @@
-function SimulationWedge
+function [WDG,res] = SimulationWedge
 
     disp('** SimulationPolarWedge **');    
 	if(length(dbstack) == 1)
@@ -8,11 +8,11 @@ function SimulationWedge
     
     %Initialization
     
-    R                   = 2;
-    half_wedge_angle    = pi/2;%4*pi/5;
+    R                   = 1;
+    half_wedge_angle    = pi/4;%4*pi/5;
     Geometry = struct('R_in',0,'R_out',R,...
-                      'th1',-half_wedge_angle,...
-                      'th2',half_wedge_angle,'N',[30,20]);
+                      'th1',pi/2-half_wedge_angle,...
+                      'th2',pi/2+half_wedge_angle,'N',[20,20]);
     
     vext              = @Vext7;
     
@@ -24,6 +24,14 @@ function SimulationWedge
     Conv   = WDG.ComputeConvolutionMatrix(@f2,true);            
     toc
     
+    figure;
+    WDG.PlotGridLines();  hold on;
+    WDG.PlotGrid();
+   % xlim([-5 5]);
+	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
+    res.fig_handles{1} = gcf;    
+    
      %Check Polar Spectral/Spectral map in 2D:                      
      intBound         = struct('y1_l',WDG.PhysSpace1(-1),...
                                'y1_u',WDG.PhysSpace1(1),...
@@ -33,6 +41,7 @@ function SimulationWedge
      [V,Vdiff,VInt] = vext(Pts.y1_kv,Pts.y2_kv,intBound,'polar');    
      VP             = vext(Interp.pts1,Interp.pts2);           
        
+     figure;
      %Check Interpolation
      WDG.plot(V);
     
@@ -43,7 +52,6 @@ function SimulationWedge
 	 %Check Integration
      display([' Error in Integration: ', num2str(Int*V-VInt)]);
     
-
      %Check Convolution
      figure
      fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);

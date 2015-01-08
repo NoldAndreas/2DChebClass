@@ -21,9 +21,13 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
                 this.y2Min = Geometry.y2Min;
             end
             if(isfield(Geometry,'Conv') && ~isempty(Geometry.Conv))
-                this.LConv = Geometry.Conv.L;
-                this.L2Conv = Geometry.Conv.L2;
-                this.ConvN  = Geometry.Conv.N;
+                this.ConvN = Geometry.Conv.N;
+                if(isfield(Geometry.Conv,'L'))
+                    this.LConv = Geometry.Conv.L;                
+                end
+                if(isfield(Geometry.Conv,'L2'))
+                    this.L2Conv = Geometry.Conv.L2;
+                end
             end
             this.polar = 'cart';            
             InitializationPts(this);            

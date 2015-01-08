@@ -53,8 +53,10 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     AD          = zeros(length(pts.y1_kv),this.M,numel(weights)+1);%always include unity weight
     areaPtsCart = area.GetCartPts();
 
-    y2Sep    = this.y2wall + this.R/sin(this.alpha) + ...
-                           + abs(min(areaPtsCart.y2_kv))/sin(this.alpha);
+    y2Wall   = min(this.Pts.y2);
+                %this.GetInvCartPts(0,min(this.GetCartPts.y2_kv)).y2_kv; 
+                %this.y2wall + this.R/sin(this.alpha)    
+    y2Sep    = y2Wall + abs(min(areaPtsCart.y2_kv))/sin(this.alpha);
     % Note: division through sin(this.alpha) takes into account that
     % pts.y1_kv and pts.y2_kv are the coordinates in the skewed
     % grid.

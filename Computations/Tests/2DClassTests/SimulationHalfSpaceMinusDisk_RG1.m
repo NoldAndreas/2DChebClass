@@ -1,4 +1,4 @@
-function [SMD,res] = SimulationHalfSpaceMinusDisk()
+function [SMD,res] = SimulationHalfSpaceMinusDisk_RG1()
 
     disp('** Simulation HalfSpace Minus Disk **');
     AddPaths();    
@@ -8,7 +8,7 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
     N1 =  15;   N2 = 15;
     R       = 1;
     L1      = 1;    
-    Origin  = [0.;0.5];%0.5];
+    Origin  = [0.;10];%0.5];
     y2Wall  = 0;
     N       = [N1;N2];
     Rmax    = Inf;

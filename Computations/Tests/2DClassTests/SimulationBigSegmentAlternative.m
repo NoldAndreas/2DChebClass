@@ -1,4 +1,4 @@
-function [data,res] = SimulationBigSegment(N1,N2,vext)
+function [data,res] = SimulationBigSegmentAlternative(N1,N2,vext)
 
     disp('** Simulation SimulationBigSegment **');
     AddPaths();
@@ -53,29 +53,34 @@ function [data,res] = SimulationBigSegment(N1,N2,vext)
     IP             = abox.SubShapePts(anarc.Pts);
     Int            = anarc.IntSc*IP;  
     scatter(anarc.Pts.y1_kv,anarc.Pts.y2_kv,'.')
-    disp(['Error in Integration over Inner Path: ',num2str(Int*V-R*2*Dth)]);        
-
-
-    %*************************************
-    %*** Check Original Integration ***
-    %*************************************    
-    N1T = 20; N2T = 20;
-    Wall_Y       = 1;
-    Wall_VertHor = 'horizontal';
-	shape        = v2struct(Origin,R,Wall_Y,Wall_VertHor);
-    shape.NW = [N1T,N2T];   
-    shape.NT = [N1T,N2T];   
-    shape.sphere = false;    
-    BS      = BigSegment(shape);    
-    IP      = abox.SubShapePts(BS.GetCartPts);
-    IntA    = BS.ComputeIntegrationVector()*IP;
+    disp(['Error in Integration over Inner Path: ',num2str(Int*V-R*2*Dth)]);
+        
+    %***************************************************************
+    %***************************************************************
     
-    data.IntA     = abs(IntA*V-VInt);
-    display([' Error in Integration: ', num2str(data.IntA)]);
+    shape   = v2struct(Origin,R,h);
+    shape.N = [N1T,N2T];
+    BSA     = BigSegmentAlternative(shape);
+    BSA.ComputeIntegrationVector();
+    IP      = abox.SubShapePts(BSA.GetCartPts);    
+    Int     = BSA.Int*IP;            
+    V                = vext(Pts.y1_kv,Pts.y2_kv);   
+    [VPS,Vdiff,VInt] = vext(BSA.Pts.y1_kv,BSA.Pts.y2_kv);
+           
+    %Check Differentiation
+    vplot   = IP*V;
+    %data    = displayErrorsPos(PtsS,vplot,VPS,V,Vdiff,DiffS,'cart');    
+    
+    %Check Integration
+    data.Int = abs(Int*V-VInt);
+    display([' Error in alternative Segment Integration: ', num2str(data.Int)]);                
+                       
+    data.N1 = N1; data.N2 = N2;
+    
     
     figure;
-    BS.PlotGridLines();    
-    BS.PlotGrid();
+    BSA.PlotGridLines();    
+    BSA.PlotGrid();
     	
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        

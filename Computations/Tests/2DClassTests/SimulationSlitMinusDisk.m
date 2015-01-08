@@ -1,4 +1,4 @@
-function data = SimulationSlitMinusDisk(N1,N2,vext)
+function [data,res] = SimulationSlitMinusDisk(N1,N2,vext)
 
     disp('** Simulation Slit Minus Disk **');
     AddPaths();    
@@ -21,9 +21,13 @@ function data = SimulationSlitMinusDisk(N1,N2,vext)
     [Pts,Diff,Int,Ind] = SMD.ComputeAll();    
     Interp             = SMD.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     
+    figure;
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
     xlim([-5 5]);
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
+    res.fig_handles{1} = gcf;    
         
     [V,Vdiff,VInt]   = VTest(Pts.y1_kv,Pts.y2_kv);
     [VP]             = VTest(Interp.pts1,Interp.pts2);

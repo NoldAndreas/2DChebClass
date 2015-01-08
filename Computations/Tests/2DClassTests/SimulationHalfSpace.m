@@ -1,4 +1,4 @@
-function data = SimulationHalfSpace(N1,N2,L1,L2,vext)
+function [data,res] = SimulationHalfSpace(N1,N2,L1,L2,vext)
 
     disp('** Simulation Half Space **');
     if(length(dbstack) == 1)
@@ -16,8 +16,7 @@ function data = SimulationHalfSpace(N1,N2,L1,L2,vext)
         PlotArea       = struct('y1Min',-5,'y1Max',5,'L1',3,'L2',2,...
                            'N2',100,'N1',100,'y2Min',0,'y2Max',4);    
 
-        Phys_Area.Conv      = struct('L',3,'L2',1,'N',[30,30]);%'ep2Conv',0.1                       
-        
+        Phys_Area.Conv      = struct('L',3,'L2',1,'N',[30,30]);%'ep2Conv',0.1
     else
         N = [N1;N2];
     end        
@@ -62,6 +61,20 @@ function data = SimulationHalfSpace(N1,N2,L1,L2,vext)
     title('Convolution');
     pbaspect([1 1 1]);
 
+    figure;
+    HS.PlotGridLines();    
+    HS.PlotGrid();
+    HS.PlotIsoline(0,'y2');
+    HS.PlotIsoline(-1/sqrt(2),'y1');
+    HS.PlotIsoline(1/sqrt(2),'y1');
+    ylim([0 10]);
+    xlim([-10 10]);
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
+                                                       
+ 
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         

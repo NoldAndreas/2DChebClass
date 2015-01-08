@@ -79,7 +79,20 @@ classdef HoleInHalfSpace < handle
                 int      = [int,IntStrip];
             end
         end        
-        
+        function PlotGridLines(this)
+           if(~isempty(this.Strip))
+               this.Strip.PlotGridLines();
+           end
+           if(~isempty(this.LeftSlit))
+               this.LeftSlit.PlotGridLines();
+           end
+           if(~isempty(this.RightSlit))
+               this.RightSlit.PlotGridLines();
+           end
+           if(~isempty(this.UpperHS))
+               this.UpperHS.PlotGridLines();
+           end
+        end
         function PlotGrid(this,InitFig)    
             global PersonalUserOutput
             if(~PersonalUserOutput)

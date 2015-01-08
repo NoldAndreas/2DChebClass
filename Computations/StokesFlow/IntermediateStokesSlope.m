@@ -38,7 +38,7 @@ function theta = IntermediateStokesSlope(z,lambda)
         
         plotOpts = struct('plain',true,'linecolor','b','linewidth',2,'linestyle','-');
         f1 =  figure('color','white','Position',[0 0 800 800]);
-        plot(y,GHR(y),'b','linewidth',2); hold on;
+        plot(y,GHR_lambda0(y),'b','linewidth',2); hold on;
         plotOpts.linecolor = 'r';
         SL.plot(IntM*OneOverf(y,1),plotOpts); hold on; 
         plotOpts.linecolor = 'm';
@@ -55,7 +55,7 @@ function theta = IntermediateStokesSlope(z,lambda)
         
         plotOpts = struct('plain',true,'linecolor','b','linewidth',2,'linestyle','-');        
         f2 =  figure('color','white','Position',[0 0 800 800]);
-        plot(y,GHR(y),'b','linewidth',2); hold on;
+        plot(y,GHR_lambda0(y),'b','linewidth',2); hold on;
         plotOpts.linecolor = 'r';
         SL.plot(IntM*OneOverf(y,1),plotOpts); hold on; 
         plotOpts.linecolor = 'm';
@@ -102,14 +102,6 @@ function theta = IntermediateStokesSlope(z,lambda)
     function h = f_interp(y)
         IP = SL.ComputeInterpolationMatrix(SL.CompSpace(y));
         h  = IP.InterPol*(IntM*f)-z;
-    end
-
-    function z = GHR(t)
-        z = 1i*pi^2/24 - t/2.*log(1+exp(1i*t)) ...
-            + 1i/2*(  dilog(1+exp(1i*t)) + ...
-                      dilog(exp(1i*t)) ) - sin(t)/2;
-        disp(['Max imaginary part: ',num2str(max(imag(z)))]);
-        z = real(z);
-    end
+    end    
 
 end

@@ -1,4 +1,4 @@
-function data = SimulationBox_Tref(N1,N2,L1,L2,vext)
+function [data,res] = SimulationBox_Tref(N1,N2,L1,L2,vext)
 
     disp('** Simulation Box Tref **');
     AddPaths();    
@@ -76,6 +76,14 @@ function data = SimulationBox_Tref(N1,N2,L1,L2,vext)
     TS.plot(fConv(Interp.pts1,Interp.pts2));
     title('Convolution');
     pbaspect([1 1 1]);    
+    
+    figure;
+    TS.PlotGridLines();    
+    TS.PlotGrid();
+    	
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    res.fig_handles{1} = gcf;
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         
