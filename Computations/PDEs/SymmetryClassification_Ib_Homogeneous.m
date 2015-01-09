@@ -11,7 +11,7 @@ function SymmetryClassification_Ib_Homogeneous()
     ChangeDirData([dirData filesep 'SymmetryClassification'],'ORG');
 
     %% Parameters
-    k = 0;
+    k  = 1.;
     %% Initialization
     %     
         
@@ -20,24 +20,41 @@ function SymmetryClassification_Ib_Homogeneous()
     plotBox  = shapeBox;
     plotBox.N = [100,100];
     BX        = Box(shapeBox);
-    Geometry = struct('R_in',0.5,'R_out',2,...
+    Geometry = struct('R_in',0.,'R_out',2,...
                       'th1',0,'th2',pi,'N',[10,20]);
     
     BX        = Wedge(Geometry);
     BX.ComputeAll();
     BX.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
     Pts = BX.GetCartPts();
-        
-    p = Psi(Pts.y1_kv,Pts.y2_kv);
+    x   = Pts.y1_kv;  y = Pts.y2_kv;    
    % BX.plot(p,'contour',struct('clabel',false,'linecolor','k'));    pbaspect([1 1 1]);  
   %  u = BX.Diff.Dy2;
   %  v = -BX.Diff.Dy1;
+  
+  
+    if(k==0)
+        psi = atan(x./y);        
+        u = -x./(x.^2+y.^2);
+        v = -y./(x.^2+y.^2);
+    else
+        A1 = 1; A2 = 0;
+        psi = real(A1*(x+1i*y).^k + A2*(x-1i*y).^k);
+        u   = real( A1*1i*k*(x+1i*y).^(k-1) -  A2*1i*k*(x-1i*y).^(k-1)  );
+        v   = real( -A1*k*(x+1i*y).^(k-1) +  A2*k*(x-1i*y).^(k-1)  );        
+        u(isnan(u))  = 0;
+        v(isnan(v))  = 0;
+    end
+    psi = y.*erf(x./y);    
+    psi(y==0) = 0;
+    u         = erf(x./y) - 2/sqrt(pi)*x./y.*exp(-(x./y).^2);
+    v         = -2/sqrt(pi)*exp(-(x./y).^2);
     
-    u = -Pts.y1_kv./((Pts.y1_kv).^2+(Pts.y2_kv).^2);
-    v = -Pts.y2_kv./((Pts.y1_kv).^2+(Pts.y2_kv).^2);
     
     f1 = figure('Position',[0 0 800 450],'color','white');
-    BX.plotFlux([u;v],[],[],2,'k');%'contour',struct('clabel',false,'linecolor','k'));    
+    BX.plotFlux([u;v],[],[],2,'k');%'contour',struct('clabel',false,'linecolor','k'));  
+    hold on;
+    BX.plot(psi,'contour',struct('clabel',false,'linecolor','k'));    
     xlim([-2,2]);
     ylim([0,2]);
     pbaspect([2 1 1]);  
@@ -69,9 +86,6 @@ function SymmetryClassification_Ib_Homogeneous()
     
    
           
-    %% Right hand side of ODE
-    function p = Psi(x,y)        
-        p = atan(x./y);        
-    end
+    %% Right hand side of ODE    
 end
 

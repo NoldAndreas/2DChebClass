@@ -11,9 +11,9 @@ function SymmetryClassificationIb_Inhomogenous()
     ChangeDirData([dirData filesep 'SymmetryClassification'],'ORG');
 
     %% Parameters
-    k = 0.5;
+    k = 1;
     N = 100;
-    L = 4;       
+    L = 2;       
     
     %% Initialization
     %     
@@ -29,10 +29,10 @@ function SymmetryClassificationIb_Inhomogenous()
     Dy   = Diff.Dy(2:end-1,2:end-1);
     DDy  = Diff.DDy(2:end-1,2:end-1);        
         
-    shapeBox = struct('y1Min',-5,'y1Max',5,'N',[40,50],...
-                      'y2Min',0,'y2Max',5);
-    plotBox = struct('y1Min',-5,'y1Max',5,'N',[100,100],...
-                     'y2Min',0,'y2Max',5);                  
+    shapeBox = struct('y1Min',-1,'y1Max',1,'N',[41,50],...
+                      'y2Min',0,'y2Max',1);
+    plotBox = struct('y1Min',-1,'y1Max',1,'N',[100,100],...
+                     'y2Min',0,'y2Max',1);  
                   
     BX       = Box(shapeBox);    
     [PtsBx]  = BX.ComputeAll(plotBox);
@@ -54,8 +54,11 @@ function SymmetryClassificationIb_Inhomogenous()
     f = zeros(N,length(t));
         
     for i = 1:length(t)
-        h      = diag(1./(1+y.^2))*RHS(Pts.y(2:end-1)-t(i));            
-        f(:,i) = [0;A\h;0];
+        %h      = diag(1./(1+y.^2))*RHS(Pts.y(2:end-1)-t(i));                    
+        h      = diag(1./(1+Pts.y.^2))*RHS(Pts.y-t(i));                    
+        %h      = RHS(Pts.y(2:end-1)-t(i));                    
+        %f(:,i) = [0;A\h;0];
+        f(:,i) = Diff.DDy\h;
     end
     
     %% Plot    
@@ -77,10 +80,11 @@ function SymmetryClassificationIb_Inhomogenous()
     xlabel('$x/y$','Interpreter','Latex','fontsize',25);
     ylabel('$f^{(I.b)}$','Interpreter','Latex','fontsize',25);
     
-    subplot(3,2,2);
+    subplot(3,2,2);    
     Psi = (y2.^k).*(IP*f(:,1));        
+    Psi(y2.^k == inf) = 0;       
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));    hold on;
-    %u = BX.Diff.Dy2*Psi;    v = -BX.Diff.Dy1*Psi;
+    u = BX.Diff.Dy2*Psi;    v = -BX.Diff.Dy1*Psi;
     %BX.plotFlux([u;v],[],[],2,'k');
     %plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
     
@@ -91,6 +95,7 @@ function SymmetryClassificationIb_Inhomogenous()
     
     subplot(3,2,4);    
     Psi = (y2.^k).*(IP*f(:,ceil(end/2)));
+    Psi(y2.^k == inf) = 0;
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     title(['$t= ',num2str(t(ceil(end/2))),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
@@ -98,6 +103,7 @@ function SymmetryClassificationIb_Inhomogenous()
     
     subplot(3,2,6);    
     Psi = (y2.^k).*(IP*f(:,end));
+    Psi(y2.^k == inf) = 0;
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     title(['$t= ',num2str(t(end)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
@@ -109,7 +115,7 @@ function SymmetryClassificationIb_Inhomogenous()
     
     %% Homogeneous solutions
     figure('color','white');
-    Psi = (y1 + y2*1i).^k;
+    %Psi = (y1 + y2*1i).^k;
     Psi = atan(y1./y2);
     BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));   
     
@@ -122,6 +128,7 @@ function SymmetryClassificationIb_Inhomogenous()
         fPBox = (IP*fP);
         
         Psi   = (y2.^k).*fBox;
+        Psi(y2.^k == inf) = 0;
         
         title(['t = ',num2str(t(i))])
         subplot(1,2,1);
@@ -133,14 +140,17 @@ function SymmetryClassificationIb_Inhomogenous()
         %v(y2==0) = 0;        
         %vAbs = sqrt(u.^2 + v.^2);
         subplot(1,2,2);
-        BX.plot(Psi,'contour',struct('clabel',true));
+        %BX.plot(Psi,'contour',struct('clabel',true));
+        BX.plot(Psi);%,'contour',struct('clabel',true));
+        %figure; 
+        %BX.plotFlux([BX.Diff.Dy2*Psi,-BX.Diff.Dy1*Psi]);
         
         pause(0.1);
     end
           
     %% Right hand side of ODE
     function h = RHS(y)
-        h = exp(-y.^2);
+        h = y.*exp(-y.^2);
     end
 end
 
