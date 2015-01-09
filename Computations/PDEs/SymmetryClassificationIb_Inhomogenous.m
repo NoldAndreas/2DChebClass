@@ -11,7 +11,7 @@ function SymmetryClassificationIb_Inhomogenous()
     ChangeDirData([dirData filesep 'SymmetryClassification'],'ORG');
 
     %% Parameters
-    k = 2;
+    k = 0.5;
     N = 100;
     L = 4;       
     
@@ -79,7 +79,11 @@ function SymmetryClassificationIb_Inhomogenous()
     
     subplot(3,2,2);
     Psi = (y2.^k).*(IP*f(:,1));        
-    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));    
+    BX.plot(Psi,'contour',struct('clabel',false,'linecolor','k'));    hold on;
+    %u = BX.Diff.Dy2*Psi;    v = -BX.Diff.Dy1*Psi;
+    %BX.plotFlux([u;v],[],[],2,'k');
+    %plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
+    
     title(['$t= ',num2str(t(1)),'$'],'Interpreter','Latex','fontsize',16);
     xlabel('$x$','Interpreter','Latex','fontsize',25);
     ylabel('$y$','Interpreter','Latex','fontsize',25);

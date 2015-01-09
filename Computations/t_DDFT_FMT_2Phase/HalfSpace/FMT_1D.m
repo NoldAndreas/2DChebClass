@@ -48,10 +48,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     y2S     = Pts.y2_kv(markComp);
     ptsCart = HS.GetCartPts(y1S,y2S);
     
-    [VAdd,dVAdd] = getVAdd(ptsCart.y1_kv,ptsCart.y2_kv,0,optsPhys.V1);    
-    
-	[h1,h2,Int_1D]     = HS.ComputeIntegrationVector();    
-    
+    [VAdd,dVAdd]    = getVAdd(ptsCart.y1_kv,ptsCart.y2_kv,0,optsPhys.V1);    
+	[h1,h2,Int_1D]  = HS.ComputeIntegrationVector();    
     
     if(isempty(IntMatrFex_2D)) %LDA Approaches
         IntMatrFex = [];
@@ -114,8 +112,9 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     
     checkContactDensity = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
     %checkContactDensity = (p)/kBT;
+    postParms.contactDensity_relError = ((rho_ic1D(1)-checkContactDensity)/checkContactDensity);
     PrintErrorPos(rho_ic1D(1)-checkContactDensity,'First Sum Rule - for Contact Density');
-    PrintErrorPos(((rho_ic1D(1)-checkContactDensity)/checkContactDensity)*100,'First Sum Rule - for contact density (in per cent)');
+    PrintErrorPos(postParms.contactDensity_relError*100,'First Sum Rule - for contact density (in per cent)');
     
     %****************************
     %********** Plot   **********
@@ -272,7 +271,6 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         pbaspect([1 1 1]);
 
     end
-
     
    function PlotRosenfeldFMT_AADInf(FMTMatrices,rho)
         
@@ -302,8 +300,6 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
    end
    function do1Dplot_D(val)
             HS.do1DPlotNormal(val);
-    end
-
-
+   end
 
 end

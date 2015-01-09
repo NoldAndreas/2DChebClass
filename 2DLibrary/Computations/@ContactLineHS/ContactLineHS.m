@@ -63,11 +63,18 @@ classdef ContactLineHS < DDFT_2D
             %(3) Test Integration
             disp('*** Test integration vector ***');
             a = 2;
+            
             %(a) Integration in HalfSpace
-            pts   = this.IDC.GetCartPts();
-            r     = sqrt(pts.y1_kv.^2+(pts.y2_kv-R).^2);
-            testF = exp(-(r/a).^2);    
-            PrintErrorPos(this.IDC.Int*testF-a^2*pi/2,['Integration of exp(-(r/',num2str(a),')^2)']);    
+            if(this.IDC.N1 > 1)
+                pts   = this.IDC.GetCartPts();
+                r     = sqrt(pts.y1_kv.^2+(pts.y2_kv-R).^2);
+                testF = exp(-(r/a).^2);    
+                PrintErrorPos(this.IDC.Int*testF-a^2*pi/2,['Integration of exp(-(r/',num2str(a),')^2)']);    
+            end            
+            pts   = this.IDC.GetCartPts(zeros(this.IDC.N2,1),this.IDC.Pts.y2);
+            [h1,h2,Int_1D] = this.IDC.ComputeIntegrationVector();
+            testF = exp(-pts.y2_kv);              
+            PrintErrorPos(Int_1D*testF-exp(-min(pts.y2_kv)),'Integration of exp(-y_2)');
 
             %(b) Integration in Composed Half Space
             pts   = this.IDC.AD.GetCartPts();
@@ -80,7 +87,7 @@ classdef ContactLineHS < DDFT_2D
         end         
                 
         %1D surface tensions
-        function [om,rho1D] = Compute1D(this,WLWGLG)
+        function [om,rho1D,params] = Compute1D(this,WLWGLG)
             rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
             rhoGas_sat       = this.optsPhys.rhoGas_sat;
             optss            = this.optsPhys;   

@@ -15,19 +15,35 @@ function SymmetryClassification_Ib_Homogeneous()
     %% Initialization
     %     
         
-    shapeBox = struct('y1Min',-0.5,'y1Max',0.5,'N',[80,50],...
-                      'y2Min',0.,'y2Max',1);
+    shapeBox = struct('y1Min',-0.5,'y1Max',0.5,'N',[50,50],...
+                      'y2Min',0.1,'y2Max',1);
     plotBox  = shapeBox;
     plotBox.N = [100,100];
     BX        = Box(shapeBox);
-    Pts       = BX.ComputeAll(plotBox);        
+    Geometry = struct('R_in',0.5,'R_out',2,...
+                      'th1',0,'th2',pi,'N',[10,20]);
     
-    figure('Position',[0 0 800 800],'color','white');
+    BX        = Wedge(Geometry);
+    BX.ComputeAll();
+    BX.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
+    Pts = BX.GetCartPts();
+        
     p = Psi(Pts.y1_kv,Pts.y2_kv);
-    BX.plot(p,'contour',struct('clabel',true,'linecolor','k'));    pbaspect([1 1 1]);  
+   % BX.plot(p,'contour',struct('clabel',false,'linecolor','k'));    pbaspect([1 1 1]);  
+  %  u = BX.Diff.Dy2;
+  %  v = -BX.Diff.Dy1;
+    
+    u = -Pts.y1_kv./((Pts.y1_kv).^2+(Pts.y2_kv).^2);
+    v = -Pts.y2_kv./((Pts.y1_kv).^2+(Pts.y2_kv).^2);
+    
+    f1 = figure('Position',[0 0 800 450],'color','white');
+    BX.plotFlux([u;v],[],[],2,'k');%'contour',struct('clabel',false,'linecolor','k'));    
+    xlim([-2,2]);
+    ylim([0,2]);
+    pbaspect([2 1 1]);  
    
     xlabel('$x$','Interpreter','Latex','fontsize',25);
-    ylabel('$y$','Interpreter','Latex','fontsize',25);   
+    ylabel('$y$','Interpreter','Latex','fontsize',25);      
     
     print2eps([dirData filesep 'SelfSimilarSolution_Ib_Hom'],f1);
     saveas(f1,[dirData filesep 'SelfSimilarSolution_Ib_Hom.fig']);
@@ -36,7 +52,7 @@ function SymmetryClassification_Ib_Homogeneous()
     shapeBox = struct('y1Min',-5,'y1Max',5,'N',[50,70],...
                       'y2Min',0.0,'y2Max',10);
     plotBox  = shapeBox;
-    plotBox.N = [80,80];
+    plotBox.N = [100,100];
                                     
     %BX       = Box(shapeBox);    
     %[PtsBx]  = BX.ComputeAll(plotBox);

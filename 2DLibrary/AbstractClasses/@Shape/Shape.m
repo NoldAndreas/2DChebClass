@@ -33,8 +33,7 @@ classdef (Abstract) Shape < handle
             this.N2 = N2;             
         end
     end  
-    methods (Access = public)
-        
+    methods (Access = public)    
         function ptsCart = GetCartPts(this,pts_y1,pts_y2)
             
             if(nargin == 1)
