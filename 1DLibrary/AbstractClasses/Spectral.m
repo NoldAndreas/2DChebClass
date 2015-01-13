@@ -57,7 +57,7 @@ classdef (Abstract) Spectral < Interval
             Int = this.Int;  % 1 x N
 
             % find size of function matrix by making a dummy version
-            fPTemp = f(GetDistance(this,Pts.y,Pts.y));
+            fPTemp = f(Pts.y-Pts.y);
             fDim = size(fPTemp);
             nElts = prod(fDim(2:end)); % first dimension stores values
             
@@ -71,7 +71,7 @@ classdef (Abstract) Spectral < Interval
             Mmask = repmat({':'},[1,fDim]);
             
             for i=1:N 
-                fP          = f(GetDistance(this,Pts.y(i),Pts.y));
+                fP          = f(Pts.y(i)-Pts.y);  
                 Mmask{1} = i;
                 M_conv(Mmask{:}) = IntT.*fP;
             end

@@ -18,7 +18,7 @@
                      'V2Num',FexNum,...                     
                      'plotTimes',0:7/100:7);
 
-    epsilonS = 0;
+    epsilonS = -0.1;
 
     alphaS = 1;    
         
