@@ -195,8 +195,8 @@ function IterationStepFullProblem(this,opts)
             A_particles = [0,0,A_particles];
             
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
-            v_SeppAdd = v_SeppAdd(3:4);
-            A_SeppAdd = A_SeppAdd(3:4,[3:end]);            
+            v_SeppAdd   = v_SeppAdd(3:4);
+            A_SeppAdd   = A_SeppAdd(3:4,[3:end]);            
         elseif(Seppecher)    
             A_cont      = [zeros(M,3),A_cont];
             A_mom       = [zeros(2*M,3),A_mom];
@@ -243,13 +243,13 @@ function IterationStepFullProblem(this,opts)
         if(Seppecher)
             A  = [A_SeppAdd;A];
             v  = [v_SeppAdd;v];
-        end       
+        end
 
         if(~solveSquare)
             A = [A;A_particles];
             v = [v;v_particles];                           
         end
-        
+
         DisplayError(v);
                 
       %  A = A(2:end,2:end);

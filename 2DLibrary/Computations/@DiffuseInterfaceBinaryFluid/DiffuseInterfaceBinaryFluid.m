@@ -303,23 +303,22 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            v_cont(Ind.left)             = p(Ind.left);
 
             % (BC2) [uv;phi;G;p]
-           
            A_cont(Ind.right,:)           = 0;
            A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
            v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
-           
+
            indBC2 = Ind.right & Ind.top;
-           
-           A_m11 = zeros(M,5*M);            
+
+           A_m11 = zeros(M,5*M);
            A_m11(:,[F;F;T;F;F]) = diag(fWP);
            A_m11(:,[F;F;F;F;T]) = -Cak*eye(M);
-           m11 =  -p*Cak + fW;                 
-           
+           m11 =  -p*Cak + fW;
+
            A_m12 = zeros(M,5*M);
            A_m12(:,[T;T;F;F;F]) = Cak*[Diff.Dy2 , Diff.Dy1];
-           A_m12(:,[F;F;T;F;F]) = -Cn*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1); 
-           m12 = Cak*[Diff.Dy2 , Diff.Dy1]*uv - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi));                       
-           
+           A_m12(:,[F;F;T;F;F]) = -Cn*(diag(Diff.Dy1*phi)*Diff.Dy2 + diag(Diff.Dy2*phi)*Diff.Dy1);
+           m12 = Cak*[Diff.Dy2 , Diff.Dy1]*uv - Cn*((Diff.Dy1*phi).*(Diff.Dy2*phi));
+
            A_cont(indBC2,:) = IntPathUpLow*A_m12  ...
                                 + y2Max*(A_m11(Ind.right & Ind.top,:) - ...
                                          A_m11(Ind.left & Ind.top,:));           
@@ -359,7 +358,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                               + repmat(G,2,1).*(Diff.grad*phi)/Cak ...
                               - Diff.grad*p;
        end       
-         
+
        function PlotResults(this)           
            PlotResults@DiffuseInterface(this);
            

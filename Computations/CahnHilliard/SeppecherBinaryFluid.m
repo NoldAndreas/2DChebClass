@@ -25,7 +25,7 @@ config = v2struct(optsPhys,optsNum);
 opts = struct('noIterations',20,'lambda',0.8,'Seppecher_red',1);
 
 
-for y2Max = 5%20%10:5:15
+for y2Max = 10%20%10:5:15
     
     config.optsNum.PhysArea.y2Max = y2Max;
     
