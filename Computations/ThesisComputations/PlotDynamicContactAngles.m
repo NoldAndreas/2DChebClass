@@ -1,4 +1,5 @@
-function PlotDynamicContactAngles   
+function PlotDynamicContactAngles
+    t = 0:0.01:pi;
 
     if(exist('D:\','dir'))
         dir = 'D://SyncGit/Projects/Data/ExperimentalContactAngle/';
@@ -64,7 +65,7 @@ function PlotDynamicContactAngles
         noPlots = i + 1;
         
         thetaM = (0:0.01:pi)';
-        G_thM  = GHR(thetaM);
+        G_thM  = GHR_lambda0(thetaM);
 
         for k = 1:length(L_Lambda)
             plot(G_thM/log(L_Lambda(k)),thetaM*180/pi,lines{k},'linewidth',2);
@@ -97,7 +98,7 @@ function PlotDynamicContactAngles
             noPlots = noPlots + 1;        
         elseif(strcmp(FHoffmann_FGHR,'FGR'))
             thetaM = (0:0.01:pi)';
-            G_thM  = GHR(thetaM);    
+            G_thM  = GHR_lambda0(thetaM);    
             for k = 1:length(L_Lambda)
                 semilogx(G_thM/log(L_Lambda(k)),thetaM*180/pi,lines{k},'linewidth',2);  hold on;
                 plotLegend{noPlots} = ['Fit to G with L/lambda = ',num2str(L_Lambda(k))];
@@ -172,7 +173,7 @@ function PlotDynamicContactAngles
         
         for i = 1:length(data)
                         
-            g   = GHR(data{i}.theta*pi/180) - GHR(data{i}.thetaEq*pi/180);
+            g   = GHR_lambda0(data{i}.theta*pi/180) - GHR_lambda0(data{i}.thetaEq*pi/180);
             
             plotLegend{noPlots} = data{i}.legend;
             noPlots = noPlots + 1;
@@ -275,11 +276,11 @@ function PlotDynamicContactAngles
         nData       = nData + 1;
                
     end
-    function z = GHR(t)
-        z = 1i*pi^2/24 - t/2.*log(1+exp(1i*t)) ...
-            + 1i/2*(  dilog(1+exp(1i*t)) + ...
-                      dilog(exp(1i*t)) ) - sin(t)/2;
-        disp(['Max imaginary part: ',num2str(max(imag(z)))]);
-        z = real(z);
-    end
+%     function z = GHR(t)
+%         z = 1i*pi^2/24 - t/2.*log(1+exp(1i*t)) ...
+%             + 1i/2*(  dilog(1+exp(1i*t)) + ...
+%                       dilog(exp(1i*t)) ) - sin(t)/2;
+%         disp(['Max imaginary part: ',num2str(max(imag(z)))]);
+%         z = real(z);
+%     end
 end

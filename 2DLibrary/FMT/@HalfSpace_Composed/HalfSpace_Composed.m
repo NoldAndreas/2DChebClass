@@ -171,7 +171,6 @@
             x1 = this.Sub_Strip.CompSpace1(y1);           
        end 
 	   function [x2] = CompSpace2(this,y2)
-           
            mark_id = GetArea_ID(this,1,y2);
           
            x2(mark_id==1,1) = this.Sub_Strip.CompSpace2(y2(mark_id==1));

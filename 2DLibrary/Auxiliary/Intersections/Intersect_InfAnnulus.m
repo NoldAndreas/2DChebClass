@@ -42,6 +42,7 @@ function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape)
 
         [dataIntersect.int] = area.ComputeIntegrationVector();
         dataIntersect.area  = Inf;
+        dataIntersect.shape = area;
     elseif(isa(MainShape,'InfCapillary'))
         
         %Cartesian shift     
@@ -70,7 +71,7 @@ function dataIntersect = Intersect_InfAnnulus(MainShape,infAnnulusShape)
         end            
 
         %Shift in y2-direction
-
+        dataIntersect.shape = area;
         [dataIntersect.int] = area.ComputeIntegrationVector();
         dataIntersect.area  = Inf;
     else

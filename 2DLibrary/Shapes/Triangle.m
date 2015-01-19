@@ -45,7 +45,7 @@ classdef Triangle < M1SpectralSpectral
 
         end
         function [x1,x2] = CompSpace(y1,y2)
-             exc = MException('BigSegmentAlternative:CompSpace','not yet implemented');
+             exc = MException('Triangle:CompSpace','not yet implemented');
             throw(exc);
         end
         

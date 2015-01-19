@@ -25,7 +25,8 @@ config = v2struct(optsPhys,optsNum);
 opts = struct('noIterations',20,'lambda',0.8,'Seppecher_red',1);
 
 
-for y2Max = 10%20%10:5:15
+%for
+    y2Max = 15;%20%10:5:15
     
     config.optsNum.PhysArea.y2Max = y2Max;
     
@@ -39,18 +40,18 @@ for y2Max = 10%20%10:5:15
     %DI.optsPhys.mobility = m;
     DI.IterationStepFullProblem(opts);    
     DI.PlotResults();	  
-    
+       
     clear('DI');
-end
+%end
 % 
 % opts.solveSquare   = false;
 % DI.IterationStepFullProblem(opts);    
 
-DI.optsNum.SubArea = SubArea;
-DI.Preprocess_SubArea();
-DI.PostProcess_Flux;
-DI.IDC.SetUpBorders([30,1000,30,200]);
-DI.FindAB();
-
-%DI.FindStagnationPoint();
-DI.PlotResults();	               
+% DI.optsNum.SubArea = SubArea;
+% DI.Preprocess_SubArea();
+% DI.PostProcess_Flux;
+% DI.IDC.SetUpBorders([30,1000,30,200]);
+% DI.FindAB();
+% 
+% %DI.FindStagnationPoint();
+% DI.PlotResults();	               

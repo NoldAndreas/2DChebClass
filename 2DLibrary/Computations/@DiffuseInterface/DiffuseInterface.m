@@ -464,12 +464,15 @@ classdef DiffuseInterface < Computation
             end
         end           
         function PlotInterfaceAnalysis(this)            
+            thetaEq = this.optsPhys.thetaEq;
+            Ca      = 3/4*this.optsPhys.Cak;
+            
             
             y2      = this.IDC.Pts.y2;
             L       = this.optsNum.PhysArea.y2Max;
             
             Diff    = barychebdiff(y2,1);
-            thetaY2 = pi/2 + atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
+            thetaY2 = pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
                         
             %maxthetaY2 = max(ab
             
@@ -477,7 +480,14 @@ classdef DiffuseInterface < Computation
             
             
             if(IsSeppecher(this))                
+                
+                lambda  = 1.5;
+                Cin     = 8;
+                y2P     = y2(2:end);
+                theta_L = GHR_Inv(Ca*log(y2P/lambda)+GHR_lambda(thetaEq,lambda),lambda) + Ca*Cin;
+
                 plot(y2,thetaY2*180/pi,'ok','linewidth',2); hold on;
+                plot(y2P,theta_L*180/pi,'m','linewidth',2); hold on;                
                 ylabel('$\theta$','Interpreter','Latex','fontsize',20);
             else
                 A = -0.34; k = 0.2; 

@@ -18,7 +18,7 @@ function Check_FMT_SumRule()
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.7);%1.375);%1.25)s;
-    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+  %  V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
@@ -30,12 +30,9 @@ function Check_FMT_SumRule()
     
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
-
-     CL = ContactLineHS(config);
-                CL.Preprocess(); 
                 
-    N  = 10:10:50;
-    NS = 10:10:40;
+    N  = 60;%:10:50;
+    NS = 30;%10:10:40;
     
     res = DataStorage([],@ComputeErrorContactDensityMatrix,v2struct(N,NS,config),[]);
     

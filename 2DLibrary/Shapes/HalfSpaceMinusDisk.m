@@ -55,14 +55,12 @@ classdef HalfSpaceMinusDisk < handle
             for i = 1:length(this.SubShape)
                 this.SubShape{i}.PlotGridLines(); hold on;     
             end
-        end    
-        
+        end            
         function PlotGrid(this)
             for i = 1:length(this.SubShape)
                 this.SubShape{i}.PlotGrid(); hold on;
             end
-        end    
-        
+        end            
         function plot(this,V,opts)
             if(nargin==2)
                 opts = [];
