@@ -1,8 +1,8 @@
 classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
     
    properties (Access = public)
-       p  % pressure                   
-   end
+       p  % pressure     
+	end
        
 	methods (Access = public) 
        function this = DiffuseInterfaceBinaryFluid(config)           
@@ -263,7 +263,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             v_mom_IBB = v_mom(IBB);
        end
 
-       vec_a  = FindAB(this,phi,mu,deltaX,a_ig)
+       vec_a  = FindAB(this,phi,mu,deltaX,a_ig)              
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
@@ -489,6 +489,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            disp(['Error of flux through subArea: ',num2str(this.Int_of_path*uv)]);
            disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*flux)]);
        end
-      
+       
    end
 end

@@ -1,4 +1,4 @@
-function Check_FMT_SumRule()
+function CheckConvolutionHalfSpace_BH_CompareWeights()
 
     PhysArea = struct('N',[1,60],...
                       'L1',5,'L2',4,'L2_AD',4.,...
@@ -31,22 +31,19 @@ function Check_FMT_SumRule()
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
-    N  = 60;%:10:50;
-    NS = 30;%10:10:40;
+    N  = 10;%:10:50;
+    NS = 10:8:50;%10:10:40;
     
-    res = DataStorage([],@ComputeErrorContactDensityMatrix,v2struct(N,NS,config),[]);
+    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
     
-    function res = ComputeErrorContactDensityMatrix(in,h)
+    function res = ComputeError(in,h)
         config = in.config;
         N      = in.N;
         NS     = in.NS;
         
-        error_wg    = zeros(length(N),length(NS));
-        error_wl    = zeros(length(N),length(NS));
-        
-        res.N  = repmat(N',1,length(NS));
-        res.NS = repmat(NS,length(N),1);
-
+        %error_wg    = zeros(length(N),length(NS));
+        %error_wl    = zeros(length(N),length(NS));
+                
         for i = 1:length(N)
             config.optsNum.PhysArea.N = [1,N(i)];
             for j = 1:length(NS)
@@ -55,19 +52,37 @@ function Check_FMT_SumRule()
                 config.optsNum.FexNum.N2disc = NS(j);
 
                 CL = ContactLineHS(config);
-                CL.Preprocess();    
+                CL.Preprocess(); 
+                
+                
+                %[~,~,params] = CL.Compute1D('WL');
+                %error_wl = params.contactDensity_relError;
 
-                [~,~,params] = CL.Compute1D('WL');
-                error_wl = params.contactDensity_relError;
-
-                [~,~,params] = CL.Compute1D('WG');
-                error_wg = params.contactDensity_relError;
+                %[~,~,params] = CL.Compute1D('WG');
+                %error_wg = params.contactDensity_relError;
 
                 clear('CL');
+                close all;
             end
         end
-        res.error_wl = error_wl;
-        res.error_wg = error_wg; 
+%        res.error_wl = error_wl;
+%        res.error_wg = error_wg; 
     end     
+
+    %Produce plots
+    figure('color','white','Position',[0 0 800 800]); 
+    for k1 = 1:size(res,1)
+        for k2 = 1:size(res,2)
+            plot(res(k1,k2).NS,res(k1,k2).errorData.error_conv1,'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
+        end
+    end
+    set(gca,'YScale','log');
     
+    
+    figure('color','white','Position',[0 0 800 800]); 
+    for k1 = 1:size(res,1)
+        for k2 = 1:size(res,2)
+            plot(res(k1,k2).NS,res(k1,k2).errorData.error_conv1_posy2,'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
+        end
+    end
 end

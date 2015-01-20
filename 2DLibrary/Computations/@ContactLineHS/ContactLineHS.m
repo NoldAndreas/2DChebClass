@@ -37,28 +37,30 @@ classdef ContactLineHS < DDFT_2D
         end                
         
         %Preprocessing and testing of results
-        function Preprocess(this)
+        function res = Preprocess(this)
             global dirDataOrg
             ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
             Preprocess@DDFT_2D(this);     
-            TestPreprocess(this);        
+            res = TestPreprocess(this);        
             
             ComputeST(this);
         end        
-        function TestPreprocess(this)                          
+        function res = TestPreprocess(this)                          
                         
             R = this.IDC.R;             
              
             disp('*** Test preprocessed matrices ***');
                                     
             disp('*** Test convolution matrix ***');
-            CheckMeanfieldConvolution(this);
+            res_conv = CheckMeanfieldConvolution(this);
             
             %(4) Test FMT Matrices            
             disp('*** Test FMT matrices ***');
             if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
-                CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);
+                res_fex = CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);
             end
+            
+            res = mergeStruct(res_conv,res_fex);
                         
             %(3) Test Integration
             disp('*** Test integration vector ***');
@@ -466,7 +468,6 @@ classdef ContactLineHS < DDFT_2D
         PlotInterfaceAnalysisY1(this)
         [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)                
         
-        
         function disjoingPressure1DCheck(this)
             rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
             rhoGas_sat     = this.optsPhys.rhoGas_sat;
@@ -541,6 +542,5 @@ classdef ContactLineHS < DDFT_2D
 
             this.disjoiningPressureCheck = fB_AI;    
         end
-
     end
 end

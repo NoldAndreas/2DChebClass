@@ -1,4 +1,4 @@
- function CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,opts)           
+ function res = CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,opts)           
  
        if((nargin > 2) && islogical(opts))
            VisualOutput = opts;
@@ -75,9 +75,9 @@
             subplot(rows,3,3); hold on; plot(x,check1n2z(x),'m');      
         end
                 
-        PrintErrorPos(IntMatrFex.AD.n2*y0-check1n2(xADInt),'FMT n2 for ones',xADInt);
-        PrintErrorPos(IntMatrFex.AD.n3*y0-check1n3(xADInt),'FMT n3 for ones',xADInt);
-        PrintErrorPos(IntMatrFex.AD.n2_v_2*y0-check1n2z(xADInt),'FMT n2_v_2 for ones',xADInt);        
+        res.error_n2_1   = PrintErrorPos(IntMatrFex.AD.n2*y0-check1n2(xADInt),'FMT n2 for ones',xADInt);
+        res.error_n3_1   = PrintErrorPos(IntMatrFex.AD.n3*y0-check1n3(xADInt),'FMT n3 for ones',xADInt);
+        res.error_n2v2_1 = PrintErrorPos(IntMatrFex.AD.n2_v_2*y0-check1n2z(xADInt),'FMT n2_v_2 for ones',xADInt);        
                
         %% 2nd Check: Average Densities with density = 2-erf(x)
         x       = CartPts.y2_kv(markInf);                

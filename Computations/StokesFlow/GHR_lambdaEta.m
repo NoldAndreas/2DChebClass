@@ -1,4 +1,4 @@
-function G = GHR_lambda(t,lambda)
+function G = GHR_lambdaEta(t,lambdaEta)
 
     N          = 200;
     shape      = struct('N',N,'yMin',0,'yMax',pi);    
@@ -16,13 +16,10 @@ function G = GHR_lambda(t,lambda)
         IntM(i,:)    = vh;
     end
     
-    G = IP.InterPol*(IntM*OneOverf(y,lambda));       
+    G = IP.InterPol*(IntM*OneOverf(y,lambdaEta));       
    
-    function f = OneOverf(t,lambda)
-        f = (lambda*(t.^2-(sin(t)).^2).*(pi-t+sin(t).*cos(t))+((pi-t).^2-(sin(t)).^2).*(t-sin(t).*cos(t)))./ ...
-                (2*sin(t).*(lambda^2*(t.^2-(sin(t)).^2)+2*lambda*(t.*(pi-t)+(sin(t)).^2)+(pi-t).^2-(sin(t)).^2));
-        f(t==0)  = 0;
-        f(t==pi) = 0;
+    function f = OneOverf(t,lambdaEta)
+        f = 1./f_stokes(t,lambdaEta);
     end
 
 end

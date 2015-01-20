@@ -266,6 +266,11 @@ classdef DiffuseInterface < Computation
         [A,b] = Div_FullStressTensor(this,phi)
                 
         %Plotting & Analysis functions
+        function theta = GetThetaY2(this)
+            y2    = this.IDC.Pts.y2;
+            Diff  = barychebdiff(y2,1);
+            theta = pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
+        end
         function spt = FindStagnationPoint(this,iguess1,iguess2)
             
             uv = this.uv;
@@ -465,14 +470,12 @@ classdef DiffuseInterface < Computation
         end           
         function PlotInterfaceAnalysis(this)            
             thetaEq = this.optsPhys.thetaEq;
-            Ca      = 3/4*this.optsPhys.Cak;
-            
+            Ca      = 3/4*this.optsPhys.Cak;            
             
             y2      = this.IDC.Pts.y2;
             L       = this.optsNum.PhysArea.y2Max;
-            
-            Diff    = barychebdiff(y2,1);
-            thetaY2 = pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
+                        
+            thetaY2 = GetThetaY2(this);%pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
                         
             %maxthetaY2 = max(ab
             
@@ -481,10 +484,9 @@ classdef DiffuseInterface < Computation
             
             if(IsSeppecher(this))                
                 
-                lambda  = 1.5;
-                Cin     = 8;
+                [lambda,Cin] = FitSliplength(this);                
                 y2P     = y2(2:end);
-                theta_L = GHR_Inv(Ca*log(y2P/lambda)+GHR_lambda(thetaEq,lambda),lambda) + Ca*Cin;
+                theta_L = GHR_Inv(Ca*log(y2P/lambda)+GHR_lambdaEta(thetaEq,1),1) + Ca*Cin;
 
                 plot(y2,thetaY2*180/pi,'ok','linewidth',2); hold on;
                 plot(y2P,theta_L*180/pi,'m','linewidth',2); hold on;                
@@ -540,6 +542,41 @@ classdef DiffuseInterface < Computation
             SaveCurrentFigure(this,[this.filename '_ErrorIterations']);                 
         end
         
+        function [lambda,Cin] = FitSliplength(this)
+           
+            thetaEq = this.optsPhys.thetaEq;
+            Ca      = 3/4*this.optsPhys.Cak;
+            
+            theta   = GetThetaY2(this);            
+            L       = this.optsNum.PhysArea.y2Max;            
+            
+            IP05    = barychebevalMatrix(this.IDC.Pts.x2,0);
+            %Diff    = barychebdiff(this.IDC.Pts.y2,1);
+            
+            thetaL  = theta(end);
+            theta_05L = IP05*theta;
+            %dthetaL = Diff.Dx(end,:)*theta;
+            
+            
+            z = fsolve(@f,[1;0]);
+            
+            lambda = z(1);
+            Cin    = z(2);
+            
+            disp(['lambda = ',num2str(lambda),' , Cin = ',num2str(Cin)]);
+            
+            function y = f(x)
+                lam = x(1);
+                C   = x(2);
+                
+                GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
+                GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
+                
+                y(1) = (GM1 + Ca*C) - thetaL;
+                y(2) = (GM2 + Ca*C) - theta_05L;
+                %y(2) = f_stokes(GM1,1)*Ca/L - dthetaL;                
+            end
+        end
         %Old                
         function theta  = FindInterfaceAngle(this,phi)
 
