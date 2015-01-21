@@ -1,6 +1,6 @@
 function theta = GHR_Inv(G,lambdaEta)
 
-    options = optimoptions('fsolve','Display','off'); 
+    options = optimoptions('fsolve','Display','off','TolFun',1e-8,'TolX',1e-8);    
     theta = fsolve(@GHR,pi/2*ones(size(G)),options);
     
     function z = GHR(t)

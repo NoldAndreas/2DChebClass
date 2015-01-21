@@ -1,11 +1,12 @@
 function CheckConvolutionHalfSpace_BH_Conv1()
 
     global dirData
+    AddPaths();
 
     PhysArea = struct('N',[1,60],...
                       'L1',5,'L2',4,'L2_AD',4.,...
                       'y2wall',0.,...
-                      'N2bound',24,'h',1,...
+                      'N2bound',16,'h',1,...
                       'alpha_deg',90);
 
     V2Num   = struct('Fex','SplitDisk','N',[30,30]);
@@ -33,8 +34,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
-    N    = 10;%:10:50;
-    NS_d = 8;
+    N    = 5;%:10:50;
+    NS_d = 2;
     NS   = 10:NS_d:50;%10:10:40;
     
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
@@ -48,7 +49,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         %error_wl    = zeros(length(N),length(NS));
                 
         for i = 1:length(N)
-            config.optsNum.PhysArea.N = [1,N(i)];
+            config.optsNum.PhysArea.N = [N(i),N(i)];
             for j = 1:length(NS)
                 config.optsNum.V2Num.N       = [NS(j),NS(j)];
                 config.optsNum.FexNum.N1disc = NS(j);
@@ -73,42 +74,65 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 res(i,j).A_n2_v_1   = CL.IntMatrFex.AD.n2_v_1;
                 res(i,j).A_n2_v_2   = CL.IntMatrFex.AD.n2_v_2;
                 
-                %[~,~,params] = CL.Compute1D('WL');
-                %error_wl = params.contactDensity_relError;
+               % [~,~,params] = CL.Compute1D('WL');
+               % res(i,j).error_wl = params.contactDensity_relError;
 
                 %[~,~,params] = CL.Compute1D('WG');
-                %error_wg = params.contactDensity_relError;
-
-                clear('CL');
+                %res(i,j).error_wg = params.contactDensity_relError;
+                
                 close all;
+                clear('CL');                
             end
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
 
-    figure('color','white','Position',[0 0 800 800]); 
-    PlotMatrixError('Conv','o','k');
-    PlotMatrixError('A_n2','d','m');
-    PlotMatrixError('A_n3','s','g');
-    PlotMatrixError('A_n2_v_1','<','b');
-    PlotMatrixError('A_n2_v_2','>','r');
+    figure('color','white','Position',[0 0 1600 800]); 
+    
+    legendstring = {};
+    subplot(1,2,1);
+    PlotMatrixError('Conv','o','k','\phi_{attr}');
+    PlotMatrixError('A_n2','d','m','w_2');
+    PlotMatrixError('A_n3','s','g','w_3');
+    PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
+    PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',15);
     xlabel('$N$','Interpreter','Latex','fontsize',15);
-    ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|$'],...
+    ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
                             'Interpreter','Latex','fontsize',15);
+    xlim([(NS(1)-2),(NS(end-1)+2)]);
+    legend(legendstring,'Location','northoutside','Orientation','horizontal');
+   
+%     filename = 'ConvolutionMatrixError';
+% 	print2eps([dirData filesep filename],gcf);
+% 	saveas(gcf,[dirData filesep filename '.fig']);        
+%     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+    
+    subplot(1,2,2);
+    
+    PlotErrorGraph('error_conv1','o','k');
+    PlotErrorGraph('error_n2_1','d','m');
+    PlotErrorGraph('error_n3_1','s','g');
+    PlotErrorGraph('error_n2v2_1','<','b');    
+    
+    set(gca,'YScale','log');
+    set(gca,'linewidth',1.5);
+    set(gca,'fontsize',15);
+    xlabel('$N$','Interpreter','Latex','fontsize',15);
+    ylabel('error$(\Phi_{2D} \ast {\bf 1})$','Interpreter','Latex','fontsize',15);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     
    
-    filename = 'ConvolutionMatrixError';
+    filename = 'ConvolutionError';
 	print2eps([dirData filesep filename],gcf);
 	saveas(gcf,[dirData filesep filename '.fig']);        
     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
     
-    PlotErrorGraph('error_conv1');
+    
     %Produce plots
     
     
@@ -119,32 +143,42 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %         end
 %     end
     
-    function PlotMatrixError(A_name,sym,col)
+    function PlotMatrixError(A_name,sym,col,name)
         
         n = 1;
         
         for k1 = 1%:size(res,1)
             for k2 = 1:(size(res,2)-1)
                 line(n)   = norm(res(k1,k2).(A_name)-res(k1,k2+1).(A_name));
-                line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;
-                plot(line_N(n),line(n),...
-                        [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;                
                 n = n+1;
             end
-        end        
-        plot(line_N,line,col);        
+        end     
+        plot(line_N,line,...
+                        ['-',sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
+        %plot(line_N,line,col);        
+        
+        legendstring(end+1) = {name};
         
     end
 
-    function PlotErrorGraph(var_name)
-        figure('color','white','Position',[0 0 800 800]); 
+    function PlotErrorGraph(var_name,sym,col)
+        
+        n = 1;
+                
         for k1 = 1:size(res,1)
             for k2 = 1:size(res,2)
-                plot(res(k1,k2).NS,res(k1,k2).(var_name),...
-                    'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
+                line(n)   = res(k1,k2).(var_name);
+                line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;
+                %plot(line_N(n),line(n),...
+                 %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                n = n+1;
+                
+                                
             end
         end
-        set(gca,'YScale','log');
+        plot(line_N,line,...
+                        ['-',sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;        
     end
 
 end

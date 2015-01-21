@@ -1,8 +1,8 @@
-function Job_ComputeExactAdsorptionIsotherm()
+function MMNP_Fig4_Isotherm()
 
     AddPaths();   
     global dirData    
-    ChangeDirData([dirData filesep 'POF_FMT_ContactLine'],'ORG');    
+    ChangeDirData([dirData filesep 'MMNP'],'ORG');    
 
     PhysArea = struct('N',[1,250],...
                       'L1',5,'L2',4,'L2_AD',4.,...
@@ -31,22 +31,14 @@ function Job_ComputeExactAdsorptionIsotherm()
 
     config = v2struct(optsNum,optsPhys);                        
     
-    
-    epw = 0.7;%[0.75,0.8,0.85,0.9,0.95];
-    
-    for i = 1:length(epw)
-        config.optsPhys.V1.epsilon_w = epw(i);%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
 
-        CL = ContactLineHS(config);
-        CL.Preprocess();    
-        CL.ComputeAdsorptionIsotherm(300,'drying');    
-        %CL.ComputeAdsorptionIsotherm(300,'wetting');    
-        CL.FittingAdsorptionIsotherm([10 14],1)
-        if(optsPhys.kBT == 0.75)
-            CL.SumRule_AdsorptionIsotherm(0.3463);
-        end
-        
-        clear('CLT');
+    CL = ContactLineHS(config);
+    CL.Preprocess();    
+    CL.ComputeAdsorptionIsotherm(600,'drying');    %wetting    
+    CL.FittingAdsorptionIsotherm([10 14],1)
+    if(optsPhys.kBT == 0.75)
+        CL.SumRule_AdsorptionIsotherm(0.3463);
     end
+
     
 end

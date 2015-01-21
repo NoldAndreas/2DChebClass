@@ -20,6 +20,9 @@ classdef DiffuseInterface < Computation
    
    methods (Access = public)          
         function this = DiffuseInterface(config)  
+            if(nargin == 0)
+                 config = [];
+            end
             this@Computation(config);            
             if(~isfield(this.optsNum.PhysArea,'y1Max'))
                 this.optsNum.PhysArea.y1Max = inf;
@@ -306,7 +309,7 @@ classdef DiffuseInterface < Computation
             else
                 this.StagnationPoint = spt;                
             end
-            
+                                    
             function z = ValueAtXY(xy)
                 pt.y1_kv = xy(1);
                 pt.y2_kv = xy(2);
@@ -550,15 +553,16 @@ classdef DiffuseInterface < Computation
             theta   = GetThetaY2(this);            
             L       = this.optsNum.PhysArea.y2Max;            
             
-            IP05    = barychebevalMatrix(this.IDC.Pts.x2,0);
+            x2M2    = this.IDC.CompSpace2(L-2);
+            IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
             %Diff    = barychebdiff(this.IDC.Pts.y2,1);
             
-            thetaL  = theta(end);
+            thetaL    = theta(end);
             theta_05L = IP05*theta;
             %dthetaL = Diff.Dx(end,:)*theta;
             
-            
-            z = fsolve(@f,[1;0]);
+            opts = optimoptions('fsolve','TolFun',1e-8,'TolX',1e-6);
+            z = fsolve(@f,[1;0],opts);
             
             lambda = z(1);
             Cin    = z(2);
@@ -569,11 +573,16 @@ classdef DiffuseInterface < Computation
                 lam = x(1);
                 C   = x(2);
                 
-                GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
-                GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
+                GM1  = (Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1));
+                GM2  = (Ca*log((L-2)/lam)+GHR_lambdaEta(thetaEq,1));
                 
-                y(1) = (GM1 + Ca*C) - thetaL;
-                y(2) = (GM2 + Ca*C) - theta_05L;
+                y(1) = GM1 - GHR_lambdaEta(thetaL - Ca*C,1);
+                y(2) = GM2 - GHR_lambdaEta(theta_05L -  Ca*C,1);
+%                 GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
+%                 GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
+%                 
+%                 y(1) = (GM1 + Ca*C) - thetaL;
+%                 y(2) = (GM2 + Ca*C) - theta_05L;
                 %y(2) = f_stokes(GM1,1)*Ca/L - dthetaL;                
             end
         end

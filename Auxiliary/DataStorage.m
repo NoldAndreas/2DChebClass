@@ -71,7 +71,10 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             else
                 par_i = index{i};
             end
-                        
+                 
+            if(~isfield(par_i,'Function'))
+                continue;
+            end
             [h1s,par_i.Function]      = fileparts(par_i.Function);
               
 %             comp_struct(Parameters,par_i)

@@ -1,0 +1,1 @@
+TestAll('MMNP_Figures');

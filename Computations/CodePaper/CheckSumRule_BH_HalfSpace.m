@@ -1,9 +1,12 @@
-function CheckConvolutionHalfSpace_BH_CompareWeights()
+function CheckSumRule_BH_HalfSpace()
+
+    global dirData
+    AddPaths();
 
     PhysArea = struct('N',[1,60],...
                       'L1',5,'L2',4,'L2_AD',4.,...
                       'y2wall',0.,...
-                      'N2bound',24,'h',1,...
+                      'N2bound',16,'h',1,...
                       'alpha_deg',90);
 
     V2Num   = struct('Fex','SplitDisk','N',[30,30]);
@@ -31,8 +34,8 @@ function CheckConvolutionHalfSpace_BH_CompareWeights()
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
-    N  = 10;%:10:50;
-    NS = 10:8:50;%10:10:40;
+    N    = 20:5:80;    
+    NS   = 40;%10:10:40;
     
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
     
@@ -45,44 +48,47 @@ function CheckConvolutionHalfSpace_BH_CompareWeights()
         %error_wl    = zeros(length(N),length(NS));
                 
         for i = 1:length(N)
-            config.optsNum.PhysArea.N = [1,N(i)];
+            
+            config.optsNum.PhysArea.N       = [1,N(i)];
+            config.optsNum.PhysArea.N2bound = round(N(i)/2);
+            
             for j = 1:length(NS)
                 config.optsNum.V2Num.N       = [NS(j),NS(j)];
                 config.optsNum.FexNum.N1disc = NS(j);
                 config.optsNum.FexNum.N2disc = NS(j);
 
                 CL = ContactLineHS(config);
-                CL.Preprocess(); 
+                preErr = CL.Preprocess(); 
                 
+                res(i,j).error_conv1   = preErr.error_conv1;
+                res(i,j).error_n2_1    = preErr.error_n2_1;
+                res(i,j).error_n3_1    = preErr.error_n3_1;
+                res(i,j).error_n2v2_1  = preErr.error_n2v2_1;                                
                 
-                %[~,~,params] = CL.Compute1D('WL');
-                %error_wl = params.contactDensity_relError;
+                res(i,j).N  = N(i);
+                res(i,j).NS = NS(j); 
+                %err         = CheckMeanfieldConvolution(CL);
+                %%res(i,j).error_conv1 = err.error_conv1; 
+                res(i,j).Conv        = CL.IntMatrV2.Conv;
+                
+                res(i,j).A_n2       = CL.IntMatrFex.AD.n2;
+                res(i,j).A_n3       = CL.IntMatrFex.AD.n3;
+                res(i,j).A_n2_v_1   = CL.IntMatrFex.AD.n2_v_1;
+                res(i,j).A_n2_v_2   = CL.IntMatrFex.AD.n2_v_2;
+                
+                [~,~,params] = CL.Compute1D('WL');
+                res(i,j).error_wl = params.contactDensity_relError;
 
-                %[~,~,params] = CL.Compute1D('WG');
-                %error_wg = params.contactDensity_relError;
-
-                clear('CL');
+                [~,~,params] = CL.Compute1D('WG');
+                res(i,j).error_wg = params.contactDensity_relError;
+                
                 close all;
+                clear('CL');                
             end
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
 
-    %Produce plots
-    figure('color','white','Position',[0 0 800 800]); 
-    for k1 = 1:size(res,1)
-        for k2 = 1:size(res,2)
-            plot(res(k1,k2).NS,res(k1,k2).errorData.error_conv1,'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
-        end
-    end
-    set(gca,'YScale','log');
-    
-    
-    figure('color','white','Position',[0 0 800 800]); 
-    for k1 = 1:size(res,1)
-        for k2 = 1:size(res,2)
-            plot(res(k1,k2).NS,res(k1,k2).errorData.error_conv1_posy2,'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
-        end
-    end
+
 end

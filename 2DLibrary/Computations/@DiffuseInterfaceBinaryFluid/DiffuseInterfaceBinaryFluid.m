@@ -5,8 +5,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
 	end
        
 	methods (Access = public) 
-       function this = DiffuseInterfaceBinaryFluid(config)           
-             this@DiffuseInterface(config);
+       function this = DiffuseInterfaceBinaryFluid(config)     
+            if(nargin == 0)
+                 config = [];
+            end
+            this@DiffuseInterface(config);            
        end
        
        IterationStepFullProblem(this,noIterations)       
@@ -490,5 +493,16 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*flux)]);
        end
        
+       function GetYueParameters(this)
+           if(IsSeppecher(this))
+                Cak      = this.optsPhys.Cak;
+                mobility = this.optsPhys.mobility;
+                S      = sqrt(Cak*mobility);
+                ls_Yue = 2.5*S;
+                disp(['Parameter S in analysis of Yue et. al (2010): ',num2str(S)]);
+                disp(['Prediction of slip lenght / distance of stagnation point to wall by Yue et. al (2010): ',num2str(ls_Yue)]);
+           end            
+           
+       end
    end
 end
