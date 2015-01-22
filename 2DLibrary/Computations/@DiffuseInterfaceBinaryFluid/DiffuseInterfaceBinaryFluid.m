@@ -9,6 +9,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             if(nargin == 0)
                  config = [];
             end
+            if(~isfield(config.optsPhys,'mobility') && ...
+                    isfield(config.optsPhys,'l_diff'))
+                config.optsPhys.mobility = (config.optsPhys.l_diff)^2/(config.optsPhys.Cak);
+            end
             this@DiffuseInterface(config);            
        end
        
@@ -496,11 +500,12 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function GetYueParameters(this)
            if(IsSeppecher(this))
                 Cak      = this.optsPhys.Cak;
+                Cn       = this.optsPhys.Cn;
                 mobility = this.optsPhys.mobility;
-                S      = sqrt(Cak*mobility);
-                ls_Yue = 2.5*S;
-                disp(['Parameter S in analysis of Yue et. al (2010): ',num2str(S)]);
-                disp(['Prediction of slip lenght / distance of stagnation point to wall by Yue et. al (2010): ',num2str(ls_Yue)]);
+                S        = sqrt(Cak*mobility);
+                ls_Yue   = 2.5*S*Cn;
+                disp(['Diffusion length/L: ',num2str(S)]);
+                disp(['Prediction of slip length / distance of stagnation point to wall by Yue et. al (2010): ',num2str(ls_Yue)]);
            end            
            
        end

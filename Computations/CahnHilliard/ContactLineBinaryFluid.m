@@ -17,20 +17,22 @@ function ContactLineBinaryFluid
                        'theta',90*pi/180,...
                        'Cak',0.01,'Cn',1,...
                        'UWall',1,...                       
-                       'mobility',10,...
+                       'l_diff',0.5,...%'mobility',10,...
                        'nParticles',0);
 
     config = v2struct(optsPhys,optsNum);   
 
     opts = struct('noIterations',20,'lambda',0.8,'Seppecher_red',1);
 
-    pars.Cak   = (0.005:0.005:0.01)';
+    pars.config = config;
+    pars.Cak   = (0.005:0.0025:0.015)';
     pars.y2Max = (12:2:18);
 
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,config);
+    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
-    function dataM = RunNumericalExperiment(pars,config)
+    function dataM = RunNumericalExperiment(pars,h)
 
+        config = pars.config;
         for i = 1:length(pars.Cak)
             config.optsPhys.Cak           = pars.Cak(i);        
             for j = 1:length(pars.y2Max)            
@@ -39,19 +41,21 @@ function ContactLineBinaryFluid
                 DI = DiffuseInterfaceBinaryFluid(config);
                 DI.Preprocess();
 
-                DI.IterationStepFullProblem(opts);    
-                DI.GetYueParameters(); 
+                DI.IterationStepFullProblem(opts);                    
 
                 opts.Seppecher_red = 2;
                 opts.lambda        = 0.6;    
                 %DI.optsPhys.mobility = m;
                 DI.IterationStepFullProblem(opts);    
+                
+                DI.GetYueParameters(); 
                 DI.PlotResults();	  
 
-                dataM(i,j).config                  = config;                
-                dataM(i,j).theta                   = DI.GetThetaY2();
-                dataM(i,j).y2                      = DI.IDC.Pts.y2;
-                [dataM(i,j).lambda,dataM(i,j).Cin] = DI.FitSliplength();
+                dataM(i,j).config   = config;                
+                dataM(i,j).theta    = DI.GetThetaY2();
+                dataM(i,j).y2       = DI.IDC.Pts.y2;
+                dataM(i,j).hatL     = DI.FitSliplength();
+                dataM(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);
 
                 close all;
                 clear('DI');
@@ -60,44 +64,46 @@ function ContactLineBinaryFluid
     end
 
     thetaEq = config.optsPhys.thetaEq;
-    cols = {'g','b','m','k','r'};
+    cols = {'b','m','k','r','g'};
     syms = {'d','s','o','>','<'};
-
+    
+    figure('Position',[0 0 800 800],'color','white');
+    
     for i1 = 1:size(dataM,1)
-
-        Ca     = 3/4*pars.Cak(i1);
-        figure('name',['Ca = ',num2str(Ca)],...
-                   'Position',[0 0 800 800],...
-                   'color','white');            
-            
-        for i2 = 1:size(dataM,2)
-            
-            y2     = dataM(i1,i2).y2;      
-            L      = max(y2);
-            y2P    = y2(2:end);
-            
-            lambda = (dataM(i1,i2).lambda);
-            Cin    = dataM(i1,i2).Cin;            
-            theta_Ana = GHR_Inv(Ca*log(y2P/lambda)+GHR_lambdaEta(thetaEq,1),1) + Ca*Cin;
-            plot(y2,180/pi*dataM(i1,i2).theta,['k',syms{i2}],'MarkerSize',7,'MarkerFaceColor','k'); hold on;
-            plot(y2P,180/pi*theta_Ana,'m','linewidth',1.5); hold on;
-                                     
-            disp(['lambda = ',num2str(lambda),...
-                  ' , Cin = ',num2str(Cin)]);
-        end
         
-        set(gca,'linewidth',1.5);
-        set(gca,'fontsize',15);
-        xlabel('$y_2$','Interpreter','Latex','fontsize',20);
-        ylabel('$\theta$','Interpreter','Latex','fontsize',20);        
-
-        filename = ['InterfaceSlope_Ca_',num2str(Ca)];
-        print2eps([dirData filesep filename],gcf);
-        saveas(gcf,[dirData filesep filename '.fig']);        
-        disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+        Ca          = 3/4*pars.Cak(i1);   
+        hatL_Av(i1) = 0;
+        
+        for i2 = 1:size(dataM,2)
+            hatL_Av(i1) = hatL_Av(i1) + (dataM(i1,i2).hatL);
+            PlotInterfaceSlope(i1,i2,cols{i1},syms{i2});
+        end        
+        hatL_Av(i1) = hatL_Av(i1)/size(dataM,2);
+        
+        y2P       = dataM(i1,i2).y2(2:end);
+        theta_Ana = GHR_Inv(Ca*log(y2P/hatL_Av(i1))+GHR_lambdaEta(thetaEq,1),1);
+        plot(y2P,180/pi*theta_Ana,cols{i1},'linewidth',1.5); hold on;        
 
     end
+    
+	set(gca,'linewidth',1.5);
+    set(gca,'fontsize',20);
+    xlabel('$y$','Interpreter','Latex','fontsize',20);
+    ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
+    ylim([90,105]);
+    
+	filename = ['InterfaceSlope'];
+    print2eps([dirData filesep filename],gcf);
+    saveas(gcf,[dirData filesep filename '.fig']);        
+    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
 
+    figure('Position',[0 0 800 800],'color','white');
+    plot(pars.Cak,hatL_Av.^2,'o-','MarkerSize',7,'MarkerFaceColor','k','linewidth',1.5);
+    xlabel('Ca','Interpreter','Latex','fontsize',20);       
+    ylabel('$(\hat L)^2$','Interpreter','Latex','fontsize',20);       
+
+	set(gca,'linewidth',1.5);
+	set(gca,'fontsize',15);
     % 
     % opts.solveSquare   = false;
     % DI.IterationStepFullProblem(opts);    
@@ -109,5 +115,14 @@ function ContactLineBinaryFluid
     % DI.FindAB();
     % 
     % %DI.FindStagnationPoint();
-    % DI.PlotResults();	               
+    % DI.PlotResults();	 
+    
+    function PlotInterfaceSlope(i1,i2,col,sym)
+                    
+        y2     = dataM(i1,i2).y2;                          
+        hatL   = (dataM(i1,i2).hatL);                        
+        
+        plot(y2,180/pi*dataM(i1,i2).theta,[col,sym],'MarkerSize',7,'MarkerFaceColor',col); hold on;                
+        disp(['hatL = ',num2str(hatL)]);                
+    end
 end

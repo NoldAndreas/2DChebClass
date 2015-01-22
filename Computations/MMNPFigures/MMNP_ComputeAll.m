@@ -1,1 +1,1 @@
-TestAll('MMNP_Figures');
+TestAll('MMNPFigures');

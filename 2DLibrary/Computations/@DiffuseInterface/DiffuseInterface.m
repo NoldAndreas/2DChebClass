@@ -487,9 +487,9 @@ classdef DiffuseInterface < Computation
             
             if(IsSeppecher(this))                
                 
-                [lambda,Cin] = FitSliplength(this);                
+                hatL    = FitSliplength(this);                
                 y2P     = y2(2:end);
-                theta_L = GHR_Inv(Ca*log(y2P/lambda)+GHR_lambdaEta(thetaEq,1),1) + Ca*Cin;
+                theta_L = GHR_Inv(Ca*log(y2P/hatL)+GHR_lambdaEta(thetaEq,1),1);
 
                 plot(y2,thetaY2*180/pi,'ok','linewidth',2); hold on;
                 plot(y2P,theta_L*180/pi,'m','linewidth',2); hold on;                
@@ -545,7 +545,7 @@ classdef DiffuseInterface < Computation
             SaveCurrentFigure(this,[this.filename '_ErrorIterations']);                 
         end
         
-        function [lambda,Cin] = FitSliplength(this)
+        function hatL = FitSliplength(this)
            
             thetaEq = this.optsPhys.thetaEq;
             Ca      = 3/4*this.optsPhys.Cak;
@@ -553,31 +553,26 @@ classdef DiffuseInterface < Computation
             theta   = GetThetaY2(this);            
             L       = this.optsNum.PhysArea.y2Max;            
             
-            x2M2    = this.IDC.CompSpace2(L-2);
+            fitPos  = L - 4;
+            x2M2    = this.IDC.CompSpace2(fitPos);
             IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
             %Diff    = barychebdiff(this.IDC.Pts.y2,1);
-            
-            thetaL    = theta(end);
+                        
             theta_05L = IP05*theta;
             %dthetaL = Diff.Dx(end,:)*theta;
             
             opts = optimoptions('fsolve','TolFun',1e-8,'TolX',1e-6);
-            z = fsolve(@f,[1;0],opts);
+            z = fsolve(@f,1,opts);
             
-            lambda = z(1);
-            Cin    = z(2);
+            hatL = z(1);            
             
-            disp(['lambda = ',num2str(lambda),' , Cin = ',num2str(Cin)]);
+            disp(['hat L = ',num2str(hatL)]);
             
             function y = f(x)
-                lam = x(1);
-                C   = x(2);
+                hL = x(1);                
                 
-                GM1  = (Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1));
-                GM2  = (Ca*log((L-2)/lam)+GHR_lambdaEta(thetaEq,1));
-                
-                y(1) = GM1 - GHR_lambdaEta(thetaL - Ca*C,1);
-                y(2) = GM2 - GHR_lambdaEta(theta_05L -  Ca*C,1);
+                GM   = (Ca*log(fitPos/hL)+GHR_lambdaEta(thetaEq,1));                                                
+                y    = GM - GHR_lambdaEta(theta_05L,1);
 %                 GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
 %                 GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
 %                 
