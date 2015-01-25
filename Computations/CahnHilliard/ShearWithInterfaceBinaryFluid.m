@@ -27,12 +27,9 @@
         DI = DiffuseInterfaceBinaryFluid(config);
         DI.Preprocess();               
         
-        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',true);
+        opts = struct('noIterations',20,'lambda',0.8);%,'solveSquare',true);
         DI.IterationStepFullProblem(opts);    
-	
-        opts = struct('noIterations',20,'lambda',0.8,'solveSquare',false);
-        DI.IterationStepFullProblem(opts);    
-                
+	               
         DI.optsNum.SubArea = SubArea;
         DI.Preprocess_SubArea();
 

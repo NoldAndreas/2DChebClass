@@ -28,6 +28,12 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
 	if(nargin <= 4)
         recompute = [];
     end
+    
+    if(nargin >= 6)
+        ignoreList(end+1) = {'Results'};
+    else
+        ignoreList = {'Results'};
+    end
    
    
     %1st Step: Search for File and load if found
@@ -139,7 +145,11 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         if(recompute)
            startComp = tic;
            fprintf(['Computing data, starting at ', datestr(now), '...\n']);
-           Data     = func(OriginalParameters,OtherInputs);
+           if(nargout(func)>=2)
+                [Data,Parameters.Results] = func(OriginalParameters,OtherInputs);
+           else
+                Data     = func(OriginalParameters,OtherInputs);
+           end
            t        = toc(startComp);     
            if(isnumeric(Data) && isscalar(Data) && (Data == 0))
                 disp(['Error after ',sec2hms(t), ' (hrs:min:sec) ']);
@@ -147,7 +157,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
            else
                 disp(['Data recomputed: ',sec2hms(t),' (hrs:min:sec)']);
            end
-
+           
            Parameters.Filename = filename;
            
            if(~exist(DataFolder,'dir'))            
@@ -229,7 +239,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                if(strcmp(names{k},IgnoreList{j}))
                     s = rmfield(s,names{k});
                elseif(~isempty(strfind(names{k},[IgnoreList{j},'_'])))
-                    s = rmfield(s,[names{k},'_']);              
+                    s = rmfield(s,[names{k}]);              
                end
             end           
         end

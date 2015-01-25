@@ -40,6 +40,50 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
     
+     figure('color','white','Position',[0 0 1600 800]); 
+    
+    legendstring = {};
+    subplot(1,2,1);
+    PlotMatrixError('Conv','o','k','\phi_{attr}');
+    PlotMatrixError('A_n2','d','m','w_2');
+    PlotMatrixError('A_n3','s','g','w_3');
+    PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
+    PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
+    
+    set(gca,'YScale','log');
+    set(gca,'linewidth',1.5);
+    set(gca,'fontsize',15);
+    xlabel('$N$','Interpreter','Latex','fontsize',15);
+    ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
+                            'Interpreter','Latex','fontsize',15);
+    xlim([(NS(1)-2),(NS(end-1)+2)]);
+    legend(legendstring,'Location','northoutside','Orientation','horizontal');
+   
+%     filename = 'ConvolutionMatrixError';
+% 	print2eps([dirData filesep filename],gcf);
+% 	saveas(gcf,[dirData filesep filename '.fig']);        
+%     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+    
+    subplot(1,2,2);
+    
+    PlotErrorGraph('error_conv1','o','k');
+    PlotErrorGraph('error_n2_1','d','m');
+    PlotErrorGraph('error_n3_1','s','g');
+    PlotErrorGraph('error_n2v2_1','<','b');    
+    
+    set(gca,'YScale','log');
+    set(gca,'linewidth',1.5);
+    set(gca,'fontsize',15);
+    xlabel('$N$','Interpreter','Latex','fontsize',15);
+    ylabel('error$(\Phi_{2D} \ast {\bf 1})$','Interpreter','Latex','fontsize',15);
+    xlim([(NS(1)-2),(NS(end-1)+2)]);
+    
+   
+    filename = 'ConvolutionError';
+	print2eps([dirData filesep filename],gcf);
+	saveas(gcf,[dirData filesep filename '.fig']);        
+    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+    
     function res = ComputeError(in,h)
         config = in.config;
         N      = in.N;
@@ -88,49 +132,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %        res.error_wg = error_wg; 
     end     
 
-    figure('color','white','Position',[0 0 1600 800]); 
-    
-    legendstring = {};
-    subplot(1,2,1);
-    PlotMatrixError('Conv','o','k','\phi_{attr}');
-    PlotMatrixError('A_n2','d','m','w_2');
-    PlotMatrixError('A_n3','s','g','w_3');
-    PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
-    PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
-    
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
-    set(gca,'fontsize',15);
-    xlabel('$N$','Interpreter','Latex','fontsize',15);
-    ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
-                            'Interpreter','Latex','fontsize',15);
-    xlim([(NS(1)-2),(NS(end-1)+2)]);
-    legend(legendstring,'Location','northoutside','Orientation','horizontal');
    
-%     filename = 'ConvolutionMatrixError';
-% 	print2eps([dirData filesep filename],gcf);
-% 	saveas(gcf,[dirData filesep filename '.fig']);        
-%     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
-    
-    subplot(1,2,2);
-    
-    PlotErrorGraph('error_conv1','o','k');
-    PlotErrorGraph('error_n2_1','d','m');
-    PlotErrorGraph('error_n3_1','s','g');
-    PlotErrorGraph('error_n2v2_1','<','b');    
-    
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
-    set(gca,'fontsize',15);
-    xlabel('$N$','Interpreter','Latex','fontsize',15);
-    ylabel('error$(\Phi_{2D} \ast {\bf 1})$','Interpreter','Latex','fontsize',15);
-    xlim([(NS(1)-2),(NS(end-1)+2)]);
-    
-   
-    filename = 'ConvolutionError';
-	print2eps([dirData filesep filename],gcf);
-	saveas(gcf,[dirData filesep filename '.fig']);        
-    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
     
     
     %Produce plots

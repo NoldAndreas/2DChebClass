@@ -12,20 +12,21 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     kBT       = optsPhys.kBT;           
     R         = optsPhys.sigmaS/2;
     fBulk     = str2func(['FexBulk_',FexNum.Fex]);  
+    optsPhys.HSBulk = (['FexBulk_',FexNum.Fex]);
     
     if(~isfield(optsPhys,'V2'))
         optsPhys.V2 = struct('V2DV2','zeroPotential');                  
     end
     
     if(isfield(optsPhys,'Dmu') && isfield(optsPhys,'mu_sat'))
-        mu        = optsPhys.mu_sat + optsPhys.Dmu;
+        mu        = optsPhys.mu_sat + optsPhys.Dmu;        
     elseif(isfield(optsPhys,'eta'))
         eta       = optsPhys.eta;
         rhoBulk   = eta*6/pi;
         mu        = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);       
-    end
+        %pBulk     =
+    end    
     
-    optsPhys.HSBulk = (['FexBulk_',FexNum.Fex]);
     [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = BulkValues(mu,optsPhys,[],false);    
     if(abs(rhoGas_eq - optsPhys.rho_iguess(end)) < abs(rhoLiq_eq - optsPhys.rho_iguess(end)))
         rhoBulk = rhoGas_eq;
@@ -34,6 +35,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         rhoBulk = rhoLiq_eq;
         pBulk   = pLiq;
     end
+    
+    
     
     getFex = str2func(['Fex_',FexNum.Fex]);
     

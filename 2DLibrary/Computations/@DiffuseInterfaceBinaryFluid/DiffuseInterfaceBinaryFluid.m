@@ -16,7 +16,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             this@DiffuseInterface(config);            
        end
        
-       IterationStepFullProblem(this,noIterations)       
+       IterationStepFullProblem(this,noIterations)              
             
        function vec = GetInitialCondition(this,theta) 
             if(nargin == 1)

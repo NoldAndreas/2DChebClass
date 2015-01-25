@@ -43,7 +43,10 @@ classdef ContactLineHS < DDFT_2D
             Preprocess@DDFT_2D(this);     
             res = TestPreprocess(this);        
             
-            ComputeST(this);
+            if(isfield(this.optsPhys,'rhoLiq_sat') && ...
+                    isfield(this.optsPhys,'rhoGas_sat'))
+                ComputeST(this);
+            end
         end        
         function res = TestPreprocess(this)                          
                         
@@ -51,8 +54,12 @@ classdef ContactLineHS < DDFT_2D
              
             disp('*** Test preprocessed matrices ***');
                                     
-            disp('*** Test convolution matrix ***');
-            res_conv = CheckMeanfieldConvolution(this);
+            if(isfield(this.optsNum,'V2Num') && ~isempty(this.optsNum.V2Num))
+                disp('*** Test convolution matrix ***');
+                res_conv = CheckMeanfieldConvolution(this);
+            else
+                res_conv = struct();
+            end
             
             %(4) Test FMT Matrices            
             disp('*** Test FMT matrices ***');
@@ -90,12 +97,15 @@ classdef ContactLineHS < DDFT_2D
                 
         %1D surface tensions
         function [om,rho1D,params] = Compute1D(this,WLWGLG)
-            rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
-            rhoGas_sat       = this.optsPhys.rhoGas_sat;
+                        
             optss            = this.optsPhys;   
             Fex_Num          = this.optsNum.FexNum;                        
             
-            if(strcmp(WLWGLG,'WL'))
+            if(isnumeric(WLWGLG))
+                optss.eta        = WLWGLG;
+                optss.rho_iguess = WLWGLG*6/pi;
+                [rho1D,params]   = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,[]);   
+            elseif(strcmp(WLWGLG,'WL'))
                 optss.rho_iguess = this.optsPhys.rhoLiq_sat;
                 [rho1D,params] = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,this.IntMatrV2.Conv);
                 this.ST_1D.om_wallLiq = params.Fex;
@@ -107,6 +117,8 @@ classdef ContactLineHS < DDFT_2D
                 this.ST_1D.om_wallGas = params.Fex;
                 this.rho1D_wg         = rho1D;                
             elseif(strcmp(WLWGLG,'LG'))
+                rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
+                rhoGas_sat       = this.optsPhys.rhoGas_sat;
                 Pts              = this.IDC.Pts;
                 theta_CS         = this.IDC.alpha;  
             
