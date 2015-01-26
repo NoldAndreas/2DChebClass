@@ -26,11 +26,11 @@ function ContactLineBinaryFluid
     pars.Cak   = (0.005:0.0025:0.01)';
     pars.y2Max = (12:2:18);
         
-    pars.config.optsPhys.l_diff = 1;    
+    pars.config.optsPhys.l_diff = 0.5;    
     dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
-    pars.config.optsPhys.l_diff = 2;    
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    %pars.config.optsPhys.l_diff = 2;    
+    %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
     function dataM = RunNumericalExperiment(pars,h)
 
@@ -93,7 +93,7 @@ function ContactLineBinaryFluid
     ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
     ylim([90,100]);
     
-	filename = ['InterfaceSlope'];
+	filename = ['InterfaceSlope_l_d_',num2str(pars.config.optsPhys.l_diff)];
     print2eps([dirData filesep filename],gcf);
     saveas(gcf,[dirData filesep filename '.fig']);        
     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);

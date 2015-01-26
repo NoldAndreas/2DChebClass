@@ -122,6 +122,7 @@ classdef DDFT_2D < Computation
                 fprintf(1,'Computing FMT matrices ...\n');   
                 paramsFex.sigmaS   = this.optsPhys.sigmaS;
                 paramsFex.kBT      = this.optsPhys.kBT;            
+                paramsFex.physArea = this.optsNum.PhysArea;
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
                 paramsFex.FexNum   = this.optsNum.FexNum;

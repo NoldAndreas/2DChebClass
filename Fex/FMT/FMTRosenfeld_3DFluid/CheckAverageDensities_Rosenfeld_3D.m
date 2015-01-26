@@ -136,9 +136,9 @@
             subplot(rows,3,6+2); plot(z_Cart,checkADn3(z),'m');
             subplot(rows,3,6+3); plot(z_Cart,checkADn2_v_2(z),'m');            
         end
-        PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for ones',xADIntC);
-        PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for ones',xADIntC);
-        PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for ones',xADIntC);
+        res.error_n2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for ones',xADIntC);
+        res.error_n3AD_erf = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for ones',xADIntC);
+        res.error_n2v2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for ones',xADIntC);
         
         %*************************************************
         
@@ -237,10 +237,9 @@
         
     end
 
-    function y = checkADn2(z)
-        
-         y = -2*sqrt(pi)*R*(-z*sqrt(pi).*erf(z+R)-sqrt(pi)*erf(z+R)*R-exp(-(z+R).^2)-sqrt(pi)*z.*erf(-z+R)+sqrt(pi)*erf(-z+R)*R+exp(-(-z+R).^2));                  
-         
+    function y = checkADn2(z)        
+         %y = -2*sqrt(pi)*R*(-z*sqrt(pi).*erf(z+R)-sqrt(pi)*erf(z+R)*R-exp(-(z+R).^2)-sqrt(pi)*z.*erf(-z+R)+sqrt(pi)*erf(-z+R)*R+exp(-(-z+R).^2));                  
+         y = -2*pi*R*(-z.*erf(z+R)-erf(z+R)*R-exp(-(z+R).^2)/sqrt(pi)-(z-R).*erf(-z+R)+exp(-(-z+R).^2)/sqrt(pi));                           
          y(z==inf) = 4*pi*R^2;                           
      end
     function y = checkADn3(z) 

@@ -1,6 +1,5 @@
 function CheckSumRule_BH_HalfSpace()
-
-    global dirData
+    
     AddPaths();
 
     PhysArea = struct('N',[1,60],...
@@ -66,11 +65,9 @@ function CheckSumRule_BH_HalfSpace()
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
     %legend(legendstring,'Location','northOutside');%,'Orientation','horizontal');
     
-    filename = 'SumRuleError';
-	print2eps([dirData filesep filename],gcf);
-	saveas(gcf,[dirData filesep filename '.fig']);        
-    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
-        
+    comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
+    SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
+	    
     function res = ComputeError(in,h)
         conf = in.config;
         N      = in.N;
