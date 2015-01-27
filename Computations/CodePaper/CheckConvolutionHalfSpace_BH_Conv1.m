@@ -3,7 +3,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     global dirData
     AddPaths();
 
-    PhysArea = struct('N',[1,60],...
+    PhysArea = struct('N',[1,30],...
                       'L1',5,'L2',4,'L2_AD',4.,...
                       'y2wall',0.,...
                       'N2bound',10,'h',1,...
@@ -38,9 +38,23 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     NS_d = 2;  %10;
     NS   = 10:NS_d:50;%10:10:40;
     
-    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
+    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
     
-     figure('color','white','Position',[0 0 1600 800]); 
+	CLT = ContactLineHS(config);
+	CLT.PreprocessIDC();     
+    
+    cols = {'b','m','k','r','g'};
+    syms = {'d','s','o','>','<'};
+    
+    %**********************************************        
+	PlotMatrixErrorOverY('A_n2');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+    xlim([0,10]);
+    
+    PlotMatrixErrorOverY('AAD_n2');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+    xlim([0,10]);    
+    %**********************************************
+    
+    figure('color','white','Position',[0 0 1600 800]); 
     
     legendstring = {};
     subplot(1,2,1);
@@ -62,7 +76,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
                             'Interpreter','Latex','fontsize',15);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
-    legend(legendstring,'Location','northoutside','Orientation','horizontal');
+    legend(legendstring,'Location','northOutside','Orientation','horizontal');
    
 %     filename = 'ConvolutionMatrixError';
 % 	print2eps([dirData filesep filename],gcf);
@@ -75,9 +89,9 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     PlotErrorGraph('error_n2_1','d','m');
     PlotErrorGraph('error_n3_1','s','g');
     PlotErrorGraph('error_n2v2_1','<','b');        
-    PlotErrorGraph('error_n2AD_erf','*','m');
-    PlotErrorGraph('error_n3AD_erf','x','g');
-    PlotErrorGraph('error_n2v2AD_erf','p','b');    
+    PlotErrorGraph('error_n2AD_ones','*','m');
+    PlotErrorGraph('error_n3AD_ones','x','g');
+    PlotErrorGraph('error_n2v2AD_ones','p','b');    
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -89,7 +103,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     SaveFigure('ConvolutionError',v2struct(N,NS,config));
     
     function res = ComputeError(in,h)
-        config = in.config;
+        conf = in.config;
         N      = in.N;
         NS     = in.NS;
         
@@ -97,13 +111,13 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         %error_wl    = zeros(length(N),length(NS));
                 
         for i = 1:length(N)
-            config.optsNum.PhysArea.N = [1,N(i)]; %N(i),N(i)
+            conf.optsNum.PhysArea.N = [1,N(i)]; %N(i),N(i)
             for j = 1:length(NS)
-                config.optsNum.V2Num.N       = [NS(j),NS(j)];
-                config.optsNum.FexNum.N1disc = NS(j);
-                config.optsNum.FexNum.N2disc = NS(j);
+                conf.optsNum.V2Num.N       = [NS(j),NS(j)];
+                conf.optsNum.FexNum.N1disc = NS(j);
+                conf.optsNum.FexNum.N2disc = NS(j);
 
-                CL = ContactLineHS(config);
+                CL = ContactLineHS(conf);
                 preErr = CL.Preprocess(); 
                 
                 res(i,j).error_conv1   = preErr.error_conv1;
@@ -114,6 +128,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 res(i,j).error_n2AD_erf   = preErr.error_n2AD_erf;
                 res(i,j).error_n3AD_erf   = preErr.error_n3AD_erf;
                 res(i,j).error_n2v2AD_erf = preErr.error_n2v2AD_erf;
+                
+                res(i,j).error_n2AD_ones   = preErr.error_n2AD_ones;
+                res(i,j).error_n3AD_ones   = preErr.error_n3AD_ones;
+                res(i,j).error_n2v2AD_ones = preErr.error_n2v2AD_ones;
                 
                 res(i,j).N  = N(i);
                 res(i,j).NS = NS(j); 
@@ -146,19 +164,30 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %        res.error_wg = error_wg; 
     end     
 
-   
-    
-    
-    %Produce plots
-    
-    
-%     figure('color','white','Position',[0 0 800 800]); 
-%     for k1 = 1:size(res,1)
-%         for k2 = 1:size(res,2)
-%             plot(res(k1,k2).NS,res(k1,k2).errorData.error_conv1_posy2,'o','MarkerSize',7,'MarkerFaceColor','k'); hold on;
-%         end
-%     end
-    
+    function PlotMatrixErrorOverY(A_name)
+        figure('color','white','Position',[0 0 800 800]); 
+        leg_string = {};
+        if(strfind(A_name,'AAD'))
+            y2 = CLT.IDC.Pts.y2_kv;
+        else
+            y2 = CLT.IDC.AD.Pts.y2_kv;
+        end
+        
+        for k1 = 1%:size(res,1)
+            for k2 = 1:(min(5,size(res,2)-1))
+                A = res(k1,k2).(A_name)-res(k1,k2+1).(A_name);
+                plot(y2,max(A,[],2),['-',syms{k2},cols{k2}],'MarkerSize',10,'MarkerFaceColor',cols{k2}); hold on;
+                leg_string(end+1) = {['NS = ',num2str(res(k1,k2).NS)]};
+            end
+        end       
+        xlabel('$y_2$','Interpreter','Latex','fontsize',15);
+        ylabel(['$\max(',A_name,'_{N,y2}-',A_name,'_{N+',num2str(NS_d),',y2})$'],...
+                                'Interpreter','Latex','fontsize',15);
+        set(gca,'YScale','log');
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',15);
+        legend(leg_string,'Location','northoutside','Orientation','horizontal');        
+    end
     function PlotMatrixError(A_name,sym,col,name)
         
         n = 1;
@@ -177,7 +206,6 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         legendstring(end+1) = {name};
         
     end
-
     function PlotErrorGraph(var_name,sym,col)
         
         n = 1;

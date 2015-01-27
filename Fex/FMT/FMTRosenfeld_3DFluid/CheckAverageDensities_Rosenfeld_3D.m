@@ -136,23 +136,31 @@
             subplot(rows,3,6+2); plot(z_Cart,checkADn3(z),'m');
             subplot(rows,3,6+3); plot(z_Cart,checkADn2_v_2(z),'m');            
         end
-        res.error_n2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for ones',xADIntC);
-        res.error_n3AD_erf = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for ones',xADIntC);
-        res.error_n2v2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for ones',xADIntC);
+        res.error_n2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for erf',xADIntC);
+        res.error_n3AD_erf = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for erf',xADIntC);
+        res.error_n2v2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for erf',xADIntC);
         
-        %*************************************************
-        
-        
-        %*********************************************
+        %*************************************************        
+        %% 4th Check: Average Densities with density = 1 for y > 1.
+                
         z     = this.AD.Pts.y2_kv(this.AD.Pts.y1_kv == inf);    
         if(checkTop)     
             z = y2M + R - z;
         end
-        rhoAD = f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
+        rhoAD = ones(size(z));
+        rhoAD(this.AD.mark_id(:,1)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
         row   = 4;
+        xADInt =  this.Pts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
         if(VisualOutput)
             PlotRosenfeldFMT_AADInf(IntMatrFex(1),rhoAD,rows,10);
-        end
+            subplot(rows,3,9+1); plot(xADInt+0.5,check1n2(xADInt),'m','linewidth',1.5);
+            subplot(rows,3,9+2); plot(xADInt+0.5,check1n3(xADInt),'m','linewidth',1.5);
+            subplot(rows,3,9+3); plot(xADInt+0.5,check1n2z(xADInt),'m','linewidth',1.5);            
+        end        
+        res.error_n2AD_ones   = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-check1n2(xADInt),'FMT, AD n2 for ones',xADInt);
+        res.error_n3AD_ones   = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-check1n3(xADInt),'FMT, AD n3 for ones',xADInt);
+        res.error_n2v2AD_ones = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-check1n2z(xADInt),'FMT, AD n2_v_2 for ones',xADInt);        
+        
         %*********************************************
         
                 

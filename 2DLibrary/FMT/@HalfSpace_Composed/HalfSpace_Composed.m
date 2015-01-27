@@ -154,6 +154,7 @@
         
        %X = InterpolateAndIntegratePtsOriginGrid(this,ptsOrGrid,dataDisk,weights);
        [Int,Int1,Int2] = ComputeIntegrationVector(this);
+       [AAD] = ComputeConvolutionFiniteSupport(this,area,weights,pts);
        
        function [Interp1,Interp2,mark_id] = ComputeInterpolationMatrix12(this,interp1,interp2)           
            

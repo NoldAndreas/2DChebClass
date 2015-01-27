@@ -18,13 +18,9 @@ classdef Computation < handle
             end
         end
         
-        function Preprocess(this)
-                         
+        function PreprocessIDC(this)
             optsNum  = this.optsNum;
-            optsPhys = this.optsPhys;
-            
-            shape    = optsNum.PhysArea;
-            
+            shape    = optsNum.PhysArea;            
             %*****************************************************
             %Special Cases - correct configuration, 
             %   account for outdated configuration files
@@ -33,11 +29,7 @@ classdef Computation < handle
             else                
                 shape.Conv = [];
             end
-
-            if(~isfield(this.optsPhys,'sigmaS') && isfield(this.optsPhys,'V2') && isfield(this.optsPhys.V2,'sigmaS'))
-                this.optsPhys.sigmaS = this.optsPhys.V2.sigmaS;
-            end
-                
+            
             % Special Case: HalfSpace_FMT
             if(strcmp(optsNum.PhysArea.shape,'HalfSpace_FMT') || ...
                strcmp(optsNum.PhysArea.shape,'InfCapillary_FMT'))
@@ -56,7 +48,14 @@ classdef Computation < handle
             else
                 this.IDC.ComputeAll();
             end
+        end
+        function Preprocess(this)                                                 
+
+            if(~isfield(this.optsPhys,'sigmaS') && isfield(this.optsPhys,'V2') && isfield(this.optsPhys.V2,'sigmaS'))
+                this.optsPhys.sigmaS = this.optsPhys.V2.sigmaS;
+            end                            
             
+            PreprocessIDC(this);
             Preprocess_SubArea(this);
         end        
         function Preprocess_SubArea(this)

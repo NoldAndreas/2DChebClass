@@ -31,7 +31,7 @@ classdef DDFT_2D < Computation
             
         end        
         function Preprocess(this)
-            
+
             Preprocess@Computation(this);
                         
             optsPhys = this.optsPhys;
@@ -128,7 +128,7 @@ classdef DDFT_2D < Computation
                 paramsFex.FexNum   = this.optsNum.FexNum;
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
-                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   
+                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'optsNum_PhysArea'});   
             elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else

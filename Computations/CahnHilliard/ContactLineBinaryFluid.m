@@ -24,9 +24,16 @@ function ContactLineBinaryFluid
 
     pars.config = config;
     pars.Cak   = (0.005:0.0025:0.01)';
-    pars.y2Max = (12:2:18);
+    %pars.y2Max = (12:2:18);
         
-    pars.config.optsPhys.l_diff = 0.5;    
+   % pars.config.optsPhys.l_diff = 0.25;    
+   % dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.y2Max = (14:2:22);    
+    %pars.config.optsPhys.l_diff = 0.75;    
+    %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.config.optsPhys.l_diff = 1.0;    
     dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
     %pars.config.optsPhys.l_diff = 2;    
