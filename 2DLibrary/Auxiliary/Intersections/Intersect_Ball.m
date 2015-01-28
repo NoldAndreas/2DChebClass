@@ -38,7 +38,7 @@ function dataBall = Intersect_Ball(MainShape,ballShape)
             throw(exc);                
         end            
         
-    elseif(isa(MainShape,'InfCapillary') && (MainShape.y2Max - MainShape.y2Min)> 2*r)   
+    elseif(isa(MainShape,'InfCapillary') && (MainShape.y2Max - MainShape.y2Min)>= 2*r)   
 %         
          y2Min = MainShape.y2Min;
          y2Max = MainShape.y2Max;

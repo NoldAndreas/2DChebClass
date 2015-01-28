@@ -97,8 +97,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     area.Origin(2) = 0;
 
     ptsStripCart = GetCartPts(this,0,ptsStrip{3}.y2);
-    ptsy2        = ptsStripCart.y2_kv;
-        
+    ptsy2        = ptsStripCart.y2_kv;        
     for iPts = 1:length(ptsy2)
         area.Origin(2) = ptsy2(iPts);
         dataAD3(iPts)   = Intersect(this,area);
@@ -118,8 +117,10 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
         AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights,params);
         AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights,params);    
         AD(mark_Ykv{3},:,:)  = Conv_LinearGridX(this,ptsStrip{3},dataAD3,weights,params);
-    else        
-        AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights);
+    else      
+        if(~isempty(ptsStrip{1}.y2))
+            AD(mark_Ykv{1},:,:)  = Conv_LinearGridX(this,ptsStrip{1},dataAD1,weights);
+        end
         if(~isempty(ptsStrip{2}.y2))
             AD(mark_Ykv{2},:,:)  = Conv_LinearGridXY(this,ptsStrip{2},area,weights);
         end

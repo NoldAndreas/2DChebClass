@@ -59,9 +59,10 @@ function dataDisk = Intersect_Disk(MainShape,diskShape)%y20,r,N,sphere)
         y2Min = MainShape.y2Min;
         y2Max = MainShape.y2Max;
         if(isa(MainShape,'InfCapillarySkewed'))
-            exc = MException('Intersect_Disk:InfCapillarySkewed','case not implemented/tested');
-            throw(exc);                
-%            y2Min = y2Min*sin(MainShape.alpha);
+%            exc = MException('Intersect_Disk:InfCapillarySkewed','case not implemented/tested');
+%            throw(exc);                
+            y2Min = y2Min*sin(MainShape.alpha);
+            y2Max = y2Max*sin(MainShape.alpha);
         end
 
         shape.N      = N;

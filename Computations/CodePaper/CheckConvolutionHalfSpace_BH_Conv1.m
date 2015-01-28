@@ -165,7 +165,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     end     
 
     function PlotMatrixErrorOverY(A_name)
-        figure('color','white','Position',[0 0 800 800]); 
+        figure('color','white','Position',[0 0 800 800]);         
         leg_string = {};
         if(strfind(A_name,'AAD'))
             y2 = CLT.IDC.Pts.y2_kv;
@@ -183,10 +183,11 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         xlabel('$y_2$','Interpreter','Latex','fontsize',15);
         ylabel(['$\max(',A_name,'_{N,y2}-',A_name,'_{N+',num2str(NS_d),',y2})$'],...
                                 'Interpreter','Latex','fontsize',15);
+        title(A_name);
         set(gca,'YScale','log');
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',15);
-        legend(leg_string,'Location','northoutside','Orientation','horizontal');        
+        legend(leg_string,'Location','southoutside','Orientation','horizontal');        
     end
     function PlotMatrixError(A_name,sym,col,name)
         

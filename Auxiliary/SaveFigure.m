@@ -2,6 +2,12 @@ function SaveFigure(filename,opts)
 
     global dirData
     
+    k = strfind(filename,'.');
+    while(~isempty(k))
+        filename(k) = '_';
+        k = strfind(filename,'.');
+    end
+    
     [s,branch]= system('C:\git rev-parse --abbrev-ref HEAD');
 	
     print2eps([dirData filesep filename],gcf);

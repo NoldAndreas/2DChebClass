@@ -40,8 +40,7 @@ function CheckSumRule_BH_HalfSpace()
     res = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
     PlotErrorGraph('error_wl','o-','b','Wall-liquid hard sphere');    
     
-    % **** 2 ****    
-    
+    % **** 2 ****  
     config.optsNum.V2Num = V2Num;
     config.optsPhys.V2   = V2;
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
@@ -91,13 +90,13 @@ function CheckSumRule_BH_HalfSpace()
                 CL = ContactLineHS(conf);
                 preErr = CL.Preprocess(); 
                 
-                if(~isfield(conf.optsPhys,'V2'))
-                    res(i,j).error_conv1 = preErr.error_conv1;
-                    res(i,j).Conv        = CL.IntMatrV2.Conv;
-                    
+                if(~isfield(conf.optsPhys,'V2'))                                        
                     [~,~,params] = CL.Compute1D(in.eta);
                     res(i,j).error_wl = params.contactDensity_relError;
                 else
+                    res(i,j).error_conv1 = preErr.error_conv1;
+                    res(i,j).Conv        = CL.IntMatrV2.Conv;
+                    
                     [~,~,params] = CL.Compute1D('WL');
                     res(i,j).error_wl = params.contactDensity_relError;
 

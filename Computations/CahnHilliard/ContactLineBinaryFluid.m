@@ -24,16 +24,26 @@ function ContactLineBinaryFluid
 
     pars.config = config;
     pars.Cak   = (0.005:0.0025:0.01)';
-    %pars.y2Max = (12:2:18);
+    pars.y2Max = (12:2:18);
         
-   % pars.config.optsPhys.l_diff = 0.25;    
-   % dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+ %   pars.config.optsPhys.l_diff = 0.25;    
+%    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
     
-    pars.y2Max = (14:2:22);    
+   % pars.y2Max = (14:2:22);    
     %pars.config.optsPhys.l_diff = 0.75;    
     %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
     
-    pars.config.optsPhys.l_diff = 1.0;    
+    %pars.config.optsPhys.l_diff = 1.0;    
+    %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.y2Max = (20:2:36);
+    pars.config.optsPhys.l_diff = 1.25;    
+    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+         
+    pars.config.optsPhys.l_diff = 1.5;    
+    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.config.optsPhys.l_diff = 1.75;
     dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
     %pars.config.optsPhys.l_diff = 2;    
@@ -70,8 +80,10 @@ function ContactLineBinaryFluid
     end
 
     thetaEq = config.optsPhys.thetaEq;
-    cols = {'b','m','k','r','g'};
-    syms = {'d','s','o','>','<'};
+    nocols = 5;
+    nosyms = 5;
+    cols = {'g','b','m','k','r'};
+    syms = {'<','d','s','o','>'};
     
     figure('Position',[0 0 800 800],'color','white');
     hatL_M = zeros(size(dataM));
@@ -84,13 +96,13 @@ function ContactLineBinaryFluid
         for i2 = 1:size(dataM,2)
             hatL_M(i1,i2) = dataM(i1,i2).hatL;         
             Sy2_M(i1,i2)  = dataM(i1,i2).stagnationPointY2;         
-            PlotInterfaceSlope(i1,i2,cols{i1},syms{i2});
+            PlotInterfaceSlope(i1,i2,cols{mod(i1,nocols)+1},syms{mod(i2,nosyms)+1});
         end        
         hatL_Av = sum(hatL_M(i1,:)/size(dataM,2));
         
         y2P       = dataM(i1,i2).y2(2:end);
         theta_Ana = GHR_Inv(Ca*log(y2P/hatL_Av)+GHR_lambdaEta(thetaEq,1),1);
-        plot(y2P,180/pi*theta_Ana,cols{i1},'linewidth',1.5); hold on;        
+        plot(y2P,180/pi*theta_Ana,cols{mod(i1,nocols)+1},'linewidth',1.5); hold on;        
 
     end       
     
@@ -100,10 +112,10 @@ function ContactLineBinaryFluid
     ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
     ylim([90,100]);
     
-	filename = ['InterfaceSlope_l_d_',num2str(pars.config.optsPhys.l_diff)];
-    print2eps([dirData filesep filename],gcf);
-    saveas(gcf,[dirData filesep filename '.fig']);        
-    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+    SaveFigure(['InterfaceSlope_l_d_',num2str(pars.config.optsPhys.l_diff)],pars);
+    %print2eps([dirData filesep filename],gcf);
+    %saveas(gcf,[dirData filesep filename '.fig']);        
+    %disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
     
     hatL_Av = mean2(hatL_M); 
     Lb =  hatL_Av - min(min(hatL_M));
