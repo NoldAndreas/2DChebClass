@@ -55,7 +55,8 @@ classdef (Abstract) Polar_SpectralFourier < SpectralFourier
             %x1New          = (1+xPos)/2;  %Version 1
 
             L05_1New          = this.PhysSpace1(sqrt(0.5)); 
-            [y1New,dy1New]    = QuotientMap(xPos,L05_1New,0,this.PhysSpace1(1)); %Version 2
+            [y1New,dy1New]    = LinearMap(xPos,0,this.PhysSpace1(1));%QuadraticMapRight(xPos);%%%LinearMap(xPos,0,this.PhysSpace1(1));% % QuadraticMap(xPos,this.PhysSpace1(1)); %QuotientMap(xPos,L05_1New,0,this.PhysSpace1(1));%LinearMap(xPos,0,this.PhysSpace1(1));%; %Version 2 % 
+            %y1New = y1New*this.PhysSpace1(1); dy1New = dy1New*this.PhysSpace1(1);
             x1New             = this.CompSpace1(y1New);%Version 2
             M3                = barychebevalMatrix(this.Pts.x1full,x1New); 
 

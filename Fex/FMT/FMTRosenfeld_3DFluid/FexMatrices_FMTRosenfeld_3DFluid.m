@@ -40,7 +40,7 @@ function FMTMatricesFull = FexMatrices_FMTRosenfeld_3DFluid(Parameters,IDC)
         FMTMatrices.AD.n2_v_1  = AD(:,:,2);
         FMTMatrices.AAD.n2_v_1 = AAD(:,:,2); 
 
-        FMTMatrices.AD.n2_v_2 = AD(:,:,3);
+        FMTMatrices.AD.n2_v_2   = AD(:,:,3);
         FMTMatrices.AAD.n2_v_2 = AAD(:,:,3); 
 
         %FMTMatrices.AD.n1_v_1  = AD(:,:,2)/(4*pi*R);

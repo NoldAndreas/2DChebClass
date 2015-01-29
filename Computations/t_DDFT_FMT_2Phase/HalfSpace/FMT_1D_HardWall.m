@@ -111,8 +111,7 @@ function rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum)
     set(gcf,'Color','white'); close(f1); close(f2);
     set(gcf, 'Position', [0 0 800 800]);	
     if(saveFigs)
-        print2eps(['Density_eta_',strEta],gcf);        
-        saveas(gcf,['Density_eta_',strEta,'.fig']);   
+        SaveFigure(['Density_eta_',strEta],v2struct(optsPhys,optsNum));
     end
 
 end

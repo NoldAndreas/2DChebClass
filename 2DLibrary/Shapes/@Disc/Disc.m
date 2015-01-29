@@ -22,11 +22,17 @@ classdef Disc < Polar_SpectralFourier
     end
     
     methods (Access = public)
-        function [r,dr,dx,ddx,dddx,ddddx] = PhysSpace1(this,x)
-            [r,dr,dx,ddx,dddx,ddddx] = LinearMap(x,-this.R,this.R);
+        function [r,dr] = PhysSpace1(this,x)%,dx,ddx,dddx,ddddx]
+            %[r,dr,dx,ddx,dddx,ddddx] = LinearMap(x,-this.R,this.R);
+            [r,dr] = QuadraticMap(x);
+            r      = this.R*r;
+            dr     = this.R*dr;
         end
         function xf = CompSpace1(this,r)
-            xf = InvLinearMap(r,-this.R,this.R);
+            r   = r/this.R;            
+            xf = bisection(@QuadraticMap,-1,1,r);%,options)            
+            %xf  = fzero(fun,r);
+            %xf = InvLinearMap(r,-this.R,this.R);
         end
         function [th,dth,dx,ddx,dddx,ddddx] = PhysSpace2(this,xT)    
             [th,dth,dx,ddx,dddx,ddddx] = LinearMap01(xT,0,2*pi);

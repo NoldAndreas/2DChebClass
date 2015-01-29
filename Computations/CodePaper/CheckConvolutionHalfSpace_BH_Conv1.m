@@ -43,14 +43,16 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 	CLT = ContactLineHS(config);
 	CLT.PreprocessIDC();     
     
+    nocols = 5;
+    nosyms = 5;
     cols = {'b','m','k','r','g'};
     syms = {'d','s','o','>','<'};
     
     %**********************************************        
-	PlotMatrixErrorOverY('A_n2');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+	PlotMatrixErrorOverY('A_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
     xlim([0,10]);
     
-    PlotMatrixErrorOverY('AAD_n2');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+    PlotMatrixErrorOverY('AAD_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
     xlim([0,10]);    
     %**********************************************
     
@@ -163,7 +165,6 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
-
     function PlotMatrixErrorOverY(A_name)
         figure('color','white','Position',[0 0 800 800]);         
         leg_string = {};
@@ -173,11 +174,16 @@ function CheckConvolutionHalfSpace_BH_Conv1()
             y2 = CLT.IDC.AD.Pts.y2_kv;
         end
         
+        n = 1;
         for k1 = 1%:size(res,1)
-            for k2 = 1:(min(5,size(res,2)-1))
+            for k2 = 1:5:(size(res,2)-1)
                 A = res(k1,k2).(A_name)-res(k1,k2+1).(A_name);
-                plot(y2,max(A,[],2),['-',syms{k2},cols{k2}],'MarkerSize',10,'MarkerFaceColor',cols{k2}); hold on;
+                plot(y2,max(A,[],2),['-',syms{1+mod(n,nosyms)},...
+                                         cols{1+mod(n,nocols)}],...
+                                         'MarkerSize',10,...
+                                         'MarkerFaceColor',cols{1+mod(n,nocols)}); hold on;
                 leg_string(end+1) = {['NS = ',num2str(res(k1,k2).NS)]};
+                n = n + 1;
             end
         end       
         xlabel('$y_2$','Interpreter','Latex','fontsize',15);
