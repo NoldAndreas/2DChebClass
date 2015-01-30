@@ -1,33 +1,35 @@
-function [data,res] = SimulationBall(N1,N2,vext)
+function [data,res] = SimulationBall_Sphere()
 
-    disp('** Simulation Ball **');
+    disp('** Simulation Ball - Sphere**');
     AddPaths();
     
     close all;
     
     %Initialization
-    if(nargin == 0)
-        N1 = 20;   N2 = 20;
-        vext  = @VTest;
-        R     = 3;
-        theta1 = pi/5;
-        theta2 = 3/4*pi;
-        Origin = [0;0];
-        N      = [N1;N2];
-    end        
+    N1 = 40;
+    N2 = 40;
+    vext  = @VTest;
+    R     = 3;
+    theta1 = pi/4;
+    theta2 = pi;
+    Origin = [0;0];
+    N      = [N1;N2];    
+    volume = false;
     
-    
-    SG  = Ball(v2struct(R,theta1,theta2,N));    
+    SG  = Sphere(v2struct(R,theta1,theta2,N,volume));
     Int = SG.ComputeIntegrationVector();    
     Interp = SG.ComputeInterpolationMatrix((-1:0.02:1)',(0:0.005:0.5)',true,true);
         
     [V,Vdiff,VInt]   = vext(SG.Pts.y1_kv,SG.Pts.y2_kv);   
     [VP]             = vext(Interp.pts1,Interp.pts2);
            
+    %Check Differentiation
+    %vplot   = Interp.InterPol*V;        
+    %data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');    
     
     %Check Interpolation
     data.InterPol = max(abs(Interp.InterPol*V - VP));       
-    display([' Error in Interpolation: ', num2str(data.InterPol)]);
+    display([' Error in Interpolation: ', num2str(data.InterPol)]);    
     
     %Check Integration
     data.Int = abs(Int*V-VInt);
@@ -42,7 +44,7 @@ function [data,res] = SimulationBall(N1,N2,vext)
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color                
-     SG.plot(V,true);        
+     SG.plot(V,'SC');        
     title('Interpolation');   
     
     figure;
@@ -58,7 +60,9 @@ function [data,res] = SimulationBall(N1,N2,vext)
     %***************************************************************         
     function [V,VDiff,VInt] = VTest(y1,y2)       
             %V           = cos(y1);  VInt = 0;
-            V           = sin(y1).^2.*cos(y2).^2;  VInt = 4/3*pi*R^2;           
+           % V           = sin(y1).^2.*cos(y2).^2;  VInt = 4/3*pi*R^2;
+            V   = ones(size(y1));  VInt = 4/3*pi*R^3; 
+            V = 2*R*sin(y1).*sin(y2);
             
             %dVy1        = -y2.*sin(y1);
             %dVy2        = cos(y1);  

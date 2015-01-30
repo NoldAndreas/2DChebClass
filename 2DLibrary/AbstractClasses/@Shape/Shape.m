@@ -331,8 +331,14 @@ classdef (Abstract) Shape < handle
             xl     = [min(yCart.y1_kv) max(yCart.y1_kv)];
             yl     = [min(yCart.y2_kv) max(yCart.y2_kv)];            
 
-            y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
-            y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);       
+            if((nargin >= 3) && strcmp(options,'comp')) 
+                [x1,x2]  = CompSpace(this,this.Interp.pts1,this.Interp.pts2);
+                y1M    = reshape(x1,this.Interp.Nplot2,this.Interp.Nplot1);
+                y2M    = reshape(x2,this.Interp.Nplot2,this.Interp.Nplot1);       
+            else
+                y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
+                y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);       
+            end
             
             if((nargin >= 4) && isfield(optDetails,'linewidth'))
                 lw = optDetails.linewidth;
@@ -427,7 +433,11 @@ classdef (Abstract) Shape < handle
                 end
                 
                 if((nargin < 4) || ~isfield(optDetails,'reshape') || optDetails.reshape)
-                    xlim(xl); ylim(yl);                    
+                    if((nargin >= 3) && strcmp(options,'comp')) 
+                        xlim([-1,1]); ylim([-1,1]);
+                    else
+                        xlim(xl); ylim(yl);                    
+                    end
                     xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
                     ylabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
                     pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1/2*min((xl(2)-xl(1)),(yl(2)-yl(1)))]);                

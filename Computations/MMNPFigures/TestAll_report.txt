@@ -1,8 +1,8 @@
 # ************************************************************ 
-# Computed at: 23-Jan-2015 16:19:29 Cumulative computation time: 00:00:00.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 30-Jan-2015 01:56:56 Cumulative computation time: 00:42:33.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 MMNP_ComputeAll : -2
-MMNP_Fig1_YoungContactAngles : -1
-MMNP_Fig2_NumParaemeterStudy : -1
-MMNP_Fig3_ComputeContactAngles : -1
-MMNP_Fig4_Isotherm : -1
+MMNP_Fig1_YoungContactAngles : -2
+MMNP_Fig2_NumParaemeterStudy : -2
+MMNP_Fig3_ComputeContactAngles : -2
+MMNP_Fig4_Isotherm : 2553

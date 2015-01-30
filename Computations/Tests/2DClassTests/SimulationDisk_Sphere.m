@@ -1,6 +1,6 @@
 function [data,res] = SimulationDisk_Sphere()
 
-    disp('** Simulation Disk, option sphere **');
+    disp('** Simulation Sphere **');
 
     if(length(dbstack) == 1)
         AddPaths();
@@ -11,21 +11,17 @@ function [data,res] = SimulationDisk_Sphere()
     if(nargin == 0)
         R       = 3;        
         N1      = 40;
-        N2      = 2;
+        N2      = 20;
         N       = [N1;N2];
         Origin  = [3,-2];
     else
         R = L1;
     end
     
-    shape        = v2struct(R,N,Origin);
-    shape.sphere = false;
-    
-    DC                 = Disc(shape);
-    Pts = DC.Pts;
-    %Ind  = ComputeIndices(this);
-            %Diff = ComputeDifferentiationMatrix(this);
-    Int = DC.ComputeIntegrationVector();
+    shape  = v2struct(R,N,Origin);        
+    DC     = Sphere(shape);
+    Pts    = DC.Pts;
+    Int    = DC.ComputeIntegrationVector();
     
     %[Pts,Diff,Int,Ind] = DC.ComputeAll();
     Interp = DC.ComputeInterpolationMatrix((0:0.02:1)',(0:0.02:1)',true,true);
@@ -96,7 +92,7 @@ function [data,res] = SimulationDisk_Sphere()
     %   Auxiliary functions:
     %***************************************************************         
     function [z,VInt] = vext(r,theta)
-        z    = 2*sqrt(R^2 - r.^2);
+        z    = ones(size(r));%2*sqrt(R^2 - r.^2);
         VInt = 4/3*pi*R^3;
     end
     function z = f1(r,t)

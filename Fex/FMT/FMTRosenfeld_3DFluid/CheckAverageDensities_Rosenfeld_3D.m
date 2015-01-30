@@ -143,14 +143,16 @@
         %*************************************************        
         %% 4th Check: Average Densities with density = 1 for y > 1.
                 
-        z     = this.AD.Pts.y2_kv(this.AD.Pts.y1_kv == inf);    
+       % z     = this.AD.Pts.y2_kv(this.AD.Pts.y1_kv == inf);    
+        z     = ADCartPts.y2_kv(this.AD.Pts.y1_kv == inf);    
         if(checkTop)     
             z = y2M + R - z;
         end
         rhoAD = ones(size(z));
-        rhoAD(this.AD.mark_id(:,1)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
+        rhoAD(this.AD.mark_id_2(:,1)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
         row   = 4;
-        xADInt =  this.Pts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
+        %xADInt =  this.Pts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
+        xADInt =  CartPts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
         if(VisualOutput)
             PlotRosenfeldFMT_AADInf(IntMatrFex(1),rhoAD,rows,10);
             subplot(rows,3,9+1); plot(xADInt+0.5,check1n2(xADInt),'m','linewidth',1.5);

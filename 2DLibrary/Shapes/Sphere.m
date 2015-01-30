@@ -1,4 +1,4 @@
-classdef Ball < SpectralEvenFourier
+classdef Sphere < SpectralEvenFourier
     %Computes the integral over the surface of a sphere, where it is
     %assumed that the x-y-plane is a axis of symmetry for the function to
     %evaluate. (otherwise inherit from SpectralFourier, not
@@ -16,13 +16,14 @@ classdef Ball < SpectralEvenFourier
     properties 
         theta1,theta2,R
         PtsCart    
+        volume = true
     end
     
     %**********************************************
     %************   Constructor   *****************
     %**********************************************
     methods 
-        function this = Ball(Geometry)
+        function this = Sphere(Geometry)
              this@SpectralEvenFourier(Geometry.N(1),Geometry.N(2));
              
              this.theta1 = Geometry.theta1;
@@ -30,6 +31,9 @@ classdef Ball < SpectralEvenFourier
              this.R      = Geometry.R;
              if(isfield(Geometry,'Origin'))
                  this.Origin = Geometry.Origin;
+             end
+             if(isfield(Geometry,'volume'))
+                 this.volume = Geometry.volume;
              end
              
              InitializationPts(this);             
@@ -42,20 +46,34 @@ classdef Ball < SpectralEvenFourier
     %**********************************************
     methods (Access = public) 
         function [int,area] = ComputeIntegrationVector(this)
+            R   = this.R;
+            y1  = this.Pts.y1_kv;
+            y2  = this.Pts.y2_kv;
+            th1 = this.theta1;  
+            th2 = this.theta1;
+            
             int = ComputeIntegrationVector@SpectralEvenFourier(this);            
-            int = int.*(2*this.R^2*sin(this.Pts.y1_kv)'); %weight from spherical coordinates
-            %int = int.*(this.R^2*sin(this.Pts.y1_kv)'.*sin(this.Pts.y2_kv').^2); %weight from spherical coordinates
+            %int = int.*(2*this.R^2*sin(this.Pts.y1_kv)'); %weight from spherical coordinates
+            int = int.*(R^2*sin(y1)'.*sin(y2').^2); %weight from spherical coordinates            
+                           
+           
+            if(this.volume)
+                int  = int.*(2*R*sin(y1).*sin(y2))';                                
+                area = 4/3*pi*R^3*( 1 - ((1-cos(th1)).^2).*(2+cos(th1))/4);
+            else
+                area = R^2*(pi-(2*th1-sin(2*th1))/2);%this.R^2*pi*(cos(this.theta1)-cos(this.theta2));
+            end
             
-            this.Int = int;
-            
-            area = 2*this.R^2*pi*(cos(this.theta1)-cos(this.theta2));
             if(nargout < 2)
                 if(area == 0)
                     disp(['Ball: Area = 0, Error in computation (absolute):',num2str(area-sum(int))]);
                 else
-                    disp(['Ball: Error in computation of area (%):',num2str(1-sum(int)/area)]);
+                    disp(['Ball: Error in computation of area (ratio):',num2str(1-sum(int)/area)]);
                 end
             end
+            
+            
+            this.Int = int;
             
         end               
     
