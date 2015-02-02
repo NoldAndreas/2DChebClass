@@ -31,27 +31,33 @@ function ContactLineBinaryFluid
     
     pars.y2Max = (14:2:24);    
     pars.config.optsPhys.l_diff = 0.75;    
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    PlotData();
+    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+  %  PlotData(dataM{1});
     
     pars.config.optsPhys.l_diff = 1.0;    
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    PlotData();
+    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+   % PlotData(dataM{2});
     
     pars.y2Max = (20:2:36);
     pars.config.optsPhys.l_diff = 1.25;    
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    PlotData();
+    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    %PlotData(dataM{3});
     
     pars.config.optsPhys.l_diff = 1.5;    
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    PlotData();
+    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+%    PlotData(dataM{4});
     
     pars.config.optsPhys.l_diff = 1.75;
-    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    PlotData();
+    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+%    PlotData(dataM{5});
+
     %pars.config.optsPhys.l_diff = 2;    
     %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    CompareAllData(dataM,1);
+    CompareAllData(dataM,2);
+    CompareAllData(dataM,3);
+    
 
     function dataM = RunNumericalExperiment(pars,h)
 
@@ -83,8 +89,45 @@ function ContactLineBinaryFluid
         end
     end
 
-    function PlotData()
-        thetaEq = config.optsPhys.thetaEq;
+    function CompareAllData(dataM,j1)
+        thetaEq = dataM{1}(1,1).config.optsPhys.thetaEq;
+        nocols = 5;
+        nosyms = 5;
+        cols = {'g','b','c','k','r'};
+        syms = {'<','d','s','o','>'};        
+
+        figure('Position',[0 0 800 800],'color','white');
+        hatL_M = zeros(size(dataM));
+        Sy2_M  = zeros(size(dataM));
+        Ca     = 3/4*pars.Cak(j1);
+        
+        
+
+        for j0 = 1:length(dataM)
+            for j2 = 1:size(dataM{j0},2)
+                hatL_M(j1,j2) = dataM{j0}(j1,j2).hatL;         
+                Sy2_M(j1,j2)  = dataM{j0}(j1,j2).stagnationPointY2;         
+                PlotRescaledInterfaceSlope(dataM{j0},j1,j2,cols{mod(j0,nocols)+1},syms{mod(j2,nosyms)+1});
+            end                                       
+        end       
+        
+        y2P       = (1:1:60)';
+        theta_Ana = GHR_Inv(Ca*log(y2P)+GHR_lambdaEta(thetaEq,1),1);
+        plot(y2P,180/pi*theta_Ana,'m','linewidth',3); hold on;        
+
+
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',20);
+        xlabel('$y/{\hat L}$','Interpreter','Latex','fontsize',20);
+        ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
+        %ylim([90,100]);
+        
+        SaveFigure(['InterfaceSlope_Ca_',num2str(Ca)],pars);
+        
+    end
+
+    function PlotData(dataM)
+        thetaEq = dataM(1,1).config.optsPhys.thetaEq;
         nocols = 5;
         nosyms = 5;
         cols = {'g','b','m','k','r'};
@@ -101,7 +144,7 @@ function ContactLineBinaryFluid
             for i2 = 1:size(dataM,2)
                 hatL_M(i1,i2) = dataM(i1,i2).hatL;         
                 Sy2_M(i1,i2)  = dataM(i1,i2).stagnationPointY2;         
-                PlotInterfaceSlope(i1,i2,cols{mod(i1,nocols)+1},syms{mod(i2,nosyms)+1});
+                PlotInterfaceSlope(dataM,i1,i2,cols{mod(i1,nocols)+1},syms{mod(i2,nosyms)+1});
             end        
             hatL_Av = sum(hatL_M(i1,:)/size(dataM,2));
 
@@ -159,7 +202,14 @@ function ContactLineBinaryFluid
     % %DI.FindStagnationPoint();
     % DI.PlotResults();	 
     
-    function PlotInterfaceSlope(i1,i2,col,sym)
+    function PlotRescaledInterfaceSlope(dataM,i1,i2,col,sym)                    
+        hatL   = 0.46*dataM(i1,i2).config.optsPhys.l_diff;%46
+        y2     = dataM(i1,i2).y2 /hatL;
+        mark   = (y2 < (max(y2)-5));
+        plot(y2(mark),180/pi*dataM(i1,i2).theta(mark),[col,sym],'MarkerSize',5,'MarkerFaceColor',col); hold on;                              
+    end
+    
+    function PlotInterfaceSlope(dataM,i1,i2,col,sym)
                     
         y2     = dataM(i1,i2).y2;                          
         hatL   = (dataM(i1,i2).hatL);                        
