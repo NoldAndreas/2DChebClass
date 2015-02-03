@@ -16,9 +16,9 @@ function [data,res] = SimulationBall(N1,N2,vext)
         N      = [N1;N2];
     end        
     
-    
-    SG  = Ball(v2struct(R,theta1,theta2,N));    
-    Int = SG.ComputeIntegrationVector();    
+    shape  = v2struct(R,theta1,theta2,N);
+    SG     = Ball(shape);    
+    Int    = SG.ComputeIntegrationVector();    
     Interp = SG.ComputeInterpolationMatrix((-1:0.02:1)',(0:0.005:0.5)',true,true);
         
     [V,Vdiff,VInt]   = vext(SG.Pts.y1_kv,SG.Pts.y2_kv);   
@@ -40,6 +40,11 @@ function [data,res] = SimulationBall(N1,N2,vext)
     data.N1 = N1; data.N2 = N2;
     
     %******** Plotting **********
+    figure
+    VI = V.*(2*R^2*sin(SG.Pts.y1_kv));    
+    SG.plot(VI,{'comp','SC'});
+    SaveFigure(['SimulationBall'],shape);
+    
     figure
     set(gcf,'Color','white'); %Set background color                
      SG.plot(V,true);        

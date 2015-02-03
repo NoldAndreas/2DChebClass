@@ -308,6 +308,10 @@ classdef (Abstract) Shape < handle
         end            
         function plot(this,V,options,optDetails)
             
+            if((nargin >= 3) && ~(iscell(options)))
+                options = {options};
+            end
+            
             %options: 'SC' , 'contour'
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -331,7 +335,7 @@ classdef (Abstract) Shape < handle
             xl     = [min(yCart.y1_kv) max(yCart.y1_kv)];
             yl     = [min(yCart.y2_kv) max(yCart.y2_kv)];            
 
-            if((nargin >= 3) && strcmp(options,'comp')) 
+            if((nargin >= 3) && IsOption(options,'comp')) 
                 [x1,x2]  = CompSpace(this,this.Interp.pts1,this.Interp.pts2);
                 y1M    = reshape(x1,this.Interp.Nplot2,this.Interp.Nplot1);
                 y2M    = reshape(x2,this.Interp.Nplot2,this.Interp.Nplot1);       
@@ -340,7 +344,7 @@ classdef (Abstract) Shape < handle
                 y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);       
             end
             
-            if((nargin >= 4) && isfield(optDetails,'linewidth'))
+            if((nargin >= 4) && IsOption(optDetails,'linewidth'))
                 lw = optDetails.linewidth;
             else
                 lw = 2.5;                
@@ -351,7 +355,7 @@ classdef (Abstract) Shape < handle
                     subplot(nRows,nCol,iSpecies);
                 end
 
-                if((nargin >= 3) && strcmp(options,'flux')) %if its a flux
+                if((nargin >= 3) && IsOption(options,'flux')) %if its a flux
                     VI = blkdiag(this.Interp.InterPol,this.Interp.InterPol)*V(:,iSpecies);
                 elseif( (size(V,1) == length(this.Interp.pts1)) && (length(this.Interp.pts1) ~= length(this.Pts.y1_kv)) )
                     VI = V(:,iSpecies);                
@@ -359,7 +363,7 @@ classdef (Abstract) Shape < handle
                     VI = this.Interp.InterPol*V(:,iSpecies);
                 end
                 
-                if((nargin >= 3) && strcmp(options,'contour'))
+                if((nargin >= 3) && IsOption(options,'contour'))
                     if(nargin >= 4)         
                         if(isfield(optDetails,'nContours'))                            
                             [C,h] = contour(y1M,y2M,reshape(VI,...
@@ -384,7 +388,7 @@ classdef (Abstract) Shape < handle
                                   'linewidth',lw);  
                     end
                     % hh = clabel(C,h,'fontsize',20);
-                elseif((nargin >= 3) && strcmp(options,'flux'))
+                elseif((nargin >= 3) && IsOption(options,'flux'))
                     fl_y1     = VI(1:end/2,iSpecies);
                     fl_y2     = VI(end/2+1:end,iSpecies);
                     
@@ -417,23 +421,28 @@ classdef (Abstract) Shape < handle
                 end
                 hold on;
                 
-                if((nargin >= 3) && strcmp(options,'SC'))
+                if((nargin >= 3) && IsOption(options,'SC'))
                     hold on; 
                     
-                    ptsCart = GetCartPts(this);
-                    mask    = ((ptsCart.y1_kv <= xl(2)) & ...
-                               (ptsCart.y1_kv >= xl(1)) & ...
-                               (ptsCart.y2_kv <= yl(2)) & ...
-                               (ptsCart.y2_kv >= yl(1)));
-                    
+                    if(IsOption(options,'comp'))
+                        pts.y1_kv = this.Pts.x1_kv;
+                        pts.y2_kv = this.Pts.x2_kv;
+                        mask      = true(size(pts.y1_kv));
+                    else
+                        pts = GetCartPts(this);
+                        mask    = ((pts.y1_kv <= xl(2)) & ...
+                                   (pts.y1_kv >= xl(1)) & ...
+                                   (pts.y2_kv <= yl(2)) & ...
+                                   (pts.y2_kv >= yl(1)));
+                    end
                     Vp      = V(:,iSpecies);
-                    h       = scatter3(ptsCart.y1_kv(mask),ptsCart.y2_kv(mask),...
+                    h       = scatter3(pts.y1_kv(mask),pts.y2_kv(mask),...
                                                     Vp(mask),'o');
                     set(h,'MarkerEdgeColor','k','MarkerFaceColor','g');
                 end
                 
                 if((nargin < 4) || ~isfield(optDetails,'reshape') || optDetails.reshape)
-                    if((nargin >= 3) && strcmp(options,'comp')) 
+                    if((nargin >= 3) && IsOption(options,'comp')) 
                         xlim([-1,1]); ylim([-1,1]);
                     else
                         xlim(xl); ylim(yl);                    

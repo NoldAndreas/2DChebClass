@@ -6,19 +6,22 @@ function [data,res] = SimulationBall_Sphere()
     close all;
     
     %Initialization
-    N1 = 40;
-    N2 = 40;
+    N1 = 20;
+    N2 = 20;
     vext  = @VTest;
     R     = 3;
-    theta1 = pi/4;
-    theta2 = pi;
+    theta1 = pi/4;%pi/2;
+    theta2 = pi/2;
     Origin = [0;0];
     N      = [N1;N2];    
-    volume = false;
+    volume = true;
     
-    SG  = Sphere(v2struct(R,theta1,theta2,N,volume));
+    shape  = v2struct(R,theta1,theta2,N,volume);
+    
+    SG  = Sphere(shape);
+    Pts = SG.Pts;
     Int = SG.ComputeIntegrationVector();    
-    Interp = SG.ComputeInterpolationMatrix((-1:0.02:1)',(0:0.005:0.5)',true,true);
+    Interp = SG.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
         
     [V,Vdiff,VInt]   = vext(SG.Pts.y1_kv,SG.Pts.y2_kv);   
     [VP]             = vext(Interp.pts1,Interp.pts2);
@@ -43,6 +46,14 @@ function [data,res] = SimulationBall_Sphere()
     
     %******** Plotting **********
     figure
+    VI = V.*sin(Pts.y1_kv).*sin(Pts.y2_kv).^2*R^2;
+    if(volume)
+        VI = VI.*(2*R*sin(Pts.y1_kv).*sin(Pts.y2_kv));
+    end
+    SG.plot(VI,{'comp','SC'});
+    SaveFigure(['SimulationBall_Sphere_Vol',num2str(volume)],shape);
+    
+    figure
     set(gcf,'Color','white'); %Set background color                
      SG.plot(V,'SC');        
     title('Interpolation');   
@@ -62,7 +73,7 @@ function [data,res] = SimulationBall_Sphere()
             %V           = cos(y1);  VInt = 0;
            % V           = sin(y1).^2.*cos(y2).^2;  VInt = 4/3*pi*R^2;
             V   = ones(size(y1));  VInt = 4/3*pi*R^3; 
-            V = 2*R*sin(y1).*sin(y2);
+           % V = 2*R*sin(y1).*sin(y2);
             
             %dVy1        = -y2.*sin(y1);
             %dVy2        = cos(y1);  
