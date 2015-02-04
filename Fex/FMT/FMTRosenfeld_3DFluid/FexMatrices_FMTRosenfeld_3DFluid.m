@@ -51,11 +51,14 @@ function FMTMatricesFull = FexMatrices_FMTRosenfeld_3DFluid(Parameters,IDC)
         
         
         shapeSphere         = shape; 
-        shapeSphere.sphere  = true;
+        %shapeSphere.sphere  = true;
+        shapeSphere.volume  = true;
         
         %AAD                 = IDC.AD.GetAverageDensities(Disc(shapeSphere),'',IDC.Pts);
         %shapeSphere.N       = GetPointNumber(shapeSphere,'Disc',requiredAbsoluteAccuracy);        
-        [AD,AAD]            = IDC.GetAverageDensities(Disc(shapeSphere),'');        
+        
+        [AD,AAD]            = IDC.GetAverageDensities(Sphere(shapeSphere),'');        
+        %[AD,AAD]            = IDC.GetAverageDensities(Disc(shapeSphere),'');        
 
         FMTMatrices.AD.n3  = AD;
         FMTMatrices.AAD.n3 = AAD;

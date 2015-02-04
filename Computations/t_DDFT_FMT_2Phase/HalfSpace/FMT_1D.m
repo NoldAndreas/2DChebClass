@@ -99,7 +99,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
     fsolveOpts=optimset('MaxFunEvals',2000000,'MaxIter',200000,...
-                        'Display','off','TolFun',1e-8);
+                        'Display','off','TolFun',1e-10,'TolX',1e-10);
     [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
     if(flag ~= 1)
         cprintf('red','Error in fsolve, FMT_1D_Interface');

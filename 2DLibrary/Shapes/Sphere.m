@@ -14,7 +14,9 @@ classdef Sphere < SpectralSpectral%EvenFourier
     % where phi in [0,pi] and 
     
     properties 
-        theta1,theta2,R
+        theta1 = 0
+        theta2 = pi
+        R
         PtsCart    
         volume = true
     end
@@ -26,8 +28,12 @@ classdef Sphere < SpectralSpectral%EvenFourier
         function this = Sphere(Geometry)
              this@SpectralSpectral(Geometry.N(1),Geometry.N(2)); %EvenFourier
              
-             this.theta1 = Geometry.theta1;
-             this.theta2 = Geometry.theta2;
+             if(isfield(Geometry,'theta1'))
+                  this.theta1 = Geometry.theta1;
+             end
+             if(isfield(Geometry,'theta2'))
+                this.theta2 = Geometry.theta2;
+             end
              this.R      = Geometry.R;
              if(isfield(Geometry,'Origin'))
                  this.Origin = Geometry.Origin;

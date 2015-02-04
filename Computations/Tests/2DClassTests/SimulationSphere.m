@@ -1,4 +1,4 @@
-function [data,res] = SimulationBall_Sphere()
+function [data,res] = SimulationSphere()
 
     disp('** Simulation Ball - Sphere**');
     AddPaths();

@@ -77,11 +77,7 @@ function rho_ic1D = FMT_1D_HardWall(HS,IntMatrFex_2D,optsPhys,optsNum)
 	set(gca,'fontsize',20);                        
     set(gca,'linewidth',1.5);        
     ax=get(f1,'Position');    
-    hold off;
-    if(saveFigs)
-        print2eps(['Density_eta',strEta],gcf);
-        save2pdf(['Density_eta_',num2str(eta),'.pdf'],gcf);
-    end
+    hold off;    
 
     %**************** Plot Density - Zoom in Close to Wall ****************
 	f2 = figure;

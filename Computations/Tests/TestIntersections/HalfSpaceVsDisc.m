@@ -24,7 +24,8 @@ while(y20 > bottom - R)
     N      = [10,10];
     sphere = true;
     
-    DC     = Disc(v2struct(Origin,R,N,sphere));       
+    %DC     = Disc(v2struct(Origin,R,N,sphere));       
+    DC     = Sphere(v2struct(Origin,R,N,sphere));       
     %theta1 = 0;  theta2 = pi;    
     %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));       
 

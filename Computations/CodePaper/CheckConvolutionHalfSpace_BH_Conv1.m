@@ -35,7 +35,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
     N    = 30;%:10:50;    
-    NS_d = 2;  %10;
+    NS_d = 2 ;  %10;
     NS   = 10:NS_d:50;%10:10:40;
     
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});

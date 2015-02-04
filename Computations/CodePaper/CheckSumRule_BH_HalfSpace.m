@@ -3,7 +3,7 @@ function CheckSumRule_BH_HalfSpace()
     AddPaths();
 
     PhysArea = struct('N',[1,60],...
-                      'L1',5,'L2',4,'L2_AD',4.,...
+                      'L1',5,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
                       'alpha_deg',90);
@@ -29,7 +29,7 @@ function CheckSumRule_BH_HalfSpace()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:5:80;    
+    N    = 20:10:80;    
     NS   = 40;%10:10:40;
     
     figure('color','white','Position',[0 0 900 800]); 
@@ -78,7 +78,7 @@ function CheckSumRule_BH_HalfSpace()
         for i = 1:length(N)
             
             conf.optsNum.PhysArea.N       = [1,N(i)];
-            conf.optsNum.PhysArea.N2bound = round(N(i)/2);
+            conf.optsNum.PhysArea.N2bound = round(N(i)/3);
             
             for j = 1:length(NS)
                 if(isfield(conf.optsPhys,'V2'))
