@@ -164,7 +164,7 @@ function TestAll(dirTest)
         fprintf(fileID,'\\end{document}\n');
         fclose(fileID); 
         
-        system(['latex ',filenameLatexDoc]);
+        %system(['latex ',filenameLatexDoc]);
     end
     function WriteReport()
         tc = 0;

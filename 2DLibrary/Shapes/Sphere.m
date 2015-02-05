@@ -1,4 +1,4 @@
-classdef Sphere < SpectralSpectral%EvenFourier
+classdef Sphere < SpectralSpectral%SpectralEvenFourier%
     %Computes the integral over the surface of a sphere, where it is
     %assumed that the x-y-plane is a axis of symmetry for the function to
     %evaluate. (otherwise inherit from SpectralFourier, not
@@ -113,7 +113,7 @@ classdef Sphere < SpectralSpectral%EvenFourier
             [y,dy,dx,ddx,dddx,ddddx] = LinearMap(x,0,pi);%CCC
         end
         function xf = CompSpace2(this,y)
-            xf = InvLinearMap(y,0,pi);
+            xf = InvLinearMap(y,0,pi);%y/(2*pi);
         end                                        
         
         acc = testIntegration(this,toCheck);

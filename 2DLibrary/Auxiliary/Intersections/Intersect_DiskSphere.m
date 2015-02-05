@@ -8,10 +8,11 @@ function dataBall = Intersect_DiskSphere(MainShape,diskShape)
     shape.R  = r;     
     shape.Origin = diskShape.Origin;
     
-	if((nargin >= 2) && ...
-            ((isa(diskShape,'Disc') && diskShape.sphere == true) || ...
-             (isa(diskShape,'Sphere') && diskShape.volume == true)))
+	if((isa(diskShape,'Disc') && (diskShape.sphere == true)) || ...
+             (isa(diskShape,'Sphere') && diskShape.volume == true))
             shape.volume = true;
+    else
+        shape.volume = false;
 	end
     
     if(isa(MainShape,'HalfSpace'))   

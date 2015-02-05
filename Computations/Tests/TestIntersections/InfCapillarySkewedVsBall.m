@@ -1,16 +1,17 @@
 clear all; close all;
 
 R      = 1;
-bottom = 0;
+bottom = 1;
 top    = 5;
 
-IntersectShape = 'Disc'; %Disc
+IntersectShape = 'Ball'; %Disc
 
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[6,6],'L1',1,'L2',2,...
                'alpha',70/180*pi);
            
 HS    = InfCapillarySkewed(shape);
+HS.PlotGridLines();
 plot([-10,10],[bottom,bottom],'b--','LineWidth',2); hold on;
 plot([-10,10],[top,top],'b--','LineWidth',2);
 
@@ -19,7 +20,7 @@ ylim([(bottom-R-1) (top + R + 1)])
 xlabel('$x$','Interpreter','Latex','fontsize',20);
 ylabel('$y$','Interpreter','Latex','fontsize',20);
 set(gca,'fontsize',20);
-axis equal
+pbaspect([10 (top-bottom+2*R+2) 1]);
 
 [y10,y20] = ginput(1);   
 while(y20 > bottom - R)
@@ -56,7 +57,7 @@ while(y20 > bottom - R)
     xlabel('$x$','Interpreter','Latex','fontsize',20);
     ylabel('$y$','Interpreter','Latex','fontsize',20);
     set(gca,'fontsize',20);    
-    axis equal
+    pbaspect([10 (top-bottom+2*R+2) 1]);
 
     [y10,y20] = ginput(1);   
 end

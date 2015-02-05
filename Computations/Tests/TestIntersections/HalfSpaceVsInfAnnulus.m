@@ -2,12 +2,13 @@ clear all; close all;
 
 L      = 1;
 R      = 1;
-bottom = 0;
+bottom = 0.5;
 
 figure('color','white','Position',[0 0 800 500]);
-shape = struct('y2Min',bottom,'N',[10,10],'L1',1,'L2',2);%,'alpha',90);
-%HS    = HalfSpaceSkewed(shape);
-HS    = HalfSpace(shape);
+shape = struct('y2Min',bottom,'N',[10,10],'L1',1,'L2',2,'alpha',pi/4);
+HS    = HalfSpaceSkewed(shape);
+%HS    = HalfSpace(shape);
+HS.PlotGridLines();
 plot([-10,10],[bottom,bottom],'b--','LineWidth',2);
 
 xlim([-5,5])
@@ -15,7 +16,7 @@ ylim([-1 9])
 xlabel('$x$','Interpreter','Latex','fontsize',20);
 ylabel('$y$','Interpreter','Latex','fontsize',20);
 set(gca,'fontsize',20);
-axis equal
+pbaspect([1 1 1]);
 
 [y10,y20] = ginput(1);   
 while(y20 > bottom - R)
@@ -43,7 +44,7 @@ while(y20 > bottom - R)
     xlabel('$x$','Interpreter','Latex','fontsize',20);
     ylabel('$y$','Interpreter','Latex','fontsize',20);
     set(gca,'fontsize',20);    
-    axis equal
+    pbaspect([1 1 1]);
 
     [y10,y20] = ginput(1);   
 end

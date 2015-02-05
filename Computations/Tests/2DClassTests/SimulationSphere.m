@@ -10,11 +10,11 @@ function [data,res] = SimulationSphere()
     N2 = 20;
     vext  = @VTest;
     R     = 3;
-    theta1 = pi/4;%pi/2;
-    theta2 = pi/2;
+    theta1 = pi/5;%pi/2;
+    theta2 = pi*3/4;
     Origin = [0;0];
     N      = [N1;N2];    
-    volume = true;
+    volume = false;
     
     shape  = v2struct(R,theta1,theta2,N,volume);
     
@@ -31,7 +31,7 @@ function [data,res] = SimulationSphere()
     %data    = displayErrorsPos(Pts,vplot,VP,V,Vdiff,Diff,'cart');    
     
     %Check Interpolation
-    data.InterPol = max(abs(Interp.InterPol*V - VP));       
+    data.InterPol = max(abs(Interp.InterPol*V - VP));
     display([' Error in Interpolation: ', num2str(data.InterPol)]);    
     
     %Check Integration

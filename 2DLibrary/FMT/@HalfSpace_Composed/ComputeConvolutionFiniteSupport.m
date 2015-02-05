@@ -3,13 +3,13 @@ function [AAD] = ComputeConvolutionFiniteSupport(this,area,weights,pts)
     %AAD - average the average densities to compute free energy
     fprintf('Computing interpolation for matrices for averaging of averaged densities..\n');    
     
-    markSub = (pts.y2_kv < this.Sub_Strip.y2Max + 0.5);
+    markSub = (pts.y2_kv < this.Sub_Strip.y2Max + 0.5/sin(this.alpha));
     ptsSub        = pts;
     ptsSub.y1_kv  = pts.y1_kv(markSub);
     ptsSub.y2_kv  = pts.y2_kv(markSub);
     ptsSub.x1_kv  = pts.x1_kv(markSub);
     ptsSub.x2_kv  = pts.x2_kv(markSub);
-    ptsSub.y2     = pts.y2(pts.y2 < this.Sub_Strip.y2Max + 0.5);
+    ptsSub.y2     = pts.y2(pts.y2 < this.Sub_Strip.y2Max + 0.5/sin(this.alpha));
     
     
     AAD_Substrip            = zeros(length(pts.y1_kv),this.Sub_Strip.M,length(weights)+1);

@@ -1,5 +1,5 @@
 # ************************************************************ 
-# Computed at: 18-Dec-2014 18:10:01 Cumulative computation time: 00:03:22.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 05-Feb-2015 15:04:58 Cumulative computation time: 00:03:24.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 Simulation1DInterpolation : -2
 SimulationAnnulus : 8
@@ -11,7 +11,7 @@ SimulationBoxFD : 4
 SimulationBoxFourier : 2
 SimulationBox_M1 : 3
 SimulationBox_Tref : 10
-SimulationDisk : 2
+SimulationDisk : 1
 SimulationEvenBoxFourier : 1
 SimulationHalfInfiniteCapillary : 3
 SimulationHalfSpace : 5
@@ -40,3 +40,4 @@ SimulationWedge_M1 : 5
 SimulationBigSegmentAlternative : 7
 SimulationHalfSpaceMinusDisk_RG1 : 2
 SimulationFittedHalfSpace : 3
+SimulationSphere : 3

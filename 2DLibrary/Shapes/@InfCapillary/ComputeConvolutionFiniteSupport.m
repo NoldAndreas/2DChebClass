@@ -47,7 +47,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     % ptsStrip.
     %
     
-    alpha = pi/2; %this.alpha
+    alpha = this.alpha;
 
     fprintf('Computing interpolation for matrices for averaged densities..\n');
 

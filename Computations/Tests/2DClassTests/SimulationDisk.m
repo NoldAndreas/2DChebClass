@@ -50,9 +50,9 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     display([' Error in Integration: ', num2str(data.Int)]);
         
     %Check Convolution
-    fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
-    data.Conv = max(abs(Interp.InterPol*fP_Conv - fConv(Interp.pts1,Interp.pts2)));
-    display([' Error in Convolution: ', num2str(data.Conv)]);        
+    %fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
+    %data.Conv = max(abs(Interp.InterPol*fP_Conv - fConv(Interp.pts1,Interp.pts2)));
+    %display([' Error in Convolution: ', num2str(data.Conv)]);        
     
     data.N1 = N1; data.N2 = N2;            
     
@@ -68,16 +68,16 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     figure
     set(gcf,'Color','white'); %Set background color    
     
-    subplot(1,2,1);
+%    subplot(1,2,1);
     DC.plot(V); 
     title('Interpolation');    
     pbaspect([1 1 1]);
     
-    subplot(1,2,2);
-    DC.plot(fP_Conv);     
-    title('Convolution');
-    pbaspect([1 1 1]);
-    
+%     subplot(1,2,2);
+%     DC.plot(fP_Conv);     
+%     title('Convolution');
+%     pbaspect([1 1 1]);
+%     
     %DoPerformanceTest(DC);
     
     %***************************************************************

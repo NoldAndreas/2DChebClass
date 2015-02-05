@@ -1,6 +1,5 @@
 function CheckConvolutionHalfSpace_BH_Conv1()
-
-    global dirData
+    
     AddPaths();
 
     PhysArea = struct('N',[1,30],...
@@ -49,11 +48,11 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     syms = {'d','s','o','>','<'};
     
     %**********************************************        
-	PlotMatrixErrorOverY('A_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+	PlotMatrixErrorOverY('Conv');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
     xlim([0,10]);
     
-    PlotMatrixErrorOverY('AAD_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
-    xlim([0,10]);    
+%    PlotMatrixErrorOverY('AAD_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+%    xlim([0,10]);    
     %**********************************************
     
     figure('color','white','Position',[0 0 1600 800]); 
@@ -168,7 +167,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     function PlotMatrixErrorOverY(A_name)
         figure('color','white','Position',[0 0 800 800]);         
         leg_string = {};
-        if(strfind(A_name,'AAD'))
+        if(~isempty(strfind(A_name,'AAD')) || strcmp(A_name,'Conv'))
             y2 = CLT.IDC.Pts.y2_kv;
         else
             y2 = CLT.IDC.AD.Pts.y2_kv;

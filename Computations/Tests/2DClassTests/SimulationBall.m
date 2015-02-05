@@ -47,7 +47,7 @@ function [data,res] = SimulationBall(N1,N2,vext)
     
     figure
     set(gcf,'Color','white'); %Set background color                
-     SG.plot(V,true);        
+    SG.plot(V);
     title('Interpolation');   
     
     figure;

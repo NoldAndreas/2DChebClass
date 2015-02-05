@@ -136,9 +136,9 @@
             subplot(rows,3,6+2); plot(z_Cart,checkADn3(z),'m');
             subplot(rows,3,6+3); plot(z_Cart,checkADn2_v_2(z),'m');            
         end
-        res.error_n2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for erf',xADIntC);
-        res.error_n3AD_erf = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for erf',xADIntC);
-        res.error_n2v2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for erf',xADIntC);
+        res.error_n2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-checkADn2(x),'FMT,AD n2 for erf',x);
+        res.error_n3AD_erf = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-checkADn3(x),'FMT,AD n3 for erf',x);
+        res.error_n2v2AD_erf = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-checkADn2_v_2(x),'FMT,AD n2_v_2 for erf',x);
         
         %*************************************************        
         %% 4th Check: Average Densities with density = 1 for y > 1.
@@ -188,7 +188,7 @@
     function y = f3_h2Diff(x)
         y          = (f3_h2(x,x+R) - f3_h2(x,max(R,x-R)));
         %y         = f3_h2(x,x+R) - f3_h2(max(R,x-R));
-        y(x==Inf)  = 4/3*pi*R^3;
+        y(x > 20)  = 4/3*pi*R^3;
     end
     function y = f3_h2(x,xt)
         y = pi*((xt.^3.*erf(xt))/3 + xt.*(2*R^2 - 2*x.^2) + 2*x.*xt.^2 + (x.*erf(xt))/2 - (2*xt.^3)/3 + (xt.^2.*exp(-xt.^2))/(3*pi^(1/2)) - x.*xt.^2.*erf(xt) + (exp(-xt.^2).*(- R^2 + x.^2 + 1/3))/pi^(1/2) - xt.*erf(xt).*(R^2 - x.^2) - (x.*xt.*exp(-xt.^2))/pi^(1/2));
@@ -204,7 +204,7 @@
 
     function y = f2z_h2Diff(x)
         y          = f2z_h2(x,x+R) - f2z_h2(x,max(R,x-R));    
-        y(x==Inf)  = 0;                
+        y(x>20)  = 0;                
     end
     function y = f2z_h2(x,xt)
         y = pi^(1/2)*xt.*exp(-xt.^2) - (pi*erf(xt))/2 - 2*pi^(1/2)*x.*exp(-xt.^2) - 2*pi*xt.^2 + pi*xt.^2.*erf(xt) + 4*pi*x.*xt - 2*pi*x.*xt.*erf(xt);
