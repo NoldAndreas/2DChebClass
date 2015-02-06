@@ -311,7 +311,7 @@ classdef (Abstract) Shape < handle
             if((nargin >= 3) && ~(iscell(options)))
                 options = {options};
             end
-            
+                        
             %options: 'SC' , 'contour'
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -344,7 +344,7 @@ classdef (Abstract) Shape < handle
                 y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);       
             end
             
-            if((nargin >= 4) && IsOption(optDetails,'linewidth'))
+            if((nargin >= 4) && isfield(optDetails,'linewidth'))
                 lw = optDetails.linewidth;
             else
                 lw = 2.5;                

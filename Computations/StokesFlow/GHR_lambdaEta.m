@@ -1,7 +1,7 @@
 function G = GHR_lambdaEta(t,lambdaEta)
 
     N          = 200;
-    shape      = struct('N',N,'yMin',0,'yMax',pi);    
+    shape      = struct('N',N,'yMin',0,'yMax',pi-0.05);    
     SL  = SpectralLine(shape);    
  
 	IP = SL.ComputeInterpolationMatrix(SL.CompSpace(t));

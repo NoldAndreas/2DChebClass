@@ -1,5 +1,5 @@
 # ************************************************************ 
-# Computed at: 30-Jan-2015 01:56:56 Cumulative computation time: 00:42:33.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 05-Feb-2015 16:40:47 Cumulative computation time: 00:42:33.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 MMNP_ComputeAll : -2
 MMNP_Fig1_YoungContactAngles : -2
