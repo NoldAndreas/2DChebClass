@@ -25,7 +25,8 @@ function [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = BulkValues(mu,optsPhys,intitialGuess,
     end
     
     %Solve Equation    
-    opts = optimset('Display','off');
+    opts = optimset('Display','off','TolFun',1e-14,'TolX',1e-14);
+
     rhoGas_eq = fsolve(@fBulk,intitialGuess(1),opts);
     rhoLiq_eq = fsolve(@fBulk,intitialGuess(2),opts);   
     

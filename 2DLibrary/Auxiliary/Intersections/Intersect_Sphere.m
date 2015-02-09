@@ -1,4 +1,4 @@
-function dataBall = Intersect_DiskSphere(MainShape,diskShape)
+function dataBall = Intersect_Sphere(MainShape,diskShape)
 %function dataBall = Intersect_Ball(MainShape,y20,r,N)
     r   = diskShape.R;
     N   = [diskShape.N1,diskShape.N2];

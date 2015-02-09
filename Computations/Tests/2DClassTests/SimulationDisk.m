@@ -9,7 +9,7 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     
     %Initialization
     if(nargin == 0)
-        R       = 3;
+        R       = 1;
         vext    = @Vext2;
         N1      = 20;
         N2      = 20;
@@ -69,7 +69,8 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
 %    subplot(1,2,1);
-    DC.plot(V); 
+    V = f3(DC.GetCartPts);
+    DC.plot(V,'SC'); 
     title('Interpolation');    
     pbaspect([1 1 1]);
     
@@ -107,6 +108,14 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
         z = 1/(s*sqrt(2*pi))*exp(-(r.^2)/(2*s^2));
         z(r == inf) = 0;        
     end
+
+    function z = f3(pts)
+        y1 = pts.y1_kv;
+        y2 = pts.y2_kv;
+        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
+        z  = BarkerHenderson_2D(d);        
+    end
+
 
  
 end

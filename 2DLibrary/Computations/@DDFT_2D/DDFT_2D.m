@@ -121,14 +121,14 @@ classdef DDFT_2D < Computation
             if(isfield(this.optsNum,'FexNum'))
                 fprintf(1,'Computing FMT matrices ...\n');   
                 paramsFex.sigmaS   = this.optsPhys.sigmaS;
-                paramsFex.kBT      = this.optsPhys.kBT;            
+                %paramsFex.kBT      = this.optsPhys.kBT;            
                 paramsFex.physArea = this.optsNum.PhysArea;
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
                 paramsFex.FexNum   = this.optsNum.FexNum;
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
-                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'optsNum_PhysArea'});   
+                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'optsNum_PhysArea','kBT'});   
             elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else

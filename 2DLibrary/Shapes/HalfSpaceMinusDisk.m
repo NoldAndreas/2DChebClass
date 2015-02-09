@@ -67,13 +67,15 @@ classdef HalfSpaceMinusDisk < handle
             end            
             mOld = 1;
             for i = 1:length(this.SubShape)
-                this.SubShape{i}.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
+                this.SubShape{i}.ComputeInterpolationMatrix((-1:0.02:0.9)',(-1:0.02:1)',true,true);
                 m = mOld + this.SubShape{i}.N1*this.SubShape{i}.N2 - 1;
                 this.SubShape{i}.plot(V(mOld:m),opts);
                 mOld = mOld + this.SubShape{i}.N1*this.SubShape{i}.N2;
                 hold on;
             end
             hold on;            
+            xlim([this.SubShape{1}.Origin(1)-5,this.SubShape{1}.Origin(1)+5]);
+            xlim([this.SubShape{2}.y2Wall-5,this.SubShape{1}.Origin(2)+5]);
         end
     end
     

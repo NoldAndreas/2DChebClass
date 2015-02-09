@@ -16,7 +16,11 @@ function [z,dzdr_r,alpha] = BarkerHenderson_2D(r,parameter)
     if(isstruct(r))
         r = r.y1_kv;
     end
-    CutD       = 0.1;
+    CutD       = 0.19;
+    
+    if(f_LL1(CutD) - f_L1(CutD) > 1e-9)
+        PrintErrorPos(f_LL1(CutD) - f_L1(CutD),'BarkerHenderson_2D');
+    end
     
     markG1     = (r >=1);
     markL1     = ((r < 1) & (r > CutD));
@@ -26,16 +30,22 @@ function [z,dzdr_r,alpha] = BarkerHenderson_2D(r,parameter)
     
     rt         = r(markG1);
     z(markG1)  = -3/2*pi*(1-(21/32)./(rt.^6))./(rt.^5);
-    rt         = r(markL1);
-    z(markL1)  = 3*sqrt(1-rt.^2)./(160*rt.^10).*...
-                        (-105-70*rt.^2-56*rt.^4+112*rt.^6+64*rt.^8) ...
-                 -3*asin(rt)./(32*rt.^11).*(32*rt.^6-21);
-    rt         = r(markLL1);
-    z(markLL1) = -48/55-24/91*rt.^2-2/15*rt.^4-15/187*rt.^6-105/1976*rt.^8;
+    z(markL1)  = f_L1(r(markL1));    
+    z(markLL1) = f_LL1(r(markLL1));
     
     z = z*epsilon;
     
     dzdr_r     = 0;    
-    alpha  = -16/9*pi*epsilon;
+    alpha  = -16/9*pi*epsilon;       
+    
+    function z = f_L1(r)
+        z = 3*sqrt(1-r.^2)./(160*r.^10).*...
+                        (-105-70*r.^2-56*r.^4+112*r.^6+64*r.^8) ...
+                 -3*asin(r)./(32*r.^11).*(32*r.^6-21);
+    end
+
+    function z = f_LL1(r)
+        z = -48/55-24/91*r.^2-2/15*r.^4-15/187*r.^6-105/1976*r.^8;
+    end
     
  end

@@ -5,15 +5,14 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
     close all;
     
     %Initialization
-    N1 =  15;   N2 = 15;
+    N1 =  20;   N2 = 20;
     R       = 1;
-    L1      = 1;    
-    Origin  = [0.;0.5];%0.5];
-    y2Wall  = 0;
-    N       = [N1;N2];
-    Rmax    = Inf;
+    L1      = 0.97;
+    Origin  = [0.;14.7];%0.5]
+    y2Wall  = 0.5;
+    N       = [N1;N2];    
 
-    SMD                = HalfSpaceMinusDisk(v2struct(Origin,R,N,L1,Rmax,y2Wall));
+    SMD                = HalfSpaceMinusDisk(v2struct(Origin,R,N,L1,y2Wall));
     Int                = SMD.ComputeIntegrationVector();
     
     figure;
@@ -45,13 +44,27 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
     ylim([y2Wall (Origin(2) + 5)]);
     pbaspect([10 (Origin(2) + 5 - y2Wall) 5]);
     
-                                                       
+                                                    
+    %******* Check Interpolation *******
+    for i = 1:2        
+        InterpCPta      = SMD.SubShape{i}.GetCartPts(...
+                                        SMD.SubShape{i}.Interp.pts1,...
+                                        SMD.SubShape{i}.Interp.pts2);
+        
+        Vi           = VTest2(SMD.SubShape{i}.GetCartPts);
+        VInterp      = SMD.SubShape{i}.Interp.InterPol*Vi;
+        VInterpExact = VTest2(InterpCPta);
+        PrintErrorPos(VInterp-VInterpExact,['Interpolation of subspace ',num2str(i)],InterpCPta);
+    end
+    [V,VInt] = VTest2(SMD.GetCartPts);
+    PrintErrorPos(Int*V-VInt,'Integration of Barker Henderson');
+    
  
     
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************             
-    function [V,VInt] = VTest(y1,y2)       
+    function [V,VInt] = VTest(y1,y2)     
             V     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(-2);  
             
             VInt  = 1/2*pi/(R^2);            
@@ -65,6 +78,17 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
                 %VInt  = 3/4*pi/(R^2) +...
 %                    pi/4*(R^(-2) - (y2Wall-Origin(2))^(-2) );
             end                        
+    end
+
+
+    function [V,VInt] = VTest2(pts)
+        y1 = pts.y1_kv;
+        y2 = pts.y2_kv;
+        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
+        V  = BarkerHenderson_2D(d);
+        
+        z    = Origin(2)-y2Wall;
+        VInt = 2/3*pi/z^3 - 4/45*pi/z^9 - 25/32*pi^2;
     end
 
 end

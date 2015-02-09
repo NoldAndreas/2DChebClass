@@ -24,31 +24,46 @@ function ContactLineBinaryFluid
 
     pars.config = config;
     pars.Cak   = (0.005:0.0025:0.01)';
-    pars.y2Max = (12:2:18);
+    y2Max = (12:2:20);
         
  %   pars.config.optsPhys.l_diff = 0.25;    
-%    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    
-    pars.y2Max = (14:2:24);    
-    pars.config.optsPhys.l_diff = 0.75;    
+%    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);    
+
+    pars.config.optsPhys.l_diff = 0.25;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
     dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+
+    pars.config.optsPhys.l_diff = 0.5;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+         
+    pars.config.optsPhys.l_diff = 0.75;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
   %  PlotData(dataM{1});
     
     pars.config.optsPhys.l_diff = 1.0;    
-    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
    % PlotData(dataM{2});
-    
-    pars.y2Max = (20:2:36);
+        
     pars.config.optsPhys.l_diff = 1.25;    
-    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
     %PlotData(dataM{3});
     
     pars.config.optsPhys.l_diff = 1.5;    
-    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{6} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 %    PlotData(dataM{4});
     
     pars.config.optsPhys.l_diff = 1.75;
-    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{7} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.config.optsPhys.l_diff = 2.0;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 %    PlotData(dataM{5});
 
     %pars.config.optsPhys.l_diff = 2;    
@@ -70,7 +85,7 @@ function ContactLineBinaryFluid
                 DI = DiffuseInterfaceBinaryFluid(config);
                 DI.Preprocess();
 
-                opts = struct('noIterations',20,'lambda',0.8,'Seppecher_red',1);
+                opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
                 DI.IterationStepFullProblem(opts);                    
                 
                 DI.GetYueParameters(); 

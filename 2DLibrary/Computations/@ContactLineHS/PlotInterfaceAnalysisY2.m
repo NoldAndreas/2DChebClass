@@ -1,5 +1,7 @@
 function [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
-        
+
+    global dirData
+
     %********************************************************************
     %Film thickness            
     if((nargin == 1) && ~isempty(this.IsolineInterfaceY2))
@@ -33,7 +35,7 @@ function [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)
     ylim([min(theta) max(theta)]);
     set(gca,'fontsize',20);   
     
-    saveas(f1,[this.FilenameEq '_InterfaceSlopeY2.fig']);
+    SaveFigure([dirData filesep this.FilenameEq '_InterfaceSlopeY2.fig']);
 
 %    f2 = PlotEquilibriumResults(this,[-5 10],[0.5 (this.optsNum.maxComp_y2+3)],true,true);
 %    plot([1 2],[3 4]);

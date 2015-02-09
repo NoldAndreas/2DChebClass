@@ -6,10 +6,10 @@ function [data,res] = SimulationSphere()
     close all;
     
     %Initialization
-    N1 = 20;
-    N2 = 20;
+    N1 = 40;
+    N2 = 40;
     vext  = @VTest;
-    R     = 3;
+    R      = 1;
     theta1 = pi/5;%pi/2;
     theta2 = pi*3/4;
     Origin = [0;0];
@@ -23,8 +23,9 @@ function [data,res] = SimulationSphere()
     Int = SG.ComputeIntegrationVector();    
     Interp = SG.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
         
-    [V,Vdiff,VInt]   = vext(SG.Pts.y1_kv,SG.Pts.y2_kv);   
-    [VP]             = vext(Interp.pts1,Interp.pts2);
+    %[V,Vdiff,VInt]   = vext(SG.Pts.y1_kv,SG.Pts.y2_kv);   
+    [V,Vdiff,VInt]   = vext(SG.GetCartPts);   
+    [VP]             = vext(SG.GetCartPts(Interp.pts1,Interp.pts2));
            
     %Check Differentiation
     %vplot   = Interp.InterPol*V;        
@@ -36,6 +37,7 @@ function [data,res] = SimulationSphere()
     
     %Check Integration
     data.Int = abs(Int*V-VInt);
+    data.IntValue = Int*V;
     display([' Error in Integration: ', num2str(data.Int)]);                                
     
 %    subplot(2,2,1); doPlots_SC(Interp,Pts,Vdiff.dy1);
@@ -69,7 +71,7 @@ function [data,res] = SimulationSphere()
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         
-    function [V,VDiff,VInt] = VTest(y1,y2)       
+    function [V,VDiff,VInt] = VTest2(y1,y2)       
             %V           = cos(y1);  VInt = 0;
            % V           = sin(y1).^2.*cos(y2).^2;  VInt = 4/3*pi*R^2;
             V   = ones(size(y1));  VInt = 4/3*pi*R^3; 
@@ -93,6 +95,15 @@ function [data,res] = SimulationSphere()
             %Int        = VInt + sin(C)*(R^2-h^2-C^2+2)-2*cos(C)*C;
              
             
+    end
+
+    function [V,VDiff,VInt] = VTest(pts)
+        y1 = pts.y1_kv;
+        y2 = pts.y2_kv;
+        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
+        V  = BarkerHenderson_2D(d);        
+        VDiff = 0;
+        VInt = 0;
     end
 
 end

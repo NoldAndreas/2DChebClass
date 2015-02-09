@@ -83,6 +83,11 @@ classdef Computation < handle
         function configName = SaveConfig(this,configuration)    
         
             global dirDataOrg
+            if(nargin < 2)
+                optsNum  = this.optsNum;
+                optsPhys = this.optsPhys;
+                configuration = v2struct(optsNum,optsPhys);
+            end
             configDir = 'Configurations';
 
             configDirFull = [dirDataOrg filesep configDir];
