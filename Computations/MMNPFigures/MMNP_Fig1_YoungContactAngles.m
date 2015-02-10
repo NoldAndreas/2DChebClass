@@ -48,12 +48,13 @@ function MMNP_Fig1_YoungContactAngles()
            
     inset2(f1,f2,0.38,[0.3,0.25]);
     close(f2);            
-    
-    f3 = hgload('D:\2DChebData\POF_FMT_ContactLine\deg90\EquilibriumSolutions\2014_8_19_3_33_12.276_contour.fig');
-    set(gca,'linewidth',2);
-    plot([-5 20],[15 15],'k--','linewidth',2);
-    inset2(f1,f2,0.35,[0.55,0.65]);
-    close(f3);
+   
+%!!INCLUDE LATER!!    
+  %  f3 = hgload('D:\2DChebData\POF_FMT_ContactLine\deg90\EquilibriumSolutions\2014_8_19_3_33_12.276_contour.fig');
+  %  set(gca,'linewidth',2);
+  %  plot([-5 20],[15 15],'k--','linewidth',2);
+  %  inset2(f1,f2,0.35,[0.55,0.65]);
+  %  close(f3);
     
       
     

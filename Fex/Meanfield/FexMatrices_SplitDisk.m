@@ -21,7 +21,9 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
 
     shapeDisc.R = params.LJsigma;
     shapeDisc.N = shapeAnn.N;
-    diskArea    = Disc(shapeDisc);
+    shapeDisc.volume = false;
+    %diskArea    = Disc(shapeDisc);
+    diskArea    = Sphere(shapeDisc);
 
     conv1 = IDC.ComputeConvolutionFiniteSupport(annulusArea,{fstr},IDC.Pts);
     conv2 = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);

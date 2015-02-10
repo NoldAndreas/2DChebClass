@@ -15,7 +15,7 @@ function dataBall = Intersect_Disk(MainShape,diskShape)
         shape.volume = false;
     end
     
-    fullDisc = false;
+   % fullDisc = false;
     
     if(isa(MainShape,'HalfSpace'))   
         
@@ -29,7 +29,7 @@ function dataBall = Intersect_Disk(MainShape,diskShape)
             shape.Origin(2) = 0;
             shape.theta1 = 0;
             shape.theta2 = pi;
-            fullDisc = true;
+           % fullDisc = true;
         elseif(y20 >= y2Min + r)
             %1a. if full disk is in HalfSpace                
             shape.theta1 = 0;
@@ -78,13 +78,13 @@ function dataBall = Intersect_Disk(MainShape,diskShape)
         throw(exc);                
     end        
     
-    if(fullDisc)
-        shape.N  = N;
-        shape.R  = r;    
-        area = Disc(shape);
-    else
+%     if(fullDisc)
+%         shape.N  = N;
+%         shape.R  = r;    
+%         area = Disc(shape);
+%     else
         area = Sphere(shape);
-    end
+  %  end
 
     dataBall.pts       = area.GetCartPts();           
     ptsLoc.y1_kv       = dataBall.pts.y1_kv - shape.Origin(1);

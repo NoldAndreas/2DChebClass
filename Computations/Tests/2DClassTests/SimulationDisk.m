@@ -12,7 +12,7 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
         R       = 1;
         vext    = @Vext2;
         N1      = 20;
-        N2      = 20;
+        N2      = 10;
         N       = [N1;N2];
         Origin  = [3,-2];
     else
@@ -69,8 +69,10 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     set(gcf,'Color','white'); %Set background color    
     
 %    subplot(1,2,1);
-    V = f3(DC.GetCartPts);
+    [V,VInt] = f3(DC.GetCartPts);
     DC.plot(V,'SC'); 
+    figure; DC.plot(V,{'comp','SC'});
+    PrintErrorPos(Int*V-VInt,'Integration of Barker Henderson potential');
     title('Interpolation');    
     pbaspect([1 1 1]);
     
@@ -109,11 +111,13 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
         z(r == inf) = 0;        
     end
 
-    function z = f3(pts)
+    function [z,VInt] = f3(pts)
         y1 = pts.y1_kv;
         y2 = pts.y2_kv;
         d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
         z  = BarkerHenderson_2D(d);        
+        VInt = -32/9*pi+25/32*pi^2;
+       % VInt = -(1871963538833/1713353241600)*pi;        
     end
 
 

@@ -16,7 +16,7 @@ function PlotThetaVsR()
         figure('color','white','Position',[0 0 800 800]);
         rT = dat.r/dat.a;
         
-        plot(rT*dat.a,dat.theta,dat.symbol,'MarkerSize',10,'MarkerFaceColor',dat.color,'MarkerEdgeColor',dat.color); hold on;
+        plot(rT,dat.theta,dat.symbol,'MarkerSize',10,'MarkerFaceColor',dat.color,'MarkerEdgeColor',dat.color); hold on;
         
         rTAna = min(rT) + (max(rT)-min(rT))*(0:0.01:1)';
         f_0   = f_0_DussanRameGaroff(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);
@@ -24,8 +24,8 @@ function PlotThetaVsR()
         
         thetaAna = thetaCox + f_0 - dat.thetaAppRad;
         
-        plot(rTAna*dat.a,180/pi*f_0,['--k'],'linewidth',1.5);
-        plot(rTAna*dat.a,180/pi*thetaAna,['-k'],'linewidth',1.5);        
+        plot(rTAna,180/pi*f_0,['--k'],'linewidth',1.5);
+        plot(rTAna,180/pi*thetaAna,['-k'],'linewidth',1.5);        
        % xlim([1e-5 100]);        ylim([0 180]);
         xlabel('$r/a$','Interpreter','Latex','fontsize',20);
         ylabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',20);

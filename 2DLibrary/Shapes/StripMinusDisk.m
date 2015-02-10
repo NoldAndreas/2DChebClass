@@ -43,8 +43,15 @@
             rd            = abs((this.Origin(2)-this.y2Wall)./sin(y2_kv));
             rd((y2_kv==pi)|(y2_kv==2*pi)) =  inf;
             
-            L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);
-            L1_r(rd==inf) = this.L1;
+            if((this.Origin(2)-this.y2Wall-this.R) > 3*this.L1)
+                L1_r = this.L1*ones(size(rd));
+            else
+                L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);L1_r(rd==inf) = this.L1;
+            end
+            %L1_r          = this.L1*(rd-this.R)./(1+rd-this.R);L1_r(rd==inf) = this.L1;
+            %*ones(size(rd));%
+            %L1_r          = min(this.L1,(this.Origin(2)-this.y2Wall-this.R)*2/3)*ones(size(rd));
+            
             [y1_kv,dy1]   = QuotientMap(x1,L1_r,O*this.R,rd);                        
             
              n = this.N1*this.N2;

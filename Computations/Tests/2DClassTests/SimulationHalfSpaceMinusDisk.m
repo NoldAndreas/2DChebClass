@@ -8,7 +8,7 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
     N1 =  20;   N2 = 20;
     R       = 1;
     L1      = 0.97;
-    Origin  = [0.;14.7];%0.5]
+    Origin  = [0.;7];%0.5]
     y2Wall  = 0.5;
     N       = [N1;N2];    
 
@@ -42,7 +42,7 @@ function [SMD,res] = SimulationHalfSpaceMinusDisk()
     title('Interpolation');
     xlim([(Origin(1)-5) (Origin(1)+5)]);
     ylim([y2Wall (Origin(2) + 5)]);
-    pbaspect([10 (Origin(2) + 5 - y2Wall) 5]);
+    pbaspect([10 (Origin(2) + 5 - y2Wall) 1]);
     
                                                     
     %******* Check Interpolation *******

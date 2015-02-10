@@ -175,7 +175,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         
         n = 1;
         for k1 = 1%:size(res,1)
-            for k2 = 1:5:(size(res,2)-1)
+            for k2 = 1:(size(res,2)-1)
                 A = res(k1,k2).(A_name)-res(k1,k2+1).(A_name);
                 plot(y2,max(A,[],2),['-',syms{1+mod(n,nosyms)},...
                                          cols{1+mod(n,nocols)}],...
