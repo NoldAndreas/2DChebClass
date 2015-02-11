@@ -23,7 +23,7 @@ classdef HalfSpaceMinusDisk < handle
                 this.SubShape{3}  = HalfStripMinusDisk(Geometry);
             elseif(((Geometry.Origin(2)-Geometry.y2Wall) < 0))            
                 errror('Not yet implemented');
-            end                        
+             end                        
         end        
         function ptsCart = GetPts(this)            
             ptsCart.y1_kv = [];

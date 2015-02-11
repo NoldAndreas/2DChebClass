@@ -47,20 +47,20 @@ function MMNP_Fig1_YoungContactAngles()
     set(gca,'fontsize',20);    
            
     inset2(f1,f2,0.38,[0.3,0.25]);
-    close(f2);            
+    close(f2);  
+    fullName = SaveFigure('temp');
    
-%!!INCLUDE LATER!!    
-  %  f3 = hgload('D:\2DChebData\POF_FMT_ContactLine\deg90\EquilibriumSolutions\2014_8_19_3_33_12.276_contour.fig');
-  %  set(gca,'linewidth',2);
-  %  plot([-5 20],[15 15],'k--','linewidth',2);
-  %  inset2(f1,f2,0.35,[0.55,0.65]);
-  %  close(f3);
+    config.optsPhys.V1.epsilon_w = 0.55;
+    f3 = PlotContourLines(config);
+	f1 = hgload([fullName '.fig']);
+    inset2(f1,f3,0.35,[0.55,0.65]);
+    close(f3);
     
-      
+    filename = ['ContactAngleMeasurements' filesep getTimeStr() , '_ContactAngles'];
+    SaveFigure(filename);
     
-    str = [getTimeStr() , '_ContactAngles'];
-    print2eps([dirData filesep 'ContactAngleMeasurements' filesep str],gcf);
-    saveas(gcf,[dirData filesep 'ContactAngleMeasurements' filesep str '.fig']);
+    %print2eps([dirData filesep 'ContactAngleMeasurements' filesep str],gcf);
+    %saveas(gcf,[dirData filesep 'ContactAngleMeasurements' filesep str '.fig']);
     
    % close all;        
     %*************************************************
@@ -118,7 +118,27 @@ function MMNP_Fig1_YoungContactAngles()
     %2.4      - 33
     %2.57     - 15.5
 
-    %config.optsNum.PhysArea.alpha_deg = degAngle;      
+    %config.optsNum.PhysArea.alpha_deg = degAngle;    
+    function f3 = PlotContourLines(config)
+        config.optsNum.PlotAreaCart = struct('y1Min',-4,'y1Max',20,...
+                                             'y2Min',0.5,'y2Max',20,...%'zMax',4,...
+                                             'N1',100,'N2',100);
+        
+        CL = ContactLineHS(config);
+        CL.Preprocess();
+        CL.ComputeEquilibrium();                                
+        CL.PlotContourResults();
+        
+        close all;
+        f3 = figure('Color','white','Position',[0 0 500 300]);                        
+        ha = area([-7,20],[20,29],15,'FaceColor',0.8*[1 1 1]);
+        CL.PlotContourResults(true);
+        plot([-5 20],[15 15],'k--','linewidth',2);
+        set(gca,'linewidth',2);        
+        text('String','$y_{max}$','VerticalAlignment', 'top','HorizontalAlignment','center ','Position',[12 17],'Interpreter','Latex','fontsize',20);
+        %print2eps('Figure1_mod',gcf);
+        %saveas(gcf,['Figure1_mod.fig']);
+    end
     
     function res = MeasureContactAngles(opts,h)
         
@@ -170,8 +190,7 @@ function MMNP_Fig1_YoungContactAngles()
             end
         end
     end
-
-  function ComputeAndPlot(epw,alpha,maxY2,symbol,color)
+    function ComputeAndPlot(epw,alpha,maxY2,symbol,color)
         opts.config = config;                
         opts.config.optsNum.maxComp_y2         = maxY2; 
         opts.config.optsNum.PhysArea.alpha_deg = alpha;        

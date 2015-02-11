@@ -1,4 +1,4 @@
-function SaveFigure(filename,opts)
+function fullName = SaveFigure(filename,opts)
 
     global dirData
     
@@ -10,16 +10,17 @@ function SaveFigure(filename,opts)
     
     [s,branch]= system('C:\git rev-parse --abbrev-ref HEAD');
 	
-    print2eps([dirData filesep filename],gcf);
-	saveas(gcf,[dirData filesep filename '.fig']);        
+    fullName = [dirData filesep filename];
+    print2eps(fullName,gcf);
+	saveas(gcf,[fullName '.fig']);        
     
-    disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+    disp(['Figures saved in ',fullName '.fig/eps']);
         
     if((nargin >= 2) && ~isempty(opts)) 
-        Struct2File([dirData filesep filename, '.txt'],opts,...
+        Struct2File([fullName, '.txt'],opts,...
                     ['Figure ',filename,'.fig/eps saved at: ',datestr(now),' with git branch ',branch(1:end-1)]);
     end
             
-	disp(['Options saved in ',dirData filesep filename '.tex']);
+	disp(['Options saved in ',fullName '.tex']);
 
 end

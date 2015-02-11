@@ -10,7 +10,7 @@ function PlotThetaVsR()
     data{1} = LoadDataFluidData('RameGaroff1996/Ca_0_005','s','r',struct('rad','deg','Ca','V')); 
 	data{2} = LoadDataFluidData('RameGaroff1996/Ca_0_1','s','r',struct('rad','deg','Ca','V')); 
 
-    PlotData(data{1});
+    PlotData(data{2});
     
     function PlotData(dat)
         figure('color','white','Position',[0 0 800 800]);
@@ -19,7 +19,7 @@ function PlotThetaVsR()
         plot(rT,dat.theta,dat.symbol,'MarkerSize',10,'MarkerFaceColor',dat.color,'MarkerEdgeColor',dat.color); hold on;
         
         rTAna = min(rT) + (max(rT)-min(rT))*(0:0.01:1)';
-        f_0   = f_0_DussanRameGaroff(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);
+        f_0   = f_0_DussanRameGaroff(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);%pi/2
         thetaCox = GHR_Inv(GHR_lambdaEta0(dat.thetaAppRad)+ dat.Ca*log(rTAna),0);
         
         thetaAna = thetaCox + f_0 - dat.thetaAppRad;

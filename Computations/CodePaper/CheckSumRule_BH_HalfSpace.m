@@ -31,7 +31,7 @@ function CheckSumRule_BH_HalfSpace()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:10:80;    
+    N    = 20:5:80;    
     NS   = 40;%10:10:40;
     
     figure('color','white','Position',[0 0 900 800]); 
@@ -40,13 +40,17 @@ function CheckSumRule_BH_HalfSpace()
     % **** 1 ****    
     eta = 0.3;    
     res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
-    PlotErrorGraph('error_wl','o-','b',['Hard sphere, eta = ',num2str(eta)]); 
+    PlotErrorGraph('error_wl','o-','k',['Hard sphere, eta = ',num2str(eta)]); 
         
+	AddPaths();    
+    ChangeDirData([dirData filesep 'deg90'],'ORG')
     % **** 2 ****    
     eta = 0.15;    
     res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
     PlotErrorGraph('error_wl','o-','b',['Hard sphere, eta = ',num2str(eta)]); 
     
+    AddPaths();    
+    ChangeDirData([dirData filesep 'deg90'],'ORG')
 %     % **** 2 ****  
 %     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
 %     PlotErrorGraph('error_wl','o-','k','Wall-liquid, BH, e = 0');
@@ -57,7 +61,7 @@ function CheckSumRule_BH_HalfSpace()
     config.optsPhys.V2   = V2;    
     config.optsPhys.V1.epsilon_w = 0.9;    
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
-    PlotErrorGraph('error_wl','o-','m','Wall-liquid, BH, e = 0.9');
+    PlotErrorGraph('error_wl','d-','m','Wall-liquid, BH, e = 0.9');
     PlotErrorGraph('error_wg','d--','m','Wall-vapour, BH, e = 0.9');
 
     

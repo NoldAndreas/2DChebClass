@@ -64,6 +64,14 @@ function ContactLineBinaryFluid
     pars.config.optsPhys.l_diff = 2.0;
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
     dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+	pars.config.optsPhys.l_diff = 3.0;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    
+    pars.config.optsPhys.l_diff = 4.0;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 %    PlotData(dataM{5});
 
     %pars.config.optsPhys.l_diff = 2;    
@@ -126,14 +134,16 @@ function ContactLineBinaryFluid
             end                                       
         end       
         
-        y2P       = (1:1:60)';
-        theta_Ana = GHR_Inv(Ca*log(y2P)+GHR_lambdaEta(thetaEq,1),1);
+        l_diff    = dataM{end}(j1,j2).config.optsPhys.l_diff;
+        y2P       = (1:0.1:max(dataM{end}(j1,j2).y2 - 4*l_diff))'/l_diff;
+        hatL      = dataM{end}(j1,j2).hatL/l_diff;
+        theta_Ana = GHR_Inv(Ca*log(y2P/hatL)+GHR_lambdaEta(thetaEq,1),1);
         plot(y2P,180/pi*theta_Ana,'m','linewidth',3); hold on;        
 
 
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
-        xlabel('$y/{\hat L}$','Interpreter','Latex','fontsize',20);
+        xlabel('$y/\ell_{d}$','Interpreter','Latex','fontsize',20);
         ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
         %ylim([90,100]);
         
@@ -218,9 +228,10 @@ function ContactLineBinaryFluid
     % DI.PlotResults();	 
     
     function PlotRescaledInterfaceSlope(dataM,i1,i2,col,sym)                    
-        hatL   = 0.46*dataM(i1,i2).config.optsPhys.l_diff;%46
-        y2     = dataM(i1,i2).y2 /hatL;
-        mark   = (y2 < (max(y2)-5));
+        l_diff = dataM(i1,i2).config.optsPhys.l_diff;
+        %hatL   = 0.46*l_diff;%46
+        y2     = dataM(i1,i2).y2 /l_diff;
+        mark   = (y2 < (max(y2)-4));
         plot(y2(mark),180/pi*dataM(i1,i2).theta(mark),[col,sym],'MarkerSize',5,'MarkerFaceColor',col); hold on;                              
     end
     

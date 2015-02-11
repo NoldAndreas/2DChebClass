@@ -28,7 +28,7 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     conv1 = IDC.ComputeConvolutionFiniteSupport(annulusArea,{fstr},IDC.Pts);
     conv2 = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
 
-    convStruct.Conv = conv1(:,:,2) + conv2(:,:,2);
+    convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2) 
     
     if(isfield(params,'epsilon'))
         convStruct.Conv = convStruct.Conv*params.epsilon;

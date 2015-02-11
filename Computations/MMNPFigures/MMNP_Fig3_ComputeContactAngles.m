@@ -1,5 +1,9 @@
 function MMNP_Fig3_ComputeContactAngles()
 
+    global dirData
+    AddPaths();        
+    ChangeDirData([dirData filesep 'MMNP'],'ORG');    
+
    bounds1    = [-10,10];
    bounds2    = [0.5,15];
    maxComp_y2 = 35;
@@ -20,9 +24,7 @@ function MMNP_Fig3_ComputeContactAngles()
    Job_ComputeContactAngle(opts); 
    
    opts.alpha_deg = 135;  opts.epw      = 0.55;   
-   Job_ComputeContactAngle(opts); 
-   
-
+   Job_ComputeContactAngle(opts);    
 
    % Job_ComputeContactAngle(160,0.5,[-10 10],[0.5 20]);
    % Job_ComputeContactAngle(20,1.47,[0 30],[0.5 20]);

@@ -34,8 +34,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
     N    = 30;%:10:50;    
-    NS_d = 10;%2;  %10;
-    NS   = [20,22,30,32];%10:NS_d:50;%10:10:40;
+    NS_d = 2;  %10;
+    NS   = [20,22,30,32];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
     res = DataStorage([],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
     
@@ -48,6 +48,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     syms = {'d','s','o','>','<'};
     
     %**********************************************        
+    PlotMatrixErrorOverY_OnePoint('Conv',1);
+    PlotMatrixErrorOverY_OnePoint('Conv',15);
 	PlotMatrixErrorOverY('Conv');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
     xlim([0,10]);
     
@@ -163,7 +165,40 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
-    end     
+    end   
+
+    function PlotMatrixErrorOverY_OnePoint(A_name,kP)
+        figure('color','white','Position',[0 0 800 800]);         
+        leg_string = {};
+        if(~isempty(strfind(A_name,'AAD')) || strcmp(A_name,'Conv'))
+            y2 = CLT.IDC.Pts.y2_kv;
+        else
+            y2 = CLT.IDC.AD.Pts.y2_kv;
+        end
+        
+        n = 1;
+        for k1 = 1%:size(res,1)
+            for k2 = 1:(size(res,2)-1)
+                A = res(k1,k2).(A_name)-res(k1,k2+1).(A_name);
+                plot(y2,abs(A(kP,:)),['-',syms{1+mod(n,nosyms)},...
+                                         cols{1+mod(n,nocols)}],...
+                                         'MarkerSize',10,...
+                                         'MarkerFaceColor',cols{1+mod(n,nocols)}); hold on;
+                leg_string(end+1) = {['NS = ',num2str(res(k1,k2).NS)]};
+                n = n + 1;
+            end
+        end       
+        xlim([0 10]);
+        xlabel('$y_2$','Interpreter','Latex','fontsize',15);
+        ylabel(['$|(',A_name,'_{N,y2_K}-',A_name,'_{N+',num2str(NS_d),',y2_K})|$'],...
+                                'Interpreter','Latex','fontsize',15);
+        title([A_name,'for y_2 = ',num2str(y2(kP))]);
+        set(gca,'YScale','log');
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',15);
+        legend(leg_string,'Location','southoutside','Orientation','horizontal');        
+    end
+
     function PlotMatrixErrorOverY(A_name)
         figure('color','white','Position',[0 0 800 800]);         
         leg_string = {};
@@ -200,7 +235,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         
         for k1 = 1%:size(res,1)
             for k2 = 1:(size(res,2)-1)
-                line(n)   = norm(res(k1,k2).(A_name)-res(k1,k2+1).(A_name));
+                %line(n)   = norm(res(k1,k2).(A_name)-res(k1,k2+1).(A_name));
+                line(n)   = max(max(abs(res(k1,k2).(A_name)-res(k1,k2+1).(A_name))));
                 line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;                
                 n = n+1;
             end
