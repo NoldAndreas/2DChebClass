@@ -21,7 +21,7 @@ classdef (Abstract) Spectral < Interval
             J(J==-inf)  = 0;  % assume integration well-defined
             J(isnan(J))= 0;  % at infinity
             
-            Int = wInt.*J.';
+            Int = wInt.*(J.');
             this.Int = Int;
         end    
         function Diff = ComputeDifferentiationMatrix(this)

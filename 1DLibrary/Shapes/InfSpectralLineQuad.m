@@ -1,19 +1,19 @@
-classdef InfSpectralLineQuad < Spectral
+classdef InfSpectralLineQuad < InfSpectralLine
     
-    properties
-        L
-        y0=0;
-    end
-    
+%     properties
+%         L
+%         y0=0;
+%     end
+%     
     methods
         function this = InfSpectralLineQuad(Geometry)
-            this@Spectral(Geometry.N);
+            %this@Spectral(Geometry.N);
+            this@InfSpectralLine(Geometry);
             
-            this.L = Geometry.L;
-
-            this.polar = 'cart';
+            %this.L = Geometry.L;
+            %this.polar = 'cart';
             
-            InitializationPts(this);  
+            %InitializationPts(this);  
         end
         
     end

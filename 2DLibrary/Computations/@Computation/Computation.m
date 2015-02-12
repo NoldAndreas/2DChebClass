@@ -130,10 +130,10 @@ classdef Computation < handle
             this.optsPhys   = configuration.optsPhys;
         end
         function SaveCurrentFigure(this,filename)
-            global dirData
-            print2eps([dirData filesep filename],gcf);
-            saveas(gcf,[dirData filesep filename '.fig']);            
-            disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+            s.optsNum     = this.optsNum;
+            s.optsPhys    = this.optsPhys;
+            s.configName  = this.configName;
+            SaveFigure(filename,s);
         end
 %         
 %         function LoadSnapshot(this)

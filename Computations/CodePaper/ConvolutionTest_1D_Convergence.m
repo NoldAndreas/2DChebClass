@@ -27,22 +27,23 @@ function ConvolutionTest_1D_Convergence
     
     y              = Pts.y;           
     shapeParams.L  = 2;
-    shapeParamsHalfLim.L = 1;
+    %shapeParamsHalfLim.L    = 2;
     shapeParamsHalfLim.yMin = 1;
+    shapeParamsHalfLim.yMax = 10;
     shapeParamsLim.yMin = -1;
     shapeParamsLim.yMax = 1;
     
     % false gives pointwise convolution
-    NS_d = 2;
-    NS = 20:NS_d:40;
+    NS_d = 5;
+    NS = 20:NS_d:80;%20:NS_d:40;
     for i = 1:length(NS)
         shapeParams.N     = NS(i);
         shapeParamsHalfLim.N  = NS(i);
         shapeParamsLim.N  = NS(i);
-        res{i}.ConvGauss1  = infLine.ComputeConvolutionMatrix(@Gaussian1,shapeParams,false);
-        res{i}.ConvBH1     = infLine.ComputeConvolutionMatrix(@BH1,shapeParams,false);
-        res{i}.ConvBH1_HalfLim     = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsHalfLim,false);
-        res{i}.ConvBH1_Lim = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsLim,false);
+        res{i}.ConvBH1_HalfLim  = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsHalfLim,false);
+        res{i}.ConvGauss1       = infLine.ComputeConvolutionMatrix(@Gaussian1,shapeParams,false);
+        %res{i}.ConvBH1     = infLine.ComputeConvolutionMatrix(@BH1,shapeParams,false);        
+        res{i}.ConvBH1_Lim      = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsLim,false);
         res{i}.NS         = NS(i);
     end        
     
@@ -52,7 +53,7 @@ function ConvolutionTest_1D_Convergence
     
 	figure('color','white','Position',[0 0 800 800]);         
     PlotMatrixErrorOverY('ConvGauss1','o','k','Gaussian');
-    PlotMatrixErrorOverY('ConvBH1','o','m','BH1');
+    %PlotMatrixErrorOverY('ConvBH1','o','m','BH1');
     PlotMatrixErrorOverY('ConvBH1_HalfLim','o','g','BH1_{HalfLim}');
     PlotMatrixErrorOverY('ConvBH1_Lim','o','b','BH1_{Lim}');
 
@@ -127,8 +128,12 @@ function ConvolutionTest_1D_Convergence
     basicErr3  = L2norm(gBasic3-gConv13)/L2norm(gConv13)
 
     function g = BH1(x)
+        x = abs(x);
         %g = x.*BarkerHenderson_2D(x); g(x==inf) = 0; g(x==-inf) = 0;
-        g = 1./(2+x.^6);
+        %g(x <= 1) = BarkerHenderson_2D(1);
+        g = 1./(x.^4);
+        %g(x <= 1) = BarkerHenderson_2D(1);
+        g(x <= 1) = 1;
     end
     
     function g = Gaussian1(x)

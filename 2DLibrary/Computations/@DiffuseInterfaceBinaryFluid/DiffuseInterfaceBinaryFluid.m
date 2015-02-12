@@ -9,7 +9,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             if(nargin == 0)
                  config = [];
             end
-            if(~isfield(config.optsPhys,'mobility') && ...
+            if(~isempty(config) && ~isfield(config.optsPhys,'mobility') && ...
                     isfield(config.optsPhys,'l_diff'))
                 config.optsPhys.mobility = (config.optsPhys.l_diff)^2/(config.optsPhys.Cak);
             end
@@ -377,7 +377,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function PlotU(this,uv,opts) 
            
             if(nargin < 2)
-                opts = [];
+                %opts = [];
+                opts.linewidth = 1.5;
+                opts.color = 'm';
             end
            
             if(nargin == 1)
@@ -507,6 +509,43 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                 disp(['Diffusion length/L: ',num2str(S)]);
                 disp(['Prediction of slip length / distance of stagnation point to wall by Yue et. al (2010): ',num2str(ls_Yue)]);
            end            
+           
+       end
+       
+       function Plot3DProfiles(this)
+           figure('color','white','Position',[0 0 800 800]);
+           this.IDC.plot(this.mu,{'SC'});
+           PlotU(this);
+           title('Chemical Potential');
+           SaveCurrentFigure(this,[this.filename ,'_3DChemPot']);
+           
+           figure('color','white','Position',[0 0 800 800]);
+           this.IDC.plot(this.phi,{'SC'});
+           PlotU(this);
+           title('Phasefield');
+           SaveCurrentFigure(this,[this.filename ,'_3DPhasefield']);
+           
+           figure('color','white','Position',[0 0 800 800]);
+           this.IDC.plot(this.p,{'SC'});
+           PlotU(this);
+           title('Pressure');
+           SaveCurrentFigure(this,[this.filename ,'_3DPressure']);
+       end
+       
+       function PlotValuesThroughStagnationPoint(this)
+           
+           figure('Position',[0 0 800 800],'color','white');
+           y1Int = 3*[this.optsNum.PlotArea.y1Min,this.optsNum.PlotArea.y1Max];
+           %y2Int =  this.StagnationPoint.y2_kv(1)*[1,1];
+           y2Int =  (this.StagnationPoint.y2_kv(1) - 2)*[1,1];
+           y2Int =  0*[1,1];
+           this.IDC.plotLine(y1Int,y2Int,100*this.mu,struct('color','b'));
+           this.IDC.plotLine(y1Int,y2Int,this.p,struct('color','r'));
+           this.IDC.plotLine(y1Int,y2Int,this.uv(1:end/2),struct('color','m'));
+           this.IDC.plotLine(y1Int,y2Int,this.uv(1+end/2:end),struct('color','k'));
+           set(gca,'linewidth',1.5);
+           set(gca,'fontsize',15);
+           SaveCurrentFigure(this,[this.filename '_ValuesThroughStagnationPoint']);
            
        end
    end
