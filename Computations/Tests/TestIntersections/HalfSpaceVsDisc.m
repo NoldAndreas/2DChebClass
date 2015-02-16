@@ -21,7 +21,7 @@ xlabel('$x$','Interpreter','Latex','fontsize',20);
 ylabel('$y$','Interpreter','Latex','fontsize',20);
 
 %axis equal
-pbaspect([10 4 1]);
+pbaspect([10 (4*R) 1]);
 set(gca,'fontsize',20);
 
 
@@ -49,13 +49,13 @@ while(y20 > bottom - R)
         %DC.PlotGrid();
     end
     
-	xlim([-3,3])
+	xlim([-5,5])
     ylim([-1.5 1.5])
     ylim([bottom-R,bottom+3*R])
     xlabel('$x/\sigma$','Interpreter','Latex','fontsize',20);
     ylabel('$y/\sigma$','Interpreter','Latex','fontsize',20);
     set(gca,'fontsize',20);
-    pbaspect([6 4 1]);
+    pbaspect([10 (4*R) 1]);
     %axis equal
 
     [y10,y20] = ginput(1);   

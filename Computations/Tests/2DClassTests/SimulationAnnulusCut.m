@@ -4,7 +4,7 @@ function [WDG,res] = SimulationAnnulusCut
     close all;
         
     Geometry = struct('R_in',1,'R_out',5,...
-                      'h',4.5,'N',[30,30]);
+                      'h',0.5,'N',[30,30]);
         
     WDG                = AnnulusCut(Geometry);    
     WDG.ComputeIntegrationVector();
