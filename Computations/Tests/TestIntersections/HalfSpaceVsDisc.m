@@ -1,6 +1,8 @@
 clear all; close all;
 
-R      = 0.5;
+R_in   = 1;
+R_out  = 3;
+R      = 3;%0.5;
 bottom = 0;
 
 figure('color','white','Position',[0 0 800 500]);
@@ -30,7 +32,8 @@ while(y20 > bottom - R)
     N      = [10,10];
     sphere = false;
     
-    DC     = Disc(v2struct(Origin,R,N,sphere));       
+    DC     = Annulus(v2struct(Origin,R_in,R_out,N));       
+    %DC     = Disc(v2struct(Origin,R,N,sphere));       
     %DC     = Sphere(v2struct(Origin,R,N,sphere));       
     %theta1 = 0;  theta2 = pi;    
     %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));       
@@ -52,7 +55,7 @@ while(y20 > bottom - R)
     xlabel('$x/\sigma$','Interpreter','Latex','fontsize',20);
     ylabel('$y/\sigma$','Interpreter','Latex','fontsize',20);
     set(gca,'fontsize',20);
-    pbaspect([10 4 1]);
+    pbaspect([6 4 1]);
     %axis equal
 
     [y10,y20] = ginput(1);   

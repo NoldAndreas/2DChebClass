@@ -10,6 +10,8 @@ function ContactLineBinaryFluid
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
     SubArea  = struct('shape','Box','N',[60,60],...
                       'y1Min',-5,'y1Max',5,'y2Min',0,'y2Max',10);   	
+                  
+    %optsSolv = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
 
     optsNum  = v2struct(PhysArea,PlotArea);                   	
 
@@ -136,9 +138,8 @@ function ContactLineBinaryFluid
 
                 DI = DiffuseInterfaceBinaryFluid(config);
                 DI.Preprocess();
-
-                opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
-                DI.IterationStepFullProblem(opts);                    
+                
+                DI.IterationStepFullProblem();                    
                 
                 DI.GetYueParameters(); 
                 DI.PlotResults();	  

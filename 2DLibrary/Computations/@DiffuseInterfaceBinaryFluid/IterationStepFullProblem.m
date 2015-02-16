@@ -1,4 +1,4 @@
-function IterationStepFullProblem(this,opts)
+function IterationStepFullProblem(this)
     %Continuitiy: 0 = div(uv)
     %Momentum:    0 = -Grad(p) + (G+s*phi)*grad(phi)/Cak + Lap(uv)
     %Phasefield   0 = m*Lap(G + s*phi) - u*grad(phi)
@@ -11,6 +11,12 @@ function IterationStepFullProblem(this,opts)
     % (BC4) p = 0  at y1 = +/- infinity
     
     % A*[uv;phi;G;p] = b corresponds to momentum and continuity Eq. for given phasefield phi                               
+    
+    if(isfield(this.optsNum,'optsSolv'))
+        opts = this.optsNum.optsSolv;
+    else
+        opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
+    end
     
     if((nargin == 1) || ~isfield(opts,'noIterations'))
         noIterations = 20;
@@ -27,7 +33,7 @@ function IterationStepFullProblem(this,opts)
 %         solveSquare = opts.solveSquare;
 %     end
 %     
- 	if((nargin == 1) || ~isfield(opts,'Seppecher_red'))
+ 	if(~isfield(opts,'Seppecher_red'))
          Seppecher_red = 0;
      else
          Seppecher_red = opts.Seppecher_red;

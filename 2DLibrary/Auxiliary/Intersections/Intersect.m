@@ -1,6 +1,8 @@
 function data = Intersect(MainShape,SecondShape)
 
-    if(isa(SecondShape,'Disc'))
+    if(isa(SecondShape,'Annulus'))
+        data = Intersect_Annulus(MainShape,SecondShape);
+    elseif(isa(SecondShape,'Disc'))
         data = Intersect_Disk(MainShape,SecondShape);
     elseif(isa(SecondShape,'Sphere'))
         data = Intersect_Sphere(MainShape,SecondShape);                
