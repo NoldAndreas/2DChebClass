@@ -8,15 +8,15 @@ classdef AnnulusCut < ComposedShape
             Geometry.th2   = 3/2*pi-th;
             this.SubShape{1}  = Wedge(Geometry);                               
             
-            if(Geometry.h < Geometry.R_in)
+            if((Geometry.h > 0) && (Geometry.h < Geometry.R_in))
                 Geometry.leftRight = 'left';
                 this.SubShape{2} = WedgeCutSide(Geometry);             
                 
                 Geometry.leftRight = 'right';
                 this.SubShape{3} = WedgeCutSide(Geometry);             
-            elseif(Geometry.h < Geometry.R_out)
+            elseif((Geometry.h > 0) && (Geometry.h < Geometry.R_out))
                 this.SubShape{2} = WedgeCut(Geometry);             
-            else
+            elseif((Geometry.h >= Geometry.R_out))
                 error('AnnulusCut: Define full annulus')
             end
                         

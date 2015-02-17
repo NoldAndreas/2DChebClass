@@ -24,7 +24,12 @@ function res = CheckMeanfieldConvolution(this)
              check = conv_BarkerHenderson2D(y2_h);   
 
              [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
-             res.error_conv1_posy2 = y2_h(ind_conv1);
+             res.error_conv1_posy2 = y2_h(ind_conv1);         
+         elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHendersonCutoff_2D'))                 
+             conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
+             y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
+             res.error_conv1 = inf;
+             res.error_conv1_posy2 = 1;
          else
              cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
          end  

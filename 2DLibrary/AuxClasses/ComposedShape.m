@@ -33,12 +33,14 @@ classdef ComposedShape < handle
                 area          = area + areaS;
             end            
             
-            if(area == 0)
-                disp(['ComposedShape: Area is zero, Absolute error is: ',...
-                                    num2str(area-sum(int))]);
-            else
-                disp(['ComposedShape: Error of integration of area (ratio): ',...
-                                    num2str(1-sum(int)/area)]);
+            if(nargout == 1)
+                if(area == 0)
+                    disp(['ComposedShape: Area is zero, Absolute error is: ',...
+                                        num2str(area-sum(int))]);
+                else
+                    disp(['ComposedShape: Error of integration of area (ratio): ',...
+                                        num2str(1-sum(int)/area)]);
+                end
             end
         end
         

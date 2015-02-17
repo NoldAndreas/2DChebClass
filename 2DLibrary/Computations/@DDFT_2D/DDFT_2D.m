@@ -143,8 +143,12 @@ classdef DDFT_2D < Computation
 
             if(isfield(this.optsNum,'V2Num') && ~isempty(this.optsNum.V2Num))
                 fprintf(1,'Computing mean field convolution matrices ...\n');   
+                if(isfield(this.optsPhys,'r_cutoff'))
+                    paramsFex.r_cutoff = this.optsPhys.r_cutoff;
+                end
                 paramsFex.V2       = this.optsPhys.V2;
-                paramsFex.kBT      = this.optsPhys.kBT;
+                paramsFex.V2       = this.optsPhys.V2;
+                paramsFex.kBT      = this.optsPhys.kBT;                
                 paramsFex.FexNum   = this.optsNum.V2Num;
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   

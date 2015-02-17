@@ -41,35 +41,36 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
         function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@Polar_SpectralFourierNoOrigin(this);
             
-            %Check Accuracy
-            
-            area = pi*(this.RMax^2-this.RMin^2);
-            disp(['Annulus: Error of integration of area (ratio): ',...
-                                    num2str(1-sum(this.Int)/area)]);      
-                                
-            % f = r; 
-            intF1 = 2*pi/3*(this.RMax^3-this.RMin^3);
-            f1 = this.Pts.y1_kv;
-            disp(['Annulus: Error of integration of r (ratio): ',...
-                                    num2str(1-sum(this.Int*f1)/intF1)]); 
-                            
-            % f = r*sin(theta); 
-            intF2 = 0;
-            f2 = this.Pts.y1_kv.*sin(this.Pts.y2_kv);
-            disp(['Annulus: Error of integration of r*sin(theta) (ratio): ',...
-                                    num2str(intF2-sum(this.Int*f2))]); 
-                                
-            % f = r*sin^2(theta); 
-            intF3 = pi/3*(this.RMax^3-this.RMin^3);
-            f3 = this.Pts.y1_kv.*sin(this.Pts.y2_kv).^2;
-            disp(['Annulus: Error of integration of r*sin^2(theta) (ratio): ',...
-                                    num2str(1-sum(this.Int*f3)/intF3)]);
-                                
-            % f = exp(-r^2); 
-            intF4 = -pi*(exp(-this.RMax^2)-exp(-this.RMin^2));
-            f4 = exp(-this.Pts.y1_kv.^2);
-            disp(['Annulus: Error of integration of exp(-r^2) (ratio): ',...
-                                    num2str(1-sum(this.Int*f4)/intF4)]); 
+            %Check Accuracy            
+            if(nargout == 1)
+                area = pi*(this.RMax^2-this.RMin^2);
+                disp(['Annulus: Error of integration of area (ratio): ',...
+                                        num2str(1-sum(this.Int)/area)]);      
+
+                % f = r; 
+                intF1 = 2*pi/3*(this.RMax^3-this.RMin^3);
+                f1 = this.Pts.y1_kv;
+                disp(['Annulus: Error of integration of r (ratio): ',...
+                                        num2str(1-sum(this.Int*f1)/intF1)]); 
+
+                % f = r*sin(theta); 
+                intF2 = 0;
+                f2 = this.Pts.y1_kv.*sin(this.Pts.y2_kv);
+                disp(['Annulus: Error of integration of r*sin(theta) (ratio): ',...
+                                        num2str(intF2-sum(this.Int*f2))]); 
+
+                % f = r*sin^2(theta); 
+                intF3 = pi/3*(this.RMax^3-this.RMin^3);
+                f3 = this.Pts.y1_kv.*sin(this.Pts.y2_kv).^2;
+                disp(['Annulus: Error of integration of r*sin^2(theta) (ratio): ',...
+                                        num2str(1-sum(this.Int*f3)/intF3)]);
+
+                % f = exp(-r^2); 
+                intF4 = -pi*(exp(-this.RMax^2)-exp(-this.RMin^2));
+                f4 = exp(-this.Pts.y1_kv.^2);
+                disp(['Annulus: Error of integration of exp(-r^2) (ratio): ',...
+                                        num2str(1-sum(this.Int*f4)/intF4)]); 
+            end
             
         end        
         function Diff = ComputeDifferentiationMatrix(this)
