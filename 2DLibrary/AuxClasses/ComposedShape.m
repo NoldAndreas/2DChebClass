@@ -30,10 +30,14 @@ classdef ComposedShape < handle
             for i = 1:length(this.SubShape)
                 [intS,areaS]  = this.SubShape{i}.ComputeIntegrationVector();
                 int           = [int,intS];
-                area          = area + areaS;
+                if(~isempty(areaS) && ~isempty(area))
+                    area          = area + areaS;
+                else
+                    area = [];
+                end
             end            
             
-            if(nargout == 1)
+            if((nargout == 1) && ~isempty(area))
                 if(area == 0)
                     disp(['ComposedShape: Area is zero, Absolute error is: ',...
                                         num2str(area-sum(int))]);

@@ -61,8 +61,9 @@
             throw(exc);
         end
         
-        function [int] = ComputeIntegrationVector(this)
+        function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@Polar_M1SpectralSpectral(this);
+            area = [];        
         end
             
     end

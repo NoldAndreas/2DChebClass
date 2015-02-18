@@ -28,7 +28,7 @@ function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r,parameter)
     
     z            = 0*r;    
     z(markG1)    = 2*BH_2D_I(rG1,sqrt(r_cutoff^2-rG1.^2));
-    z(markL1)    = 2*( BH_2D_I(rL1,sqrt(r_cutoff^2-rL1.^2)) - BH_2D_I(rL1,sqrt(1-rL1.^2)) );
+    z(markL1)    = BH_2D_L1(rL1);
     
     alpha        = 1/2*( BH_0D_I(r_cutoff) - BH_0D_I(1) );
 

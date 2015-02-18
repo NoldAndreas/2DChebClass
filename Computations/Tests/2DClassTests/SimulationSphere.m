@@ -8,7 +8,7 @@ function [data,res] = SimulationSphere()
     %Initialization
     N1 = 40;
     N2 = 40;
-    vext  = @VTest;
+    vext  = @VTestt;
     R      = 1;
     theta1 = 0;%pi/5;%pi/2;
     theta2 = pi;%pi*3/4;
@@ -104,6 +104,23 @@ function [data,res] = SimulationSphere()
         V  = BarkerHenderson_2D(d);        
         VDiff = 0;
         VInt = -32/9*pi+25/32*pi^2;
+    end
+
+    function [V,VDiff,VInt] = VTestt(pts)
+        y1 = pts.y1_kv;
+        y2 = pts.y2_kv;
+        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
+        global r_cutoff
+        r_cutoff = 5;
+        rc       = r_cutoff;
+        V  = BarkerHendersonCutoff_2D(d);        
+        %V  = BarkerHenderson_2D(d);        
+        VDiff = 0;
+        if(rc == inf)
+            VInt = -32/9*pi+25/32*pi^2;
+        else
+            VInt = pi * (0.18000e5 * atan(sqrt((rc ^ 2 - 1))) * (rc ^ 10) - (40960 * rc ^ 10) + (18000 * (rc ^ 2 - 1) ^ (0.3e1 / 0.2e1) * rc ^ 6) - (9240 * (rc ^ 2 - 1) ^ (0.3e1 / 0.2e1) * rc ^ 4) - 0.22200e5 * sqrt((rc ^ 2 - 1)) * (rc ^ 6) + (61440 * rc ^ 7) - (12978 * (rc ^ 2 - 1) ^ (0.3e1 / 0.2e1) * rc ^ 2) + 0.1050e4 * sqrt((rc ^ 2 - 1)) * (rc ^ 4) - (16857 * (rc ^ 2 - 1) ^ (0.3e1 / 0.2e1)) + 0.1575e4 * sqrt((rc ^ 2 - 1)) * (rc ^ 2) + 0.1575e4 * sqrt((rc ^ 2 - 1)) - (20480 * rc)) / (rc ^ 10) / 0.11520e5;        
+        end
     end
 
 end

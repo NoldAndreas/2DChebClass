@@ -27,9 +27,9 @@ function [error,ind,cnt] = PrintErrorPos(error,text,Pts1,Pts2)
         str2 = num2str(error);     
     end
   
-     if(error > 10^-1)
+     if(error > 10^-3)
          cnt = cnt + cprintf('*red',str2);
-     elseif(error <= 10^(-5))
+     elseif(error <= 10^(-8))
          cnt = cnt + cprintf('*blue',str2);
      else
          cnt = cnt + cprintf('*magenta',str2);

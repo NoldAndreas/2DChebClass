@@ -18,19 +18,22 @@ function convStruct = FexMatrices_SplitAnnulus(optsPhys,IDC)
     else            
         shapeAnn.N    = optsPhys.optsNum.PhysArea.Conv.N;
     end
-    
-    annulusArea       = Annulus(shapeAnn);
-
+       
     shapeDisc.R = params.LJsigma;
     shapeDisc.N = shapeAnn.N;
     shapeDisc.volume = false;
     %diskArea    = Disc(shapeDisc);
+
+    annulusArea = Annulus(shapeAnn);
+    conv1       = IDC.ComputeConvolutionFiniteSupport(annulusArea,{fstr},IDC.Pts);
     diskArea    = Sphere(shapeDisc);
+    conv2       = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
+    
+    %shapeDisc.R = r_cutoff;
+    %diskArea    = Sphere(shapeDisc);
+    %conv3      = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
 
-    conv1 = IDC.ComputeConvolutionFiniteSupport(annulusArea,{fstr},IDC.Pts);
-    conv2 = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
-
-    convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2);
+    convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2); %conv3(:,:,2);
     
     if(isfield(params,'epsilon'))
         convStruct.Conv = convStruct.Conv*params.epsilon;

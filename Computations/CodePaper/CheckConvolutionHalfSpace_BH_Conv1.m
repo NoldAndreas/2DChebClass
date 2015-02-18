@@ -8,7 +8,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                       'N2bound',10,'h',1,...
                       'alpha_deg',90);
 
-    V2Num   = struct('Fex','SplitDisk','N',[30,30]);
+    %V2Num   = struct('Fex','SplitDisk','N',[30,30]);
+    V2Num   = struct('Fex','SplitAnnulus','N',[30,30]);
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
@@ -20,8 +21,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.7);%1.375);%1.25)s;
-    V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1); 
+%    V2 = struct('V2DV2','Phi2DLongRange','epsilon',1.,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,'V2',V2,...                   
                       'kBT',0.75,...                                                    
@@ -235,8 +238,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         
         for k1 = 1%:size(res,1)
             for k2 = 1:(size(res,2)-1)
-                %line(n)   = norm(res(k1,k2).(A_name)-res(k1,k2+1).(A_name));
-                line(n)   = max(max(abs(res(k1,k2).(A_name)-res(k1,k2+1).(A_name))));
+                line(n)   = norm(res(k1,k2).(A_name)-res(k1,k2+1).(A_name));
+                %line(n)   = max(max(abs(res(k1,k2).(A_name)-res(k1,k2+1).(A_name))));
                 line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;                
                 n = n+1;
             end

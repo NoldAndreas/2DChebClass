@@ -28,8 +28,10 @@ function res = CheckMeanfieldConvolution(this)
          elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHendersonCutoff_2D'))                 
              conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
              y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
-             res.error_conv1 = inf;
-             res.error_conv1_posy2 = 1;
+             check = conv_BarkerHendersonCutoff2D(y2_h);   
+
+             [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
+             res.error_conv1_posy2 = y2_h(ind_conv1);         
          else
              cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
          end  
@@ -62,6 +64,7 @@ function res = CheckMeanfieldConvolution(this)
          z = this.optsPhys.V2.epsilon*(- pi^2/2 + ...
                                       + pi*atan(-y2)+...
                                       - pi*(y2)./(1+y2.^2));
+        z(y2==inf) =  this.optsPhys.V2.epsilon*(- pi^2);
     end
     function C = conv_BarkerHenderson_IC(y2)        
         C = zeros(size(y2));
@@ -83,6 +86,10 @@ function res = CheckMeanfieldConvolution(this)
                     + BH_Int(y2(mark3)-y2Min) - BH_Int(d);                
 
         C = C*this.optsPhys.V2.epsilon;
+    end
+
+    function z = conv_BarkerHendersonCutoff2D(y2_h)
+        z = 2*a-this.optsPhys.V2.epsilon*BH_Psi(y2_h);
     end
     function z = conv_BarkerHenderson2D(y2_h)
         Psi(y2_h < 1)  = -16/9*pi +6/5*pi*y2_h(y2_h < 1);         

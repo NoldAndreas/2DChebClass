@@ -9,7 +9,7 @@ function Check_FMT_SumRule()
                       'alpha_deg',90);
 
     %V2Num   = struct('Fex','SplitDisk','N',[20,20]); 
-    V2Num   = struct('Fex','SplitAnnulus','N',[40,40]); 
+    V2Num   = struct('Fex','SplitAnnulus','N',[60,60]); 
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   

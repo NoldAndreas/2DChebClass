@@ -154,7 +154,7 @@ classdef DDFT_2D < Computation
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
-                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   
+                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,true);   
                 
                 CheckMeanfieldConvolution(this);
 

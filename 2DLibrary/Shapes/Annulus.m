@@ -40,10 +40,10 @@ classdef Annulus < Polar_SpectralFourierNoOrigin
         end                      
         function [int,area] = ComputeIntegrationVector(this)
             int = ComputeIntegrationVector@Polar_SpectralFourierNoOrigin(this);
+            area = pi*(this.RMax^2-this.RMin^2);
             
             %Check Accuracy            
-            if(nargout == 1)
-                area = pi*(this.RMax^2-this.RMin^2);
+            if(nargout == 1)                
                 disp(['Annulus: Error of integration of area (ratio): ',...
                                         num2str(1-sum(this.Int)/area)]);      
 

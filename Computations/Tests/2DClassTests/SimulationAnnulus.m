@@ -7,7 +7,7 @@ function [data,res] = SimulationAnnulus()
     %Initialization
     N1 =  20;   N2 = 20;        
     RMin     = 1;
-    RMax     = 3;
+    RMax     = 5;
     Origin  = [-2;3];
     N       = [N1;N2];    
 
@@ -49,7 +49,11 @@ function [data,res] = SimulationAnnulus()
     %   Auxiliary functions:
     %***************************************************************         
    function [V,VInt] = VTest(y1,y2)       
-            V     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(-2);  
+            r     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(0.5);  
+            %V     = r.^(-4);  
+            global r_cutoff
+            r_cutoff = RMax;
+            V     = BarkerHendersonCutoff_2D(r);
             VInt  = pi*(1/RMin^2 - 1/RMax^2);
    end
 
