@@ -9,7 +9,7 @@ function [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,initialG
     
     HS_f  = str2func(optsPhys.HSBulk);    
 	
-    [h1,h2,alpha] = Phi_r(0);    
+    [h1,h2,alpha] = Phi_r(0,optsPhys.V2);    
     
     if((nargin == 1) || isempty(initialGuess))
         initialGuess = [1;0.4;-3.4]; 

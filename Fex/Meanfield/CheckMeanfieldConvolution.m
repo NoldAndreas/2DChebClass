@@ -32,7 +32,13 @@ function res = CheckMeanfieldConvolution(this)
 
              [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
              res.error_conv1_posy2 = y2_h(ind_conv1);         
-         else
+         elseif(strcmp(this.optsPhys.V2.V2DV2,'ConstShortRange'))                 
+             conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
+             y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
+             check = conv_ConstShortRange(y2_h);   
+             [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
+             res.error_conv1_posy2 = y2_h(ind_conv1);                      
+         else                          
              cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
          end  
      elseif(isa(this.IDC,'InfCapillary'))
@@ -91,6 +97,24 @@ function res = CheckMeanfieldConvolution(this)
     function z = conv_BarkerHendersonCutoff2D(y2_h)
         z = 2*a-this.optsPhys.V2.epsilon*BH_Psi(y2_h);
     end
+    function z = conv_ConstShortRange(y2_h)
+        z = zeros(size(y2_h));
+        
+        lambda = this.optsPhys.V2.lambda;
+        z(y2_h > lambda) = 2*a;
+        
+        markG1      = (y2_h > 1) & (y2_h < lambda);
+        hh          = lambda - y2_h(markG1);
+        z(markG1)   = 2*a + pi/3*hh.^2.*(3*lambda-hh);
+        
+        markL1      = (y2_h <= 1);
+        hh          = lambda - y2_h(markL1);
+        h1          = 1 - y2_h(markL1);
+        z(markL1) = - (4/3*pi*lambda^3 - pi/3*hh.^2.*(3*lambda-hh) -...
+                        (4/3*pi - pi/3*h1.^2.*(3-h1)));
+                
+    end
+
     function z = conv_BarkerHenderson2D(y2_h)
         Psi(y2_h < 1)  = -16/9*pi +6/5*pi*y2_h(y2_h < 1);         
         Psi(y2_h >= 1) = 4*pi*(1./(45*y2_h(y2_h >= 1).^9) - 1./(6*y2_h(y2_h >= 1).^3));

@@ -139,7 +139,7 @@ classdef DDFT_2D < Computation
             %t_fex = toc;
             %disp(['Fex computation time (sec): ', num2str(t_fex)]);
         end            
-        function Preprocess_MeanfieldContribution(this)
+        function res = Preprocess_MeanfieldContribution(this)
 
             if(isfield(this.optsNum,'V2Num') && ~isempty(this.optsNum.V2Num))
                 fprintf(1,'Computing mean field convolution matrices ...\n');   
@@ -154,13 +154,14 @@ classdef DDFT_2D < Computation
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
-                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,true);   
+                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   %true
                 
-                CheckMeanfieldConvolution(this);
+                res = CheckMeanfieldConvolution(this);
 
-            elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                
+            elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                                
                 error('Define V2Num structure in optsNum')
             else
+                res = [];
                 this.IntMatrV2 = 0;
             end
         end

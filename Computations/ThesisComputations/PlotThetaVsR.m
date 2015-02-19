@@ -7,25 +7,29 @@ function PlotThetaVsR()
     end
 
     nData = 1;
-    data{1} = LoadDataFluidData('RameGaroff1996/Ca_0_005','s','r',struct('rad','deg','Ca','V')); 
-	data{2} = LoadDataFluidData('RameGaroff1996/Ca_0_1','s','r',struct('rad','deg','Ca','V')); 
+    %data{1} = LoadDataFluidData('\ChenRameGaroff/Fig4a','s','r',struct('rad','deg','Ca','V')); 
+    %data{1} = LoadDataFluidData('\ChenRameGaroff/Fig6a','s','r',struct('rad','deg','Ca','V')); 
+    %data{1} = LoadDataFluidData('RameGaroff1996/Ca_0_005','s','r',struct('rad','deg','Ca','V')); 
+	data{1} = LoadDataFluidData('RameGaroff1996/Ca_0_1','s','r',struct('rad','deg','Ca','V')); 
 
-    PlotData(data{2});
+    PlotData(data{1});
     
     function PlotData(dat)
         figure('color','white','Position',[0 0 800 800]);
         rT = dat.r/dat.a;
         
-        plot(rT,dat.theta,dat.symbol,'MarkerSize',10,'MarkerFaceColor',dat.color,'MarkerEdgeColor',dat.color); hold on;
+        plot(rT*dat.a,dat.theta,dat.symbol,'MarkerSize',10,'MarkerFaceColor',dat.color,'MarkerEdgeColor',dat.color); hold on;
         
-        rTAna = min(rT) + (max(rT)-min(rT))*(0:0.01:1)';
-        f_0   = f_0_DussanRameGaroff(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);%pi/2
+        rTAna   = min(rT) + (max(rT)-min(rT))*(0:0.01:1)';        
+        f_0     = f_0_HuhScrivenCapillary(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);%pi/2
+        f_0DR   = f_0_DussanRameGaroff(rTAna,dat.thetaAppRad,pi/2,dat.R_T/dat.a);%pi/2
         thetaCox = GHR_Inv(GHR_lambdaEta0(dat.thetaAppRad)+ dat.Ca*log(rTAna),0);
         
         thetaAna = thetaCox + f_0 - dat.thetaAppRad;
         
-        plot(rTAna,180/pi*f_0,['--k'],'linewidth',1.5);
-        plot(rTAna,180/pi*thetaAna,['-k'],'linewidth',1.5);        
+        plot(rTAna*dat.a,180/pi*f_0,['--k'],'linewidth',1.5);
+        plot(rTAna*dat.a,180/pi*f_0DR,['--b'],'linewidth',1.5);        
+        plot(rTAna*dat.a,180/pi*thetaAna,['-k'],'linewidth',1.5);        
        % xlim([1e-5 100]);        ylim([0 180]);
         xlabel('$r/a$','Interpreter','Latex','fontsize',20);
         ylabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',20);
@@ -64,5 +68,11 @@ function PlotThetaVsR()
         else
             dataL.MarkerSize = 10;            
         end                                       
+    end
+    function th = f_0_HuhScrivenCapillary(r,thOut,alpha,R_T)
+        phi = 1/4*(alpha - thOut);
+        phi_r = atan(besselk(1,r+R_T)/besselk(1,R_T)*tan(phi));  
+        th  = pi/2 - 4*phi_r;   
+        th  = real(th);
     end
 end
