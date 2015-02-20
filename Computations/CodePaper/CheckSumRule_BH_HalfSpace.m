@@ -9,8 +9,13 @@ function CheckSumRule_BH_HalfSpace()
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
                       'alpha_deg',90);
+                  
+    V2Num   = struct('Fex','SplitAnnulus','N',[80,80]);    
+    V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 
-    V2Num   = struct('Fex','SplitDisk','N',[34,34]);
+    %V2Num   = struct('Fex','SplitDisk','N',[34,34]);
+    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1);     
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
@@ -21,8 +26,7 @@ function CheckSumRule_BH_HalfSpace()
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.);%1.375);%1.25)s;
-    V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-%    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1); 
+    
 
     optsPhys = struct('V1',V1,...%'V2',V2,...
                       'kBT',0.75,...                                               
@@ -31,23 +35,23 @@ function CheckSumRule_BH_HalfSpace()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:5:80;    
+    N    = 20:40:100;    
     NS   = 40;%10:10:40;
     
     figure('color','white','Position',[0 0 900 800]); 
     legendstring = {};
-    
-    % **** 1 ****    
-    eta = 0.3;    
-    res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
-    PlotErrorGraph('error_wl','o-','k',['Hard sphere, eta = ',num2str(eta)]); 
-        
-	AddPaths();    
-    ChangeDirData([dirData filesep 'deg90'],'ORG')
-    % **** 2 ****    
-    eta = 0.15;    
-    res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
-    PlotErrorGraph('error_wl','o-','b',['Hard sphere, eta = ',num2str(eta)]); 
+%     
+%     % **** 1 ****    
+%     eta = 0.3;    
+%     res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
+%     PlotErrorGraph('error_wl','o-','k',['Hard sphere, eta = ',num2str(eta)]); 
+%         
+% 	AddPaths();    
+%     ChangeDirData([dirData filesep 'deg90'],'ORG')
+%     % **** 2 ****    
+%     eta = 0.15;    
+%     res  = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
+%     PlotErrorGraph('error_wl','o-','b',['Hard sphere, eta = ',num2str(eta)]); 
     
     AddPaths();    
     ChangeDirData([dirData filesep 'deg90'],'ORG')
@@ -57,13 +61,27 @@ function CheckSumRule_BH_HalfSpace()
 %     PlotErrorGraph('error_wg','d--','k','Wall-vapour,BH, e = 0');
 
     % **** 3 ****
-    config.optsNum.V2Num = V2Num;
-    config.optsPhys.V2   = V2;    
+    NS   = 60;
+    config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
+    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
-    PlotErrorGraph('error_wl','d-','m','Wall-liquid, BH, e = 0.9');
-    PlotErrorGraph('error_wg','d--','m','Wall-vapour, BH, e = 0.9');
+    res{1} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);    
 
+    
+    % **** 4 ****
+    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    config.optsPhys.V1.epsilon_w = 0.9;    
+    res{2} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
+    
+    
+    PlotErrorGraph(res{1},'error_wl','d-','b','Wall-liquid, BH, e = 0.9');
+    PlotErrorGraph(res{1},'error_wg','d--','b','Wall-vapour, BH, e = 0.9');
+        
+    PlotErrorGraph(res{2},'error_wl','d-','m','Wall-liquid, BH, e = 0.9');
+    PlotErrorGraph(res{2},'error_wg','d--','m','Wall-vapour, BH, e = 0.9');
+    
+    
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -135,7 +153,7 @@ function CheckSumRule_BH_HalfSpace()
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
-    function PlotErrorGraph(var_name,sym,col,name)
+    function PlotErrorGraph(res,var_name,sym,col,name)
         
         n = 1;
                 

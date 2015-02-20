@@ -11,6 +11,13 @@ function fullName = SaveFigure(filename,opts)
     [s,branch]= system('C:\git rev-parse --abbrev-ref HEAD');
 	
     fullName = [dirData filesep filename];
+    
+    DataFolder = fileparts(fullName);
+	if(~exist(DataFolder,'dir'))            
+        disp('Folder not found. Creating new path..');            
+        mkdir(DataFolder);
+	end
+    
     print2eps(fullName,gcf);
 	saveas(gcf,[fullName '.fig']);        
     

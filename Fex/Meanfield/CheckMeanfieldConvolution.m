@@ -103,16 +103,19 @@ function res = CheckMeanfieldConvolution(this)
         lambda = this.optsPhys.V2.lambda;
         z(y2_h > lambda) = 2*a;
         
+        alpha  = -2/3*pi*(lambda^3 - 1);    
+        c      = (-16/9*pi)/alpha;    
+        
         markG1      = (y2_h > 1) & (y2_h < lambda);
         hh          = lambda - y2_h(markG1);
-        z(markG1)   = 2*a + pi/3*hh.^2.*(3*lambda-hh);
+        z(markG1)   = 2*a + c*pi/3*hh.^2.*(3*lambda-hh);
         
         markL1      = (y2_h <= 1);
         hh          = lambda - y2_h(markL1);
         h1          = 1 - y2_h(markL1);
-        z(markL1) = - (4/3*pi*lambda^3 - pi/3*hh.^2.*(3*lambda-hh) -...
+        z(markL1) = - c*(4/3*pi*lambda^3 - pi/3*hh.^2.*(3*lambda-hh) -...
                         (4/3*pi - pi/3*h1.^2.*(3-h1)));
-                
+                                                                 
     end
 
     function z = conv_BarkerHenderson2D(y2_h)
@@ -130,5 +133,6 @@ function res = CheckMeanfieldConvolution(this)
     function z = conv_BarkerHenderson2D_rl1(y2_h)        
         z = -32/9*pi+25/32*pi^2;
     end
+
 
 end

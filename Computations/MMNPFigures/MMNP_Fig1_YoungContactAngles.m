@@ -56,8 +56,8 @@ function MMNP_Fig1_YoungContactAngles()
     inset2(f1,f3,0.35,[0.55,0.65]);
     close(f3);
     
-    filename = ['ContactAngleMeasurements' filesep getTimeStr() , '_ContactAngles'];
-    SaveFigure(filename);
+    ChangeDirData();    
+    SaveFigure(['Figures' filesep 'Fig1']);
     
     %print2eps([dirData filesep 'ContactAngleMeasurements' filesep str],gcf);
     %saveas(gcf,[dirData filesep 'ContactAngleMeasurements' filesep str '.fig']);

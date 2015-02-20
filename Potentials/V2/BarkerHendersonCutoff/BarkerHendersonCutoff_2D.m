@@ -29,10 +29,16 @@ function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r,parameter)
     z            = 0*r;    
     z(markG1)    = 2*BH_2D_I(rG1,sqrt(r_cutoff^2-rG1.^2));
     z(markL1)    = BH_2D_L1(rL1);
-    
+    dzdr_r       = 0*r;
     alpha        = 1/2*( BH_0D_I(r_cutoff) - BH_0D_I(1) );
+    
+    %Rescale
+    c = (-16/9*pi)/alpha;    
+    z      = c*z;
+    dzdr_r = c*dzdr_r;
+    alpha  = c*alpha;
 
-    dzdr_r = 0;
+    %Rescale with epsilon
     z      = epsilon*z;
     alpha  = epsilon*alpha;
 end

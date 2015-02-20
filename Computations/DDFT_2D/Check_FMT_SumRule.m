@@ -2,14 +2,17 @@ function Check_FMT_SumRule()
 
     AddPaths();
 
-    PhysArea = struct('N',[1,60],...
+    PhysArea = struct('N',[1,80],...
                       'L1',5,'L2',4,'L2_AD',4,...
                       'y2wall',0.,...
                       'N2bound',14,'h',1,...
                       'alpha_deg',90);
 
     %V2Num   = struct('Fex','SplitDisk','N',[20,20]); 
-    V2Num   = struct('Fex','SplitAnnulus','N',[60,60]); 
+    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    
+    V2Num   = struct('Fex','SplitAnnulus','N',[80,80]); 
+    V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
@@ -21,8 +24,8 @@ function Check_FMT_SumRule()
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.9);%1.3);%1.375);%1.25)s;
-    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    
+    
 %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1); 
 
     optsPhys = struct('V1',V1,...
@@ -33,15 +36,28 @@ function Check_FMT_SumRule()
 
     config = v2struct(optsNum,optsPhys);                        
     
+    
+    CheckConfig(config);
+            
+	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     CheckConfig(config);
     
-    %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
-    config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
-                
-    N  = 60;%:10:50;
-    NS = 30;%10:10:40;
+    config.optsNum.V2Num   = struct('Fex','ConstShortRange','N',[30,30]);
+	config.optsPhys.V2     = struct('V2DV2','ConstShortRange','epsilon',1,'LJsigma',1,'lambda',1.5);                                 
+    CheckConfig(config);
     
-    res = DataStorage([],@ComputeErrorContactDensityMatrix,v2struct(N,NS,config),[]);
+    config.optsNum.V2Num   = struct('Fex','ConstShortRange','N',[30,30]);
+	config.optsPhys.V2     = struct('V2DV2','ConstShortRange','epsilon',1,'LJsigma',1,'lambda',1.5);                                 
+    CheckConfig(config);
+    
+    
+    %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
+%    config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+                
+%    N  = 100;%:10:50;
+%    NS = 100;%10:10:40;   
+%    res = DataStorage([],@ComputeErrorContactDensityMatrix,v2struct(N,NS,config),[]);
     
     function res = ComputeErrorContactDensityMatrix(in,h)
         config = in.config;
@@ -71,7 +87,7 @@ function Check_FMT_SumRule()
     end     
 
     function [error_wl,error_wg] = CheckConfig(config)
-        CL = ContactLineHS(config);
+        CL = ContactLineHS(config);        
         CL.Preprocess();    
 
         [~,~,params] = CL.Compute1D('WL');

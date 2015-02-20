@@ -118,10 +118,10 @@ function MMNP_Fig2_NumParaemeterStudy()
     CLT2.PlotContourResults(true);
         
     inset2(f1,f2,0.5,[0.45,0.55]);
-    close(f2);   
+    close(f2);  
     
-    print2eps([dirData filesep 'CA_Asymptotics' filesep 'CA'],f1);
-    saveas(f1,[dirData filesep 'CA_Asymptotics' filesep 'CA.fig']);
+    ChangeDirData();
+	SaveFigure(['Figures' filesep 'Fig2']);
         
     %**************************************
      
