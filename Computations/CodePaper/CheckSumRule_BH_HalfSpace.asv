@@ -9,7 +9,9 @@ function CheckSumRule_BH_HalfSpace()
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
                       'alpha_deg',90);
-                      
+                  
+    V2Num   = struct('Fex','SplitAnnulus','N',[80,80]);    
+    V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 
     %V2Num   = struct('Fex','SplitDisk','N',[34,34]);
     %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
@@ -54,12 +56,9 @@ function CheckSumRule_BH_HalfSpace()
     AddPaths();    
     ChangeDirData([dirData filesep 'deg90'],'ORG')
     % **** 2 ****  
-%	config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-%    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-
-%    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
-%    PlotErrorGraph('error_wl','o-','k','Wall-liquid, BH, e = 0');
-%    PlotErrorGraph('error_wg','d--','k','Wall-vapour,BH, e = 0');
+    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
+    PlotErrorGraph('error_wl','o-','k','Wall-liquid, BH, e = 0');
+     PlotErrorGraph('error_wg','d--','k','Wall-vapour,BH, e = 0');
 
     % **** 3 ****
     NS   = 80;
@@ -73,7 +72,8 @@ function CheckSumRule_BH_HalfSpace()
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{2} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);            
+    res{2} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);
+    
     
     PlotErrorGraph(res{1},'error_wl','d-','b','Wall-liquid, BH, e = 0.9');
     PlotErrorGraph(res{1},'error_wg','d--','b','Wall-vapour, BH, e = 0.9');

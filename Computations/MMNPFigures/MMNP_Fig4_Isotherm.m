@@ -31,7 +31,6 @@ function MMNP_Fig4_Isotherm()
 
     config = v2struct(optsNum,optsPhys);                        
     
-
     CL = ContactLineHS(config);
     CL.Preprocess();    
     CL.ComputeAdsorptionIsotherm(600,'drying');    %wetting    
@@ -39,6 +38,5 @@ function MMNP_Fig4_Isotherm()
     if(optsPhys.kBT == 0.75)
         CL.SumRule_AdsorptionIsotherm(0.3463);
     end
-
-    
+ 
 end

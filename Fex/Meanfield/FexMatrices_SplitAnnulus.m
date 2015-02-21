@@ -1,5 +1,5 @@
 function convStruct = FexMatrices_SplitAnnulus(optsPhys,IDC)
-    
+        
     global r_cutoff
     r_cutoff = optsPhys.V2.r_cutoff;
 
@@ -34,7 +34,7 @@ function convStruct = FexMatrices_SplitAnnulus(optsPhys,IDC)
     %conv3      = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
 
     convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2); %conv3(:,:,2);
-    %convStruct.Conv =  conv1(:,:,1) + conv2(:,:,1);
+    %convStruct.Conv =  conv1(:,:,1) + conv2(:,:,1);    
     
     if(isfield(params,'epsilon'))
         convStruct.Conv = convStruct.Conv*params.epsilon;

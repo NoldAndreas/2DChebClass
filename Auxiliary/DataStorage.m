@@ -150,7 +150,8 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
            else
                 Data     = func(OriginalParameters,OtherInputs);
            end
-           t        = toc(startComp);     
+           t                               = toc(startComp);     
+           Parameters.Results.comptime_sec = t;
            if(isnumeric(Data) && isscalar(Data) && (Data == 0))
                 disp(['Error after ',sec2hms(t), ' (hrs:min:sec) ']);
                 comments = ['Computation failed! ',comments];
