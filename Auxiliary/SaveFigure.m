@@ -24,10 +24,10 @@ function fullName = SaveFigure(filename,opts)
     disp(['Figures saved in ',fullName '.fig/eps']);
         
     if((nargin >= 2) && ~isempty(opts)) 
-        Struct2File([fullName, '.txt'],opts,...
+        opts_filename = [fullName, '_figData.txt'];
+        Struct2File(opts_filename,opts,...
                     ['Figure ',filename,'.fig/eps saved at: ',datestr(now),' with git branch ',branch(1:end-1)]);
+        disp(['Options saved in ',opts_filename]);
     end
-            
-	disp(['Options saved in ',fullName '.tex']);
 
 end

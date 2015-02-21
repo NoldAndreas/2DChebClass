@@ -261,7 +261,6 @@ classdef ContactLineHS < DDFT_2D
             
             SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_Interfaces']);
         end
-    
         function f2 = PlotDisjoiningPressures(this)
 
             y1   = this.y1_SpectralLine.Pts.y;    
@@ -335,8 +334,7 @@ classdef ContactLineHS < DDFT_2D
             dP1D  = IP*Pi_I;
             dP1D(ellAD<min(fT)) = 0;
             dP1D(ellAD>max(fT)) = 0;
-        end
-        
+        end        
         function [Pi_III] = GetDisjoiningPressure_III(this)
             D       = this.y1_SpectralLine.Diff.Dy;
             D2      = this.y1_SpectralLine.Diff.DDy;
