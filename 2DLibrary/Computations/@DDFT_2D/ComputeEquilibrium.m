@@ -60,6 +60,8 @@
          
     this.x_eq   = sol.x;
     this.mu     = sol.mu;
-    this.FilenameEq  = paramsEq.Filename;
+    if(isfield(paramsEq,'Filename'))
+        this.FilenameEq  = paramsEq.Filename;
+    end
     
 end

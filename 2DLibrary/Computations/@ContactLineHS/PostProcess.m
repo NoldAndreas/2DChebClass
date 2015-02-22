@@ -1,4 +1,4 @@
-function PostProcess(this)
+function PostProcess(this,opts)
 
 	if(isfield(this.optsNum,'PlotAreaCart'))
         shapeSL = struct('yMin',this.optsNum.PlotAreaCart.y1Min,...
@@ -33,7 +33,11 @@ function PostProcess(this)
         
         
          %ComputeAdsorptionIsotherm(this,'load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
-         ComputeAdsorptionIsotherm(this,200);
+         if(isfield(opts,'AdsorptionIsotherm_file'))
+             ComputeAdsorptionIsotherm(this,'load');
+         else
+            ComputeAdsorptionIsotherm(this,200);
+         end
         
         
          Compute_DisjoiningPressure_II(this);

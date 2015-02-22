@@ -37,7 +37,11 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
    
    
     %1st Step: Search for File and load if found
-    if((nargin >= 5) && ~(isempty(recompute)) && (recompute == 2))        
+    if((nargin >= 5) && ~(isempty(recompute)) &&  ischar(recompute)) 
+        load(recompute);  
+        disp(['Stored data from ',recompute,' will be used..']);                        
+        recompute = false;
+    elseif((nargin >= 5) && ~(isempty(recompute)) && (recompute == 2))        
         %(1)First Option: Select Input File
             [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
             load([DataFolder,FileName]);  
@@ -85,12 +89,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
               
 %             comp_struct(Parameters,par_i)
 %             pause
-            if(nargin >= 6)
-                par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
-            else
-                par_i_comp = par_i;
-            end
-
+            
+            par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
+            
             if(isequaln(Parameters_comp,par_i_comp))%index{i}.Parameters))
                 
                 filename            = index{i}.Filename;
@@ -136,8 +137,20 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             end
         end     
     
-        if(~exist('Data','var'))                           
-            recompute = true;       
+        if(~exist('Data','var'))
+            no = fprintf('Do you want to load data (press "l"), or wait for 2 seconds.');        
+            if(getkeywait(2) == 108)
+                [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
+                load([DataFolder,FileName]);  
+                disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
+
+                recompute = false;
+            else
+                for ih = 1:no
+                    fprintf('\b');
+                end  
+                recompute = true;       
+            end
         end         
         
         %2b) If File not found: Compute Data and Save Data

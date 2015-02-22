@@ -19,11 +19,11 @@
         optss.NContIterations = n;        
     end
 
-    if(strcmp(n,'load'))                             
+    if(ischar(n))
         [rho,ell,mu,OmEx,dmuCheck,pts] = FMT_1DContinuation(this.IDC,...
-            this.IntMatrFex,optss,this.optsNum.FexNum,this.IntMatrV2.Conv,'mu','load');%,'Movie');            
+            this.IntMatrFex,optss,this.optsNum.FexNum,this.IntMatrV2.Conv,'mu',n);%,'Movie');            
     else
-        [rho,ell,mu,OmEx,dmuCheck,pts] = FMT_1DContinuation(this.IDC,...
+        [rho,ell,mu,OmEx,dmuCheck,pts,params] = FMT_1DContinuation(this.IDC,...
             this.IntMatrFex,optss,this.optsNum.FexNum,this.IntMatrV2.Conv,'mu');%,'load');%,'Movie');            
     end
 
@@ -32,6 +32,7 @@
                                  'rho',rho,...
                                  'OmEx',OmEx,...
                                  'dmuCheck',dmuCheck,...
-                                 'Pts',pts);
-    
+                                 'Pts',pts,...
+                                 'Filename',params.Filename);
+
 end 

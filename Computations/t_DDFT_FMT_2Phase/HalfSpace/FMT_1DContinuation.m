@@ -1,10 +1,10 @@
- function [rho_cont,ell,par,OmEx,dmuCheck,pts] = FMT_1DContinuation(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,parCont,output)
+ function [rho_cont,ell,par,OmEx,dmuCheck,pts,params] = FMT_1DContinuation(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,parCont,output)
     %parCont = {'mu'}
     %global dirDataOrg
-    if((nargin >= 7) && strcmp(output,'load'))
+    if((nargin >= 7) && (ischar(output) && ~strcmp(output,'Movie')))
         %ChangeDirData([dirDataOrg filesep 'deg90']);
         ignoreList = {'thetaDirection','rho_iguess'};
-        res       = DataStorage('IterativeContinuationPostProcess',...
+        [res,~,params]  = DataStorage('IterativeContinuationPostProcess',...
                         @PostProcessAdsorptionIsotherm,optsPhys,[],2,ignoreList);                  
      %   ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
                             
@@ -131,7 +131,7 @@
     %*********** Postprocess   **********
     %************************************        
     Int_1D(y2S > 45) = 0;    
-    res       = DataStorage('IterativeContinuationPostProcess',...
+    [res,~,params]  = DataStorage('IterativeContinuationPostProcess',...
                         @PostProcessAdsorptionIsotherm,optsPhys,x_cont);      
                     
     rho_cont    = exp(x_cont(:,2:end)/kBT); 	
