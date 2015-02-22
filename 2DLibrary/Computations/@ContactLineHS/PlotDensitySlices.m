@@ -24,21 +24,20 @@ function PlotDensitySlices(this)
         
         hold on;
         plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
-        this.IDC.plotLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,struct('CART',true,'color',col(i,:)));        
+        this.IDC.plotLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:)));        
     end
     
     box on;
     xlim([0 (y2Max-0.5)]);
-    ylim([0 1.1]);%max(this.rho_eq)]);
+    ylim([0 1.4]);%max(this.rho_eq)]);
     xlabel('$y/\sigma$','Interpreter','Latex','fontsize',25);
     ylabel('$n\sigma^3$','Interpreter','Latex','fontsize',25);
     set(gca,'fontsize',20);                        
     set(gca,'linewidth',1.5);          
     %pbaspect([(y1Max-y1Min) (y2Max) 1]);
     
-    print2eps([dirData filesep 'DensitySlices'],f1);
-    saveas(f1,[dirData filesep 'DensitySlices.fig']);
-
+    SaveFigure('DensitySlices');
+    
     f2 = figure('color','white','Position',[0 0 600 500]);    
 	PlotContourResults(this,true); hold on;        
     for i = 1:n

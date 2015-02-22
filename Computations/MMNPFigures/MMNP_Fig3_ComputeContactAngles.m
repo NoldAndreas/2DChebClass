@@ -8,6 +8,7 @@ function MMNP_Fig3_ComputeContactAngles()
    opts.alpha_deg = 40;  
    opts.epw       = 1.375;   
    opts.dryingWetting = 'wetting';
+   %opts.AdsorptionIsotherm_file = '/Users/NoldAndreas/Documents/2DChebData/MMNP/deg90/IterativeContinuationPostProcess/2015_2_22_0_51_12.mat';   
    opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
    Job_ComputeContactAngle(opts);    
    
@@ -41,8 +42,9 @@ function MMNP_Fig3_ComputeContactAngles()
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
         CLT.ComputeEquilibrium();      
-        CLT.PostProcess(opts.AdsorptionIsotherm_file);
+        CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
+        CLT.PlotDisjoiningPressures();
         
         %CLT.PlotDensityResult();
         %CLT.PlotContourResults();
@@ -78,7 +80,7 @@ function MMNP_Fig3_ComputeContactAngles()
         epw        = opts.epw;
         
         bounds1    = opts.bounds1;
-        bounds2    = [0.5,15];
+        bounds2    = [0.5,15.5];
         maxComp_y2 = 35;        
         N          = [50,80];           
 
@@ -136,7 +138,7 @@ function MMNP_Fig3_ComputeContactAngles()
 
         optsPhys = struct('V1',V1,'V2',V2,...                   
                           'kBT',0.75,...                                                    
-                          'Dmu',0.03,'nSpecies',1,...
+                          'Dmu',0.0,'nSpecies',1,...
                           'sigmaS',1);      
 
         config = v2struct(optsNum,optsPhys);                        
@@ -152,8 +154,5 @@ function MMNP_Fig3_ComputeContactAngles()
         
         filename = CL.AdsorptionIsotherm.Filename;
 
-
     end
-
-    
 end
