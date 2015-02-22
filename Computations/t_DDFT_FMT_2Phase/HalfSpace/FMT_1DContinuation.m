@@ -5,7 +5,10 @@
         %ChangeDirData([dirDataOrg filesep 'deg90']);
         ignoreList = {'thetaDirection','rho_iguess'};
         [res,~,params]  = DataStorage('IterativeContinuationPostProcess',...
-                        @PostProcessAdsorptionIsotherm,optsPhys,[],2,ignoreList);                  
+                        @PostProcessAdsorptionIsotherm,optsPhys,[],output,ignoreList);                  
+                    
+        %[res,~,params]  = DataStorage('IterativeContinuationPostProcess',...
+        %                @PostProcessAdsorptionIsotherm,optsPhys,[],2,ignoreList);                                      
      %   ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
                             
         par         = res.dmu;
