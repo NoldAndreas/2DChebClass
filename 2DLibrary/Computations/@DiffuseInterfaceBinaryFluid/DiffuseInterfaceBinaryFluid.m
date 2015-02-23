@@ -372,7 +372,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            figure('Position',[0 0 800 600],'color','white');
            PlotU(this); hold on;            
            this.IDC.plot(this.p,'contour');     
-           SaveCurrentFigure(this,[this.filename '_Pressure']);                
+           SaveCurrentFigure(this,'Pressure');
        end       
        function PlotU(this,uv,opts) 
            
@@ -517,19 +517,19 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.IDC.plot(this.mu,{'SC'});
            PlotU(this);
            title('Chemical Potential');
-           SaveCurrentFigure(this,[this.filename ,'_3DChemPot']);
+           SaveCurrentFigure(this,'3DChemPot');
            
            figure('color','white','Position',[0 0 800 800]);
            this.IDC.plot(this.phi,{'SC'});
            PlotU(this);
            title('Phasefield');
-           SaveCurrentFigure(this,[this.filename ,'_3DPhasefield']);
+           SaveCurrentFigure(this,'3DPhasefield');
            
            figure('color','white','Position',[0 0 800 800]);
            this.IDC.plot(this.p,{'SC'});
            PlotU(this);
            title('Pressure');
-           SaveCurrentFigure(this,[this.filename ,'_3DPressure']);
+           SaveCurrentFigure(this,'3DPressure');
        end
        
        function PlotValuesThroughStagnationPoint(this)
@@ -545,7 +545,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.IDC.plotLine(y1Int,y2Int,this.uv(1+end/2:end),struct('color','k'));
            set(gca,'linewidth',1.5);
            set(gca,'fontsize',15);
-           SaveCurrentFigure(this,[this.filename '_ValuesThroughStagnationPoint']);
+           SaveCurrentFigure(this,'ValuesThroughStagnationPoint');
            
        end
    end

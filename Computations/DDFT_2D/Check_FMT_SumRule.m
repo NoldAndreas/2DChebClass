@@ -8,11 +8,12 @@ function Check_FMT_SumRule()
                       'N2bound',14,'h',1,...
                       'alpha_deg',90);
 
-    %V2Num   = struct('Fex','SplitDisk','N',[20,20]); 
+    V2Num   = struct('Fex','SplitDisk','N',[40,40]); 
     %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+    V2 = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1); %'lambda',1
     
-    V2Num   = struct('Fex','SplitAnnulus','N',[80,80]); 
-    V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    %V2Num   = struct('Fex','SplitAnnulus','N',[80,80]); 
+    %V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   

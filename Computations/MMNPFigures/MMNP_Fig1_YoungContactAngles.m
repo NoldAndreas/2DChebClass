@@ -58,67 +58,7 @@ function MMNP_Fig1_YoungContactAngles()
     
     ChangeDirData();    
     SaveFigure(['Figures' filesep 'Fig1']);
-    
-    %print2eps([dirData filesep 'ContactAngleMeasurements' filesep str],gcf);
-    %saveas(gcf,[dirData filesep 'ContactAngleMeasurements' filesep str '.fig']);
-    
-   % close all;        
-    %*************************************************
-%     figure('Color','white','Position',[0 0 800 800]);
-% 	f1 = figure('Color','white','Position',[0 0 800 800]);
-%     plot(res.epw,180/pi*res.theta_CA,'k','linewidth',1.5); hold on;    
-%     xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
-%     ylabel('$\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25); 
-%     set(gca,'fontsize',20);
-        
-    %Filled: 15, unfilled:1
-    %o - 90deg
-    %s - 60deg (square)
-    %d - 40deg
-   % Msize = 8;
-    %**
-%     %plot(resM90_a.epw,resM90_a.theta_YCA,'k-.');    
-%     plot(resM90_a.epw,resM90_a.thetaM,'ko','MarkerFaceColor','k','MarkerSize',Msize);
-%     %errorbar(resM90_a.epw,resM90_a.thetaM,resM90_a.thetaM_err,'k');
-% 	%**
-%     %plot(resM90_b.epw,resM90_b.theta_YCA,'k-.');    
-%     plot(resM90_b.epw,resM90_b.thetaM,'ko','MarkerFaceColor','k','MarkerSize',Msize);
-%     %errorbar(resM90_b.epw,resM90_b.thetaM,resM90_b.thetaM_err,'k');
-%     %**
-%     %plot(resM90.epw,resM90.theta_YCA,'k-.');
-%     plot(resM90.epw,resM90.thetaM,'ko','MarkerSize',Msize);    
-%     %errorbar(resM90.epw,resM90.thetaM,resM90.thetaM_err,'k');
-%     %**
-%      %plot(resM60.epw,resM60.theta_YCA,'g-.');
-%      plot(resM60.epw,resM60.thetaM,'ks','MarkerFaceColor','k','MarkerSize',Msize);
-%      plot(resM60_b.epw,resM60_b.thetaM,'ks','MarkerFaceColor','k','MarkerSize',Msize);
-%      %errorbar(resM60.epw,resM60.thetaM,resM60.thetaM_err,'g');
-% % 	%**
-%      %plot(resM40.epw,resM40.theta_YCA,'m-.');
-%      plot(resM40.epw,resM40.thetaM,'kd','MarkerSize',Msize);
-%      %errorbar(resM40.epw,resM40.thetaM,resM40.thetaM_err,'m');    
-%      
-%      %plot(resM40_b.epw,resM40_b.theta_YCA,'m-.');
-%      plot(resM40_b.epw,resM40_b.thetaM,'kd','MarkerFaceColor','k','MarkerSize',Msize);
-%      %errorbar(resM40_b.epw,resM40_b.thetaM,resM40_b.thetaM_err,'m');         
-%     
-%     %plot(resM90.epw,resM90.thetaM,'ko');
-%     %plot(resM40.epw,resM40.thetaM,'kx');
-%     xlabel('$\varepsilon_w/\varepsilon$','Interpreter','Latex','fontsize',25);
-%     ylabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',25);
-%     set(gca,'fontsize',20);
-%     %xlim([min(res.epw) max(res.epw)]);
-%    xlim([1 1.52]);
-%        
-
-    %LDA: 
-    %epsilonw - angle
-    %1.5      - 88
-    %2        - 60
-    %2.4      - 33
-    %2.57     - 15.5
-
-    %config.optsNum.PhysArea.alpha_deg = degAngle;    
+         
     function f3 = PlotContourLines(config)
         config.optsNum.PlotAreaCart = struct('y1Min',-4,'y1Max',20,...
                                              'y2Min',0.5,'y2Max',20,...%'zMax',4,...
@@ -131,13 +71,11 @@ function MMNP_Fig1_YoungContactAngles()
         
         close all;
         f3 = figure('Color','white','Position',[0 0 500 300]);                        
-        ha = area([-7,20],[20,29],15,'FaceColor',0.8*[1 1 1]);
-        CL.PlotContourResults(true);
+        ha = area([-7,20],[20,29],15,'FaceColor',0.8*[1 1 1]); hold on;
+        CL.PlotContourResults({});
         plot([-5 20],[15 15],'k--','linewidth',2);
         set(gca,'linewidth',2);        
-        text('String','$y_{max}$','VerticalAlignment', 'top','HorizontalAlignment','center ','Position',[12 17],'Interpreter','Latex','fontsize',20);
-        %print2eps('Figure1_mod',gcf);
-        %saveas(gcf,['Figure1_mod.fig']);
+        text('String','$y_{max}$','VerticalAlignment', 'top','HorizontalAlignment','center ','Position',[12 17],'Interpreter','Latex','fontsize',20);        
     end
     
     function res = MeasureContactAngles(opts,h)

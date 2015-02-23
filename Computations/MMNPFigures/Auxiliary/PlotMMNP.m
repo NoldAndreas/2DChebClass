@@ -1,32 +1,33 @@
 function PlotMMNP
     close all;
+    global dirData
         
+    ChangeDirData();
     noRows  = 3;
     figMain = figure('color','white','Position',[0 0 1000 1300]);
     %s1 = subplot(4,2,2*(row-1)+1);
     
-    SetRow('135deg',1,-10,'(a.I)','(a.II)',0.55,134.2);
-    SetRow('120deg',2,-10,'(b.I)','(b.II)',0.7,119.9);
-    SetRow('90deg',3,-10,'(c.I)','(c.II)',1.0,89.66);
+    SetRow('deg135',1,-10,'(a.I)','(a.II)',0.55,134.2);
+    SetRow('deg120',2,-10,'(b.I)','(b.II)',0.7,119.9);
+    SetRow('deg90',3,-10,'(c.I)','(c.II)',1.0,89.66);
     
-    print2eps('D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\DensitySlices_Figure1',gcf);
-    saveas(gcf,'D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\DensitySlices_Figure1.fig');   
+    SaveFigure(['Figures' filesep 'Fig3a']);
     
     noRows  = 2;
     figMain = figure('color','white','Position',[0 0 1000 800]);
-    SetRow('60deg',1,-10,'(d.I)','(d.II)',1.25,59.95);
-    SetRow('40deg',2,-0,'(e.I)','(e.II)',1.375,41.02);             
+    SetRow('deg60',1,-10,'(d.I)','(d.II)',1.25,59.95);
+    SetRow('deg40',2,-0,'(e.I)','(e.II)',1.375,41.02);             
     
-    
-    print2eps('D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\DensitySlices_Figure2',gcf);
-    saveas(gcf,'D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\DensitySlices_Figure2.fig');   
+    SaveFigure(['Figures' filesep 'Fig3b']);        
 
     function SetRow(angle,row,xmin,str1,str2,alphaW,thetaY)
                 
-        f11 = openfig(['D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\',angle,'\DensitySlices_contour.fig']);
+        %f11 = openfig(['D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\',angle,'\DensitySlices_contour.fig']);
+        f11 = openfig([dirData filesep, angle filesep 'DensitySlices_contour.fig']);        
         ax11 = gca;                
         
-        f12 = openfig(['D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\',angle,'\DensitySlices.fig']); %hgload
+        f12 = openfig([dirData filesep, angle,'\DensitySlices.fig']);
+        %f12 = openfig(['D:\2DChebData\POF_FMT_ContactLine\DensitySlices_MMNPComparison\',angle,'\DensitySlices.fig']); %hgload
         ax12 = gca;        
                                 
         

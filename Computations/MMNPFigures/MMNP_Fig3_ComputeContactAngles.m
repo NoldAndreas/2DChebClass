@@ -7,11 +7,10 @@ function MMNP_Fig3_ComputeContactAngles()
    opts.bounds1   = [0,20];
    opts.alpha_deg = 40;  
    opts.epw       = 1.375;   
-   opts.dryingWetting = 'wetting';
-   %opts.AdsorptionIsotherm_file = '/Users/NoldAndreas/Documents/2DChebData/MMNP/deg90/IterativeContinuationPostProcess/2015_2_22_0_51_12.mat';   
+   opts.dryingWetting = 'wetting';   
    opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
    Job_ComputeContactAngle(opts);    
-   
+    
    opts.bounds1   = [-10,10];
    opts.alpha_deg = 60;  
    opts.epw       = 1.25;   
@@ -44,36 +43,8 @@ function MMNP_Fig3_ComputeContactAngles()
         CLT.ComputeEquilibrium();      
         CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
-        CLT.PlotDisjoiningPressures();
-        
-        %CLT.PlotDensityResult();
-        %CLT.PlotContourResults();
-        %CLT.PlotDisjoiningPressures();
-
-        %     CLT.ComputeAdsorptionIsotherm('load'); %load \2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_1_20_18_46
-    %     CLT.PostProcess_2DDisjoiningPressure();
-    %     
-    % 	%f1 = figure('Color','white','Position',[0 0 1000 600]);
-    %     [f1,f2] = CLT.Post_HFrom2DDisjoiningPressure();
-    %
-    %     print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces'],f1);
-    %     saveas(f1,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_Interfaces.fig']);
-    %
-    %     print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure'],f2);
-    %     saveas(f2,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_DisjoiningPressure.fig']);
-    %     
-    %     inset2(f1,f2,0.4,[0.26,0.55]);
-    %     %inset2(f1,f2,0.35,[0.22,0.55]);
-    %     close(f2);      
-    %     
-    %     print2eps([dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_InterfacesAndDisjoiningPressure'],f1);
-    %     saveas(f1,[dirData filesep 'EquilibriumSolutions' filesep CLT.FilenameEq '_InterfacesAndDisjoiningPressure.fig']);
-    %         
-    %     CLT.FittingAdsorptionIsotherm([10 14],1);
-    %     CLT.SumRule_DisjoiningPotential();
-    %     %***************************************  
+        CLT.PlotDisjoiningPressures();        
     end
-
     function config = GetStandardConfig(opts)
         
         alpha_deg  = opts.alpha_deg;
@@ -113,7 +84,6 @@ function MMNP_Fig3_ComputeContactAngles()
         config = v2struct(optsNum,optsPhys);                        
 
     end
-
     function filename = ComputeExactAdsorptionIsotherm(opts)
        
         PhysArea = struct('N',[1,250],...

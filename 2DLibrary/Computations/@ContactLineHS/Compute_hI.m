@@ -10,6 +10,10 @@ function Compute_hI(this)
     
 	hmax = min(max(abs(this.AdsorptionIsotherm.FT)),...
            min(max(this.hII),max(this.hIII)))-2;
+       
+    if(this.optsNum.PhysArea.alpha_deg == 90)
+        hmax = max(hmax,6);
+    end
     
     yN = 0; hN = hmax;    
     yC = []; hC = [];

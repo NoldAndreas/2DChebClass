@@ -115,7 +115,7 @@ function MMNP_Fig2_NumParaemeterStudy()
     set(gca,'linewidth',1.5,'fontsize',20);    
 
     f2 = figure('Color','white');
-    CLT2.PlotContourResults(true);
+    CLT2.PlotContourResults({});
         
     inset2(f1,f2,0.5,[0.45,0.55]);
     close(f2);  

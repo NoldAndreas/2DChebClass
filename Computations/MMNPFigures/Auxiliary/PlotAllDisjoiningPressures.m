@@ -50,8 +50,5 @@ function PlotAllDisjoiningPressures()
         
         print2eps('D:\2DChebData\POF_FMT_ContactLine\DijoiningPressures_MMNPComparison\DisjoiningPressures',gcf);
         saveas(gcf,'D:\2DChebData\POF_FMT_ContactLine\DijoiningPressures_MMNPComparison\DisjoiningPressures.fig');   
-
         
-
-
 end

@@ -137,14 +137,16 @@ classdef ContactLineHS < DDFT_2D
             
             Compute1D(this,'WL');            
             Compute1D(this,'WG');
-            Compute1D(this,'LG');                      
-
-            alpha_YCA = ComputeContactAngle(this.ST_1D.om_wallGas,...
+            if(this.IDC.N1 > 1)
+                Compute1D(this,'LG');                      
+                alpha_YCA = ComputeContactAngle(this.ST_1D.om_wallGas,...
                             this.ST_1D.om_wallLiq,...
-                            this.ST_1D.om_LiqGas);
+                            this.ST_1D.om_LiqGas);            
+                this.alpha_YCA = alpha_YCA;
+            else
+                alpha_YCA = [];
+            end
             
-            %****************************************
-            this.alpha_YCA = alpha_YCA;
         end        
         
         % Initialization
@@ -187,7 +189,7 @@ classdef ContactLineHS < DDFT_2D
             pbaspect([(PlotArea.y1Max-PlotArea.y1Min) (PlotArea.y2Max-PlotArea.y2Min) 5]);
             view([-10 5 3]);
             
-            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq]);                        
+            SaveCurrentFigure(this,'Density');   
             if((nargin == 1) || ~strcmp(DP,'DP'))                
                 return;
             end
@@ -234,7 +236,7 @@ classdef ContactLineHS < DDFT_2D
             
     
 
-            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_3D_DP']);                        
+            SaveCurrentFigure(this,'3D_DP');                        
         end
         function PlotInterfaceResults(this)
             %*******************************************************
@@ -259,7 +261,7 @@ classdef ContactLineHS < DDFT_2D
             ylabel('$\varrho$','Interpreter','Latex'); 
             xlabel('$y_2$','Interpreter','Latex');
             
-            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_Interfaces']);
+            SaveCurrentFigure(this,'Interfaces');
         end
         function f2 = PlotDisjoiningPressures(this)
 
@@ -291,8 +293,8 @@ classdef ContactLineHS < DDFT_2D
             xlabel('$x/\sigma$','Interpreter','Latex','fontsize',25);
             ylabel('$\Pi \sigma^3/\varepsilon$','Interpreter','Latex','fontsize',25);
             %set(gca,'YTick',-0.1:0.01:0);    
-
-            SaveCurrentFigure(this,['Equilibrium' filesep this.FilenameEq '_DisjoiningPressures']);
+             
+            SaveCurrentFigure(this,'DisjoiningPressures');
 
         end
         PlotDensitySlices(this)
@@ -432,6 +434,12 @@ classdef ContactLineHS < DDFT_2D
 
         end
         function [DeltaY1_II,DeltaY1_III] = ComputeDeltaFit(this)
+            
+            if(this.optsNum.PhysArea.alpha_deg == 90)
+                DeltaY1_II  = 0;
+                DeltaY1_III = 0;
+                return;
+            end
 
             dP1D        = GetDisjoiningPressure_I_ell(this,this.hI);
             [min_I,i_I] = min(dP1D);
@@ -467,6 +475,25 @@ classdef ContactLineHS < DDFT_2D
         %Postprocess
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
         [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)               
+                
+        function SaveCurrentFigure(this,filename,foldername)
+            if(nargin < 3)
+                foldername = 'Equilibrium';
+            end
+            
+            if(strcmp(foldername,'Equilibrium'))
+                [~,fn]   = fileparts(this.FilenameEq);
+                if(~isempty(filename))
+                    filename = [fn,'_',filename];            
+                else
+                    filename = fn;
+                end
+            end
+            if(nargin>2)
+                filename = [foldername filesep filename];
+            end
+            SaveCurrentFigure@Computation(this,filename);            
+        end
         
         %to delete                   
         [f,y1]  = PostProcess(this,y1Int)                                

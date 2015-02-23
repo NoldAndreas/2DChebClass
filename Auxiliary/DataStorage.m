@@ -95,7 +95,8 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             if(isequaln(Parameters_comp,par_i_comp))%index{i}.Parameters))
                 
                 filename            = index{i}.Filename;
-                Parameters.Filename = filename(1:end-4);
+                Parameters.Filename = [DataFolder filesep filename(1:end-4)];
+                
                 fileParamTxtname    = [filename(1:end-4),'.txt'];
                 
                 load([DataFolder filesep filename]);

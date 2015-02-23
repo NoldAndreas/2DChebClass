@@ -387,7 +387,7 @@ classdef DiffuseInterface < Computation
             figure('Position',[0 0 800 600],'color','white');
             this.IDC.plot(this.mu,'contour');             
             PlotU(this); hold on;             
-            SaveCurrentFigure(this,[this.filename '_ChemPot']);            
+            SaveCurrentFigure(this,'ChemPot');            
         end
         function PlotResultsPhi(this)
             figure('Position',[0 0 800 600],'color','white');
@@ -403,7 +403,7 @@ classdef DiffuseInterface < Computation
       %      if(IsSeppecher(this))
 %                PlotSeppecherSolution(this);
 %            end
-            SaveCurrentFigure(this,[this.filename '_Density']);            
+            SaveCurrentFigure(this,'Density');            
         end        
         function PlotSeppecherSolution(this)                                                                 
            % PlotU(this);            hold on;                               
@@ -505,7 +505,7 @@ classdef DiffuseInterface < Computation
             
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);            
                         
-            SaveCurrentFigure(this,[this.filename '_InterfaceSlope']);           
+            SaveCurrentFigure(this,'InterfaceSlope');           
             
         end
         function PlotResults(this)                                            
@@ -542,7 +542,7 @@ classdef DiffuseInterface < Computation
             xlabel('Iteration');
             ylabel('Error');
                         
-            SaveCurrentFigure(this,[this.filename '_ErrorIterations']);                 
+            SaveCurrentFigure(this,'ErrorIterations');
         end
         
         function hatL = FitSliplength(this)
@@ -585,6 +585,16 @@ classdef DiffuseInterface < Computation
 %                 y(2) = (GM2 + Ca*C) - theta_05L;
                 %y(2) = f_stokes(GM1,1)*Ca/L - dthetaL;                
             end
+        end
+        
+        function SaveCurrentFigure(this,filename,foldername)
+            
+            [~,fn]   = fileparts(this.filename);
+            filename = [fn,'_',filename];            
+            if(nargin>2)
+                filename = [foldername filesep filename];
+            end
+            SaveCurrentFigure@Computation(filename);            
         end
         %Old                
         function theta  = FindInterfaceAngle(this,phi)

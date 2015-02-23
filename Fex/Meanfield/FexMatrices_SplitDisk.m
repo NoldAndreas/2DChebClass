@@ -2,7 +2,7 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
   
     params = optsPhys.V2;
     
-    fstr      = (params.V2DV2);
+    fstr      = (params.V2DV2);    
     
     params     = rmfield(params,'V2DV2');
     paramNames = fieldnames(params);
@@ -33,5 +33,6 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     if(isfield(params,'epsilon'))
         convStruct.Conv = convStruct.Conv*params.epsilon;
     end
+    
 
 end

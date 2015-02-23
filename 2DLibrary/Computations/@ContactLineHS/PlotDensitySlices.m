@@ -1,7 +1,5 @@
 function PlotDensitySlices(this)       
-    % Initialization 
-    global dirData
-    
+    % Initialization         
     n     = 5;
     
     y2Max = this.optsNum.PlotAreaCart.y2Max;
@@ -17,14 +15,16 @@ function PlotDensitySlices(this)
     
 
     for i = 1:n
-        % get adsorption
-        ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII;
-        %ell      = this.IDC.doIntFLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq-rhoGas_sat,'CHEB')/(rhoLiq_sat-rhoGas_sat);
-        [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
+        this.IDC.plotLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:)));  hold on;
+    end
         
-        hold on;
-        plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
-        this.IDC.plotLine([y1P(i) y1P(i)],[0.5 y2Max],this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:)));        
+        % get adsorption
+	if(this.optsNum.PhysArea.alpha_deg ~= 90)
+        for i = 1:n
+            ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII;        
+            [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
+            plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
+        end
     end
     
     box on;
@@ -39,13 +39,16 @@ function PlotDensitySlices(this)
     SaveFigure('DensitySlices');
     
     f2 = figure('color','white','Position',[0 0 600 500]);    
-	PlotContourResults(this,true); hold on;        
+    if(this.optsNum.PhysArea.alpha_deg ~= 90)
+        PlotContourResults(this,{'hI','hII','hIII'}); hold on;        
+    else
+        PlotContourResults(this,{'hI','hII'}); hold on;        
+    end
     for i = 1:n
         plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.5);
     end
 
-    print2eps([dirData filesep 'DensitySlices_contour'],f2);
-    saveas(f2,[dirData filesep 'DensitySlices_contour.fig']);
+    SaveFigure('DensitySlices_contour');    
     
     inset2(f1,f2,0.43,[0.55,0.62]);
     set(gca,'fontsize',10);
@@ -54,8 +57,7 @@ function PlotDensitySlices(this)
     close(f2);      
         
     % Save plot
-	print2eps([dirData filesep 'DensitySlices_Inset'],f1);
-    saveas(f1,[dirData filesep 'DensitySlices_Inset.fig']);
+    SaveFigure('DensitySlices_Inset');	
     
     function str = distinguishable_colors_NoRedBlueGreen()
         str = [0 1 1;... %cyan

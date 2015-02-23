@@ -39,7 +39,14 @@ function PostProcess(this,opts)
             ComputeAdsorptionIsotherm(this,200);
          end
         
-        
+         ix   = find(abs(this.AdsorptionIsotherm.FT) > this.optsNum.PlotAreaCart.y2Max,1);
+         mark = (1:ix);
+         this.AdsorptionIsotherm.FT       = this.AdsorptionIsotherm.FT(mark);
+         this.AdsorptionIsotherm.mu       = this.AdsorptionIsotherm.mu(mark);
+         this.AdsorptionIsotherm.rho      = this.AdsorptionIsotherm.rho(mark,:);
+         this.AdsorptionIsotherm.OmEx     = this.AdsorptionIsotherm.OmEx(mark);
+         this.AdsorptionIsotherm.dmuCheck = this.AdsorptionIsotherm.dmuCheck(mark);
+           
          Compute_DisjoiningPressure_II(this);
          Compute_DisjoiningPressure_IV(this);
 
