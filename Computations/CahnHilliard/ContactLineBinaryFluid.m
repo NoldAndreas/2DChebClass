@@ -33,43 +33,43 @@ function ContactLineBinaryFluid
 
     pars.config.optsPhys.l_diff = 0.25;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
 
     pars.config.optsPhys.l_diff = 0.5;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
          
     pars.config.optsPhys.l_diff = 0.75;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
   %  PlotData(dataM{1});
     
     pars.config.optsPhys.l_diff = 1.0;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
    % PlotData(dataM{2});
         
     pars.config.optsPhys.l_diff = 1.25;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
     %PlotData(dataM{3});
     
     pars.config.optsPhys.l_diff = 1.5;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{6} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{6} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
 %    PlotData(dataM{4});
     
     pars.config.optsPhys.l_diff = 1.75;
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{7} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{7} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
     
     pars.config.optsPhys.l_diff = 2.0;
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
     
     pars.config.optsPhys.l_diff = 2.5;
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{9} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    dataM{9} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
     
 % 	pars.config.optsPhys.l_diff = 3.0;
 %     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;

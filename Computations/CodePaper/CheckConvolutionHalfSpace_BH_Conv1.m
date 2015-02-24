@@ -161,19 +161,32 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 res(i,j).AAD_n2_v_1   = CL.IntMatrFex.AAD.n2_v_1;
                 res(i,j).AAD_n2_v_2   = CL.IntMatrFex.AAD.n2_v_2;
                 
+                    
+                CL.optsNum.V2Num   = struct('Fex','SplitAnnulus','N',[50,50]); 
+                CL.optsPhys.V2     = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);                             
+                preErr             = CL.Preprocess_MeanfieldContribution();                
+                res(i,j).error_convBH_HardCutoff   = preErr.error_conv1;
+                res(i,j).ConvBH_HardCutoff         = CL.IntMatrV2.Conv;
+                
                 
                 CL.optsNum.V2Num   = struct('Fex','ConstShortRange','N',[NS(j),NS(j)]);
                 CL.optsPhys.V2     = struct('V2DV2','ConstShortRange','epsilon',1,'LJsigma',1,'lambda',1.5);                                 
-                preErr = CL.Preprocess_MeanfieldContribution();                
+                preErr             = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_convShortRange   = preErr.error_conv1;
                 res(i,j).ConvShortRange         = CL.IntMatrV2.Conv;
                 
                 
                 CL.optsNum.V2Num   = struct('Fex','SplitDisk','N',[NS(j),NS(j)]);
                 CL.optsPhys.V2     = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-                preErr = CL.Preprocess_MeanfieldContribution();                
+                preErr             = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
                 res(i,j).ConvSplitDisk          = CL.IntMatrV2.Conv;
+                
+                CL.optsNum.V2Num   = struct('Fex','SplitDisk','N',[NS(j),NS(j)]);                
+                CL.optsPhys.V2     = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+                preErr             = CL.Preprocess_MeanfieldContribution();                
+                res(i,j).error_conv_SplitDiskExp   = preErr.error_conv1;
+                res(i,j).ConvSplitDiskExp          = CL.IntMatrV2.Conv;
                 
                % [~,~,params] = CL.Compute1D('WL');
                % res(i,j).error_wl = params.contactDensity_relError;

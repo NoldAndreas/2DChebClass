@@ -40,34 +40,17 @@ classdef ContactLineHS < DDFT_2D
         function res = Preprocess(this)
             global dirDataOrg
             ChangeDirData([dirDataOrg filesep 'deg',num2str(this.optsNum.PhysArea.alpha_deg,3)]);
-            Preprocess@DDFT_2D(this);     
-            res = TestPreprocess(this);        
+            res = Preprocess@DDFT_2D(this);     
+            TestPreprocess(this);        
             
             if(isfield(this.optsPhys,'rhoLiq_sat') && ...
                     isfield(this.optsPhys,'rhoGas_sat'))
                 ComputeST(this);
             end
         end        
-        function res = TestPreprocess(this)                          
+        function TestPreprocess(this)                          
                         
-            R = this.IDC.R;             
-             
-            disp('*** Test preprocessed matrices ***');
-                                    
-            if(isfield(this.optsNum,'V2Num') && ~isempty(this.optsNum.V2Num))
-                disp('*** Test convolution matrix ***');
-                res_conv = CheckMeanfieldConvolution(this);
-            else
-                res_conv = struct();
-            end
-            
-            %(4) Test FMT Matrices            
-            disp('*** Test FMT matrices ***');
-            if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
-                res_fex = CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);
-            end
-            
-            res = mergeStruct(res_conv,res_fex);
+            R = this.IDC.R;                                                  
                         
             %(3) Test Integration
             disp('*** Test integration vector ***');

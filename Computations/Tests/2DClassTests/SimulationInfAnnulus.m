@@ -11,7 +11,7 @@ function [AS,res] = SimulationInfAnnulus()
     Origin = [0,0];
     N       = [N1;N2];    
 
-    AS                = InfAnnulus(v2struct(Origin,RMin,L,N));
+    AS                 = InfAnnulus(v2struct(Origin,RMin,L,N));
     [Pts,Diff,Int,Ind] = AS.ComputeAll();    
     Interp             = AS.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     
@@ -46,8 +46,14 @@ function [AS,res] = SimulationInfAnnulus()
     %***************************************************************
     %   Auxiliary functions:
     %***************************************************************         
-   function [V,VInt] = VTest(y1,y2)       
+   function [V,VInt] = VTest2(y1,y2)       
             V     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(-2);  
+            VInt  = pi/RMin^2;
+   end
+
+    function [V,VInt] = VTest(y1,y2)       
+            r     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);  
+            V     = ExponentialDouble(r);
             VInt  = pi/RMin^2;
    end
 

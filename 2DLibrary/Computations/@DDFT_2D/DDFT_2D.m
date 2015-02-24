@@ -30,7 +30,7 @@ classdef DDFT_2D < Computation
             end                
             
         end        
-        function Preprocess(this)
+        function res = Preprocess(this)
 
             Preprocess@Computation(this);
                         
@@ -65,12 +65,14 @@ classdef DDFT_2D < Computation
                 % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
             end
-           
-            Preprocess_MeanfieldContribution(this);
-            Preprocess_HardSphereContribution(this);            
-            Preprocess_HIContribution(this);           
-            Preprocess_ExternalPotential(this);                                   
+
+            res_conv = Preprocess_MeanfieldContribution(this);
+            res_fex  = Preprocess_HardSphereContribution(this);
+            Preprocess_HIContribution(this);
+            Preprocess_ExternalPotential(this);
             Preprocess_SubArea(this);
+            
+            res = mergeStruct(res_conv,res_fex);
         end                
         function y0  = getInitialGuess(this,rho_ig)
             
@@ -116,8 +118,8 @@ classdef DDFT_2D < Computation
         function rho = GetRhoEq(this)
             rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
         end        
-        function Preprocess_HardSphereContribution(this)      
-            %tic
+        function res = Preprocess_HardSphereContribution(this)      
+            res = struct();
             if(isfield(this.optsNum,'FexNum'))
                 fprintf(1,'Computing FMT matrices ...\n');   
                 paramsFex.sigmaS   = this.optsPhys.sigmaS;
@@ -129,15 +131,18 @@ classdef DDFT_2D < Computation
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
                 this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'optsNum_PhysArea','kBT'});   
+                
+                disp('*** Test FMT matrices ***');
+                if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
+                    res = CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);                    
+                end
+                
             elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
                 this.optsNum.FexNum.Fex  = this.optsPhys.HSBulk;                                                               
             else
                 this.optsNum.FexNum.Fex  = 'ZeroMap';                           
             end
-
-            fprintf(1,'done.\n');
-            %t_fex = toc;
-            %disp(['Fex computation time (sec): ', num2str(t_fex)]);
+            fprintf(1,'done.\n');            
         end            
         function res = Preprocess_MeanfieldContribution(this)
 
@@ -161,7 +166,7 @@ classdef DDFT_2D < Computation
             elseif(isfield(this.optsPhys,'V2') && ~isfield(this.optsNum,'V2Num'))                                
                 error('Define V2Num structure in optsNum')
             else
-                res = [];
+                res = struct();
                 this.IntMatrV2 = 0;
             end
         end

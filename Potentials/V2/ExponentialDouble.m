@@ -30,7 +30,7 @@ function [z,dzdr_r,alpha] = ExponentialDouble(r,parameter)
     z(markG1)  = exp(-lambda*rt.^2)*sqrt(pi/lambda);
     
     dzdr_r     = [];    
-    alpha      = 4*pi*(1/(2*lambda*exp(lambda))-(1/4)*sqrt(pi)*erf(sqrt(lambda))/lambda^(3/2)+(1/4)*sqrt(pi)/lambda^(3/2));
+    alpha      = 2*pi*(1/(2*lambda*exp(lambda))-(1/4)*sqrt(pi)*erf(sqrt(lambda))/lambda^(3/2)+(1/4)*sqrt(pi)/lambda^(3/2));
     
     
     c      = epsilon*(-16/9*pi)/alpha;    

@@ -558,7 +558,7 @@ classdef DiffuseInterface < Computation
             else
                 l_diff = 1;
             end
-            fitPos  = L - min(L/2,3*l_diff);
+            fitPos  = min(12*l_diff,L*4/5);%L - min(L/2,2*l_diff);
             x2M2    = this.IDC.CompSpace2(fitPos);
             IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
             %Diff    = barychebdiff(this.IDC.Pts.y2,1);
@@ -594,7 +594,7 @@ classdef DiffuseInterface < Computation
             if(nargin>2)
                 filename = [foldername filesep filename];
             end
-            SaveCurrentFigure@Computation(filename);            
+            SaveCurrentFigure@Computation(this,filename);            
         end
         %Old                
         function theta  = FindInterfaceAngle(this,phi)

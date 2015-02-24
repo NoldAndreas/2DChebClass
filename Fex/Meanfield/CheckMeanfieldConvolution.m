@@ -25,6 +25,9 @@ function res = CheckMeanfieldConvolution(this)
 
              [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
              res.error_conv1_posy2 = y2_h(ind_conv1);         
+         elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHendersonHardCutoff_2D'))    
+             res.error_conv1 = inf;
+             res.error_conv1_posy2 = 1;             
          elseif(strcmp(this.optsPhys.V2.V2DV2,'ExponentialDouble'))    
              res.error_conv1 = inf;
              res.error_conv1_posy2 = 1;
