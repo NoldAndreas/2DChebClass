@@ -31,8 +31,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     
     if(nargin >= 6)
         ignoreList(end+1) = {'Results'};
+        ignoreList(end+1) = {'configName'};
     else
-        ignoreList = {'Results'};
+        ignoreList = {'Results','configName'};
     end
    
    

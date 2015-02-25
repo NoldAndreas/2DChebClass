@@ -22,7 +22,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            if(isfield(this.optsPhys,'l_diff'))
                this.optsPhys.mobility = (this.optsPhys.l_diff)^2/Cak;
            end            
-           this.optsPhys.Cak = Cak;
+           this.optsPhys.Cak = Cak;           
+           SaveConfig(this);   
        end
             
        function vec = GetInitialCondition(this,theta) 

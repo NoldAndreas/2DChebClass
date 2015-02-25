@@ -22,17 +22,55 @@ function ContactLineBinaryFluid
                        'l_diff',0.5,...%'mobility',10,...
                        'nParticles',0);
 
-    parameters.config = v2struct(optsPhys,optsNum);    ;
-    parameters.Cak   = 0.01;%(0.005:0.0025:0.01)';
-    y2Max      = 24;%(16:2:24);            
+    config = v2struct(optsPhys,optsNum);      
 
-    l_d = 1:0.25:2.5;%0.25:0.25:2.5;
-    for k = 1:length(l_d)
-        parameters.config.optsPhys.l_diff = l_d(k);    
-        parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
-        dataM{k} = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[]);
-    end
-      
+    pars.config = config;
+    pars.Cak   = (0.005:0.0025:0.01)';
+    y2Max      = (16:2:24);
+        
+ %   pars.config.optsPhys.l_diff = 0.25;    
+%    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);    
+    rec 
+
+    pars.config.optsPhys.l_diff = 0.25;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+
+    pars.config.optsPhys.l_diff = 0.5;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{2} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+         
+    pars.config.optsPhys.l_diff = 0.75;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{3} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+  %  PlotData(dataM{1});
+    
+    pars.config.optsPhys.l_diff = 1.0;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{4} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+   % PlotData(dataM{2});
+        
+    pars.config.optsPhys.l_diff = 1.25;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{5} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+    %PlotData(dataM{3});
+    
+    pars.config.optsPhys.l_diff = 1.5;    
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{6} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+%    PlotData(dataM{4});
+    
+    pars.config.optsPhys.l_diff = 1.75;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{7} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+    
+    pars.config.optsPhys.l_diff = 2.0;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{8} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+    
+    pars.config.optsPhys.l_diff = 2.5;
+    pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
+    dataM{9} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
     
 % 	pars.config.optsPhys.l_diff = 3.0;
 %     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
@@ -60,23 +98,14 @@ function ContactLineBinaryFluid
     
 	cols = {'g','b','c','k','r'};  nocols = length(cols);
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);
-            
-    PlotAsymptoticResults_Y2Max(dataM,'hatL','\hat{L}');
-    PlotAsymptoticResults_Y2Max(dataM,'stagnationPointY2','y_{S2}');
-    PlotAsymptoticResults_Y2Max(dataM,'muPlusInf','muPlusInf');
-    PlotAsymptoticResults_Y2Max(dataM,'muMinusInf','muMinusInf');
-    PlotAsymptoticResults_Y2Max(dataM,'muMaxAbs','muMaxAbs');
-    PlotAsymptoticResults_Y2Max(dataM,'pMin','pMin');
-    PlotAsymptoticResults_Y2Max(dataM,'pMax','pMax');
     
     PlotAsymptoticResults(dataM,'hatL','\hat{L}');
     PlotAsymptoticResults(dataM,'stagnationPointY2','y_{S2}');
-        
+    
     CompareAllData(dataM,1);
     CompareAllData(dataM,2);
     CompareAllData(dataM,3);
-    
-    
+        
     function PlotAsymptoticResults(dataM,parameter,parName)
         figure('Position',[0 0 800 800],'color','white');
          
@@ -97,31 +126,7 @@ function ContactLineBinaryFluid
         xlabel('$\ell_{d}$','Interpreter','Latex','fontsize',20);
         ylabel(['$',parName,'/ \ell_D$'],'Interpreter','Latex','fontsize',20);        
         %ylim([90,100]);        
-        SaveFigure([parameter,'_vs_l_diff']);
-    end
-        
-    function PlotAsymptoticResults_Y2Max(dataM,parameter,parName)
-        figure('Position',[0 0 800 800],'color','white');
-         
-        for j1 = 1:size(dataM{1},1)
-            for j0 = 1:length(dataM)
-                l_diff = dataM{j0}(j1,1).config.optsPhys.l_diff;
-                for j2 = 1:size(dataM{1},2)
-                    y2M(j2)  = dataM{j0}(j1,j2).config.optsNum.PhysArea.y2Max;
-                    par(j2)    = dataM{j0}(j1,j2).(parameter);                
-                end                 
-                col = cols{mod(j0,nocols)+1};
-                plot(y2M,par/l_diff,...
-                    ['-',syms{mod(j1,nosyms)+1},col],...
-                    'MarkerSize',8,'MarkerFaceColor',col); hold on;                
-             end  
-        end
-        set(gca,'linewidth',1.5);
-        set(gca,'fontsize',20);
-        xlabel('$y_{2,max}$','Interpreter','Latex','fontsize',20);
-        ylabel(['$',parName,'/ \ell_D$'],'Interpreter','Latex','fontsize',20);        
-        %ylim([90,100]);
-        SaveFigure([parameter,'_vs_l_diff']);
+        SaveFigure([parameter,'_vs_l_diff'],pars);
     end
 
     function dataM = RunNumericalExperiment(pars,h)
@@ -136,6 +141,7 @@ function ContactLineBinaryFluid
             for i = 1:length(pars.Cak)
                 
 %                config.optsPhys.Cak = pars.Cak(i);
+                
                 
                 DI.SetCak(pars.Cak(i));                
                 
@@ -165,15 +171,13 @@ function ContactLineBinaryFluid
         end
     end
 
-   
-
     function CompareAllData(dataM,j1)
         thetaEq = dataM{1}(1,1).config.optsPhys.thetaEq;        
 
         figure('Position',[0 0 800 800],'color','white');
         hatL_M = zeros(size(dataM));
         Sy2_M  = zeros(size(dataM));
-        Ca     = 3/4*dataM{1}(j1,1).config.optsPhys.Cak;
+        Ca     = 3/4*pars.Cak(j1);
         
         for j0 = 1:length(dataM)
             for j2 = 1:size(dataM{j0},2)
