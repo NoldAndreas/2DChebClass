@@ -174,7 +174,9 @@
     y1err = ptsC.y1_kv(ierrAD);
     y2err = ptsC.y2_kv(ierrAD);            
 
-    PrintErrorPos(errAD,'Area in Conv_LinearGridX',y1err,y2err);
+    if(max(checkSum) < inf)
+        PrintErrorPos(errAD,'Area in Conv_LinearGridX',y1err,y2err);
+    end
     %********************************************************** 
     
     

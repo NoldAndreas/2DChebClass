@@ -9,11 +9,13 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                       'alpha_deg',90);
 
     %V2Num   = struct('Fex','SplitDisk','N',[30,30]);
-    V2Num   = struct('Fex','SplitAnnulus','N',[30,30]);
+    V2Num   = struct('Fex','SplitAnnulus','N',[10,10]);
+    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
 %    V2Num   = struct('Fex','ConstShortRange','N',[30,30]);
 
+
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);                   
+                       'Ncircle',1,'N1disc',10,'N2disc',10);
  
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',Fex_Num,...
@@ -22,8 +24,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.7);%1.375);%1.25)s;
-    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1);     
 %    V2 = struct('V2DV2','ConstShortRange','epsilon',1,'LJsigma',1,'lambda',1.5); 
 %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1); 
 %    V2 = struct('V2DV2','Phi2DLongRange','epsilon',1.,'LJsigma',1); 
@@ -53,10 +54,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     syms = {'d','s','o','>','<'};
     
     %**********************************************        
-    PlotMatrixErrorOverY_OnePoint('Conv',1);
-    PlotMatrixErrorOverY_OnePoint('Conv',15);
-	PlotMatrixErrorOverY('Conv');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
-    xlim([0,10]);
+    %PlotMatrixErrorOverY_OnePoint('Conv',1);
+    %PlotMatrixErrorOverY_OnePoint('Conv',15);
+	%PlotMatrixErrorOverY('Conv');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
+    %xlim([0,10]);
     
 %    PlotMatrixErrorOverY('AAD_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
 %    xlim([0,10]);    
@@ -65,8 +66,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     figure('color','white','Position',[0 0 1600 800]); 
     
     legendstring = {};
-    subplot(1,2,1);        
-    PlotMatrixError('ConvSplitDisk','*','k','\phi_{SR}');
+    subplot(1,2,1);    
+    PlotMatrixError('ConvBH_HardCutoff','>','k','\phi_{HC}');
+    PlotMatrixError('ConvSplitDiskExp','^','k','\phi_{Exp}');
+    PlotMatrixError('ConvSplitDisk','*','k','\phi_{SD}');
     PlotMatrixError('ConvShortRange','d','k','\phi_{SR}');
     PlotMatrixError('Conv','o','k','\phi_{LR}');
     PlotMatrixError('A_n2','d','m','w_2');
@@ -93,7 +96,9 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 % 	saveas(gcf,[dirData filesep filename '.fig']);        
 %     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
     
-    subplot(1,2,2);
+    subplot(1,2,2);        
+    PlotErrorGraph('error_convBH_HardCutoff','>','k');
+    PlotErrorGraph('error_conv_SplitDiskExp','^','k');
     PlotErrorGraph('error_conv_SplitDisk','*','k');
     PlotErrorGraph('error_convShortRange','d','k');
     PlotErrorGraph('error_conv1','o','k');
@@ -122,17 +127,23 @@ function CheckConvolutionHalfSpace_BH_Conv1()
         %error_wl    = zeros(length(N),length(NS));
                 
         for i = 1:length(N)
+            
             conf.optsNum.PhysArea.N = [1,N(i)]; %N(i),N(i)
+            
+            CL = ContactLineHS(conf);
+            preErr = CL.Preprocess();        
+            
+            
             for j = 1:length(NS)
-                conf.optsNum.V2Num.N       = [NS(j),NS(j)];
-                conf.optsNum.FexNum.N1disc = NS(j);
-                conf.optsNum.FexNum.N2disc = NS(j);
-
-                CL = ContactLineHS(conf);
-                preErr = CL.Preprocess();        
+                CL.optsNum.V2Num.N       = [NS(j),NS(j)];
+                CL.optsNum.FexNum.N1disc = NS(j);
+                CL.optsNum.FexNum.N2disc = NS(j);                                
                 
-                res(i,j).Conv        = CL.IntMatrV2.Conv;
-                res(i,j).error_conv1 = preErr.error_conv1;                
+                res(i,j).N  = N(i);
+                res(i,j).NS = NS(j); 
+                
+                preErr = CL.Preprocess_HardSphereContribution();
+                               
                 res(i,j).error_n2_1    = preErr.error_n2_1;
                 res(i,j).error_n3_1    = preErr.error_n3_1;
                 res(i,j).error_n2v2_1  = preErr.error_n2v2_1;                                
@@ -144,25 +155,24 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 res(i,j).error_n2AD_ones   = preErr.error_n2AD_ones;
                 res(i,j).error_n3AD_ones   = preErr.error_n3AD_ones;
                 res(i,j).error_n2v2AD_ones = preErr.error_n2v2AD_ones;
+                                
                 
-                res(i,j).N  = N(i);
-                res(i,j).NS = NS(j); 
-                %err         = CheckMeanfieldConvolution(CL);
-                %%res(i,j).error_conv1 = err.error_conv1;                 
+                res(i,j).A_n2        = CL.IntMatrFex.AD.n2;
+                res(i,j).A_n3        = CL.IntMatrFex.AD.n3;
+                res(i,j).A_n2_v_1    = CL.IntMatrFex.AD.n2_v_1;
+                res(i,j).A_n2_v_2    = CL.IntMatrFex.AD.n2_v_2;                
+                res(i,j).AAD_n2      = CL.IntMatrFex.AAD.n2;
+                res(i,j).AAD_n3      = CL.IntMatrFex.AAD.n3;
+                res(i,j).AAD_n2_v_1  = CL.IntMatrFex.AAD.n2_v_1;
+                res(i,j).AAD_n2_v_2  = CL.IntMatrFex.AAD.n2_v_2;
                 
-                res(i,j).A_n2       = CL.IntMatrFex.AD.n2;
-                res(i,j).A_n3       = CL.IntMatrFex.AD.n3;
-                res(i,j).A_n2_v_1   = CL.IntMatrFex.AD.n2_v_1;
-                res(i,j).A_n2_v_2   = CL.IntMatrFex.AD.n2_v_2;
+                CL.optsNum.V2Num     = struct('Fex','SplitAnnulus','N',[NS(j),NS(j)]);
+                CL.optsPhys.V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);                            
+                preErr               = CL.Preprocess_MeanfieldContribution();                
+                res(i,j).error_conv1 = preErr.error_conv1; 
+                res(i,j).Conv        = CL.IntMatrV2.Conv;                
                 
-                
-                res(i,j).AAD_n2       = CL.IntMatrFex.AAD.n2;
-                res(i,j).AAD_n3       = CL.IntMatrFex.AAD.n3;
-                res(i,j).AAD_n2_v_1   = CL.IntMatrFex.AAD.n2_v_1;
-                res(i,j).AAD_n2_v_2   = CL.IntMatrFex.AAD.n2_v_2;
-                
-                    
-                CL.optsNum.V2Num   = struct('Fex','SplitAnnulus','N',[50,50]); 
+                CL.optsNum.V2Num   = struct('Fex','SplitAnnulus','N',[NS(j),NS(j)]); 
                 CL.optsPhys.V2     = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);                             
                 preErr             = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_convBH_HardCutoff   = preErr.error_conv1;
@@ -194,9 +204,9 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 %[~,~,params] = CL.Compute1D('WG');
                 %res(i,j).error_wg = params.contactDensity_relError;
                 
-                close all;
-                clear('CL');                
+                close all;                       
             end
+            clear('CL');         
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 

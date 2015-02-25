@@ -16,7 +16,14 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             this@DiffuseInterface(config);            
        end
        
-       IterationStepFullProblem(this)              
+       IterationStepFullProblem(this)        
+       
+       function SetCak(this,Cak)
+           if(isfield(this.optsPhys,'l_diff'))
+               this.optsPhys.mobility = (this.optsPhys.l_diff)^2/Cak;
+           end            
+           this.optsPhys.Cak = Cak;
+       end
             
        function vec = GetInitialCondition(this,theta) 
             if(nargin == 1)

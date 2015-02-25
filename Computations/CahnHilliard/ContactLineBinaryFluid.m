@@ -26,14 +26,14 @@ function ContactLineBinaryFluid
 
     pars.config = config;
     pars.Cak   = (0.005:0.0025:0.01)';
-    y2Max = (16:2:24);
+    y2Max      = (16:2:24);
         
  %   pars.config.optsPhys.l_diff = 0.25;    
 %    dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);    
 
     pars.config.optsPhys.l_diff = 0.25;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[],true);
+    dataM{1} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
 
     pars.config.optsPhys.l_diff = 0.5;    
     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
@@ -131,13 +131,15 @@ function ContactLineBinaryFluid
     function dataM = RunNumericalExperiment(pars,h)
 
         config = pars.config;
-        for i = 1:length(pars.Cak)
-            config.optsPhys.Cak           = pars.Cak(i);
-            for j = 1:length(pars.y2Max)            
-                config.optsNum.PhysArea.y2Max = pars.y2Max(j);
-
-                DI = DiffuseInterfaceBinaryFluid(config);
-                DI.Preprocess();
+        for j = 1:length(pars.y2Max)            
+            
+            config.optsNum.PhysArea.y2Max = pars.y2Max(j);
+            DI = DiffuseInterfaceBinaryFluid(config);
+            DI.Preprocess();
+                
+            for i = 1:length(pars.Cak)
+                
+                DI.SetCak(pars.Cak(i));                
                 
                 DI.IterationStepFullProblem();                    
                 
@@ -147,13 +149,21 @@ function ContactLineBinaryFluid
                 dataM(i,j).config   = config;                
                 dataM(i,j).Ca       = 3/4*pars.Cak(i);
                 dataM(i,j).theta    = DI.GetThetaY2();
-                dataM(i,j).y2       = DI.IDC.Pts.y2;
+                
+                dataM(i,j).muMinusInf  = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
+                dataM(i,j).muPlusInf   = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
+                dataM(i,j).muMaxAbs    = max(abs(DI.mu));
+                dataM(i,j).pMax        = max((DI.p));
+                dataM(i,j).pMin        = min((DI.p));
+                                
+                dataM(i,j).y2       = DI.IDC.Pts.y2;                
+                
                 dataM(i,j).hatL     = DI.FitSliplength();
                 dataM(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);
 
                 close all;
-                clear('DI');
             end
+            clear('DI');
         end
     end
 

@@ -198,5 +198,7 @@ function X = Conv_LinearGridXY(this,ptsC,area,weights,params)
     y1err = ptsC.y1_kv(ierrAD);
     y2err = ptsC.y2_kv(ierrAD);
     
-    PrintErrorPos(errAD,'Area in Conv_LinearGridXY',y1err,y2err);   
+    if(max(checkSum) < inf)
+        PrintErrorPos(errAD,'Area in Conv_LinearGridXY',y1err,y2err);   
+    end
 end
