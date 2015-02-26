@@ -454,11 +454,10 @@ classdef ContactLineHS < DDFT_2D
             end    
 
         end
-        
+
         %Postprocess
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
-        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)               
-                
+        [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)
         function SaveCurrentFigure(this,filename,foldername)
             if(nargin < 3)
                 foldername = 'Equilibrium';
@@ -478,16 +477,15 @@ classdef ContactLineHS < DDFT_2D
             SaveCurrentFigure@Computation(this,filename);            
         end
         
-        %to delete                   
-        [f,y1]  = PostProcess(this,y1Int)                                
-                                
-        I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)        
+        %to delete
+        [f,y1]  = PostProcess(this,y1Int)
+        I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);
         
         PlotDisjoiningPressureAnalysis(this)    
         PlotInterfaceAnalysisY1(this)
         [y2,theta] = PlotInterfaceAnalysisY2(this,yInt)                
-        
+
         function disjoingPressure1DCheck(this)
             rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
             rhoGas_sat     = this.optsPhys.rhoGas_sat;

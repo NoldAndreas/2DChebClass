@@ -14,9 +14,9 @@ function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
           
       
 	while(err > TolFun && i < MaxIter && ...
-            ((i < 4) || (errorHistory(i-2) < errorHistory(i-3)) || ...
-                        (errorHistory(i-1) < errorHistory(i-2)) || ...
-                        (errorHistory(i)< errorHistory(i-1))))
+            ((i < 5) || (errorHistory(i-3) < errorHistory(i-4)) || ...
+                        (errorHistory(i-2) < errorHistory(i-3)) || ...
+                        (errorHistory(i-1)< errorHistory(i-2))))
          no = PrintErrorPos(err,['Newton iteration no ',num2str(i)]);         
          
          rho    = rho - lambda*(J\v);
@@ -28,8 +28,13 @@ function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
          
         % for ih = 1:no
          %   fprintf('\b');
-        %end 
-     end
+        %end                 
+    end
+    
+    if(err > TolFun)
+        rho = [];        
+    end
+    
      display(['Error: ',num2str(err)]);
      display(['No of iterations: ' , num2str(i)]);
 end

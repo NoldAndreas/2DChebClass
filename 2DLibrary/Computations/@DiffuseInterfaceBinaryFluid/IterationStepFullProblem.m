@@ -17,13 +17,7 @@ function IterationStepFullProblem(this)
     else
         opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
     end
-    
-    if((nargin == 1) || ~isfield(opts,'noIterations'))
-        noIterations = 20;
-    else
-        noIterations = opts.noIterations;
-    end
-        
+           
     solveSquare   = [];
 %    Seppecher_red = [];
 %     
@@ -67,7 +61,8 @@ function IterationStepFullProblem(this)
     opts.optsPhys   = this.optsPhys;
     opts.configName = this.configName;    
      	            
-	[res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,[],[],{'optsNum_SubArea','noIterations'});        
+	[res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,[],[],{'optsNum_SubArea','noIterations'});                
+        
     SetResults(res);
 
     if(IsSeppecher(this))
@@ -79,7 +74,7 @@ function IterationStepFullProblem(this)
         SetResults(res);
     end
 	           
-    this.filename = Parameters.Filename;
+    this.filename               = Parameters.Filename;
     this.errors.errorIterations = res.errorHistory;        
     
     function SetResults(res)
@@ -120,7 +115,14 @@ function IterationStepFullProblem(this)
         %solveSquare = true;        
 
         solveSquare      = true;
-        [vec,errHistory] = NewtonMethod(iGuess,@f,1e-6,noIterations,opts.lambda);
+        [vec,errHistory] = NewtonMethod(iGuess,@f,1e-6,opts.noIterations,opts.lambda);
+        if(isempty(vec))            
+            opts.optsNum.PhysArea
+            opts.optsPhys
+            opts.configName
+            errHistory
+            error('Newtonmethod failed to converge');                                    
+        end
 
         solveSquare = false;
         optsFS = optimoptions(@fsolve,'Jacobian','on','Display','iter','Algorithm','levenberg-marquardt');

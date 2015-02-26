@@ -1,7 +1,8 @@
 classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
     
    properties (Access = public)
-       p  % pressure     
+       p  % pressure    
+       flux
 	end
        
 	methods (Access = public) 
@@ -498,13 +499,34 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
        end
        function PostProcess_Flux(this)
-           Diff = this.IDC.Diff;
-           m    = this.optsPhys.mobility;
-           uv   = this.uv;
+           Diff      = this.IDC.Diff;
+           m         = this.optsPhys.mobility;
+           uv        = this.uv;           
+           this.flux = repmat(this.phi,2,1).*uv - m*Diff.grad*this.mu;
            
-           flux = repmat(this.phi,2,1).*uv - m*Diff.grad*this.mu;
            disp(['Error of flux through subArea: ',num2str(this.Int_of_path*uv)]);
-           disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*flux)]);
+           disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*this.flux)]);
+       end
+       
+       function PostProcessInterface(this)
+            PostProcessInterface@DiffuseInterface(this);
+            if(~isempty(this.flux))               
+                pts.y1_kv = this.IsoInterface.h;
+                pts.y2_kv = this.IDC.Pts.y2;            
+                IP        = this.IDC.SubShapePtsCart(pts);
+                fl_1      = this.flux(1:end/2);
+                fl_2      = this.flux(1+end/2:end);
+                th        = this.IsoInterface.theta;
+                this.IsoInterface.flux_n   = cos(th).*(IP*fl_1)  + sin(th).*(IP*fl_2);
+                this.IsoInterface.flux_t   = -sin(th).*(IP*fl_1) + cos(th).*(IP*fl_2);            
+            end
+       end
+       
+       function PostProcess(this)
+           GetYueParameters(this);           
+           FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
+           PostProcess_Flux(this);
+           PostProcessInterface(this);
        end
        
        function GetYueParameters(this)

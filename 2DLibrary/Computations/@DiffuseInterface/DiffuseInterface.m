@@ -7,7 +7,9 @@ classdef DiffuseInterface < Computation
        theta=[],a=[],deltaX=[]
        errors = []
        
-       IsolineInterfaceY2=[],StagnationPoint=[]
+       IsoInterface=struct('y2',[],'h',[],'theta',[],'kappa',[],...
+                                 'mu',[],'p',[],'u_n',[],'u_t',[]);
+       StagnationPoint=[]
        %surfaceTension = 4/3;
        
        RightCapillary
@@ -268,11 +270,94 @@ classdef DiffuseInterface < Computation
         %Auxiliary Cahn-Hilliard
         [A,b] = Div_FullStressTensor(this,phi)
                 
-        %Plotting & Analysis functions
-        function theta = GetThetaY2(this)
-            y2    = this.IDC.Pts.y2;
-            Diff  = barychebdiff(y2,1);
-            theta = pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
+        %PostProcessing
+        function PostProcessInterface(this)
+            y2           = this.IDC.Pts.y2;
+            Diff         = barychebdiff(y2,2);            
+            phi          = this.phi; 
+
+            fsolveOpts   = optimset('Display','off');
+            interface    = zeros(size(y2));
+
+            y1Bottom = this.IDC.GetCartPts.y1_kv(this.IDC.Ind.bottom);
+            [~,j]    = min(abs(phi(this.IDC.Ind.bottom)));
+            y1I      = y1Bottom(j);
+                        
+            for i = 1:length(y2)
+                pt.y2_kv     = y2(i);        
+                [interface(i),~,flag] = fsolve(@phiX1,y1I,fsolveOpts);        
+                if(flag < 1)
+                    cprintf('*r',['PostProcessInterface: Interface not found at y2 = ',num2str(y2(i)),'\n']);
+                    return;
+                end
+                y1I          = interface(i);        
+            end
+
+            this.IsoInterface.h = interface;    
+            
+            %Compute values on Interface 
+            pts.y1_kv = this.IsoInterface.h;
+            pts.y2_kv = y2;            
+            IP        = this.IDC.SubShapePtsCart(pts);
+            u1        = this.uv(1:end/2);
+            u2        = this.uv(1+end/2:end);
+            
+            this.IsoInterface.y2    = y2;
+            this.IsoInterface.mu    = IP*this.mu;
+            this.IsoInterface.p     = IP*this.p;
+            th                      = pi/2 - atan(Diff.Dx*interface);
+            this.IsoInterface.theta = th;
+            
+            this.IsoInterface.kappa = (Diff.DDx*interface)./((1+(Diff.Dx*interface).^2).^(3/2));   
+            this.IsoInterface.u_n   = sin(th).*(IP*u1)  - cos(th).*(IP*u2);
+            this.IsoInterface.u_t   = cos(th).*(IP*u1) + sin(th).*(IP*u2);            
+
+            this.IsoInterface.hatL  = FitSliplength(this);
+            function z = phiX1(y1)
+                pt.y1_kv = y1;
+                IP_h     = this.IDC.SubShapePtsCart(pt);
+                z        = IP_h*phi;
+            end   
+        end
+        function hatL = FitSliplength(this)
+           
+            thetaEq = this.optsPhys.thetaEq;
+            Ca      = 3/4*this.optsPhys.Cak;
+                        
+            L       = this.optsNum.PhysArea.y2Max;            
+            
+            if(isfield(this.optsPhys,'l_diff'))
+                l_diff  = this.optsPhys.l_diff;
+            else
+                l_diff = 1;
+            end
+            fitPos  = min(12*l_diff,L*4/5);%L - min(L/2,2*l_diff);
+            x2M2    = this.IDC.CompSpace2(fitPos);
+            IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
+            %Diff    = barychebdiff(this.IDC.Pts.y2,1);
+                        
+            theta_05L = IP05*this.IsoInterface.theta;
+            %dthetaL = Diff.Dx(end,:)*theta;
+            
+            opts = optimoptions('fsolve','TolFun',1e-8,'TolX',1e-6);
+            z = fsolve(@f,1,opts);
+            
+            hatL = z(1);            
+            
+            disp(['hat L = ',num2str(hatL)]);
+            
+            function y = f(x)
+                hL = x(1);                
+                
+                GM   = (Ca*log(fitPos/hL)+GHR_lambdaEta(thetaEq,1));                                                
+                y    = GM - GHR_lambdaEta(theta_05L,1);
+%                 GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
+%                 GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
+%                 
+%                 y(1) = (GM1 + Ca*C) - thetaL;
+%                 y(2) = (GM2 + Ca*C) - theta_05L;
+                %y(2) = f_stokes(GM1,1)*Ca/L - dthetaL;                
+            end
         end
         function spt = FindStagnationPoint(this,iguess1,iguess2)
             
@@ -316,36 +401,10 @@ classdef DiffuseInterface < Computation
                 IP  = this.IDC.SubShapePtsCart(pt);
                 z   = [IP*uv(1:end/2);IP*uv(1+end/2:end)];
             end
-        end
-        function ComputeInterfaceContour(this)
-            y2           = this.IDC.Pts.y2;
-            phi          = this.phi; 
-
-            fsolveOpts   = optimset('Display','off');
-            interface    = zeros(size(y2));
-
-            y1Bottom = this.IDC.GetCartPts.y1_kv(this.IDC.Ind.bottom);
-            [~,j]    = min(abs(phi(this.IDC.Ind.bottom)));
-            y1I      = y1Bottom(j);
-                        
-            for i = 1:length(y2)
-                pt.y2_kv     = y2(i);        
-                [interface(i),~,flag] = fsolve(@phiX1,y1I,fsolveOpts);        
-                if(flag < 1)
-                    cprintf('*r',['ComputeInterfaceContour: Interface not found at y2 = ',num2str(y2(i)),'\n']);
-                    return;
-                end
-                y1I          = interface(i);        
-            end
-
-            this.IsolineInterfaceY2 = interface;    
-
-            function z = phiX1(y1)
-                pt.y1_kv = y1;
-                IP = this.IDC.SubShapePtsCart(pt);
-                z  = IP*phi;
-            end   
-        end
+        end                        
+        
+        %Plotting & Analysis functions
+                
         function AnalyzeScalarQuantity(this,f,interval)
             if(nargin == 2)
                 interval = [-10,10];
@@ -396,8 +455,8 @@ classdef DiffuseInterface < Computation
             this.IDC.plot(this.phi,'contour');     
                         
             hold on;
-            if(~isempty(this.IsolineInterfaceY2))
-                plot(this.IsolineInterfaceY2,this.IDC.Pts.y2,...
+            if(~isempty(this.IsoInterface.h))
+                plot(this.IsoInterface.h,this.IDC.Pts.y2,...
                                                     'k','linewidth',3);
             end
       %      if(IsSeppecher(this))
@@ -475,20 +534,15 @@ classdef DiffuseInterface < Computation
             thetaEq = this.optsPhys.thetaEq;
             Ca      = 3/4*this.optsPhys.Cak;            
             
-            y2      = this.IDC.Pts.y2;
+            y2      = this.IDC.Pts.y2;%IsoInterface.y2;
             L       = this.optsNum.PhysArea.y2Max;
                         
-            thetaY2 = GetThetaY2(this);%pi/2 - atan(Diff.Dx*this.IsolineInterfaceY2);%*180/pi;
-                        
-            %maxthetaY2 = max(ab
-            
-            figure('color','white','Position',[0 0 800 800]);
-            
-            
-            if(IsSeppecher(this))                
-                
-                hatL    = FitSliplength(this);                
+            thetaY2 = this.IsoInterface.theta;
+                                                
+            figure('color','white','Position',[0 0 800 800]);                        
+            if(IsSeppecher(this))                                                
                 y2P     = y2(2:end);
+                hatL    = this.IsoInterface.hatL;
                 theta_L = GHR_Inv(Ca*log(y2P/hatL)+GHR_lambdaEta(thetaEq,1),1);
 
                 plot(y2,thetaY2*180/pi,'ok','linewidth',2); hold on;
@@ -504,16 +558,26 @@ classdef DiffuseInterface < Computation
             end
             
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);            
-                        
             SaveCurrentFigure(this,'InterfaceSlope');           
             
+            legendstr = {};
+            figure('color','white','Position',[0 0 800 800]);                        
+            plot(y2,this.IsoInterface.kappa/2,'k-o','linewidth',1.5); legendstr(end+1) = {'kappa/2'}; hold on;
+            plot(y2,this.IsoInterface.mu,'m-o','linewidth',1.5);    legendstr(end+1) = {'mu'};                        
+            plot(y2,this.IsoInterface.p,'r-o','linewidth',1.5);     legendstr(end+1) = {'p'};
+            plot(y2,this.IsoInterface.u_n,'b-o','linewidth',1.5);   legendstr(end+1) = {'u_n'};            
+            plot(y2,this.IsoInterface.u_t,'g-o','linewidth',1.5);   legendstr(end+1) = {'u_t'};
+                        
+            ylim([min(this.IsoInterface.u_n),max(this.IsoInterface.p)]*1.2);
+            set(gca,'linewidth',1.5);
+            xlabel('$y_2$','Interpreter','Latex','fontsize',20);            
+            legend(legendstr,'Location','northEast');%,'Orientation','horizontal');
+            SaveCurrentFigure(this,'InterfaceValues');           
         end
         function PlotResults(this)                                            
             PlotResultsPhi(this);                       
             PlotResultsMu(this);
-            PlotErrorIterations(this);     
-            
-            ComputeInterfaceContour(this);
+            PlotErrorIterations(this);                             
             PlotInterfaceAnalysis(this);
         end        
         function PlotErrorIterations(this)           
@@ -544,49 +608,7 @@ classdef DiffuseInterface < Computation
                         
             SaveCurrentFigure(this,'ErrorIterations');
         end
-        
-        function hatL = FitSliplength(this)
-           
-            thetaEq = this.optsPhys.thetaEq;
-            Ca      = 3/4*this.optsPhys.Cak;
-            
-            theta   = GetThetaY2(this);            
-            L       = this.optsNum.PhysArea.y2Max;            
-            
-            if(isfield(this.optsPhys,'l_diff'))
-                l_diff  = this.optsPhys.l_diff;
-            else
-                l_diff = 1;
-            end
-            fitPos  = min(12*l_diff,L*4/5);%L - min(L/2,2*l_diff);
-            x2M2    = this.IDC.CompSpace2(fitPos);
-            IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
-            %Diff    = barychebdiff(this.IDC.Pts.y2,1);
-                        
-            theta_05L = IP05*theta;
-            %dthetaL = Diff.Dx(end,:)*theta;
-            
-            opts = optimoptions('fsolve','TolFun',1e-8,'TolX',1e-6);
-            z = fsolve(@f,1,opts);
-            
-            hatL = z(1);            
-            
-            disp(['hat L = ',num2str(hatL)]);
-            
-            function y = f(x)
-                hL = x(1);                
                 
-                GM   = (Ca*log(fitPos/hL)+GHR_lambdaEta(thetaEq,1));                                                
-                y    = GM - GHR_lambdaEta(theta_05L,1);
-%                 GM1  = GHR_Inv(Ca*log(L/lam)+GHR_lambdaEta(thetaEq,1),1);
-%                 GM2  = GHR_Inv(Ca*log(L/2/lam)+GHR_lambdaEta(thetaEq,1),1);
-%                 
-%                 y(1) = (GM1 + Ca*C) - thetaL;
-%                 y(2) = (GM2 + Ca*C) - theta_05L;
-                %y(2) = f_stokes(GM1,1)*Ca/L - dthetaL;                
-            end
-        end
-        
         function SaveCurrentFigure(this,filename,foldername)
             
             [~,fn]   = fileparts(this.filename);

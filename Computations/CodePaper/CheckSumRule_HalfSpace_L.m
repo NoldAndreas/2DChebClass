@@ -2,7 +2,7 @@ function CheckSumRule_HalfSpace_L()
     
     AddPaths();    
 
-    PhysArea = struct('N',[1,80],...
+    PhysArea = struct('N',[1,100],...
                       'L1',5,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
@@ -31,14 +31,14 @@ function CheckSumRule_HalfSpace_L()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    L = 1:5;
+    L = 0.25:0.25:4;
     
     figure('color','white','Position',[0 0 900 800]); 
     legendstring = {};
     
     % **** 1 ****    
     eta = 0.3;    
-    res{1} = DataStorage([],@ComputeError,v2struct(L,config,eta),[]);
+    res{1} = DataStorage([],@ComputeError,v2struct(L,config,eta),[],true);
         
 	AddPaths();    
     ChangeDirData();
