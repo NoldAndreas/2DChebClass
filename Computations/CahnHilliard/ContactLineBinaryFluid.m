@@ -32,31 +32,20 @@ function ContactLineBinaryFluid
         parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
         dataM{k} = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[]);
     end
-      
     
-% 	pars.config.optsPhys.l_diff = 3.0;
-%     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-%     dataM{10} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-    
-%     pars.config.optsPhys.l_diff = 3.5;
-%     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-%     dataM{11} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-%     
-%     pars.config.optsPhys.l_diff = 4.0;
-%     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-%     dataM{12} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-%     
-%     pars.config.optsPhys.l_diff = 4.5;
-%     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-%     dataM{13} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-%     
-%     pars.config.optsPhys.l_diff = 5.0;
-%     pars.y2Max = y2Max*pars.config.optsPhys.l_diff;
-%     dataM{14} = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
-%    PlotData(dataM{5});
-
-    %pars.config.optsPhys.l_diff = 2;    
-    %dataM = DataStorage('NumericalExperiment',@RunNumericalExperiment,pars,[]);
+    for k0 = 1:length(dataM)
+        for k1 = 1:size(dataM{1},1)
+            for k2 = 1:size(dataM{1},2)
+                l_d    = dataM{k0}(k1,k2).config.optsPhys.l_diff;
+                dataM{k0}(k1,k2).IsoInterface.kappa_rescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
+                dataM{k0}(k1,k2).IsoInterface.p_rescaled = dataM{k0}(k1,k2).IsoInterface.p*l_d;
+                dataM{k0}(k1,k2).IsoInterface.mu_rescaled = dataM{k0}(k1,k2).IsoInterface.mu*l_d;
+                dataM{k0}(k1,k2).IsoInterface.kappa_mu = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
+                %dataM{k0}(k1,k2).IsoInterface.kappaRescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
+            end
+        end
+    end
+                
     
 	cols = {'g','b','c','k','r'};  nocols = length(cols);
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);
@@ -68,8 +57,13 @@ function ContactLineBinaryFluid
 %     PlotAsymptoticResults_Y2Max(dataM,'muMaxAbs','muMaxAbs');
 %     PlotAsymptoticResults_Y2Max(dataM,'pMin','pMin');
 %     PlotAsymptoticResults_Y2Max(dataM,'pMax','pMax');
-
-    PlotAsymptoticInterfaceResults(dataM,1,'mu');
+    
+    PlotAsymptoticInterfaceResults(dataM,1,'kappa_rescaled');    
+    PlotAsymptoticInterfaceResults(dataM,1,'mu_rescaled');    
+    PlotAsymptoticInterfaceResults(dataM,1,'p_rescaled');   
+    PlotAsymptoticInterfaceResults(dataM,1,'kappa_mu');   
+    
+    
     PlotAsymptoticResults(dataM,'hatL',{'rescale','IsoInterface'});
     PlotAsymptoticResults(dataM,'stagnationPointY2','rescale');
     PlotAsymptoticResults(dataM,'muPlusInf');
@@ -113,8 +107,11 @@ function ContactLineBinaryFluid
                 legendstr(end+1) = {['l_d = ',num2str(l_diff),' y_{2,Max}/l_d = ',num2str(dataM{j0}(i_Cak,j2).config.optsNum.PhysArea.y2Max/l_diff)]};
             end
         end  
-         legend(legendstr);
-
+        legend(legendstr);
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',20);
+        xlabel('$y_2/\ell_{d}$','Interpreter','Latex','fontsize',20);
+        ylabel(value,'fontsize',20);  
     end
     
     

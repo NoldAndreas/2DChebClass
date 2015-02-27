@@ -49,15 +49,14 @@ function CheckSumRule_BH_HalfSpace()
     
     AddPaths();  ChangeDirData();   
     % **** 3 ****
-    NS   = 80;
-    N    = 20:20:100;
+   % NS   = 80;
+   % N    = 20:10:120;
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.9;    
     res{3} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]); 
     
-    AddPaths();  ChangeDirData();
-     NS   = 80;
+    AddPaths();  ChangeDirData();     
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
     config.optsPhys.V1.epsilon_w = 0.9;    

@@ -510,10 +510,15 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        
        function PostProcessInterface(this)
             PostProcessInterface@DiffuseInterface(this);
+            
+            pts.y1_kv = this.IsoInterface.h;
+            pts.y2_kv = this.IDC.Pts.y2;            
+            IP        = this.IDC.SubShapePtsCart(pts);            
+            
+            this.IsoInterface.p     = IP*this.p;      
+            
             if(~isempty(this.flux))               
-                pts.y1_kv = this.IsoInterface.h;
-                pts.y2_kv = this.IDC.Pts.y2;            
-                IP        = this.IDC.SubShapePtsCart(pts);
+                
                 fl_1      = this.flux(1:end/2);
                 fl_2      = this.flux(1+end/2:end);
                 th        = this.IsoInterface.theta;

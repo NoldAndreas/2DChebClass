@@ -303,16 +303,17 @@ classdef DiffuseInterface < Computation
             u2        = this.uv(1+end/2:end);
             
             this.IsoInterface.y2    = y2;
-            this.IsoInterface.mu    = IP*this.mu;
-            this.IsoInterface.p     = IP*this.p;
+            this.IsoInterface.mu    = IP*this.mu;            
+                        
             th                      = pi/2 - atan(Diff.Dx*interface);
             this.IsoInterface.theta = th;
             
+            this.IsoInterface.hatL  = FitSliplength(this);
+            
             this.IsoInterface.kappa = (Diff.DDx*interface)./((1+(Diff.Dx*interface).^2).^(3/2));   
             this.IsoInterface.u_n   = sin(th).*(IP*u1)  - cos(th).*(IP*u2);
-            this.IsoInterface.u_t   = cos(th).*(IP*u1) + sin(th).*(IP*u2);            
-
-            this.IsoInterface.hatL  = FitSliplength(this);
+            this.IsoInterface.u_t   = cos(th).*(IP*u1) + sin(th).*(IP*u2);                                    
+            
             function z = phiX1(y1)
                 pt.y1_kv = y1;
                 IP_h     = this.IDC.SubShapePtsCart(pt);
