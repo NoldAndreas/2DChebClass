@@ -24,8 +24,7 @@ classdef ContactLineHS < DDFT_2D
         CA_deg_measured,CA_deg_measured_error
         
         saveFigs = true;
-    end
-    
+    end    
     methods (Access = public)          
         function this = ContactLineHS(configuration)        
              if(nargin == 0)

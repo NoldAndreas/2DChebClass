@@ -141,7 +141,10 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
         function do1DPlotNormal(this,V,sym,col)
             if(nargin < 3)
                 sym = 'o';
-            end            
+            end
+            if(nargin < 4)
+            else
+            end
             
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -161,12 +164,8 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             IP.InterPol = IP.InterPol(:,mark);
             
             PtsCart     = GetCartPts(this);
-            IPPtsCart   = GetCartPts(this,IP.pts1,IP.pts2);          
-            if(nargin < 4)                
-                plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
-            else
-                plot(PtsCart.y2_kv(mark),V,sym,'MarkerEdgeColor',col,'MarkerFaceColor',col); 
-            end                        
+            IPPtsCart   = GetCartPts(this,IP.pts1,IP.pts2);            
+            plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
             hold on;
             plot(IPPtsCart.y2_kv,IP.InterPol*V,'linewidth',1.5);
             xlim([min(IPPtsCart.y2_kv) max(IPPtsCart.y2_kv)]);

@@ -1,4 +1,5 @@
-function AddPaths()   
+function AddPaths(dirOrg)
+   
 
     global dirData
     global dirDataOrg    
@@ -36,6 +37,9 @@ function AddPaths()
     PersonalUserOutput = true;    
     
     dirDataOrg = dirData;
+    if(nargin >= 1)
+        ChangeDirData([dirDataOrg filesep dirOrg],'ORG');
+    end
     
     if(isempty(recomputeAll))
         recomputeAll = false;

@@ -1,23 +1,22 @@
 function CheckSumRule_BH_HalfSpace()
     
-    AddPaths();    
-
-    PhysArea = struct('N',[1,60],...
+    AddPaths('CodePaper');            
+    
+    PhysArea = struct('N',[1,100],...
                       'L1',5,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
-                      'N2bound',16,'h',1,...
+                      'N2bound',34,'h',1,...
                       'alpha_deg',90);
                       
-
     %V2Num   = struct('Fex','SplitDisk','N',[34,34]);
     %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1);     
 
-    Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);                   
- 
+    FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
+                       'Ncircle',1,'N1disc',80,'N2disc',80);                   
+
     optsNum = struct('PhysArea',PhysArea,...
-                     'FexNum',Fex_Num,...%'V2Num',V2Num,...
+                     'FexNum',FexNum,...%'V2Num',V2Num,...
                      'maxComp_y2',-1,...
                      'y1Shift',0);
 
@@ -32,68 +31,97 @@ function CheckSumRule_BH_HalfSpace()
     config = v2struct(optsNum,optsPhys);                        
 
     N    = 20:5:120;
-    NS   = 80;%10:10:40;
+    NS   = 80;%10:10:40;        
     
-    figure('color','white','Position',[0 0 900 800]); 
-    legendstring = {};
-    
-    % **** 1 ****    
+    ignoreList = {'config_optsNum_PhysArea_N',...
+                  'config_optsNum_PhysArea_N2bound',...
+                  'config_optsNum_V2Num_N',...
+                  'config_optsNum_FexNum_N1disc',...
+                  'config_optsNum_FexNum_N2disc'};
+    % **** 1 ****        
     eta = 0.3;    
-    res{1} = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);
-        
-	AddPaths();    
-    ChangeDirData();
+    res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],[],ignoreList);
+    resC{1}.config = config;
+    resC{1}.eta    = eta;
+        	
+    AddPaths('CodePaper');
     % **** 2 ****    
     eta = 0.15;    
-    res{2} = DataStorage([],@ComputeError,v2struct(N,NS,config,eta),[]);  
+    res{2}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],[],ignoreList);  
+    resC{2}.config = config;
+    resC{2}.eta    = eta;
     
-    AddPaths();  ChangeDirData();   
+    AddPaths('CodePaper');
     % **** 3 ****
    % NS   = 80;
    % N    = 20:10:120;
+   
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{3} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]); 
+    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList); 
+    resC{3}.config = config;
     
-    AddPaths();  ChangeDirData();     
+    AddPaths('CodePaper');
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{4} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]); 
+    res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList); 
+    resC{4}.config = config;
     
-    AddPaths();  ChangeDirData();
+    AddPaths('CodePaper');
     
     % **** 4 ****
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{5} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);            
+    res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList);            
+    resC{5}.config = config;
     
-    AddPaths();  ChangeDirData();
+    AddPaths('CodePaper');
     
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{6} = DataStorage([],@ComputeError,v2struct(N,NS,config),[]);    
+    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList);    
+    resC{6}.config = config;
     
-    AddPaths();  ChangeDirData();
+    AddPaths('CodePaper');
     
+    %**********************
+    %**********************
+    resC = DataStorage([],@ComputeDensityProfile,config,resC,[],ignoreList);
     
-    PlotErrorGraph(res{1},'error_wl','o-','k',['Hard sphere, eta = ',num2str(0.3)]); 
-    PlotErrorGraph(res{2},'error_wl','s-','k',['Hard sphere, eta = ',num2str(0.15)]);     
-    
-    PlotErrorGraph(res{3},'error_wl','d-','b','BarkerHendersonCutoff_2D, liq');
-    PlotErrorGraph(res{3},'error_wg','d--','b','BarkerHendersonCutoff_2D, vap');
-    
-    PlotErrorGraph(res{4},'error_wl','>-','b','BarkerHendersonHardCutoff_2D, liq');
-    PlotErrorGraph(res{4},'error_wg','>--','b','BarkerHendersonHardCutoff_2D, vap');
-    
-    PlotErrorGraph(res{5},'error_wl','<-','b','BarkerHenderson_2D, liq');
-    PlotErrorGraph(res{5},'error_wg','<--','b','BarkerHenderson_2D, vap');
+    CLT = ContactLineHS(config);
+	CLT.Preprocess();
+    figure('color','white','Position',[0 0 900 800]); 
+    for k = 1:length(resC)
+        if(isfield(resC{k},'rho1D'))
+            CLT.IDC.do1DPlotNormal(resC{k}.rho1D,'d','r');
+        else
+            CLT.IDC.do1DPlotNormal(resC{k}.rho1D_WL,'d','r');
+            CLT.IDC.do1DPlotNormal(resC{k}.rho1D_WG,'d','g');
+        end
+    end
         
-    PlotErrorGraph(res{6},'error_wl','^-','m','ExponentialDouble, liq');
-    PlotErrorGraph(res{6},'error_wg','^--','m','ExponentialDouble, vap');
+    %**********************
+    %**********************
+    figure('color','white','Position',[0 0 900 800]); 
+    legendstring = {};
+    PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
+    PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
+    
+    PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
+    PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
+    
+    PlotErrorGraph(res{4},'error_wl','>-','k','BarkerHendersonHardCutoff_2D, liq');
+    PlotErrorGraph(res{4},'error_wg','>--','k','BarkerHendersonHardCutoff_2D, vap');
+    
+    PlotErrorGraph(res{5},'error_wl','*-','k','BarkerHenderson_2D, liq');
+    PlotErrorGraph(res{5},'error_wg','*--','k','BarkerHenderson_2D, vap');
+        
+    PlotErrorGraph(res{6},'error_wl','^-','k','ExponentialDouble, liq');
+    PlotErrorGraph(res{6},'error_wg','^--','k','ExponentialDouble, vap');
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -103,10 +131,39 @@ function CheckSumRule_BH_HalfSpace()
                             'Interpreter','Latex','fontsize',20);
     xlim([(N(1)-2),(N(end)+2)]);    
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
-    legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
+   % legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
     
     comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
     SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
+    
+    function res = ComputeDensityProfile(opts,res)
+        
+        CL = ContactLineHS(res{1}.config);
+        CL.Preprocess(); 
+        
+        for i = 1:length(res)
+            
+            if(isfield(res{i}.config.optsNum,'V2Num'))                
+                CL.optsPhys.V1.epsilon_w = res{i}.config.optsPhys.V1.epsilon_w; 
+                CL.optsNum.V2Num     = res{i}.config.optsNum.V2Num;
+                CL.optsPhys.V2       = res{i}.config.optsPhys.V2;            
+                CL.Preprocess_MeanfieldContribution();
+                
+                [CL.optsPhys.rhoGas_sat,...
+                 CL.optsPhys.rhoLiq_sat,...
+                 CL.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(CL.optsPhys);
+                
+                [~,res{i}.rho1D_WL] = CL.Compute1D('WL');
+                [~,res{i}.rho1D_WG] = CL.Compute1D('WG');
+            else
+                [~,res{i}.rho1D] = CL.Compute1D(res{i}.eta);
+            end            
+            
+        end
+        
+        
+    end
+    
 	    
     function res = ComputeError(in,h)
         conf = in.config;

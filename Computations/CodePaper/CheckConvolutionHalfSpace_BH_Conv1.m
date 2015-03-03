@@ -2,7 +2,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     
     AddPaths();
 
-    PhysArea = struct('N',[1,30],...
+    PhysArea = struct('N',[20,20],...
                       'L1',5,'L2',4,'L2_AD',4.,...
                       'y2wall',0.,...
                       'N2bound',10,'h',1,...
@@ -39,11 +39,11 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
-    N    = 30;%:10:50;    
+    N    = 20;%:10:50;    
     NS_d = 2; %2;  %10;
     NS   = 10:NS_d:100;%[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
-    res = DataStorage([],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
+    res = DataStorage(['CodePaperConv'],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
     
 	CLT = ContactLineHS(config);
 	CLT.PreprocessIDC();     
@@ -72,15 +72,16 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     PlotMatrixError('ConvSplitDisk','*','k','\phi_{SD}');
     PlotMatrixError('ConvShortRange','d','k','\phi_{SR}');
     PlotMatrixError('Conv','o','k','\phi_{LR}');
-    PlotMatrixError('A_n2','d','m','w_2');
-    PlotMatrixError('A_n3','s','g','w_3');
-    PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
-    PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
     
-    PlotMatrixError('AAD_n2','*','m','w_{2,AD}');
-    PlotMatrixError('AAD_n3','x','g','w_{3,AD}');
-    PlotMatrixError('AAD_n2_v_1','p','b','w_{2AD,1}');
-    PlotMatrixError('AAD_n2_v_2','h','r','w_{2AD,2}');
+    PlotMatrixError('A_n2','s','g','w_2'); %    PlotMatrixError('A_n2','d','m','w_2'); 
+    PlotMatrixError('A_n3','p','g','w_3');
+    PlotMatrixError('A_n2_v_1','v','g','w_{2,1}'); %PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
+    PlotMatrixError('A_n2_v_2','<','g','w_{2,2}'); %PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
+    
+    PlotMatrixError('AAD_n2','s','b','w_{2,AD}'); %PlotMatrixError('AAD_n2','*','m','w_{2,AD}');
+    PlotMatrixError('AAD_n3','p','b','w_{3,AD}'); %PlotMatrixError('AAD_n3','x','g','w_{3,AD}');
+    PlotMatrixError('AAD_n2_v_1','v','b','w_{2AD,1}');
+    PlotMatrixError('AAD_n2_v_2','<','b','w_{2AD,2}');%PlotMatrixError('AAD_n2_v_2','v','r','w_{2AD,2}');
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -89,7 +90,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
                             'Interpreter','Latex','fontsize',15);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
-    legend(legendstring,'Location','northOutside','Orientation','horizontal');
+    ylim([1e-16 1]);
+    %legend(legendstring,'Location','northOutside','Orientation','horizontal');
    
 %     filename = 'ConvolutionMatrixError';
 % 	print2eps([dirData filesep filename],gcf);
@@ -102,12 +104,13 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     PlotErrorGraph('error_conv_SplitDisk','*','k');
     PlotErrorGraph('error_convShortRange','d','k');
     PlotErrorGraph('error_conv1','o','k');
-    PlotErrorGraph('error_n2_1','d','m');
-    PlotErrorGraph('error_n3_1','s','g');
-    PlotErrorGraph('error_n2v2_1','<','b');        
-    PlotErrorGraph('error_n2AD_ones','*','m');
-    PlotErrorGraph('error_n3AD_ones','x','g');
-    PlotErrorGraph('error_n2v2AD_ones','p','b');    
+    
+    PlotErrorGraph('error_n2_1','s','g');
+    PlotErrorGraph('error_n3_1','p','g');
+    PlotErrorGraph('error_n2v2_1','v','g');        
+    PlotErrorGraph('error_n2AD_ones','s','b');
+    PlotErrorGraph('error_n3AD_ones','p','b');
+    PlotErrorGraph('error_n2v2AD_ones','v','b');    
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -115,6 +118,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     xlabel('$N$','Interpreter','Latex','fontsize',15);
     ylabel('error$(\Phi_{2D} \ast {\bf 1})$','Interpreter','Latex','fontsize',15);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
+    ylim([1e-16 1]);
     
     SaveFigure('ConvolutionError',v2struct(N,NS,config));
     
@@ -128,7 +132,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 
         for i = 1:length(N)
             
-            conf.optsNum.PhysArea.N = [1,N(i)]; %N(i),N(i)
+            conf.optsNum.PhysArea.N = [N(i),N(i)]; %N(i),N(i)
             
             CL = ContactLineHS(conf);
             preErr = CL.Preprocess();        
