@@ -572,7 +572,7 @@ classdef (Abstract) Shape < handle
                 I = w*f;
             end
         end        
-        function plotLine(this,y1P,y2P,f,opts)
+        function [f_p,pts] = plotLine(this,y1P,y2P,f,opts)
             
             plain = false;
             color = 'k';
@@ -675,7 +675,8 @@ classdef (Abstract) Shape < handle
                 xLab_Txt = 'Distance from point y0';
             end
             
-            plot(offset + dist,IP*f,'color',color,'linewidth',1.5); hold on;
+            f_p = IP*f;
+            plot(offset + dist,f_p,'color',color,'linewidth',1.5); hold on;
             xlabel(xLab_Txt);
             if(~plain)
                 plot(offset + distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            

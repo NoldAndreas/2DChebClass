@@ -1,92 +1,64 @@
-function CheckSumRule_BH_HalfSpace()
+function Check2DSumRule()
     
     AddPaths('CodePaper');            
     
-    PhysArea = struct('N',[1,40],...
-                      'L1',5,'L2',2,'L2_AD',2.,...
+    PhysArea = struct('N',[20,20],...
+                      'L1',4,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',14,'h',1,...
                       'alpha_deg',90);
                       
-    %V2Num   = struct('Fex','SplitDisk','N',[34,34]);
-    %V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    %    V2 = struct('V2DV2','Exponential','epsilon',1.5,'LJsigma',1);     
+    V2Num    = struct('Fex','SplitDisk','N',[80,80]);
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',80,'N2disc',80);                   
+                       'Ncircle',1,'N1disc',50,'N2disc',50);
 
     optsNum = struct('PhysArea',PhysArea,...
-                     'FexNum',FexNum,...%'V2Num',V2Num,...
-                     'maxComp_y2',-1,...
+                     'FexNum',FexNum,'V2Num',V2Num,...
+                     'maxComp_y2',20,...
                      'y1Shift',0);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.);%1.375);%1.25)s;
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.0);%1.375);%1.25)s;
     
 
-    optsPhys = struct('V1',V1,...%'V2',V2,...
+    optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
                       'Dmu',0.0,'nSpecies',1,...
                       'sigmaS',1);
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:5:120;
-    NS   = 80;%10:10:40;        
+    N    = 20:10:50;        
     
     ignoreList = {'config_optsNum_PhysArea_N',...
-                  'config_optsNum_PhysArea_N2bound',...
-                  'config_optsNum_V2Num_N',...
-                  'config_optsNum_FexNum_N1disc',...
-                  'config_optsNum_FexNum_N2disc'};
-              
+                  'config_optsNum_PhysArea_N2bound'};
     comp = [];
-    % **** 1 ****        
-    eta = 0.3;    
-    res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);
-    resC{1}.config = config;
-    resC{1}.eta    = eta;
-        	
-    AddPaths('CodePaper');
-    % **** 2 ****    
-    eta = 0.15;    
-    res{2}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);  
-    resC{2}.config = config;
-    resC{2}.eta    = eta;
     
-    AddPaths('CodePaper');
-    % **** 3 ****
-   % NS   = 80;
-   % N    = 20:10:120;
+    AddPaths('CodePaper');    
+    dirRes = 'SumRuleError2D';
    
-    config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
-    resC{3}.config = config;
+    config.optsNum.V2Num.Fex = 'SplitAnnulus'; 
+    config.optsPhys.V2.V2DV2 = 'BarkerHendersonCutoff_2D';                
+    res{1}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
     
     AddPaths('CodePaper');
-    config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
-    resC{4}.config = config;
+    config.optsNum.V2Num.Fex = 'SplitAnnulus';
+    config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
+    res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
     
     AddPaths('CodePaper');
     
-    % **** 4 ****
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
-    resC{5}.config = config;
+    
+    config.optsNum.V2Num.Fex = 'SplitDisk';     
+    config.optsPhys.V2.V2DV2 = 'BarkerHenderson_2D';     
+    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                
     
     AddPaths('CodePaper');
     
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);    
-    resC{6}.config = config;
+    config.optsNum.V2Num.Fex = 'SplitDisk'; 
+    config.optsPhys.V2.V2DV2 = 'ExponentialDouble';            
+    res{4} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);        
     
     AddPaths('CodePaper');
     
@@ -187,61 +159,34 @@ function CheckSumRule_BH_HalfSpace()
     end
     function res = ComputeError(in,h)
         conf = in.config;
-        N      = in.N;
-        NS     = in.NS;
-        
-        %error_wg    = zeros(length(N),length(NS));
-        %error_wl    = zeros(length(N),length(NS));
+        n    = in.N;                        
                 
-        for i = 1:length(N)
+        for i = 1:length(n)
             
-            conf.optsNum.PhysArea.N       = [1,N(i)];
-            conf.optsNum.PhysArea.N2bound = max(10,2*round(N(i)/6));
+            conf.optsNum.PhysArea.N       = [1,n(i)];
+            conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
+                
+            CL            = ContactLineHS(conf);
+            preErr        = CL.Preprocess(); 
             
-            for j = 1:length(NS)
-                if(isfield(conf.optsPhys,'V2'))
-                    conf.optsNum.V2Num.N       = [NS(j),NS(j)];
-                end
-                conf.optsNum.FexNum.N1disc = NS(j);
-                conf.optsNum.FexNum.N2disc = NS(j);
+            res(i).config = conf;            
 
-                CL = ContactLineHS(conf);
-                preErr = CL.Preprocess(); 
-                
-                res(i,j).config = conf;
-                res(i,j).y2      = CL.IDC.Pts.y2;
-                res(i,j).x2      = CL.IDC.Pts.x2;
-                
-                if(~isfield(conf.optsPhys,'V2'))                                        
-                    [~,res(i,j).rho_1D,params] = CL.Compute1D(in.eta);
-                    res(i,j).error_wl = params.contactDensity_relError;
-                else
-                    res(i,j).error_conv1 = preErr.error_conv1;
-                    res(i,j).Conv        = CL.IntMatrV2.Conv;
-                    
-                    [~,res(i,j).rho_1D_WL,params] = CL.Compute1D('WL');
-                    res(i,j).error_wl = params.contactDensity_relError;
+            res(i).error_conv1 = preErr.error_conv1;
+            res(i).Conv        = CL.IntMatrV2.Conv;
 
-                    [~,res(i,j).rho_1D_WG,params] = CL.Compute1D('WG');
-                    res(i,j).error_wg = params.contactDensity_relError;
-                end
-                %res(i,j).error_n2_1    = preErr.error_n2_1;
-                %res(i,j).error_n3_1    = preErr.error_n3_1;
-                %res(i,j).error_n2v2_1  = preErr.error_n2v2_1;                                
-                
-                res(i,j).N  = N(i);
-                res(i,j).NS = NS(j); 
-                %err         = CheckMeanfieldConvolution(CL);
-                %%res(i,j).error_conv1 = err.error_conv1;                 
-                
-                %res(i,j).A_n2       = CL.IntMatrFex.AD.n2;
-                %res(i,j).A_n3       = CL.IntMatrFex.AD.n3;
-                %res(i,j).A_n2_v_1   = CL.IntMatrFex.AD.n2_v_1;
-                %res(i,j).A_n2_v_2   = CL.IntMatrFex.AD.n2_v_2;                                
-                
-                close all;
-                clear('CL');                
-            end
+            [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');
+            res(i).error_wl = params.contactDensity_relError;
+
+            [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
+            res(i).error_wg = params.contactDensity_relError;
+            
+            CLT.ComputeEquilibrium();      
+            CLT.PostProcess(opts);
+            %CLT.PlotDensitySlices();
+            %CLT.PlotDisjoiningPressures();       
+
+            close all;
+            clear('CL');                            
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 

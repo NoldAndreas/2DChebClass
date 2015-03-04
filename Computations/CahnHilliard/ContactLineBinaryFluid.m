@@ -58,26 +58,28 @@ function ContactLineBinaryFluid
 %     PlotAsymptoticResults_Y2Max(dataM,'pMin','pMin');
 %     PlotAsymptoticResults_Y2Max(dataM,'pMax','pMax');
     
-    PlotAsymptoticInterfaceResults(dataM,1,'kappa_rescaled');    
-    PlotAsymptoticInterfaceResults(dataM,1,'mu_rescaled');    
-    PlotAsymptoticInterfaceResults(dataM,1,'p_rescaled');   
-    PlotAsymptoticInterfaceResults(dataM,1,'kappa_mu');   
+    for ii = 1:length(dataM{1}(1,1).mu_y2)
+        PlotAsymptoticInterfaceResults(dataM,1,ii,{'mu_y2'});    
+    end
+    
+    PlotAsymptoticInterfaceResults(dataM,1,'kappa_rescaled',{'IsoInterface'});    
+    PlotAsymptoticInterfaceResults(dataM,1,'mu_rescaled',{'IsoInterface'});
+    PlotAsymptoticInterfaceResults(dataM,1,'p_rescaled',{'IsoInterface'});
+    PlotAsymptoticInterfaceResults(dataM,1,'kappa_mu',{'IsoInterface'});
     
     
     PlotAsymptoticResults(dataM,'hatL',{'rescale','IsoInterface'});
     PlotAsymptoticResults(dataM,'stagnationPointY2','rescale');
-    PlotAsymptoticResults(dataM,'muPlusInf');
-    PlotAsymptoticResults(dataM,'muMinusInf');
-    PlotAsymptoticResults(dataM,'muMaxAbs');
-    PlotAsymptoticResults(dataM,'pMin');
-    PlotAsymptoticResults(dataM,'pMax');
-    
-    PlotAsymptoticResults(dataM,'IsoInterface.hatL','\hat{L}');
-    PlotAsymptoticResults(dataM,'stagnationPointY2','y_{S2}');
+    PlotAsymptoticResults(dataM,'muPlusInf',{'rescaleInv'});
+    PlotAsymptoticResults(dataM,'muMinusInf',{'rescaleInv'});
+    PlotAsymptoticResults(dataM,'muMaxAbs',{'rescaleInv','rescaleCa'});
+    PlotAsymptoticResults(dataM,'pMin',{'rescaleInv'});
+    PlotAsymptoticResults(dataM,'pMax',{'rescaleInv'});
+            
         
-    CompareAllData(dataM,1);
-    CompareAllData(dataM,2);
-    CompareAllData(dataM,3);
+   % CompareAllData(dataM,1);
+   %CompareAllData(dataM,2);
+   %CompareAllData(dataM,3);
     
     %dataM{l_diff}(Cak,y2Max)
     function PlotAsymptoticInterfaceResults(dataM,i_Cak,value,opts)
@@ -92,18 +94,26 @@ function ContactLineBinaryFluid
         title(['Ca = ',num2str(dataM{1}(i_Cak,1).Ca)]);
         for j2 = 1:size(dataM{1},2)
             for j0 = 1:length(dataM)
-                l_diff    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;
-                val       = dataM{j0}(i_Cak,j2).IsoInterface.(value); 
-
-                col = cols{mod(j0,nocols)+1};
-                
-                if(IsOption(opts,'rescale'))
-                    par = par./l_diff;
+                l_diff    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;                
+                col       = cols{mod(j0,nocols)+1};
+                                
+                if(IsOption(opts,'IsoInterface'))
+                    val = dataM{j0}(i_Cak,j2).IsoInterface.(value); 
+                    y  = dataM{j0}(i_Cak,j2).IsoInterface.y2/l_diff;
+                elseif(IsOption(opts,'mu_y2'))
+                    val = dataM{j0}(i_Cak,j2).mu_y2{value}.mu_0*l_diff;
+                    y  = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y1_kv/l_diff;
+                    y2 = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y2_kv(1)/l_diff
+                    %dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
                 end
-                y2 = dataM{j0}(i_Cak,j2).IsoInterface.y2/l_diff;
-                plot(y2,val,...
-                    ['-',syms{mod(j2,nosyms)+1},col],...
-                    'MarkerSize',8,'MarkerFaceColor',col); hold on;                                
+                
+                if(IsOption(opts,'SC'))
+                    plot(y,val,['-',syms{mod(j2,nosyms)+1},col],...
+                        'MarkerSize',8,'MarkerFaceColor',col);
+                else
+                    plot(y,val,['-',col],'linewidth',1.5); 
+                end
+                hold on;                                
                 legendstr(end+1) = {['l_d = ',num2str(l_diff),' y_{2,Max}/l_d = ',num2str(dataM{j0}(i_Cak,j2).config.optsNum.PhysArea.y2Max/l_diff)]};
             end
         end  
@@ -111,10 +121,12 @@ function ContactLineBinaryFluid
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
         xlabel('$y_2/\ell_{d}$','Interpreter','Latex','fontsize',20);
-        ylabel(value,'fontsize',20);  
-    end
-    
-    
+        if(IsOption(opts,'mu_y2'))
+            ylabel(['$\mu$ at $y_2/\ell_{d} = ',num2str(y2),'$'],'Interpreter','Latex','fontsize',20);  
+        else
+            ylabel(value,'fontsize',20);  
+        end
+    end        
     function PlotAsymptoticResults(dataM,parameter,opts)        
         
         if(nargin == 2)
@@ -124,29 +136,40 @@ function ContactLineBinaryFluid
             opts = {opts};
         end
         
+        
         figure('Position',[0 0 800 800],'color','white');
-         
-        for j1 = 1:size(dataM{1},1)
+        legendstr = {}; 
+        for i_Cak = 1:size(dataM{1},1)
+            Ca = dataM{1}(i_Cak,1).Ca;
             for j2 = 1:size(dataM{1},2)
                 for j0 = 1:length(dataM)
-                    l_diff(j0)    = dataM{j0}(j1,j2).config.optsPhys.l_diff;
+                    l_diff(j0)    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;
                     if(IsOption(opts,'IsoInterface'))
-                        par(j0)      = dataM{j0}(j1,j2).IsoInterface.(parameter);                
+                        par(j0)      = dataM{j0}(i_Cak,j2).IsoInterface.(parameter);                
                     else                        
-                        par(j0)      = dataM{j0}(j1,j2).(parameter);                
+                        par(j0)      = dataM{j0}(i_Cak,j2).(parameter);                
                     end
                 end 
                 col = cols{mod(j2,nocols)+1};
                 if(IsOption(opts,'rescale'))
                     par = par./l_diff;
+                elseif(IsOption(opts,'rescaleInv'))
+                    par = par.*l_diff;
+                end
+                
+                if(IsOption(opts,'rescaleCa'))
+                    par = par/Ca;
                 end
                 plot(1./l_diff,par,...
-                    ['-',syms{mod(j1,nosyms)+1},col],...
+                    ['-',syms{mod(i_Cak,nosyms)+1},col],...
                     'MarkerSize',8,'MarkerFaceColor',col); hold on;                
+                
+                legendstr(end+1) = {['Ca = ',num2str(Ca),' y_{2,Max}/l_d = ',num2str(dataM{1}(i_Cak,j2).config.optsNum.PhysArea.y2Max/l_diff(1))]};
              end  
         end
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
+        legend(legendstr);
         xlabel('$1/\ell_{d}$','Interpreter','Latex','fontsize',20);
         if(IsOption(opts,'rescale'))
             ylabel(['$',parameter,'/\ell_{d}$'],'Interpreter','Latex','fontsize',20);        
@@ -155,8 +178,7 @@ function ContactLineBinaryFluid
         end
         %ylim([90,100]);        
         SaveFigure([parameter,'_vs_l_diff']);
-    end
-        
+    end        
     function PlotAsymptoticResults_Y2Max(dataM,parameter,parName)
         figure('Position',[0 0 800 800],'color','white');
          
@@ -210,14 +232,20 @@ function ContactLineBinaryFluid
                 dataM(i,j).pMin        = min((DI.p));                              
                 dataM(i,j).IsoInterface = DI.IsoInterface;                                
                 dataM(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);
-
+                
+                l_diff = DI.optsPhys.l_diff;
+                
+                y2 = 0:0.5:3;
+                for kk = 1:length(y2)
+                    [f_p,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);
+                    dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
+                end
+                
                 close all;
             end
             clear('DI');
         end
-    end
-
-   
+    end  
 
     function CompareAllData(dataM,j1)
         thetaEq = dataM{1}(1,1).config.optsPhys.thetaEq;        

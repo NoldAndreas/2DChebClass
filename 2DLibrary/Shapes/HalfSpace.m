@@ -141,7 +141,14 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
         function do1DPlotNormal(this,V,sym,col)
             if(nargin < 3)
                 sym = 'o';
-            end            
+            end 
+            if(nargin < 4)
+                colEdge = 'k';
+                colFace = 'g';                
+            else
+                colEdge = col;
+                colFace = col;
+            end
             
             global PersonalUserOutput
             if(~PersonalUserOutput)
@@ -150,7 +157,7 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             V = V(:);
             
             %V: Vector of length N2
-            ptsM        = GetInvCartPts(this,inf,10);
+            ptsM        = GetInvCartPts(this,inf,15);
             y2Max       = ptsM.y2_kv;%10
             mark        = (this.Pts.y1_kv == inf);            
             IP          = ComputeInterpolationMatrix(this,1,(-1:0.01:CompSpace2(this,y2Max))',true);         
@@ -162,14 +169,12 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             
             PtsCart     = GetCartPts(this);
             IPPtsCart   = GetCartPts(this,IP.pts1,IP.pts2);          
-            if(nargin < 4)                
-                plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
-            else
-                plot(PtsCart.y2_kv(mark),V,sym,'MarkerEdgeColor',col,'MarkerFaceColor',col); 
-            end                        
-            hold on;
-            plot(IPPtsCart.y2_kv,IP.InterPol*V,'linewidth',1.5);
-            xlim([min(IPPtsCart.y2_kv) max(IPPtsCart.y2_kv)]);
+            y2MinC      = min(PtsCart.y2_kv(mark));
+            if(~isempty(sym))
+                plot(PtsCart.y2_kv(mark)-y2MinC,V,sym,'MarkerEdgeColor',colEdge,'MarkerFaceColor',colFace); hold on;
+            end
+            plot(IPPtsCart.y2_kv-y2MinC,IP.InterPol*V,colEdge,'linewidth',1.5);
+            xlim([0 max(IPPtsCart.y2_kv)]);
             xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);       
