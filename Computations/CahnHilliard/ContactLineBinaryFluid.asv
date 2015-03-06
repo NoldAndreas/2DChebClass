@@ -233,7 +233,7 @@ function ContactLineBinaryFluid
                 DI.PostProcess(); 
                 %DI.PlotResults();	  
 
-                dataM(i,j).config      = DI.GetConfig();                
+                dataM(i,j).config      = config;                
                 dataM(i,j).Ca          = 3/4*pars.Cak(i);                                
                 dataM(i,j).muMinusInf  = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
                 dataM(i,j).muPlusInf   = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
