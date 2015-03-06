@@ -1,4 +1,13 @@
-function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)     
+function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda,opts)     
+
+     if(nargin < 6)
+         opts = {};
+     end
+     if(~iscell(opts))
+         opts = {opts};
+     end
+     
+     
      if(nargin == 2)
          TolFun  = 10^(-10);
          MaxIter = 2000;
@@ -25,6 +34,10 @@ function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
          errorHistory(i) = err;
          %display(num2str(err));             
          i  = i+1;
+         
+         if((err < 1e-2) && IsOption(opts,'boost'))
+             lambda = lambda + (1-lambda)/2;
+         end
          
         % for ih = 1:no
          %   fprintf('\b');

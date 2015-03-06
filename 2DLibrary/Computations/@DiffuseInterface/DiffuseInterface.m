@@ -4,7 +4,7 @@ classdef DiffuseInterface < Computation
        IntSubArea
               
        phi = [],uv  = [],mu=[]      
-       theta=[],a=[],deltaX=[]
+       theta=[],deltaX=[]
        errors = []
        
        IsoInterface=struct('y2',[],'h',[],'theta',[],'kappa',[],...
@@ -97,12 +97,12 @@ classdef DiffuseInterface < Computation
                 this.mu  = zeros(this.IDC.M,1);                          
                 vec      = [this.uv;this.phi;this.mu];             
             end
-                        
+            
             if(IsSeppecher(this))
                 if(isempty(this.theta))
-                    vec = [0;0;theta;vec];
+                    vec = [theta;vec];
                 else
-                    vec = [this.a;this.deltaX;this.theta;vec];
+                    vec = [this.deltaX;this.theta;vec];
                 end
             end
              

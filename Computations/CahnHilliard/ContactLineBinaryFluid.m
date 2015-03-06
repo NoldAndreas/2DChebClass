@@ -5,7 +5,7 @@ function ContactLineBinaryFluid
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
 
     PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',20,...
-                      'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
+                      'L1_d',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
     SubArea  = struct('shape','Box','N',[60,60],...
@@ -18,18 +18,17 @@ function ContactLineBinaryFluid
     optsPhys = struct('thetaEq',pi/2,...       
                        'theta',90*pi/180,...
                        'Cak',0.01,'Cn',1,...
-                       'UWall',1,...                       
-                       'l_diff',0.5,...%'mobility',10,...
+                       'UWall',1,...                                              
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = 0.005;%[0.005;0.01];%(0.005:0.0025:0.01)';
     y2Max            = 24;%(16:2:24);            
-    l_d              = 3.0;%1:0.25:3.0;%0.25:0.25:2.5;
+    Cn               = 1./(1:0.25:3.0);%1:0.25:3.0;%0.25:0.25:2.5;
     
-    for k = 1:length(l_d)
-        parameters.config.optsPhys.l_diff = l_d(k);    
-        parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
+    for k = 1:length(Cn)
+        parameters.config.optsPhys.l_diff = Cn(k);    
+        parameters.y2Max                  = y2Max;
         dataM{k} = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],true);
     end
     
