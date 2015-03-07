@@ -1,8 +1,8 @@
 function IterationStepFullProblem(this)
-    %Continuitiy: 0           = div(uv)
-    %Momentum:    0           = -Grad(p) + mu*grad(phi) + Lap(uv)
-    %Phasefield   u*grad(phi) = Lap(mu) 
-    %ChemPot      Cak*mu      = f_w' - Cn*Lap(phi)
+    %Continuitiy: 0 = div(uv)
+    %Momentum:    0 = -Grad(p) + (G+s*phi)*grad(phi)/Cak + Lap(uv)
+    %Phasefield   0 = m*Lap(G + s*phi) - u*grad(phi)
+    %ChemPot      0 = f_w' - s*phi - Cn*Lap(phi) - G
     %
     % 
     % (BC1) uv = uv_BC    
@@ -15,12 +15,19 @@ function IterationStepFullProblem(this)
     if(isfield(this.optsNum,'optsSolv'))
         opts = this.optsNum.optsSolv;
     else
-        opts = struct('noIterations',40,'lambda',0.6,'Seppecher_red',1);
+        opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
     end
            
     solveSquare   = [];
-
-    if(~isfield(opts,'Seppecher_red'))
+%    Seppecher_red = [];
+%     
+% 	if((nargin == 1) || ~isfield(opts,'solveSquare'))
+%         solveSquare = true;
+%     else
+%         solveSquare = opts.solveSquare;
+%     end
+%     
+ 	if(~isfield(opts,'Seppecher_red'))
          Seppecher_red = 0;
      else
          Seppecher_red = opts.Seppecher_red;
@@ -35,7 +42,12 @@ function IterationStepFullProblem(this)
         theta = this.theta;
     else
         theta = pi/2;
-    end    
+    end
+    
+    if(Seppecher)            
+        a      = [0;0];
+        this.a = a;          
+	end
       
     nParticles     = this.optsPhys.nParticles;            
     M              = this.IDC.M;  
@@ -56,13 +68,10 @@ function IterationStepFullProblem(this)
     if(IsSeppecher(this))
         Seppecher_red      = 2;
         opts.Seppecher_red = Seppecher_red;
-        opts.lambda        = 0.4;    
-        opts.noIterations  = 100;
+        opts.lambda        = 0.6;    
         
         [res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,[],[],{'optsNum_SubArea','noIterations'});    
         SetResults(res);
-        
-      
     end
 	           
     this.filename               = Parameters.Filename;
@@ -73,13 +82,16 @@ function IterationStepFullProblem(this)
         this.mu       = res.mu;
         this.phi      = res.phi;
         this.p        = res.p;
-        if(Seppecher_red == 1)            
+        if(Seppecher_red == 1)
+            this.a        = a;        
             this.deltaX   = res.deltaX;
             this.theta    = theta;    
-        elseif(Seppecher_red == 2)                    
+        elseif(Seppecher_red == 2)
+            this.a        = a;        
             this.deltaX   = res.deltaX;
             this.theta    = res.theta;    
-        elseif(Seppecher)            
+        elseif(Seppecher)
+            this.a        = res.a;        
             this.deltaX   = res.deltaX;
             this.theta    = theta;
             %this.theta    = res.theta;
@@ -90,14 +102,20 @@ function IterationStepFullProblem(this)
         
          if(Seppecher_red == 1)
              iGuess = GetInitialCondition(this,theta);
-             iGuess = [0;iGuess];%iGuess([1,3:end]);
+             iGuess = iGuess([3,5:end]);
+         elseif(Seppecher_red == 2)            
+             iGuess = GetInitialCondition(this,theta);
+             iGuess = iGuess(3:end);
+         elseif(Seppecher)
+             iGuess          = GetInitialCondition(this,theta);
+             iGuess = iGuess([1:3,5:end]);
          else
              iGuess = GetInitialCondition(this);        
          end
         %solveSquare = true;        
 
         solveSquare      = true;
-        [vec,errHistory] = NewtonMethod(iGuess,@f,1e-6,opts.noIterations,opts.lambda,'boost');
+        [vec,errHistory] = NewtonMethod(iGuess,@f,1e-6,opts.noIterations,opts.lambda);
         if(isempty(vec))            
             opts.optsNum.PhysArea
             opts.optsPhys
@@ -117,7 +135,12 @@ function IterationStepFullProblem(this)
         elseif(Seppecher_red == 2)
             res.deltaX = vec(1);
             res.theta  = vec(2);
-            vec        = vec(3:end);        
+            vec        = vec(3:end);
+        elseif(Seppecher)
+            res.a      = vec(1:2);
+            res.deltaX = vec(3);
+            res.theta  = vec(4);
+            vec        = vec(5:end);
         end
         res.uv     = vec([T;T;F;F;F]);
         res.phi    = vec([F;F;T;F;F]);
@@ -144,9 +167,16 @@ function IterationStepFullProblem(this)
             deltaX = z(1);
             theta  = z(2);
             disp(['[deltaX,theta] = ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);        
-            z      = z(3:end);                                
+            z      = z(3:end);                        
+        elseif(Seppecher)
+            a      = z(1:2);
+            deltaX = z(3);
+            %theta  = z(4);
+            disp(['[a,deltaX,theta] = ',num2str(a(1)),' , ',num2str(a(2)),' , ',num2str(deltaX),' , ',num2str(theta*180/pi),'.']);
+        
+            z      = z(4:end);
         else
-            deltaX = []; theta = [];                    
+            a = []; deltaX = []; theta = [];                    
         end                
 
         uv  = z([T;T;F;F;F]);
@@ -186,11 +216,21 @@ function IterationStepFullProblem(this)
             
             [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
             v_SeppAdd   = v_SeppAdd(3:4);
-            A_SeppAdd   = A_SeppAdd(3:4,[3:end]);                                
+            A_SeppAdd   = A_SeppAdd(3:4,[3:end]);            
+        elseif(Seppecher)    
+            A_cont      = [zeros(M,3),A_cont];
+            A_mom       = [zeros(2*M,3),A_mom];
+            A_G         = [zeros(M,3),A_G];
+            A_mu        = [zeros(M,3),A_mu];
+            A_particles = [0,0,0,A_particles];
+            
+            [v_SeppAdd,A_SeppAdd] = GetSeppecherConditions(this,uv,phi,G,p,deltaX,theta);
+            v_SeppAdd = v_SeppAdd(1:3);
+            A_SeppAdd = A_SeppAdd(1:3,[1:3,5:end]);
         end
         
         [v_mu(Ind.top|Ind.bottom),A_mu_BC] = GetPhiBC(this,phi,theta);          
-        [v_mom(IBB),A_mom_BC]              = GetVelBC(this,uv,deltaX,theta);                    
+        [v_mom(IBB),A_mom_BC]              = GetVelBC(this,uv,a,deltaX,theta);                    
         [v_G(Ind.bound),A_G_BC]            = GetChemPotBC(this,uv,phi,G,theta);
         
         if(Seppecher_red == 1)
@@ -201,6 +241,10 @@ function IterationStepFullProblem(this)
             A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[3:end]);
             A_mom(IBB,:)               = A_mom_BC(:,[3:end]);
             A_G(Ind.bound,:)           = A_G_BC(:,[3:end]);
+        elseif(Seppecher)
+            A_mu(Ind.top|Ind.bottom,:) = A_mu_BC(:,[1:3,5:end]);
+            A_mom(IBB,:)               = A_mom_BC(:,[1:3,5:end]);
+            A_G(Ind.bound,:)           = A_G_BC(:,[1:3,5:end]);
         else
             A_mu(Ind.top|Ind.bottom,:) = A_mu_BC;
             A_mom(IBB,:)               = A_mom_BC;
@@ -228,6 +272,11 @@ function IterationStepFullProblem(this)
 
         DisplayError(v);
                 
+      %  A = A(2:end,2:end);
+      %  v = v(2:end);
+        
+        %A = A([1,3:end],[1,3:end]);
+        %v = v([1,3:end]);
     end    
     function DisplayError(error)
         
@@ -238,7 +287,14 @@ function IterationStepFullProblem(this)
         elseif(Seppecher_red == 2)
             PrintErrorPos(error(1),'zero density at interface');        
             PrintErrorPos(error(2),'chemical potential at -inf');            
-            error = error(3:end);                            
+            error = error(3:end);                    
+        elseif(Seppecher)
+            PrintErrorPos(error(1),'consistent phase mass');
+            PrintErrorPos(error(2),'consistent mass');
+            PrintErrorPos(error(3),'zero density at interface');        
+            %PrintErrorPos(error(4),'chemical potential at -inf');
+        
+            error = error(4:end);
         end
         PrintErrorPos(error([F;F;F;F;T]),'continuity equation',this.IDC.Pts);
         PrintErrorPos(error([T;F;F;F;F]),'y1-momentum equation',this.IDC.Pts);

@@ -18,11 +18,6 @@ classdef Computation < handle
             end
         end
         
-        function config = GetConfig(this)
-            config = struct('optsNum',this.optsNum,...
-                            'optsPhys',this.optsPhys);
-        end
-        
         function PreprocessIDC(this)
             optsNum  = this.optsNum;
             shape    = optsNum.PhysArea;            

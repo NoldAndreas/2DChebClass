@@ -1,9 +1,5 @@
 classdef DiffuseInterfaceSingleFluid < DiffuseInterface
-        
-    
-    properties (Access = public)
-        a=[]
-    end
+         
     methods (Access = public) 
          function this = DiffuseInterfaceSingleFluid(config)           
              this@DiffuseInterface(config);
@@ -183,20 +179,6 @@ classdef DiffuseInterfaceSingleFluid < DiffuseInterface
 
              v_SeppAdd = [v_a;v_deltaX;v_theta];
              A_SeppAdd = [A_a;A_deltaX;A_theta];
-         end
-         
-         
-         function vec = GetInitialCondition(this,theta) 
-            vec = GetInitialCondition@DiffuseInterface(this,theta);
-                        
-            if(IsSeppecher(this))
-                if(isempty(this.theta))
-                    vec = [0;0;vec];
-                else
-                    vec = [this.a;vec];
-                end
-            end
-             
          end
         
          %Old
