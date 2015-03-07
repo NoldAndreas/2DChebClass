@@ -15,7 +15,7 @@ function IterationStepFullProblem(this)
     if(isfield(this.optsNum,'optsSolv'))
         opts = this.optsNum.optsSolv;
     else
-        opts = struct('noIterations',40,'lambda',0.8,'Seppecher_red',1);
+        opts = struct('noIterations',40,'lambda',0.6,'Seppecher_red',1);
     end
            
     solveSquare   = [];
@@ -90,7 +90,7 @@ function IterationStepFullProblem(this)
         
          if(Seppecher_red == 1)
              iGuess = GetInitialCondition(this,theta);
-             iGuess = iGuess([1,3:end]);
+             iGuess = [0;iGuess];%iGuess([1,3:end]);
          else
              iGuess = GetInitialCondition(this);        
          end

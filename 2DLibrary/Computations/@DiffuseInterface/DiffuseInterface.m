@@ -98,13 +98,13 @@ classdef DiffuseInterface < Computation
                 vec      = [this.uv;this.phi;this.mu];             
             end
             
-            if(IsSeppecher(this))
-                if(isempty(this.theta))
-                    vec = [theta;vec];
-                else
+%             if(IsSeppecher(this))
+%                 if(isempty(this.theta))
+%                     vec = [theta;vec];
+%                 else
                     vec = [this.deltaX;this.theta;vec];
-                end
-            end
+               % end
+            %end
              
          end
         function phi = InitialGuessRho(this,theta)
