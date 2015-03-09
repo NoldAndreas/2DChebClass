@@ -9,28 +9,25 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        function this = DiffuseInterfaceBinaryFluid(config)     
             if(nargin == 0)
                  config = [];
-            end            
-            config.optsNum.PhysArea.L1 = config.optsNum.PhysArea.L1_d*...
-                                         config.optsPhys.Cn;
+            end
+            if(~isempty(config) && ~isfield(config.optsPhys,'mobility') && ...
+                    isfield(config.optsPhys,'l_diff'))
+                config.optsPhys.mobility = (config.optsPhys.l_diff)^2/(config.optsPhys.Cak);
+            end
             this@DiffuseInterface(config);            
        end
        
        IterationStepFullProblem(this)        
        
-       
-       function SetCn(this,Cn)           
-           this.optsPhys.Cn = Cn;           
-           this.optsNum.PhysArea.L1 = this.optsNum.PhysArea.L1_d*Cn;
-           PreprocessIDC();
-           SaveConfig(this);   
-       end
-       
-       function SetCak(this,Cak)          
+       function SetCak(this,Cak)
+           if(isfield(this.optsPhys,'l_diff'))
+               this.optsPhys.mobility = (this.optsPhys.l_diff)^2/Cak;
+           end            
            this.optsPhys.Cak = Cak;           
            SaveConfig(this);   
        end
             
-       function vec           = GetInitialCondition(this,theta) 
+       function vec = GetInitialCondition(this,theta) 
             if(nargin == 1)
                 theta = pi/2;
             end
@@ -43,12 +40,12 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             end           
            vec      = [vec;this.p];
        end        
-       function [v_mom,A_mom] = GetVelBC(this,uv,deltaX,theta)
+       function [v_mom,A_mom] = GetVelBC(this,uv,a,deltaX,theta)
            M = this.IDC.M;           
            if(nargin == 2)
                 [v_mom,A_mom] = GetVelBC@DiffuseInterface(this,uv);
            else
-                [v_mom,A_mom] = GetVelBC@DiffuseInterface(this,uv,[0;0],deltaX,theta);
+                [v_mom,A_mom] = GetVelBC@DiffuseInterface(this,uv,a,deltaX,theta);
            end
            A_mom         = [A_mom,zeros(size(A_mom,1),M)]; 
        end
@@ -61,7 +58,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            end
        end       
        function [v_G_IBB,A_G_IBB] = GetChemPotBC(this,uv,phi,G,theta)
-                      
+           
+            m              = this.optsPhys.mobility;
             Ind            = this.IDC.Ind;
             Diff           = this.IDC.Diff;
             M    = this.IDC.M;
@@ -102,11 +100,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             A_G(Ind.left & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) ...
                                                       - EYM(Ind.left & Ind.bottom,:) ...                                              
                                                       + this.IDC.borderBottom.IntSc*(diag(Diff.Dy2*(uv(1+end/2:end))));
-            A_G(Ind.left & Ind.bottom,[F;F;F;T;F]) = - this.IDC.borderBottom.IntSc*Diff.DDy2;
+            A_G(Ind.left & Ind.bottom,[F;F;F;T;F]) = - m*this.IDC.borderBottom.IntSc*Diff.DDy2;
             v_G(Ind.left & Ind.bottom)             =    phi(Ind.right & Ind.bottom) ...
                                                       - phi(Ind.left & Ind.bottom) ...
                                                       + this.IDC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
-                                                      - this.IDC.borderBottom.IntSc*Diff.DDy2*G;
+                                                      - m*this.IDC.borderBottom.IntSc*Diff.DDy2*G;
                               
             % ****************
             IP                      = this.IDC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
@@ -117,11 +115,11 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             A_G(Ind.right & Ind.bottom,[F;T;F;F;F]) = IntPath_Half_Low*(diag(phi)*Diff.Dy2);
             A_G(Ind.right & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) - IP0 ...                                              
                                                       + IntPath_Half_Low*(Diff.Dy2*(uv(1+end/2:end)));
-            A_G(Ind.right & Ind.bottom,[F;F;F;T;F]) = - IntPath_Half_Low*Diff.DDy2;
+            A_G(Ind.right & Ind.bottom,[F;F;F;T;F]) = - m*IntPath_Half_Low*Diff.DDy2;
             
             v_G(Ind.right & Ind.bottom) = phi(Ind.right & Ind.bottom) - IP0*phi ...
                                           + IntPath_Half_Low*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
-                                          - IntPath_Half_Low*Diff.DDy2*G;
+                                          - m*IntPath_Half_Low*Diff.DDy2*G;
                                       
             if(IsSeppecher(this))
                 A_G  = [A_G_four,A_G];
@@ -138,6 +136,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             Diff           = this.IDC.Diff;
             IntNormalUp    = this.IDC.borderTop.IntNormal;
             Cn             = this.optsPhys.Cn;
+            m              = this.optsPhys.mobility;
             y2Max          = this.optsNum.PhysArea.y2Max;
             lbC            = Ind.left & Ind.bottom;
             rbC            = Ind.right & Ind.bottom;
@@ -155,10 +154,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             A_a([F;F;T;F;F])   = IntNormalUp*[diag(uv(1:end/2));diag(uv(1+end/2:end))];
             A_a([F;F;rbC;F;F]) = A_a([F;F;rbC;F;F]) + y2Max;
             A_a([F;F;lbC;F;F]) = A_a([F;F;lbC;F;F]) - y2Max;            
-            A_a([F;F;F;T;F])   = -IntNormalUp*Diff.grad;
+            A_a([F;F;F;T;F])   = -m*IntNormalUp*Diff.grad;
             A_a                = [0,0,0,0,A_a];        
             
-            v_a                = IntNormalUp*(repmat(phi,2,1).*uv - Diff.grad*G) +(phi(rbC)-phi(lbC))*y2Max;
+            v_a                = IntNormalUp*(repmat(phi,2,1).*uv - m*Diff.grad*G) +(phi(rbC)-phi(lbC))*y2Max;
 
             % Conservation of mass
             A_b                = zeros(1,5*M);        
@@ -278,7 +277,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
             A_mom_IBB = A_mom(IBB,:);
             v_mom_IBB = v_mom(IBB);
-       end      
+       end
+
+       vec_a  = FindAB(this,phi,mu,deltaX,a_ig)              
        
        function [v_cont,A_cont] = Continuity(this,uv,phi,G,p)            
            
@@ -342,28 +343,13 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                                       - m11(Ind.left & Ind.top));                                
 
        end
-       function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
-            %[uv;phi;G]     
-            Cak            = this.optsPhys.Cak;
-            Cn             = this.optsPhys.Cn;
-            M              = this.IDC.M;
-            Z              = zeros(M);
-            Diff           = this.IDC.Diff;            
-            
-            [fWP,fW,fWPP]  = DoublewellPotential(phi,Cn);
-            
-            A_mu           = [Z,Z,diag(fWPP)-Cn*Diff.Lap,-eye(M)*Cak];
-            v_mu           = fWP - Cn*Diff.Lap*phi - G*Cak;
-            
-            A_mu           = [A_mu,zeros(this.IDC.M)];
-        end  
-       
-       %function [v_mu,A_mu]     = ChemicalPotential(this,phi,G)
-%           [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,phi,G);
-%           A_mu = [A_mu,zeros(this.IDC.M)];
-%       end
+       function [v_mu,A_mu]     = ChemicalPotential(this,phi,G)
+           [v_mu,A_mu] = ChemicalPotential@DiffuseInterface(this,phi,G);
+           A_mu = [A_mu,zeros(this.IDC.M)];
+       end
        function [v_G,A_G]       = PhasefieldEq(this,uv,phi,G)
-                       
+           
+            m              = this.optsPhys.mobility;            
             Diff           = this.IDC.Diff;
             M    = this.IDC.M;            
             Z    = zeros(M);            
@@ -371,8 +357,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             uvTdiag        = [diag(uv(1:end/2)),diag(uv(end/2+1:end))];        
             gradPhiMT      = [diag(Diff.Dy1*phi),diag(Diff.Dy2*phi)];
               
-            A_G            = [-gradPhiMT,-uvTdiag*Diff.grad,Diff.Lap,Z];
-            v_G            = Diff.Lap*G - gradPhiMT*uv;           
+            A_G            = [-gradPhiMT,-uvTdiag*Diff.grad,m*Diff.Lap,Z];
+            v_G            = m*Diff.Lap*G - gradPhiMT*uv;           
        end
        function [v_mom,A_mom]   = Momentum(this,uv,phi,G,p)                
            
@@ -382,14 +368,12 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
             A_mom          = [Diff.LapVec,...
                                diag(repmat(G,2,1))*Diff.grad/Cak,...                               
-                               [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)],...
+                               [diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)]/Cak,...
                                - Diff.grad];
             v_mom          = Diff.LapVec*uv ...
-                              + repmat(G,2,1).*(Diff.grad*phi) ...
+                              + repmat(G,2,1).*(Diff.grad*phi)/Cak ...
                               - Diff.grad*p;
        end       
-       
-       vec_a  = FindAB(this,phi,mu,deltaX,a_ig)              
 
        function PlotResults(this)           
            PlotResults@DiffuseInterface(this);

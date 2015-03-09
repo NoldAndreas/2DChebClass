@@ -5,7 +5,7 @@ function ContactLineBinaryFluid
     ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
 
     PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',20,...
-                      'L1_d',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
+                      'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
 
     PlotArea = struct('y1Min',-15,'y1Max',15,'N1',80,'N2',80);   
     SubArea  = struct('shape','Box','N',[60,60],...
@@ -18,36 +18,30 @@ function ContactLineBinaryFluid
     optsPhys = struct('thetaEq',pi/2,...       
                        'theta',90*pi/180,...
                        'Cak',0.01,'Cn',1,...
-                       'UWall',1,...                                              
+                       'UWall',1,...                       
+                       'l_diff',0.5,...%'mobility',10,...
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = 0.005;%[0.005;0.01];%(0.005:0.0025:0.01)';
     y2Max            = 24;%(16:2:24);            
-    Cn               = 1./(1:0.25:3.0);%1:0.25:3.0;%0.25:0.25:2.5;
+
+    l_d = 3.0;%1:0.25:3.0;%0.25:0.25:2.5;
     
-    for k = 1:length(Cn)
-        parameters.config.optsPhys.l_diff = Cn(k);    
-        parameters.y2Max                  = y2Max;
+    for k = 1:length(l_d)
+        parameters.config.optsPhys.l_diff = l_d(k);    
+        parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
         dataM{k} = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],true);
     end
     
     for k0 = 1:length(dataM)
         for k1 = 1:size(dataM{1},1)
             for k2 = 1:size(dataM{1},2)
-                
-                l_d    = dataM{k0}(k1,k2).config.optsPhys.l_diff;     
-                Cak    = dataM{k0}(k1,k2).config.optsPhys.Cak;     
-                
-                for k3 = 1:length(dataM{k0}(k1,k2).mu_y2)
-                    Diff   = barychebdiff(dataM{k0}(k1,k2).mu_y2{k3}.pts.y1_kv/l_d,1);
-                    dataM{k0}(k1,k2).mu_y2{k3}.mu_0P = Diff.Dx*dataM{k0}(k1,k2).mu_y2{k3}.mu;
-                end
-                
+                l_d    = dataM{k0}(k1,k2).config.optsPhys.l_diff;
                 dataM{k0}(k1,k2).IsoInterface.kappa_rescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
-                dataM{k0}(k1,k2).IsoInterface.p_rescaled     = dataM{k0}(k1,k2).IsoInterface.p*l_d;
-                dataM{k0}(k1,k2).IsoInterface.mu_rescaled    = dataM{k0}(k1,k2).IsoInterface.mu*l_d;
-                dataM{k0}(k1,k2).IsoInterface.kappa_mu       = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
+                dataM{k0}(k1,k2).IsoInterface.p_rescaled = dataM{k0}(k1,k2).IsoInterface.p*l_d;
+                dataM{k0}(k1,k2).IsoInterface.mu_rescaled = dataM{k0}(k1,k2).IsoInterface.mu*l_d;
+                dataM{k0}(k1,k2).IsoInterface.kappa_mu = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
                 %dataM{k0}(k1,k2).IsoInterface.kappaRescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
             end
         end
@@ -101,7 +95,7 @@ function ContactLineBinaryFluid
         title(['Ca = ',num2str(dataM{1}(i_Cak,1).Ca)]);
         for j2 = 1:size(dataM{1},2)
             for j0 = 1:length(dataM)
-                Ca_k      = dataM{j0}(i_Cak,j2).config.optsPhys.Cak;     
+                Ca_k      = dataM{j0}(i_Cak,j2).config.optsPhys.Cak;
                 l_diff    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;                
                 col       = cols{mod(j0,nocols)+1};
                                 
@@ -109,10 +103,9 @@ function ContactLineBinaryFluid
                     val = dataM{j0}(i_Cak,j2).IsoInterface.(value); 
                     y  = dataM{j0}(i_Cak,j2).IsoInterface.y2/l_diff;
                 elseif(IsOption(opts,'mu_y2'))
-                    val = dataM{j0}(i_Cak,j2).mu_y2{value}.mu_0P*l_diff/Ca_k;
                     val = dataM{j0}(i_Cak,j2).mu_y2{value}.muP*l_diff^2/Ca_k;
-                    y   = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y1_kv/l_diff;
-                    y2  = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y2_kv(1)/l_diff;
+                    y  = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y1_kv/l_diff;
+                    y2 = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y2_kv(1)/l_diff;
                     %dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
                 end
                 
@@ -232,7 +225,8 @@ function ContactLineBinaryFluid
                 DI.PostProcess(); 
                 %DI.PlotResults();	  
 
-                dataM(i,j).config      = DI.GetConfig();                
+                dataM(i,j).config.optsNum  = DI.optsNum;
+                dataM(i,j).config.optsPhys = DI.optsPhys;
                 dataM(i,j).Ca          = 3/4*pars.Cak(i);                                
                 dataM(i,j).muMinusInf  = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
                 dataM(i,j).muPlusInf   = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
@@ -246,9 +240,10 @@ function ContactLineBinaryFluid
                 
                 y2 = 0:0.5:3;
                 for kk = 1:length(y2)
-                    [mu,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);
+                    [mu,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);                    
                     [muP,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
                     dataM(i,j).mu_y2{kk} = struct('mu',mu,'muP',muP,'pts',pts,'y2',y2(kk));
+                    %dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
                 end
                 
                 close all;
