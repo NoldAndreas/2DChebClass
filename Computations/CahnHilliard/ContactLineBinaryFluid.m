@@ -23,34 +23,23 @@ function ContactLineBinaryFluid
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
-    parameters.Cak   = 0.005;%[0.005;0.01];%(0.005:0.0025:0.01)';
-    y2Max            = 24;%(16:2:24);            
-
-    l_d = 3.0;%1:0.25:3.0;%0.25:0.25:2.5;
+    parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
+    parameters.y2Max = 24;%(16:2:24);            
+    parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;        
+%         for k = 1:length(l_d)
+%             parameters.config.optsPhys.l_diff = params.l_d(k);    
+%             parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
+%             
+%         end
+	[dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[]);
+    dataN = Rescale(dataM);clear('dataM');
     
-    for k = 1:length(l_d)
-        parameters.config.optsPhys.l_diff = l_d(k);    
-        parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
-        dataM{k} = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],true);
-    end
     
-    for k0 = 1:length(dataM)
-        for k1 = 1:size(dataM{1},1)
-            for k2 = 1:size(dataM{1},2)
-                l_d    = dataM{k0}(k1,k2).config.optsPhys.l_diff;
-                dataM{k0}(k1,k2).IsoInterface.kappa_rescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
-                dataM{k0}(k1,k2).IsoInterface.p_rescaled = dataM{k0}(k1,k2).IsoInterface.p*l_d;
-                dataM{k0}(k1,k2).IsoInterface.mu_rescaled = dataM{k0}(k1,k2).IsoInterface.mu*l_d;
-                dataM{k0}(k1,k2).IsoInterface.kappa_mu = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
-                %dataM{k0}(k1,k2).IsoInterface.kappaRescaled = dataM{k0}(k1,k2).IsoInterface.kappa*l_d;
-            end
-        end
-    end
-                
+    cols = {'g','b','c','k','r'};  nocols = length(cols);
+	syms = {'<','d','s','o','>'};  nosyms = length(syms);            
     
-	cols = {'g','b','c','k','r'};  nocols = length(cols);
-	syms = {'<','d','s','o','>'};  nosyms = length(syms);
-            
+    SaveFigures(dataN,res,parameters);
+    
  %   PlotAsymptoticResults_Y2Max(dataM,'IsoInterface.hatL','\hat{L}');
 %     PlotAsymptoticResults_Y2Max(dataM,'stagnationPointY2','y_{S2}');
 %     PlotAsymptoticResults_Y2Max(dataM,'muPlusInf','muPlusInf');
@@ -58,32 +47,84 @@ function ContactLineBinaryFluid
 %     PlotAsymptoticResults_Y2Max(dataM,'muMaxAbs','muMaxAbs');
 %     PlotAsymptoticResults_Y2Max(dataM,'pMin','pMin');
 %     PlotAsymptoticResults_Y2Max(dataM,'pMax','pMax');
-    
-    for ii = 1:length(dataM{1}(1,1).mu_y2)
-        PlotAsymptoticInterfaceResults(dataM,1,ii,{'mu_y2'});    
-    end
-    
-    PlotAsymptoticInterfaceResults(dataM,1,'kappa_rescaled',{'IsoInterface'});    
-    PlotAsymptoticInterfaceResults(dataM,1,'mu_rescaled',{'IsoInterface'});
-    PlotAsymptoticInterfaceResults(dataM,1,'p_rescaled',{'IsoInterface'});
-    PlotAsymptoticInterfaceResults(dataM,1,'kappa_mu',{'IsoInterface'});
+
+  %  PlotAsymptoticInterfaceResults(dataN,1,'theta',{'IsoInterface'},'\theta');    
+    PlotAsymptoticInterfaceResults(dataN,1,'kappa',{'IsoInterface'},'\kappa');    
+    PlotAsymptoticInterfaceResults(dataN,1,'mu',{'IsoInterface'},'\mu');
+    PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
+    PlotAsymptoticInterfaceResults(dataN,1,'p',{'IsoInterface'},'p');
+    PlotAsymptoticInterfaceResults(dataN,1,'kappa_Cakmu',{'IsoInterface'},'\kappa/(Ca_k\mu)');    
     
     
-    PlotAsymptoticResults(dataM,'hatL',{'rescale','IsoInterface'});
-    PlotAsymptoticResults(dataM,'stagnationPointY2','rescale');
-    PlotAsymptoticResults(dataM,'muPlusInf',{'rescaleInv'});
-    PlotAsymptoticResults(dataM,'muMinusInf',{'rescaleInv'});
-    PlotAsymptoticResults(dataM,'muMaxAbs',{'rescaleInv','rescaleCa'});
-    PlotAsymptoticResults(dataM,'pMin',{'rescaleInv'});
-    PlotAsymptoticResults(dataM,'pMax',{'rescaleInv'});
-            
-        
+	PlotAsymptoticInterfaceResults(dataN,1,'mu',{'mu_y2'},'\mu');        
+    PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'mu_y2'},'\frac{\partial^2\mu}{\partial y_2^2}');                
+    
+    PlotAsymptoticResults(dataN,'hatL',{'IsoInterface'}); 
+    PlotAsymptoticResults(dataN,'stagnationPointY2');
+    PlotAsymptoticResults(dataN,'muPlusInf');
+    PlotAsymptoticResults(dataN,'muMinusInf');
+    PlotAsymptoticResults(dataN,'muMaxAbs');
+    PlotAsymptoticResults(dataN,'pMin');
+    PlotAsymptoticResults(dataN,'pMax');
+                    
    % CompareAllData(dataM,1);
    %CompareAllData(dataM,2);
    %CompareAllData(dataM,3);
     
     %dataM{l_diff}(Cak,y2Max)
-    function PlotAsymptoticInterfaceResults(dataM,i_Cak,value,opts)
+    
+    function SaveFigures(dataN,res,params) 
+        params.comment = 'run by ContactLineBinaryFluid.m';
+        [~,fn]   = fileparts(res.Filename);        
+        filename = ['NumericalExperiment' filesep fn '_'];
+        
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'u_n',{'IsoInterface','noLegend'},'u_n');    
+        plot([0,24],[0 0],'k--','linewidth',1.5);
+        SaveFigure([filename, 'Interface_u_n'],params);        
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'u_t',{'IsoInterface','noLegend'},'u_t');    
+        plot([0,24],[0 0],'k--','linewidth',1.5);
+        SaveFigure([filename, 'Interface_u_t'],params);        
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'flux_n',{'IsoInterface','noLegend'},'j_n');    
+        plot([0,24],[0 0],'k--','linewidth',1.5);
+        SaveFigure([filename, 'Interface_flux_n'],params);        
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'flux_t',{'IsoInterface','noLegend'},'j_t');    hold on;
+        plot([0,24],[0 0],'k--','linewidth',1.5);
+        SaveFigure([filename, 'Interface_flux_t'],params);                
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'mu',{'mu_y2','noLegend'},'\mu');        
+        SaveFigure([filename, 'wall_mu'],params);
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'mu_dy1',{'mu_y2','noLegend'},'\frac{\partial\mu}{\partial y_1}');                
+        SaveFigure([filename, 'wall_mu_dy1'],params);
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'mu_y2','noLegend'},'\frac{\partial^2\mu}{\partial y_2^2}');                
+        SaveFigure([filename, 'wall_mu_ddy2'],params);
+        
+        PlotAsymptoticResults(dataN,'hatL',{'IsoInterface'},'$\hat L$'); 
+        SaveFigure([filename, 'hatL'],params);
+                       
+        PlotAsymptoticResults(dataN,'stagnationPointY2',{},'$y_{2,S}$');         
+        SaveFigure([filename, 'stagnationPointY2'],params);
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'kappa',{'IsoInterface','noLegend'},'\kappa');    
+        SaveFigure([filename, 'Interfacekappa'],params);
+                
+        PlotAsymptoticInterfaceResults(dataN,1,'mu',{'IsoInterface','noLegend'},'\mu');
+        SaveFigure([filename, 'InterfaceMu'],params);
+        
+        %PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
+        PlotAsymptoticInterfaceResults(dataN,1,'p',{'IsoInterface','noLegend'},'p');
+        SaveFigure([filename, 'InterfaceP'],params);        
+        
+        PlotAsymptoticInterfaceResults(dataN,1,'kappa_Cakmu',{'IsoInterface','noLegend'},'\kappa/(Ca_k\mu)');     hold on;
+        plot([0,24],[1.5 1.5],'k--','linewidth',1.5);
+        SaveFigure([filename, 'Interface_KappaCak_Mu'],params);
+    end
+    function PlotAsymptoticInterfaceResults(dataM,i_Cak,value,opts,ylabelStr)
         if(nargin < 4)
             opts = {};                        
         end        
@@ -94,19 +135,16 @@ function ContactLineBinaryFluid
         figure('Position',[0 0 800 800],'color','white');
         title(['Ca = ',num2str(dataM{1}(i_Cak,1).Ca)]);
         for j2 = 1:size(dataM{1},2)
-            for j0 = 1:length(dataM)
-                Ca_k      = dataM{j0}(i_Cak,j2).config.optsPhys.Cak;
-                l_diff    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;                
+            for j0 = 1:length(dataM)                
+                Cn    = dataM{j0}(i_Cak,j2).Cn;                
                 col       = cols{mod(j0,nocols)+1};
                                 
                 if(IsOption(opts,'IsoInterface'))
                     val = dataM{j0}(i_Cak,j2).IsoInterface.(value); 
-                    y  = dataM{j0}(i_Cak,j2).IsoInterface.y2/l_diff;
+                    y  = dataM{j0}(i_Cak,j2).IsoInterface.y2;
                 elseif(IsOption(opts,'mu_y2'))
-                    val = dataM{j0}(i_Cak,j2).mu_y2{value}.muP*l_diff^2/Ca_k;
-                    y  = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y1_kv/l_diff;
-                    y2 = dataM{j0}(i_Cak,j2).mu_y2{value}.pts.y2_kv(1)/l_diff;
-                    %dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
+                    val = dataM{j0}(i_Cak,j2).mu_y2{1}.(value);
+                    y  = dataM{j0}(i_Cak,j2).mu_y2{1}.pts.y1_kv;                                        
                 end
                 
                 if(IsOption(opts,'SC'))
@@ -116,20 +154,29 @@ function ContactLineBinaryFluid
                     plot(y,val,['-',col],'linewidth',1.5); 
                 end
                 hold on;                                
-                legendstr(end+1) = {['l_d = ',num2str(l_diff),' y_{2,Max}/l_d = ',num2str(dataM{j0}(i_Cak,j2).config.optsNum.PhysArea.y2Max/l_diff)]};
+                if(size(dataM{1},2)>1)
+                    legendstr(end+1) = {['Cn = ',num2str(Cn),' y_{2,Max} = ',num2str(dataM{j0}(i_Cak,j2).y2Max)]};
+                else
+                    legendstr(end+1) = {['Cn = ',num2str(Cn)]};
+                end
             end
         end  
-        legend(legendstr);
-        set(gca,'linewidth',1.5);
-        set(gca,'fontsize',20);
-        xlabel('$y_2/\ell_{d}$','Interpreter','Latex','fontsize',20);
-        if(IsOption(opts,'mu_y2'))
-            ylabel(['$\mu$ at $y_2/\ell_{d} = ',num2str(y2),'$'],'Interpreter','Latex','fontsize',20);  
-        else
-            ylabel(value,'fontsize',20);  
+        if(~IsOption(opts,'noLegend'))            
+            legend(legendstr);
         end
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',20);        
+                       
+        if(IsOption(opts,'mu_y2'))
+            xlabel('$y_1$','Interpreter','Latex','fontsize',20);
+            ylabel(['$',ylabelStr,'$ at $y_2 = ',num2str(dataM{1}(i_Cak,1).mu_y2{1}.y2),'$'],'Interpreter','Latex','fontsize',20);  
+        else            
+            xlabel('$y_2$','Interpreter','Latex','fontsize',20);
+            ylabel(['$',ylabelStr,'$'],'Interpreter','Latex','fontsize',20);  
+        end        
+                
     end        
-    function PlotAsymptoticResults(dataM,parameter,opts)        
+    function PlotAsymptoticResults(dataM,parameter,opts,ylabelStr)        
         
         if(nargin == 2)
             opts = {};                        
@@ -145,41 +192,36 @@ function ContactLineBinaryFluid
             Ca = dataM{1}(i_Cak,1).Ca;
             for j2 = 1:size(dataM{1},2)
                 for j0 = 1:length(dataM)
-                    l_diff(j0)    = dataM{j0}(i_Cak,j2).config.optsPhys.l_diff;
+                    Cn(j0)    = dataM{j0}(i_Cak,j2).Cn;
                     if(IsOption(opts,'IsoInterface'))
                         par(j0)      = dataM{j0}(i_Cak,j2).IsoInterface.(parameter);                
                     else                        
                         par(j0)      = dataM{j0}(i_Cak,j2).(parameter);                
                     end
                 end 
-                col = cols{mod(j2,nocols)+1};
-                if(IsOption(opts,'rescale'))
-                    par = par./l_diff;
-                elseif(IsOption(opts,'rescaleInv'))
-                    par = par.*l_diff;
-                end
-                
-                if(IsOption(opts,'rescaleCa'))
-                    par = par/Ca;
-                end
-                plot(1./l_diff,par,...
-                    ['-',syms{mod(i_Cak,nosyms)+1},col],...
+                col = cols{mod(i_Cak,nocols)+1};                
+                sym = syms{mod(j2,nosyms)+1};
+                                
+                plot(Cn,par,...
+                    ['-',sym,col],...
                     'MarkerSize',8,'MarkerFaceColor',col); hold on;                
                 
-                legendstr(end+1) = {['Ca = ',num2str(Ca),' y_{2,Max}/l_d = ',num2str(dataM{1}(i_Cak,j2).config.optsNum.PhysArea.y2Max/l_diff(1))]};
+                legendstr(end+1) = {['Ca = ',num2str(Ca),' y_{2,Max} = ',num2str(dataM{1}(i_Cak,j2).y2Max)]};
              end  
         end
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
-        legend(legendstr);
-        xlabel('$1/\ell_{d}$','Interpreter','Latex','fontsize',20);
-        if(IsOption(opts,'rescale'))
-            ylabel(['$',parameter,'/\ell_{d}$'],'Interpreter','Latex','fontsize',20);        
-        else    
-            ylabel(parameter,'Interpreter','Latex','fontsize',20);        
+        if(~IsOption(opts,'noLegend'))            
+            legend(legendstr);
+        end
+        xlabel('Cn','Interpreter','Latex','fontsize',20);
+        if(nargin >= 4)
+            ylabel(ylabelStr,'Interpreter','Latex','fontsize',20);                
+        else
+            ylabel(parameter,'Interpreter','Latex','fontsize',20);                
         end
         %ylim([90,100]);        
-        SaveFigure([parameter,'_vs_l_diff']);
+        %SaveFigure([parameter,'_vs_l_diff']);
     end        
     function PlotAsymptoticResults_Y2Max(dataM,parameter,parName)
         figure('Position',[0 0 800 800],'color','white');
@@ -204,54 +246,54 @@ function ContactLineBinaryFluid
         %ylim([90,100]);
         SaveFigure([parameter,'_vs_l_diff']);
     end
-
     function dataM = RunNumericalExperiment(pars,h)
-
+    
         config = pars.config;
-        for j = 1:length(pars.y2Max)            
+        for k0 = 1:length(pars.l_d)
             
-            config.optsNum.PhysArea.y2Max = pars.y2Max(j);
+            l_diff                 = pars.l_d(k0);
+            config.optsPhys.l_diff = l_diff;    
             
-            DI = DiffuseInterfaceBinaryFluid(config);
-            DI.Preprocess();
-            for i = 1:length(pars.Cak)
-                
-%                config.optsPhys.Cak = pars.Cak(i);
-                
-                DI.SetCak(pars.Cak(i));                
-                
-                DI.IterationStepFullProblem();                    
-                
-                DI.PostProcess(); 
-                %DI.PlotResults();	  
+            for j = 1:length(pars.y2Max)            
 
-                dataM(i,j).config.optsNum  = DI.optsNum;
-                dataM(i,j).config.optsPhys = DI.optsPhys;
-                dataM(i,j).Ca          = 3/4*pars.Cak(i);                                
-                dataM(i,j).muMinusInf  = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
-                dataM(i,j).muPlusInf   = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
-                dataM(i,j).muMaxAbs    = max(abs(DI.mu));
-                dataM(i,j).pMax        = max((DI.p));
-                dataM(i,j).pMin        = min((DI.p));                              
-                dataM(i,j).IsoInterface = DI.IsoInterface;                                
-                dataM(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);
-                
-                l_diff = DI.optsPhys.l_diff;
-                
-                y2 = 0:0.5:3;
-                for kk = 1:length(y2)
-                    [mu,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);                    
-                    [muP,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
-                    dataM(i,j).mu_y2{kk} = struct('mu',mu,'muP',muP,'pts',pts,'y2',y2(kk));
-                    %dataM(i,j).mu_y2{kk} = struct('mu_0',f_p,'pts',pts,'y2',y2(kk));
+                config.optsNum.PhysArea.y2Max = pars.y2Max(j)*l_diff;
+
+                DI = DiffuseInterfaceBinaryFluid(config);
+                DI.Preprocess();
+                for i = 1:length(pars.Cak)
+
+                    DI.SetCak(pars.Cak(i));                
+                    DI.IterationStepFullProblem();                    
+                    DI.PostProcess();                       
+
+                    dataM{k0}(i,j).config.optsNum    = DI.optsNum;
+                    dataM{k0}(i,j).config.optsPhys   = DI.optsPhys;
+                    dataM{k0}(i,j).Ca                = 3/4*pars.Cak(i);                                
+                    dataM{k0}(i,j).muMinusInf        = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
+                    dataM{k0}(i,j).muPlusInf         = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
+                    dataM{k0}(i,j).muMaxAbs          = max(abs(DI.mu));
+                    dataM{k0}(i,j).pMax              = max((DI.p));
+                    dataM{k0}(i,j).pMin              = min((DI.p));                              
+                    dataM{k0}(i,j).IsoInterface      = DI.IsoInterface;                                
+                    dataM{k0}(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);                    
+
+                    y2 = 0:0.5:3;
+                    for kk = 1:length(y2)
+                        [mu,pts]      = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);                    
+                        [mu_dy1,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
+                        [mu_ddy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.DDy2*DI.mu);
+                        dataM{k0}(i,j).mu_y2{kk} = struct('mu',mu,...
+                                                      'mu_dy1',mu_dy1,...
+                                                      'mu_ddy2',mu_ddy2,...
+                                                      'pts',pts,'y2',y2(kk));                        
+                    end
+
+                    close all;
                 end
-                
-                close all;
+                clear('DI');
             end
-            clear('DI');
-        end
+        end        
     end  
-
     function CompareAllData(dataM,j1)
         thetaEq = dataM{1}(1,1).config.optsPhys.thetaEq;        
 
@@ -284,7 +326,6 @@ function ContactLineBinaryFluid
         SaveFigure(['InterfaceSlope_Ca_',num2str(Ca)],pars);
         
     end
-
     function PlotData(dataM)
         thetaEq = dataM(1,1).config.optsPhys.thetaEq;
         nocols = 5;
@@ -367,8 +408,7 @@ function ContactLineBinaryFluid
         y2     = dataM(i1,i2).y2 /l_diff;
         mark   = (y2 < (max(y2)-4));
         plot(y2(mark),180/pi*dataM(i1,i2).theta(mark),[col,sym],'MarkerSize',5,'MarkerFaceColor',col); hold on;                              
-    end
-    
+    end   
     function PlotInterfaceSlope(dataM,i1,i2,col,sym)
                     
         y2     = dataM(i1,i2).y2;                          
@@ -377,4 +417,56 @@ function ContactLineBinaryFluid
         plot(y2,180/pi*dataM(i1,i2).theta,[col,sym],'MarkerSize',7,'MarkerFaceColor',col); hold on;                
         disp(['hatL = ',num2str(hatL)]);                
     end
+
+    function dataN = Rescale(dataM)
+        for k0 = 1:length(dataM)
+            for k1 = 1:size(dataM{1},1)
+                for k2 = 1:size(dataM{1},2)
+                    Cn    = 1/dataM{k0}(k1,k2).config.optsPhys.l_diff;
+                    Cak   = dataM{k0}(k1,k2).config.optsPhys.Cak;
+                    
+                    dataN{k0}(k1,k2).Cn  = Cn;           
+                    dataN{k0}(k1,k2).Cak = Cak;
+                    
+                    dataN{k0}(k1,k2).y2Max  = dataM{k0}(k1,k2).config.optsNum.PhysArea.y2Max*Cn;
+
+                    dataN{k0}(k1,k2).Ca              = dataM{k0}(k1,k2).Ca;                                
+                    
+                    
+                    dataN{k0}(k1,k2).muMinusInf  = dataM{k0}(k1,k2).muMinusInf/(Cn*Cak);
+                    dataN{k0}(k1,k2).muPlusInf   = dataM{k0}(k1,k2).muPlusInf/(Cn*Cak);
+                    dataN{k0}(k1,k2).muMaxAbs    = dataM{k0}(k1,k2).muMaxAbs/(Cn*Cak);
+                    dataN{k0}(k1,k2).pMax        = dataM{k0}(k1,k2).pMax/Cn;
+                    dataN{k0}(k1,k2).pMin        = dataM{k0}(k1,k2).pMin/Cn;                                      
+                    dataN{k0}(k1,k2).stagnationPointY2 = dataM{k0}(k1,k2).stagnationPointY2*Cn;
+                    
+                    for kk = 1:length(dataM{1}(1,1).mu_y2)
+                        dataN{k0}(k1,k2).mu_y2{kk}.mu        = dataM{k0}(k1,k2).mu_y2{kk}.mu/(Cn*Cak);
+                        dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1    = dataM{k0}(k1,k2).mu_y2{kk}.mu_dy1/(Cn^2*Cak);
+                        dataN{k0}(k1,k2).mu_y2{kk}.mu_ddy2   = dataM{k0}(k1,k2).mu_y2{kk}.mu_ddy2/(Cn^3*Cak);
+                        dataN{k0}(k1,k2).mu_y2{kk}.pts.y1_kv = dataM{k0}(k1,k2).mu_y2{kk}.pts.y1_kv*Cn;
+                        dataN{k0}(k1,k2).mu_y2{kk}.pts.y2_kv = dataM{k0}(k1,k2).mu_y2{kk}.pts.y2_kv*Cn;
+                        dataN{k0}(k1,k2).mu_y2{kk}.y2        = dataM{k0}(k1,k2).mu_y2{kk}.y2*Cn;                        
+                    end
+
+                    
+                    dataN{k0}(k1,k2).IsoInterface.y2       = dataM{k0}(k1,k2).IsoInterface.y2*Cn;
+                    dataN{k0}(k1,k2).IsoInterface.theta    = dataM{k0}(k1,k2).IsoInterface.theta;
+                    dataN{k0}(k1,k2).IsoInterface.hatL     = dataM{k0}(k1,k2).IsoInterface.hatL*Cn;
+                    dataN{k0}(k1,k2).IsoInterface.mu_ddy2  = dataM{k0}(k1,k2).IsoInterface.mu_ddy2/(Cn^3*Cak);
+                    dataN{k0}(k1,k2).IsoInterface.u_n  = dataM{k0}(k1,k2).IsoInterface.u_n;
+                    dataN{k0}(k1,k2).IsoInterface.u_t  = dataM{k0}(k1,k2).IsoInterface.u_t;
+                    dataN{k0}(k1,k2).IsoInterface.flux_n  = dataM{k0}(k1,k2).IsoInterface.flux_n;
+                    dataN{k0}(k1,k2).IsoInterface.flux_t  = dataM{k0}(k1,k2).IsoInterface.flux_t;
+                    
+                    
+                    dataN{k0}(k1,k2).IsoInterface.kappa = dataM{k0}(k1,k2).IsoInterface.kappa/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.p     = dataM{k0}(k1,k2).IsoInterface.p/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.mu    = dataM{k0}(k1,k2).IsoInterface.mu/(Cak*Cn);
+                    dataN{k0}(k1,k2).IsoInterface.kappa_Cakmu       = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
+                end
+            end
+        end
+	end
 end
+

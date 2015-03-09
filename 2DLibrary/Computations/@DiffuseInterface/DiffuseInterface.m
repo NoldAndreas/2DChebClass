@@ -302,8 +302,9 @@ classdef DiffuseInterface < Computation
             u1        = this.uv(1:end/2);
             u2        = this.uv(1+end/2:end);
             
-            this.IsoInterface.y2    = y2;
-            this.IsoInterface.mu    = IP*this.mu;            
+            this.IsoInterface.y2      = y2;
+            this.IsoInterface.mu      = IP*this.mu;                        
+            this.IsoInterface.mu_ddy2 = IP*(this.IDC.Diff.DDy2*this.mu);     
                         
             th                      = pi/2 - atan(Diff.Dx*interface);
             this.IsoInterface.theta = th;
