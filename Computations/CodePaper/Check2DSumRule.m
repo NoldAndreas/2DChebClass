@@ -9,7 +9,7 @@ function Check2DSumRule()
                       'alpha_deg',90);
                       
     V2Num    = struct('Fex','SplitDisk','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1);     
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
@@ -163,7 +163,7 @@ function Check2DSumRule()
                 
         for i = 1:length(n)
             
-            conf.optsNum.PhysArea.N       = [1,n(i)];
+            conf.optsNum.PhysArea.N       = [n(i),n(i)];
             conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
                 
             CL            = ContactLineHS(conf);
@@ -174,14 +174,14 @@ function Check2DSumRule()
             res(i).error_conv1 = preErr.error_conv1;
             res(i).Conv        = CL.IntMatrV2.Conv;
 
-            [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');
-            res(i).error_wl = params.contactDensity_relError;
-
-            [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
-            res(i).error_wg = params.contactDensity_relError;
+           % [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');
+%             res(i).error_wl = params.contactDensity_relError;
+% 
+%             [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
+%             res(i).error_wg = params.contactDensity_relError;
             
-            CLT.ComputeEquilibrium();      
-            CLT.PostProcess(opts);
+            CL.ComputeEquilibrium();      
+            %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       
 
