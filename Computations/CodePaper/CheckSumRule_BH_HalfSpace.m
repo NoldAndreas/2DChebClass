@@ -82,10 +82,11 @@ function CheckSumRule_BH_HalfSpace()
     
     AddPaths('CodePaper');
     
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+    config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
+    config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);    
+    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],true,ignoreList);    
     resC{6}.config = config;
     
     AddPaths('CodePaper');
@@ -169,9 +170,10 @@ function CheckSumRule_BH_HalfSpace()
         for i = 1:length(res)
             
             if(isfield(res{i}.config.optsNum,'V2Num'))                
+                CL.optsPhys.V1.V1DV1     =  res{i}.config.optsPhys.V1.V1DV1;
                 CL.optsPhys.V1.epsilon_w = res{i}.config.optsPhys.V1.epsilon_w; 
-                CL.optsNum.V2Num     = res{i}.config.optsNum.V2Num;
-                CL.optsPhys.V2       = res{i}.config.optsPhys.V2;            
+                CL.optsNum.V2Num         = res{i}.config.optsNum.V2Num;
+                CL.optsPhys.V2           = res{i}.config.optsPhys.V2;            
                 CL.Preprocess_MeanfieldContribution();
                 
                 [CL.optsPhys.rhoGas_sat,...
@@ -182,8 +184,10 @@ function CheckSumRule_BH_HalfSpace()
                 [~,res{i}.rho1D_WG] = CL.Compute1D('WG');
             else
                 [~,res{i}.rho1D] = CL.Compute1D(res{i}.eta);
-            end             
+            end          
+            close all;
         end
+        close all;
     end
     function res = ComputeError(in,h)
         conf = in.config;

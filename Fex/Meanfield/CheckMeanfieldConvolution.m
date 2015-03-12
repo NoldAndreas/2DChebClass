@@ -29,8 +29,14 @@ function res = CheckMeanfieldConvolution(this)
              res.error_conv1 = inf;
              res.error_conv1_posy2 = 1;             
          elseif(strcmp(this.optsPhys.V2.V2DV2,'ExponentialDouble'))    
-             res.error_conv1 = inf;
-             res.error_conv1_posy2 = 1;
+             conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
+             y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
+             check = conv_ExpDouble2D(y2_h);
+
+             [res.error_conv1,ind_conv1] = PrintErrorPos(conv*ones(M,1) - check,'convolution at y1 = infinity',y2_h);                 
+             res.error_conv1_posy2 = y2_h(ind_conv1);             
+             %res.error_conv1 = inf;
+             %res.error_conv1_posy2 = 1;
          elseif(strcmp(this.optsPhys.V2.V2DV2,'BarkerHendersonCutoff_2D'))                 
              conv  = this.IntMatrV2.Conv(this.IDC.Pts.y1_kv==inf,:);
              y2_h  = this.IDC.GetCartPts.y2_kv(this.IDC.Pts.y1_kv==inf) - y2MinCart;
@@ -122,6 +128,16 @@ function res = CheckMeanfieldConvolution(this)
         z(markL1) = - c*(4/3*pi*lambda^3 - pi/3*hh.^2.*(3*lambda-hh) -...
                         (4/3*pi - pi/3*h1.^2.*(3-h1)));
                                                                  
+    end
+
+    function z = conv_ExpDouble2D(y2_h)
+        lambda      = 1;
+        alpha      = 2*pi*(1/(2*lambda*exp(lambda))-(1/4)*sqrt(pi)*erf(sqrt(lambda))/lambda^(3/2)+(1/4)*sqrt(pi)/lambda^(3/2));        
+        c           = (-16/9*pi)/alpha;
+                
+        Psi(y2_h < 1)  = 0.5*(pi/lambda)^(3/2)*(1-erf(sqrt(lambda))) + pi/lambda*exp(-lambda)*(1-y2_h(y2_h < 1));
+        Psi(y2_h >= 1) = 0.5*(pi/lambda)^(3/2)*(1-erf(sqrt(lambda)*y2_h(y2_h >= 1)));
+        z              = 2*a - c*this.optsPhys.V2.epsilon*Psi';
     end
 
     function z = conv_BarkerHenderson2D(y2_h)

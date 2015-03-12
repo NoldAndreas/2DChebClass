@@ -15,12 +15,12 @@ function [z,dzdr_r,alpha] = Exponential(r,parameter)
 
     if(isstruct(r))
         r = r.y1_kv;
-    end    
+    end
     
     markG1     = (r >=1);
     markL1     = (r < 1);    
     
-    z = zeros(size(r));
+    z          = zeros(size(r));
     
     rt         = r(markG1);
     z(markG1)  = -epsilon*exp(-rt);
