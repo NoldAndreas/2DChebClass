@@ -24,7 +24,7 @@ function ContactLineBinaryFluid
 
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
-    parameters.y2Max = 24;%(16:2:24);            
+    parameters.y2Max = 18:2:24;%(16:2:24);            
     parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;        
 %         for k = 1:length(l_d)
 %             parameters.config.optsPhys.l_diff = params.l_d(k);    
@@ -295,6 +295,12 @@ function ContactLineBinaryFluid
 
                     dataM{k0}(i,j).config.optsNum    = DI.optsNum;
                     dataM{k0}(i,j).config.optsPhys   = DI.optsPhys;
+                    
+                    dataM{k0}(i,j).mu  = DI.mu;
+                    dataM{k0}(i,j).uv  = DI.uv;
+                    dataM{k0}(i,j).p   = DI.p;
+                    dataM{k0}(i,j).phi = DI.phi;
+                    
                     dataM{k0}(i,j).Ca                = 3/4*pars.Cak(i);                                
                     dataM{k0}(i,j).muMinusInf        = DI.mu(DI.IDC.Ind.left & DI.IDC.Ind.bottom);
                     dataM{k0}(i,j).muPlusInf         = DI.mu(DI.IDC.Ind.right & DI.IDC.Ind.bottom);
