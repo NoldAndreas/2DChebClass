@@ -89,20 +89,21 @@ classdef DiffuseInterface < Computation
            
             if(~isempty(this.uv) && ...                
                 ~isempty(this.mu) && ...
-                ~isempty(this.phi))
-                vec  = [this.uv;this.phi;this.mu];                
-            else                                   
-                this.phi = InitialGuessRho(this,theta);                             
-                this.uv  = InitialGuessUV(this,theta);
-                this.mu  = zeros(this.IDC.M,1);                          
-                vec      = [this.uv;this.phi;this.mu];             
-            end
+                ~isempty(this.phi))                
+                cprintf('r*','Existing data is ignored in initial Condition.\n')               
+            end                       
+            
+            this.phi = InitialGuessRho(this,theta);                             
+            this.uv  = InitialGuessUV(this,theta);
+            this.mu  = zeros(this.IDC.M,1);                          
+            vec      = [this.uv;this.phi;this.mu];                         
                         
             if(IsSeppecher(this))
                 if(isempty(this.theta))
                     vec = [0;0;theta;vec];
                 else
-                    vec = [this.a;this.deltaX;this.theta;vec];
+                    vec = [0;0;0;theta;vec];
+                    %vec = [this.a;this.deltaX;this.theta;vec];
                 end
             end
              
@@ -405,8 +406,7 @@ classdef DiffuseInterface < Computation
             end
         end                        
         
-        %Plotting & Analysis functions
-                
+        %Plotting & Analysis functions       
         function AnalyzeScalarQuantity(this,f,interval)
             if(nargin == 2)
                 interval = [-10,10];
@@ -642,8 +642,7 @@ classdef DiffuseInterface < Computation
                 IP       = this.IDC.SubShapePtsCart(pt);
                 z        = IP*phi;
             end    
-        end   
-        
+        end          
    end
     
 end

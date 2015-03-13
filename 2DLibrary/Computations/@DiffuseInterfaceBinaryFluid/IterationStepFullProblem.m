@@ -19,25 +19,18 @@ function IterationStepFullProblem(this)
     end
            
     solveSquare   = [];
-%    Seppecher_red = [];
-%     
-% 	if((nargin == 1) || ~isfield(opts,'solveSquare'))
-%         solveSquare = true;
-%     else
-%         solveSquare = opts.solveSquare;
-%     end
-%     
- 	if(~isfield(opts,'Seppecher_red'))
+
+    if(~isfield(opts,'Seppecher_red'))
          Seppecher_red = 0;
-     else
+    else
          Seppecher_red = opts.Seppecher_red;
-     end
+    end
      
     Seppecher     = IsSeppecher(this);        
     %solveSquare = true;
     
     if(isfield(this.optsPhys,'theta'))
-        theta = this.optsPhys.theta; %100*pi/180;]
+        theta = this.optsPhys.theta;
     elseif(~isempty(this.theta))
         theta = this.theta;
     else
@@ -61,7 +54,7 @@ function IterationStepFullProblem(this)
     opts.optsPhys   = this.optsPhys;
     opts.configName = this.configName;    
      	            
-	[res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,[],[],{'optsNum_SubArea','noIterations'});                
+	[res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','noIterations','Function'});                
         
     SetResults(res);
 
@@ -70,7 +63,7 @@ function IterationStepFullProblem(this)
         opts.Seppecher_red = Seppecher_red;
         opts.lambda        = 0.6;    
         
-        [res,~,Parameters] = DataStorage([],@SolveSingleFluid,opts,[],[],{'optsNum_SubArea','noIterations'});    
+        [res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','noIterations','Function'});    
         SetResults(res);
     end
 	           
@@ -98,16 +91,18 @@ function IterationStepFullProblem(this)
         end
     end
         
-    function [res,Results] = SolveSingleFluid(opts,in)   
+    function [res,Results] = SolveBinaryFluid(opts,in)   
         
          if(Seppecher_red == 1)
              iGuess = GetInitialCondition(this,theta);
              iGuess = iGuess([3,5:end]);
-         elseif(Seppecher_red == 2)            
-             iGuess = GetInitialCondition(this,theta);
-             iGuess = iGuess(3:end);
+         elseif(Seppecher_red == 2)     
+              iGuess = [this.deltaX;this.theta;...
+                        this.uv;this.phi;this.mu;this.p]; 
+             %iGuess = GetInitialCondition(this,theta);
+             %iGuess = iGuess(3:end);
          elseif(Seppecher)
-             iGuess          = GetInitialCondition(this,theta);
+             iGuess = GetInitialCondition(this,theta);
              iGuess = iGuess([1:3,5:end]);
          else
              iGuess = GetInitialCondition(this);        

@@ -1,8 +1,6 @@
 function ContactLineBinaryFluid
-    close all;
-    global dirData
-    AddPaths();        
-    ChangeDirData([dirData filesep 'CahnHilliard_InnerRegion'],'ORG');    
+    close all;    
+    AddPaths('DIBinaryPaper');            
 
     PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',20,...
                       'L1',7,'IntInterval',[-10,10]);%,'NBorder',[30,200,30,200]);
@@ -25,13 +23,10 @@ function ContactLineBinaryFluid
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
     parameters.y2Max = 18:2:24;%(16:2:24);            
-    parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;        
-%         for k = 1:length(l_d)
-%             parameters.config.optsPhys.l_diff = params.l_d(k);    
-%             parameters.y2Max                  = y2Max*parameters.config.optsPhys.l_diff;
-%             
-%         end
-	[dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],true);
+    parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
+	%parameters.l_d   = 2.25:0.25:3.0;%0.25:0.25:2.5;                    
+
+    [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
     dataN = Rescale(dataM);clear('dataM');
     
     
@@ -39,7 +34,7 @@ function ContactLineBinaryFluid
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);            
     lines = {'-','--',':','.','-.'}; nolines = length(lines);
             
-      PlotAsymptoticResults(dataN,'d',{'mu_y2'},'$d$ at $y_2 = 0$');    
+    PlotAsymptoticResults(dataN,'d',{'mu_y2'},'$d$ at $y_2 = 0$');    
     SaveFigures(dataN,res,parameters);
     
  %   PlotAsymptoticResults_Y2Max(dataM,'IsoInterface.hatL','\hat{L}');

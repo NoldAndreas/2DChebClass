@@ -29,7 +29,7 @@ function Check2DSumRule()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:10:50;        
+    N    = 20:10:70;        
     
     ignoreList = {'config_optsNum_PhysArea_N',...
                   'config_optsNum_PhysArea_N2bound'};
@@ -181,6 +181,8 @@ function Check2DSumRule()
 %             res(i).error_wg = params.contactDensity_relError;
             
             CL.ComputeEquilibrium();      
+            [res(i).sumRuleII_relError,...
+             res(i).sumRuleII_eps] = CL.SumRuleIIError([-10,10]);
             %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       
