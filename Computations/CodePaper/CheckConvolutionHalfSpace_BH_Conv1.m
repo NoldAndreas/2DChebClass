@@ -1,6 +1,6 @@
 function CheckConvolutionHalfSpace_BH_Conv1()
     
-    AddPaths();
+    AddPaths('CodePaper');
 
     PhysArea = struct('N',[20,20],...
                       'L1',5,'L2',4,'L2_AD',4.,...
@@ -43,7 +43,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     NS_d = 2; %2;  %10;
     NS   = 10:NS_d:100;%[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
-    res = DataStorage(['CodePaperConv'],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
+    res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],true,{'config_optsNum_PhysArea_N'});
     
 	CLT = ContactLineHS(config);
 	CLT.PreprocessIDC();     
