@@ -80,6 +80,9 @@ classdef Computation < handle
             end
         end        
 
+        function conf = GetConfig(this)
+            conf = struct('optsNum',this.optsNum,'optsPhys',this.optsPhys);
+        end
         function configName = SaveConfig(this,configuration)    
         
             global dirDataOrg

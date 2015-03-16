@@ -1,6 +1,7 @@
 function CheckSumRule_HalfSpace_L()
     
-    AddPaths();    
+    close all;
+    AddPaths('CodePaper');    
 
     PhysArea = struct('N',[1,100],...
                       'L1',5,'L2',2,'L2_AD',2.,...
@@ -35,61 +36,75 @@ function CheckSumRule_HalfSpace_L()
     
     figure('color','white','Position',[0 0 900 800]); 
     legendstring = {};
+    folder = 'SumRuleErrorL';
     
     % **** 1 ****    
     eta = 0.3;    
-    res{1} = DataStorage([],@ComputeError,v2struct(L,config,eta),[],true);
+    res{1} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);
         
-	AddPaths();    
-    ChangeDirData();
+	AddPaths('CodePaper');        
     % **** 2 ****    
     eta = 0.15;    
-    res{2} = DataStorage([],@ComputeError,v2struct(L,config,eta),[]);  
+    res{2} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);  
     
-    AddPaths();  ChangeDirData();   
-
+    AddPaths('CodePaper');    
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{3} = DataStorage([],@ComputeError,v2struct(L,config),[]); 
+    res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
     
-    AddPaths();  ChangeDirData();
-    
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{4}  = DataStorage([],@ComputeError,v2struct(L,config),[]);    
-    
-    AddPaths();  ChangeDirData();
-       
+	AddPaths('CodePaper');    
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{5} = DataStorage([],@ComputeError,v2struct(L,config),[]); 
-        
-    AddPaths();  ChangeDirData();
+    res{4} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
     
+	AddPaths('CodePaper');    
 	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     config.optsPhys.V1.epsilon_w = 0.9;    
-    res{6} = DataStorage([],@ComputeError,v2struct(L,config),[]);            
-                       
-    AddPaths();  ChangeDirData();
+    res{5} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);            
+
     
-    PlotErrorGraph(res{1},'error_wl','o-','k',['Hard sphere, eta = ',num2str(0.3)]); 
-    PlotErrorGraph(res{2},'error_wl','s-','k',['Hard sphere, eta = ',num2str(0.15)]);     
+    AddPaths('CodePaper');        
+    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+    config.optsPhys.V1.epsilon_w = 0.9;    
+    res{6}  = DataStorage(folder,@ComputeError,v2struct(L,config),[]);    
+        
+              
+    AddPaths('CodePaper');    
+    figure('color','white','Position',[0 0 900 800]); 
+    legendstring = {};
+	PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
+    PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
     
-    PlotErrorGraph(res{3},'error_wl','d-','b','BarkerHendersonCutoff_2D, liq');
-    PlotErrorGraph(res{3},'error_wg','d--','b','BarkerHendersonCutoff_2D, vap');
+    PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
+    PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
     
-    PlotErrorGraph(res{4},'error_wl','>-','b','BarkerHendersonHardCutoff_2D, liq');
-    PlotErrorGraph(res{4},'error_wg','>--','b','BarkerHendersonHardCutoff_2D, vap');         
-         
-    PlotErrorGraph(res{5},'error_wl','^-','m','ExponentialDouble, liq');
-    PlotErrorGraph(res{5},'error_wg','^--','m','ExponentialDouble, vap');
-     
-    PlotErrorGraph(res{6},'error_wl','<-','b','BarkerHenderson_2D, liq');
-    PlotErrorGraph(res{6},'error_wg','<--','b','BarkerHenderson_2D, vap');
+    PlotErrorGraph(res{4},'error_wl','>-','k','BarkerHendersonHardCutoff_2D, liq');
+    PlotErrorGraph(res{4},'error_wg','>--','k','BarkerHendersonHardCutoff_2D, vap');
+    
+    PlotErrorGraph(res{5},'error_wl','*-','k','BarkerHenderson_2D, liq');
+    PlotErrorGraph(res{5},'error_wg','*--','k','BarkerHenderson_2D, vap');
+        
+    PlotErrorGraph(res{6},'error_wl','^-','k','ExponentialDouble, liq');
+    PlotErrorGraph(res{6},'error_wg','^--','k','ExponentialDouble, vap');
+    
+%     PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
+%     PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
+%     
+%     PlotErrorGraph(res{3},'error_wl','d-','b','BarkerHendersonCutoff_2D, liq');
+%     PlotErrorGraph(res{3},'error_wg','d--','b','BarkerHendersonCutoff_2D, vap');
+%     
+%     PlotErrorGraph(res{4},'error_wl','>-','b','BarkerHendersonHardCutoff_2D, liq');
+%     PlotErrorGraph(res{4},'error_wg','>--','b','BarkerHendersonHardCutoff_2D, vap');         
+%          
+%     PlotErrorGraph(res{5},'error_wl','^-','m','ExponentialDouble, liq');
+%     PlotErrorGraph(res{5},'error_wg','^--','m','ExponentialDouble, vap');
+%      
+%     PlotErrorGraph(res{6},'error_wl','<-','b','BarkerHenderson_2D, liq');
+%     PlotErrorGraph(res{6},'error_wg','<--','b','BarkerHenderson_2D, vap');
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -97,12 +112,12 @@ function CheckSumRule_HalfSpace_L()
     xlabel('$L$','Interpreter','Latex','fontsize',20);
     ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
                             'Interpreter','Latex','fontsize',20);
-    xlim([(L(1)-2),(L(end)+2)]);    
+    xlim([0,(L(end)+0.5)]);    
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
-    legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
+   % legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
     
     comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
-    SaveFigure('SumRuleError',v2struct(L,config,comment));
+    SaveFigure('SumRuleError_L',v2struct(L,config,comment));
 	    
    
     function res = ComputeError(in,h)

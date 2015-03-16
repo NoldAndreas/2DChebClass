@@ -43,64 +43,60 @@ function Check2DSumRule()
     res{1}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
     
     AddPaths('CodePaper');
-    config.optsNum.V2Num.Fex = 'SplitAnnulus';
-    config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
-    res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
-    
-    AddPaths('CodePaper');
-    
-    
-    config.optsNum.V2Num.Fex = 'SplitDisk';     
-    config.optsPhys.V2.V2DV2 = 'BarkerHenderson_2D';     
-    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                
-    
-    AddPaths('CodePaper');
-    
     config.optsNum.V2Num.Fex = 'SplitDisk'; 
-    config.optsPhys.V2.V2DV2 = 'ExponentialDouble';            
-    res{4} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);        
+    config.optsPhys.V2.V2DV2 = 'ExponentialDouble';                          
+    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
+    config.optsPhys.V1.epsilon_w = 0.9;         
+    %res{4} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);        
     
+     %AddPaths('CodePaper');
+     %config.optsNum.V2Num.Fex = 'SplitAnnulus';
+     %config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
+%     res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
+     
+     AddPaths('CodePaper');
+     config.optsNum.V2Num.Fex = 'SplitDisk';     
+     config.optsPhys.V2.V2DV2 = 'BarkerHenderson_2D';     
+%     res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                          
+     
     AddPaths('CodePaper');
     
     %**********************
     %**********************
-    cols = {'b','m','k','r','g'};
-    syms = {'o','>','*','^','h'};        
-    resC = DataStorage([],@ComputeDensityProfile,config,resC,[],ignoreList);
-    
-    PlotDensityProfiles(resC);
+   % cols = {'b','m','k','r','g'};
+%    syms = {'o','>','*','^','h'};   
+    PlotDensityProfile(res{1}(3));
+    %resC = DataStorage([],@ComputeDensityProfile,config,res,[],ignoreList);
+    %PlotDensityProfiles(resC);
          
     %**********************
     %**********************
-    figure('color','white','Position',[0 0 900 800]); 
+    figure('color','white','Position',[0 0 1700 800]); 
     legendstring = {};
-    PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
-    PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
-    
-    PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
-    PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
-    
-    PlotErrorGraph(res{4},'error_wl','>-','k','BarkerHendersonHardCutoff_2D, liq');
-    PlotErrorGraph(res{4},'error_wg','>--','k','BarkerHendersonHardCutoff_2D, vap');
-    
-    PlotErrorGraph(res{5},'error_wl','*-','k','BarkerHenderson_2D, liq');
-    PlotErrorGraph(res{5},'error_wg','*--','k','BarkerHenderson_2D, vap');
-        
-    PlotErrorGraph(res{6},'error_wl','^-','k','ExponentialDouble, liq');
-    PlotErrorGraph(res{6},'error_wg','^--','k','ExponentialDouble, vap');
-    
+    subplot(1,2,1);
+    PlotErrorGraph(res{1},'sumRuleII_relError','s-','b','');            
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
-    set(gca,'fontsize',20);
+    set(gca,'fontsize',20);            
     xlabel('$N$','Interpreter','Latex','fontsize',20);
-    ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
+    ylabel(['Relative sum rule error $\frac{\int_{-\infty}^\infty\Pi_{II} dx + \gamma_{lv}\sin \theta_{{Y}}}{\gamma_{lv}\sin \theta_Y}$'],...
+                            'Interpreter','Latex','fontsize',20);
+    xlim([(N(1)-2),(N(end)+2)]);    
+    
+    subplot(1,2,2);
+    PlotErrorGraph(res{1},'sumRuleII_eps','s-','b','eps');     
+    set(gca,'YScale','log');
+    set(gca,'linewidth',1.5);
+    set(gca,'fontsize',20);            
+    xlabel('$N$','Interpreter','Latex','fontsize',20);
+    ylabel(['$|\Pi_{II,g}- \Pi_{II,l}|$'],...
                             'Interpreter','Latex','fontsize',20);
     xlim([(N(1)-2),(N(end)+2)]);    
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
    % legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
-    
-    comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
-    SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
+        
+    comment = '';
+    SaveFigure('SumRuleError2D',v2struct(N,config,comment));
     
     function PlotDensityProfiles(resC)
         CLT = ContactLineHS(config);
@@ -133,29 +129,13 @@ function Check2DSumRule()
         ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);
         SaveFigure('DensityProfiles',v2struct(N,NS,config));
     end   
-    function res = ComputeDensityProfile(conf,res)
+    function res = PlotDensityProfile(res)
         
-        CL = ContactLineHS(res{1}.config);
-        CL.Preprocess(); 
-        
-        for i = 1:length(res)
-            
-            if(isfield(res{i}.config.optsNum,'V2Num'))                
-                CL.optsPhys.V1.epsilon_w = res{i}.config.optsPhys.V1.epsilon_w; 
-                CL.optsNum.V2Num     = res{i}.config.optsNum.V2Num;
-                CL.optsPhys.V2       = res{i}.config.optsPhys.V2;            
-                CL.Preprocess_MeanfieldContribution();
-                
-                [CL.optsPhys.rhoGas_sat,...
-                 CL.optsPhys.rhoLiq_sat,...
-                 CL.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(CL.optsPhys);
-                
-                [~,res{i}.rho1D_WL] = CL.Compute1D('WL');
-                [~,res{i}.rho1D_WG] = CL.Compute1D('WG');
-            else
-                [~,res{i}.rho1D] = CL.Compute1D(res{i}.eta);
-            end             
-        end
+        CL = ContactLineHS(res.config);
+        CL.Preprocess();
+        CL.ComputeEquilibrium();                              
+        CL.InitInterpolation([-7.5 7.5],[0.5 15.5])
+        CL.PlotContourResults({'newFigure','save'})
     end
     function res = ComputeError(in,h)
         conf = in.config;
@@ -200,12 +180,11 @@ function Check2DSumRule()
         for k1 = 1:size(res,1)
             for k2 = 1:size(res,2)
                 line(n)   = abs(res(k1,k2).(var_name));
-                line_N(n) = (res(k1,k2).N);%+res(k1,k2+1).NS)/2;
+                line_N(n) = (res(k1,k2).config.optsNum.PhysArea.N(1));%+res(k1,k2+1).NS)/2;
                 %plot(line_N(n),line(n),...
                  %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
                 n = n+1;
-                
-                                
+
             end
         end
         plot(line_N,line,...

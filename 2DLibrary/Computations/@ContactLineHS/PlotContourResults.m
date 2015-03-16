@@ -1,10 +1,13 @@
 function [fContour] =  PlotContourResults(this,options) %plain
     if(nargin == 1) %select all
         options = {'hI','hII','hIII','hI_alignedwith_hII','5contours',...
-                            'YoungCA','hContour','Isoline','save'};
-        fContour = figure('Color','white','Position',[0 0 1200 800]);
+                            'YoungCA','hContour','Isoline','save','newFigure'};        
     elseif((nargin >= 2) && ~(iscell(options)))
         options = {options};
+    end
+    
+    if(IsOption(options,'newFigure'))
+        fContour = figure('Color','white','Position',[0 0 1200 800]);
     end
     
     rho           = GetRhoEq(this);
