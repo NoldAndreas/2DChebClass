@@ -39,7 +39,8 @@ function ContactLineBinaryFluid
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);            
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
     
-    Plot3D(dataN,1,4,parameters.config);
+    %Plot3D(dataN,1,4,parameters.config);
+    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','mu'),{'mu_y1'});    
     
     PlotAllAsymptotics({'y2Max'},parameters);
     PlotAllAsymptotics({'Cn'},parameters);
@@ -48,15 +49,13 @@ function ContactLineBinaryFluid
     SaveFigures(dataN,res,parameters);
      
   %  PlotAsymptoticInterfaceResults(dataN,1,'theta',{'IsoInterface'},'\theta');        
-    PlotAsymptoticInterfaceResults(dataN,[],'kappa',{'IsoInterface'},'\kappa');    
-    PlotAsymptoticInterfaceResults(dataN,1,'mu',{'IsoInterface'},'\mu');
-    PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
-    PlotAsymptoticInterfaceResults(dataN,1,'p',{'IsoInterface'},'p');
-    PlotAsymptoticInterfaceResults(dataN,1,'kappa_Cakmu',{'IsoInterface'},'\kappa/(Ca_k\mu)');    
-    
-    
-	PlotAsymptoticInterfaceResults(dataN,1,'mu',{'mu_y2'},'\mu');        
-    PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'mu_y2'},'\frac{\partial^2\mu}{\partial y_2^2}');                
+    PlotAsymptoticInterfaceResults(dataN,[],[],'kappa',{'IsoInterface'},'\kappa');    
+    PlotAsymptoticInterfaceResults(dataN,1,[],'mu',{'IsoInterface'},'\mu');
+    PlotAsymptoticInterfaceResults(dataN,1,[],'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
+    PlotAsymptoticInterfaceResults(dataN,1,[],'p',{'IsoInterface'},'p');
+    PlotAsymptoticInterfaceResults(dataN,1,[],'kappa_Cakmu',{'IsoInterface'},'\kappa/(Ca_k\mu)');        
+	PlotAsymptoticInterfaceResults(dataN,1,[],'mu',{'mu_y2'},'\mu');        
+    PlotAsymptoticInterfaceResults(dataN,1,[],'mu_ddy2',{'mu_y2'},'\frac{\partial^2\mu}{\partial y_2^2}');                
     
                     
    % CompareAllData(dataM,1);
@@ -128,29 +127,29 @@ function ContactLineBinaryFluid
         PlotAsymptoticResults(dataN,'mu_ddy2_max_y20_sqrtCn',{'mu_y2','noLegend'});
         SaveFigure([filename, 'wall_max_muddy2_sqrtCn'],params);        
         
-        PlotAsymptoticInterfaceResults(dataN,[],'u_n',{'IsoInterface','noLegend'},'u_n');    
+        PlotAsymptoticInterfaceResults(dataN,[],[],'u_n',{'IsoInterface','noLegend'},'u_n');    
         plot([0,24],[0 0],'k--','linewidth',1.5);
         SaveFigure([filename, 'Interface_u_n'],params);        
         
-        PlotAsymptoticInterfaceResults(dataN,[],'u_t',{'IsoInterface','noLegend'},'u_t');    
+        PlotAsymptoticInterfaceResults(dataN,[],[],'u_t',{'IsoInterface','noLegend'},'u_t');    
         plot([0,24],[0 0],'k--','linewidth',1.5);
         SaveFigure([filename, 'Interface_u_t'],params);        
         
-        PlotAsymptoticInterfaceResults(dataN,[],'flux_n',{'IsoInterface','noLegend'},'j_n');    
+        PlotAsymptoticInterfaceResults(dataN,[],[],'flux_n',{'IsoInterface','noLegend'},'j_n');    
         plot([0,24],[0 0],'k--','linewidth',1.5);
         SaveFigure([filename, 'Interface_flux_n'],params);        
         
-        PlotAsymptoticInterfaceResults(dataN,[],'flux_t',{'IsoInterface','noLegend'},'j_t');    hold on;
+        PlotAsymptoticInterfaceResults(dataN,[],[],'flux_t',{'IsoInterface','noLegend'},'j_t');    hold on;
         plot([0,24],[0 0],'k--','linewidth',1.5);
         SaveFigure([filename, 'Interface_flux_t'],params);                
         
-        PlotAsymptoticInterfaceResults(dataN,[],'mu',{'mu_y2','noLegend'},'\mu');                
+        PlotAsymptoticInterfaceResults(dataN,[],[],'mu',{'mu_y2','noLegend'},'\mu');                
         SaveFigure([filename, 'wall_mu'],params);
         
-        PlotAsymptoticInterfaceResults(dataN,[],'mu_dy1',{'mu_y2','noLegend'},'\frac{\partial\mu}{\partial y_1}');                        
+        PlotAsymptoticInterfaceResults(dataN,[],[],'mu_dy1',{'mu_y2','noLegend'},'\frac{\partial\mu}{\partial y_1}');                        
         SaveFigure([filename, 'wall_mu_dy1'],params);
         
-        PlotAsymptoticInterfaceResults(dataN,[],'mu_ddy2',{'mu_y2','noLegend'},'\frac{\partial^2\mu}{\partial y_2^2}');                        
+        PlotAsymptoticInterfaceResults(dataN,[],[],'mu_ddy2',{'mu_y2','noLegend'},'\frac{\partial^2\mu}{\partial y_2^2}');                        
         SaveFigure([filename, 'wall_mu_ddy2'],params);
         
         PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend'}); 
@@ -159,22 +158,22 @@ function ContactLineBinaryFluid
         PlotAsymptoticResults(dataN,'stagnationPointY2',{'noLegend'});         
         SaveFigure([filename, 'stagnationPointY2'],params);
         
-        PlotAsymptoticInterfaceResults(dataN,[],'kappa',{'IsoInterface','noLegend'},'\kappa');    
+        PlotAsymptoticInterfaceResults(dataN,[],[],'kappa',{'IsoInterface','noLegend'},'\kappa');    
         SaveFigure([filename, 'Interfacekappa'],params);
                 
         PlotAsymptoticInterfaceResults(dataN,[],'mu',{'IsoInterface','noLegend'},'\mu');
         SaveFigure([filename, 'InterfaceMu'],params);
         
         %PlotAsymptoticInterfaceResults(dataN,1,'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
-        PlotAsymptoticInterfaceResults(dataN,[],'p',{'IsoInterface','noLegend'},'p');
+        PlotAsymptoticInterfaceResults(dataN,[],[],'p',{'IsoInterface','noLegend'},'p');
         SaveFigure([filename, 'InterfaceP'],params);        
         
-        PlotAsymptoticInterfaceResults(dataN,[],'kappa_Cakmu',{'IsoInterface','noLegend'},'\kappa/(Ca_k\mu)');     hold on;
+        PlotAsymptoticInterfaceResults(dataN,[],[],'kappa_Cakmu',{'IsoInterface','noLegend'},'\kappa/(Ca_k\mu)');     hold on;
         plot([0,24],[1.5 1.5],'k--','linewidth',1.5);
         ylim([1.2 1.8]);
         SaveFigure([filename, 'Interface_KappaCak_Mu'],params);
     end
-    function PlotAsymptoticInterfaceResults(dataM,i_Cak,value,opts,ylabelStr)
+    function PlotAsymptoticInterfaceResults(dataM,i_Cak,i_y2Max,value,opts)
         if(nargin < 4)
             opts = {};                        
         end        
@@ -186,8 +185,12 @@ function ContactLineBinaryFluid
         if(isempty(i_Cak))
             i_Cak =  1:size(dataM{1},1);
         end
+        if(isempty(i_y2Max))
+            i_y2Max = size(dataM{1},2);
+        end
         
-        
+        ylabelStr = GetYStr(value,opts,dataM);
+                
         figure('Position',[0 0 800 800],'color','white');        
         if(length(i_Cak) == 1)
             title(['Ca = ',num2str(dataM{1}(i_Cak,1).Ca)]);
@@ -195,7 +198,7 @@ function ContactLineBinaryFluid
         
         for j1 = i_Cak
             lin   = lines{mod(j1-1,nolines)+1};
-            for j2 = 1:size(dataM{1},2)                
+            for j2 = i_y2Max  
                 sym = syms{mod(j2-1,nosyms)+1};                
                 for j0 = 1:length(dataM)                
                     Cn    = dataM{j0}(j1,j2).Cn;                
@@ -207,13 +210,17 @@ function ContactLineBinaryFluid
                     elseif(IsOption(opts,'mu_y2'))
                         val = dataM{j0}(j1,j2).mu_y2{1}.(value);
                         y  = dataM{j0}(j1,j2).mu_y2{1}.pts.y1_kv;                                        
+                    elseif(IsOption(opts,'mu_y1'))
+                        val = dataM{j0}(j1,j2).mu_y1{value.i}.(value.val);
+                        y  = dataM{j0}(j1,j2).mu_y1{value.i}.pts.y2_kv;   
                     end
 
                     if(IsOption(opts,'SC'))
-                        plot(y,val,[lin,sym,col],...
+                        plot(y,val,[lin,sym],...
+                            'color',col,...
                             'MarkerSize',8,'MarkerFaceColor',col);
                     else
-                        plot(y,val,[lin,col],'linewidth',1.5); 
+                        plot(y,val,[lin],'color',col,'linewidth',1.5); 
                     end
                     hold on;                                
                     if(size(dataM{1},2)>1)
@@ -229,14 +236,13 @@ function ContactLineBinaryFluid
         end
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);        
-                       
+        
         if(IsOption(opts,'mu_y2'))
             xlabel('$y_1$','Interpreter','Latex','fontsize',20);
-            ylabel(['$',ylabelStr,'$ at $y_2 = ',num2str(dataM{1}(1,1).mu_y2{1}.y2),'$'],'Interpreter','Latex','fontsize',20);  
-        else            
+        else
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
-            ylabel(['$',ylabelStr,'$'],'Interpreter','Latex','fontsize',20);  
-        end        
+        end
+        ylabel(ylabelStr,'Interpreter','Latex','fontsize',20);  
                 
     end        
     function PlotAsymptoticResults(dataM,parameter,opts)        
@@ -361,6 +367,7 @@ function ContactLineBinaryFluid
                     dataM{k0}(i,j).config.optsNum    = DI.optsNum;
                     dataM{k0}(i,j).config.optsPhys   = DI.optsPhys;
                     
+                    dataM{k0}(i,j).Pts = DI.IDC.Pts;
                     dataM{k0}(i,j).mu  = DI.mu;
                     dataM{k0}(i,j).uv  = DI.uv;
                     dataM{k0}(i,j).p   = DI.p;
@@ -379,12 +386,29 @@ function ContactLineBinaryFluid
                     for kk = 1:length(y2)
                         [mu,pts]      = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);                    
                         [mu_dy1,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
+                        [mu_dy2,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.mu);
                         [mu_ddy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.DDy2*DI.mu);
                         %[v_dy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.uv(1+end/2:end));
                         dataM{k0}(i,j).mu_y2{kk} = struct('mu',mu,...%'v_dy2',v_dy2,...
                                                       'mu_dy1',mu_dy1,...
+                                                      'mu_dy2',mu_dy2,...
                                                       'mu_ddy2',mu_ddy2,...
                                                       'pts',pts,'y2',y2(kk));                        
+                    end
+                    
+                    
+                    y1 = -2:0.5:3;
+                    for kk = 1:length(y2)
+                        [mu,pts]      = DI.IDC.plotLine(l_diff*y1(kk)*[1 1],l_diff*[0 10],DI.mu);                    
+                        [mu_dy1,pts]  = DI.IDC.plotLine(l_diff*y1(kk)*[1 1],l_diff*[0 10],DI.IDC.Diff.Dy1*DI.mu);
+                        [mu_dy2,pts]  = DI.IDC.plotLine(l_diff*y1(kk)*[1 1],l_diff*[0 10],DI.IDC.Diff.Dy2*DI.mu);
+                        [mu_ddy2,pts] = DI.IDC.plotLine(l_diff*y1(kk)*[1 1],l_diff*[0 10],DI.IDC.Diff.DDy2*DI.mu);
+                        %[v_dy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.uv(1+end/2:end));
+                        dataM{k0}(i,j).mu_y1{kk} = struct('mu',mu,...%'v_dy2',v_dy2,...
+                                                      'mu_dy1',mu_dy1,...
+                                                      'mu_dy2',mu_dy2,...
+                                                      'mu_ddy2',mu_ddy2,...
+                                                      'pts',pts,'y1',y1(kk));                        
                     end
 
                     close all;
@@ -502,12 +526,9 @@ function ContactLineBinaryFluid
                     
                     dataN{k0}(k1,k2).Cn  = Cn;           
                     dataN{k0}(k1,k2).Cak = Cak;
-                    
                     dataN{k0}(k1,k2).y2Max  = dataM{k0}(k1,k2).config.optsNum.PhysArea.y2Max*Cn;
-
                     dataN{k0}(k1,k2).Ca              = dataM{k0}(k1,k2).Ca;                                
-                    
-                    
+
                     dataN{k0}(k1,k2).muMinusInf  = dataM{k0}(k1,k2).muMinusInf/(Cn*Cak);
                     dataN{k0}(k1,k2).muPlusInf   = dataM{k0}(k1,k2).muPlusInf/(Cn*Cak);
                     dataN{k0}(k1,k2).muMaxAbs    = dataM{k0}(k1,k2).muMaxAbs/(Cn*Cak);
@@ -515,21 +536,34 @@ function ContactLineBinaryFluid
                     dataN{k0}(k1,k2).pMin        = dataM{k0}(k1,k2).pMin/Cn;                                      
                     dataN{k0}(k1,k2).stagnationPointY2 = dataM{k0}(k1,k2).stagnationPointY2*Cn;
                     dataN{k0}(k1,k2).mu          = dataM{k0}(k1,k2).mu/(Cn*Cak);
-                    
-                    for kk = 1:length(dataM{1}(1,1).mu_y2)
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu        = dataM{k0}(k1,k2).mu_y2{kk}.mu/(Cn*Cak);
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1    = dataM{k0}(k1,k2).mu_y2{kk}.mu_dy1/(Cn^2*Cak);
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu_ddy2   = dataM{k0}(k1,k2).mu_y2{kk}.mu_ddy2/(Cn^3*Cak);
-                        dataN{k0}(k1,k2).mu_y2{kk}.pts.y1_kv = dataM{k0}(k1,k2).mu_y2{kk}.pts.y1_kv*Cn;
-                        dataN{k0}(k1,k2).mu_y2{kk}.pts.y2_kv = dataM{k0}(k1,k2).mu_y2{kk}.pts.y2_kv*Cn;
-                        dataN{k0}(k1,k2).mu_y2{kk}.y2        = dataM{k0}(k1,k2).mu_y2{kk}.y2*Cn;                        
-                        
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu_max_y20             = max(abs(dataN{k0}(k1,k2).mu_y2{kk}.mu));
-                        [muMax,i] = max((dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1));
-                        [muMin,j] = min((dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1));
-                        dataN{k0}(k1,k2).mu_y2{kk}.d                      = dataN{k0}(k1,k2).mu_y2{kk}.pts.y1_kv(i)-dataN{k0}(k1,k2).mu_y2{kk}.pts.y1_kv(j);
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1_max_y20_sqrtCn  = max(abs(dataN{k0}(k1,k2).mu_y2{kk}.mu_dy1))*sqrt(Cn);
-                        dataN{k0}(k1,k2).mu_y2{kk}.mu_ddy2_max_y20_sqrtCn = max(abs(dataN{k0}(k1,k2).mu_y2{kk}.mu_ddy2))*sqrt(Cn);
+
+                    for i = 1:2
+                        if(i==1)
+                            mu_str = 'mu_y2';
+                        elseif(i==2)
+                            mu_str = 'mu_y1';
+                        end
+                            
+                        for kk = 1:length(dataM{1}(1,1).(mu_str))
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu        = dataM{k0}(k1,k2).(mu_str){kk}.mu/(Cn*Cak);
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu_dy1    = dataM{k0}(k1,k2).(mu_str){kk}.mu_dy1/(Cn^2*Cak);
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu_ddy2   = dataM{k0}(k1,k2).(mu_str){kk}.mu_ddy2/(Cn^3*Cak);
+                            dataN{k0}(k1,k2).(mu_str){kk}.pts.y1_kv = dataM{k0}(k1,k2).(mu_str){kk}.pts.y1_kv*Cn;
+                            dataN{k0}(k1,k2).(mu_str){kk}.pts.y2_kv = dataM{k0}(k1,k2).(mu_str){kk}.pts.y2_kv*Cn;
+                            
+                            if(strcmp(mu_str,'mu_y2'))
+                                dataN{k0}(k1,k2).(mu_str){kk}.y2        = dataM{k0}(k1,k2).(mu_str){kk}.y2*Cn;
+                            elseif(strcmp(mu_str,'mu_y1'))
+                                dataN{k0}(k1,k2).(mu_str){kk}.y1        = dataM{k0}(k1,k2).(mu_str){kk}.y1*Cn;
+                            end
+
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu_max_y20             = max(abs(dataN{k0}(k1,k2).(mu_str){kk}.mu));
+                            [muMax,i] = max((dataN{k0}(k1,k2).(mu_str){kk}.mu_dy1));
+                            [muMin,j] = min((dataN{k0}(k1,k2).(mu_str){kk}.mu_dy1));
+                            dataN{k0}(k1,k2).(mu_str){kk}.d                      = dataN{k0}(k1,k2).(mu_str){kk}.pts.y1_kv(i)-dataN{k0}(k1,k2).(mu_str){kk}.pts.y1_kv(j);
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu_dy1_max_y20_sqrtCn  = max(abs(dataN{k0}(k1,k2).(mu_str){kk}.mu_dy1))*sqrt(Cn);
+                            dataN{k0}(k1,k2).(mu_str){kk}.mu_ddy2_max_y20_sqrtCn = max(abs(dataN{k0}(k1,k2).(mu_str){kk}.mu_ddy2))*sqrt(Cn);
+                        end
                     end
                     
                     
@@ -551,32 +585,49 @@ function ContactLineBinaryFluid
             end
         end
     end
-    function str = GetYStr(parameter)
-        if(strcmp(parameter,'muMinusInf'))
+    function str = GetYStr(parameter,opts,data)
+        
+        if(IsOption(opts,'mu_y1'))
+            VarName = parameter.val;
+        else
+            VarName = parameter;
+        end
+        
+        if(strcmp(VarName,'mu'))
+            str = '$\mu$';
+        elseif(strcmp(VarName,'muMinusInf'))
             str = '$\mu_{y_1 = -\infty}$';
-        elseif(strcmp(parameter,'muPlusInf'))
+        elseif(strcmp(VarName,'muPlusInf'))
             str = '$\mu_{y_1 = \infty}$';
-        elseif(strcmp(parameter,'stagnationPointY2'))
+        elseif(strcmp(VarName,'stagnationPointY2'))
             str = '$y_{2,S}$';
-        elseif(strcmp(parameter,'hatL'))
+        elseif(strcmp(VarName,'hatL'))
             str = '$\hat L$';
-        elseif(strcmp(parameter,'muMaxAbs'))
+        elseif(strcmp(VarName,'muMaxAbs'))
             str = '$\max|\mu|$';   
-        elseif(strcmp(parameter,'pMin'))
+        elseif(strcmp(VarName,'pMin'))
             str = '$\min p$';            
-        elseif(strcmp(parameter,'pMax'))
+        elseif(strcmp(VarName,'pMax'))
             str = '$\max p$';           
-        elseif(strcmp(parameter,'mu_max_y20'))
+        elseif(strcmp(VarName,'mu_max_y20'))
             str = '$\max|\mu|$ at $y_2 = 0$';
-        elseif(strcmp(parameter,'mu_dy1_max_y20_sqrtCn'))
+        elseif(strcmp(VarName,'mu_dy1_max_y20_sqrtCn'))
             str = '$\sqrt{Cn}\max|\frac{\partial \mu}{\partial y_1}|$ at $y_2 = 0$';
-        elseif(strcmp(parameter,'mu_ddy2_max_y20_sqrtCn'))
+        elseif(strcmp(VarName,'mu_ddy2_max_y20_sqrtCn'))
             str = '$\sqrt{Cn}\max|\frac{\partial^2 \mu}{\partial y_2^2}|$ at $y_2 = 0$';
-        elseif(strcmp(parameter,'d'))
+        elseif(strcmp(VarName,'d'))
             str = '$d$ at $y_2 = 0$';
         else
-            str = parameter;
+            str = VarName;
         end
+        
+        
+        if(IsOption(opts,'mu_y1'))
+            str = [str,' at $y_1 = ',num2str(data{1}(1,1).mu_y1{parameter.i}.y1),'$'];
+        elseif(IsOption(opts,'mu_y2'))
+            str = [str,' at $y_2 = ',num2str(data{1}(1,1).mu_y1{parameter.i}.y2),'$'];                          
+        end
+        
     end
 
 end
