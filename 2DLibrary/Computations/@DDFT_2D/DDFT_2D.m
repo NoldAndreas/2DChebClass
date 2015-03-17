@@ -125,12 +125,12 @@ classdef DDFT_2D < Computation
                 paramsFex.sigmaS   = this.optsPhys.sigmaS;
                 %paramsFex.kBT      = this.optsPhys.kBT;            
                 paramsFex.physArea = this.optsNum.PhysArea;
-                paramsFex.Pts      = this.IDC.Pts;
+                %paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
                 paramsFex.FexNum   = this.optsNum.FexNum;
                 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.FexNum.Fex]);    
-                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'optsNum_PhysArea','kBT'});   
+                this.IntMatrFex    = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'Pts','kBT'});   
                 
                 disp('*** Test FMT matrices ***');
                 if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
@@ -151,15 +151,15 @@ classdef DDFT_2D < Computation
                 if(isfield(this.optsPhys,'r_cutoff'))
                     paramsFex.r_cutoff = this.optsPhys.r_cutoff;
                 end
-                paramsFex.V2       = this.optsPhys.V2;
-                paramsFex.V2       = this.optsPhys.V2;
-                paramsFex.kBT      = this.optsPhys.kBT;                
+                paramsFex.V2       = this.optsPhys.V2;                
+                %paramsFex.kBT      = this.optsPhys.kBT;                
                 paramsFex.FexNum   = this.optsNum.V2Num;
+                paramsFex.physArea = this.optsNum.PhysArea;
                 paramsFex.Pts      = this.IDC.Pts;
                 paramsFex.nSpecies = this.optsPhys.nSpecies;   
 
                 FexFun             = str2func(['FexMatrices_',this.optsNum.V2Num.Fex]);    
-                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC);   %true
+                this.IntMatrV2     = DataStorage(['FexData' filesep class(this.IDC) filesep func2str(FexFun)],FexFun,paramsFex,this.IDC,[],{'physArea','kBT'});   %true
                 
                 res = CheckMeanfieldConvolution(this);
 

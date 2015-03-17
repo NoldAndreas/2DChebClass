@@ -88,8 +88,6 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             end
             [h1s,par_i.Function]      = fileparts(par_i.Function);
               
-%             comp_struct(Parameters,par_i)
-%             pause
             
             par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
             
@@ -113,7 +111,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                         [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
                         load([DataFolder,FileName]);  
                         disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
-
+                        
                         recompute = false;
                         
                     elseif(getkeywait(2) == -1)
@@ -165,28 +163,30 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
            else
                 Data     = func(OriginalParameters,OtherInputs);
            end
-           t                               = toc(startComp);     
+           t                               = toc(startComp);                
+           
+           if(~exist(DataFolder,'dir'))            
+                disp('Folder not found. Creating new path..');            
+                mkdir(DataFolder);
+           end
+           save([DataFolder filesep filename],'Data');
+           disp(['Data saved in ',[DataFolder filesep filename],'.']);            
+            
            Parameters.Results.comptime_sec = t;
+           Parameters.Results.comp_at      = datestr(now);           
            if(isnumeric(Data) && isscalar(Data) && (Data == 0))
                 disp(['Error after ',sec2hms(t), ' (hrs:min:sec) ']);
                 comments = ['Computation failed! ',comments];
            else
                 disp(['Data recomputed: ',sec2hms(t),' (hrs:min:sec)']);
            end
-           
-           Parameters.Filename = filename;
-           
-           if(~exist(DataFolder,'dir'))            
-                disp('Folder not found. Creating new path..');            
-                mkdir(DataFolder);
-           end
-            save([DataFolder filesep filename],'Data');
+           Parameters.Results.comments  = comments; 
+           Parameters.Filename          = filename;          
             
-            Struct2File([DataFolder filesep fileParamTxtname],Parameters,...
+           Struct2File([DataFolder filesep fileParamTxtname],Parameters,...
                 ['Computed at: ',datestr(now),...
                 ' Computation time: ',sec2hms(t), ' (hrs:min:sec) ',comments]);
-
-            disp(['Data saved in ',[DataFolder filesep filename],'.']);            
+            
             %disp(['Index file saved in ',[DataFolder filesep fileParamTxtname],'..']);            
             Parameters.Filename = Parameters.Filename(1:end-4);
          end       
