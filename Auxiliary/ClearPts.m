@@ -19,7 +19,9 @@ function ClearPts(nameDir,func,Parameters,ignoreList)
     
     if(~isempty(ind))
         filename         = [DataFolder filesep index{ind}.Filename(1:end-4),'.txt'];
-        Struct2File(filename,RemovePts(index{ind}));        
+        s                = RemovePts(index{ind});
+        s                = AddPhysArea(s,Parameters);
+        Struct2File(filename,s);        
         disp(['Pts cleared from found in ',filename,' ...']);
     end
     
@@ -31,4 +33,23 @@ function ClearPts(nameDir,func,Parameters,ignoreList)
             end
         end   
     end
+
+    function s = AddPhysArea(s,parameters)
+                
+        names = fieldnames(s);
+        for k = 1:length(names)            
+            if(~isempty(strfind(names{k},'physArea')))
+                return;
+            end
+        end   
+        
+        %if no physArea found: add
+        names = fieldnames(parameters);
+        for k = 1:length(names)            
+            if(~isempty(strfind(names{k},'physArea')))
+                s.(names{k}) = parameters.(names{k});
+            end
+        end   
+    end
+        
 end
