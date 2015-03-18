@@ -347,7 +347,7 @@ classdef ContactLineHS < DDFT_2D
         Compute_DisjoiningPressure_II(this,y1Int)
         Compute_DisjoiningPressure_IV(this)
         errRel = SumRule_DisjoiningPressure(this,II_or_IV)      
-        [err,eps] = SumRuleIIError(this,interval_y1)
+        [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
 
         
         %Compute height profiles
