@@ -30,17 +30,18 @@ function CodePaper_ComputeSurfaceTensions
     config = v2struct(optsNum,optsPhys);      
     epw    = [0.5:0.05:1.3];   
     
-	config.optsNum.V2Num.Fex   = 'SplitAnnulus';
-	config.optsPhys.V2.V2DV2   = 'BarkerHendersonCutoff_2D';                            
+	config.optsNum.V2Num.Fex     = 'SplitAnnulus';
+	config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';           
+    config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
 	[res{1},f1] = ComputeYoungContactAngle(config,epw);
-
-    config.optsNum.V2Num.Fex     = 'SplitDisk';
-    config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D'; 
-	[res{2},f1] = ComputeYoungContactAngle(config,epw);
 
     config.optsNum.V2Num.Fex     = 'SplitDisk';                
     config.optsPhys.V2.V2DV2     = 'ExponentialDouble';
-  	[res{3},f1] = ComputeYoungContactAngle(config,epw);
+    config.optsPhys.V1.V1DV1     = 'Vext_Exp_HardWall';
+  	[res{2},f1] = ComputeYoungContactAngle(config,epw);
     
-            
+    config.optsNum.V2Num.Fex     = 'SplitDisk';
+    config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D'; 
+    config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
+	[res{3},f1] = ComputeYoungContactAngle(config,epw);       
 end

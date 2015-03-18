@@ -43,18 +43,18 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
         confP.optsNum.PhysArea.N2bound = 3;
         confP.optsNum.PhysArea.N = [60;3];
         CLP = ContactLineHS(confP);
-        CLP.Preprocess();     
+        CLP.Preprocess();     close all;
         omLG = CLP.ST_1D.om_LiqGas;            
         
         
         opts.config.optsNum.PhysArea.N = [1;100];
         CLN = ContactLineHS(opts.config);
-        CLN.Preprocess();     
+        CLN.Preprocess();     close all;
         
         for j = 1:length(epw_YCA)                  
             CLN.optsPhys.V1.epsilon_w = epw_YCA(j);      
-            CLN.Compute1D('WL');            
-            CLN.Compute1D('WG');
+            CLN.Compute1D('WL'); close all;
+            CLN.Compute1D('WG'); close all;
             
             omWG(j) = CLN.ST_1D.om_wallGas;
             omWL(j) = CLN.ST_1D.om_wallLiq;

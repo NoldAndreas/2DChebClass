@@ -37,24 +37,24 @@ function Check2DSumRule()
     dirRes = 'SumRuleError2D';
     
     AddPaths('CodePaper');    
-    config.optsNum.V2Num.Fex = 'SplitAnnulus'; 
-    config.optsPhys.V2.V2DV2 = 'BarkerHendersonCutoff_2D';                
+    config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
+    config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
     config.optsPhys.V1.epsilon_w = 0.94;                
     res{1}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
-    
+            
     AddPaths('CodePaper');
-    config.optsNum.V2Num.Fex = 'SplitDisk'; 
-    config.optsPhys.V2.V2DV2 = 'ExponentialDouble';                          
-    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
+    config.optsNum.V2Num.Fex     = 'SplitDisk'; 
+    config.optsPhys.V2.V2DV2     = 'ExponentialDouble';                          
+    config.optsPhys.V1.V1DV1     = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 0.82;         
-    res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);        
+    res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                
     
-    
-    AddPaths('CodePaper');
+    AddPaths('CodePaper');    
+    config.optsNum.V2Num.Fex     = 'SplitDisk';     
+    config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D';     
+    config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
     config.optsPhys.V1.epsilon_w = 1.0;                
-    config.optsNum.V2Num.Fex = 'SplitDisk';     
-    config.optsPhys.V2.V2DV2 = 'BarkerHenderson_2D';     
-    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                          
+    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);
     
      %AddPaths('CodePaper');
      %config.optsNum.V2Num.Fex = 'SplitAnnulus';
