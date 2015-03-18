@@ -6,21 +6,20 @@ function st = File2Struct(filename)
     fileID = fopen(filename);
     
     tline = fgets(fileID);
+    line_no = 1;
     while ischar(tline)
                             
         if(tline(1) ~= '#')
-            [name,remain]  = strtok(tline);
-            [h1,remain]     = strtok(remain);
-            data           = strtok(remain);
-
-%            if(isempty(str2num(data)))
-            st.(name) = data;            
-%            else
-%                st.(name) = str2num(data);            
-%            end
+            ind  = strfind(tline,':');            
+            name = tline(1:ind-2);
+            data = tline(ind+2:end-1);                        
+            st.(name)      = data;            
+        elseif(line_no == 2)
+            st.SecondLine = tline(2:end-1);
         end
         
-        tline = fgets(fileID);
+        tline   = fgets(fileID);
+        line_no = line_no + 1;
     end
     
     fclose(fileID);

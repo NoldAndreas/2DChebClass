@@ -46,7 +46,7 @@ function Check2DSumRule()
     config.optsNum.V2Num.Fex     = 'SplitDisk'; 
     config.optsPhys.V2.V2DV2     = 'ExponentialDouble';                          
     config.optsPhys.V1.V1DV1     = 'Vext_Exp_HardWall';
-    config.optsPhys.V1.epsilon_w = 0.82;         
+    config.optsPhys.V1.epsilon_w = 1.45;         
     res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                
     
     AddPaths('CodePaper');    

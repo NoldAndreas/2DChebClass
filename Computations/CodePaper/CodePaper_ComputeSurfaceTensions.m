@@ -35,11 +35,13 @@ function CodePaper_ComputeSurfaceTensions
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
 	[res{1},f1] = ComputeYoungContactAngle(config,epw);
 
+    epw    = [1.2:0.05:1.6];   
     config.optsNum.V2Num.Fex     = 'SplitDisk';                
     config.optsPhys.V2.V2DV2     = 'ExponentialDouble';
     config.optsPhys.V1.V1DV1     = 'Vext_Exp_HardWall';
   	[res{2},f1] = ComputeYoungContactAngle(config,epw);
     
+    epw    = [0.5:0.05:1.3];   
     config.optsNum.V2Num.Fex     = 'SplitDisk';
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D'; 
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    

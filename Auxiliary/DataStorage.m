@@ -10,15 +10,23 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     global PersonalUserOutput recomputeAll loadAll
     %*****************************
     %Trim numbers of parameters
-    OriginalParameters = Parameters;
-    Parameters         = FlattenStructure(Parameters,10,'AllStr');    
+    OriginalParameters = Parameters;    
+    Parameters         = FlattenStructure(Parameters,10,'AllStr');   
+    [h1s,Parameters.Function] = fileparts(func2str(func));
     
 	if(isfield(Parameters,'Identifier'))
-        identifier = Parameters.Identifier;
-        Parameters = rmfield(Parameters,'Identifier');
+        identifier = Parameters.Identifier;        
     else
         identifier = [];
     end
+    if(isfield(Parameters,'Comments'))
+        comments            = Parameters.Comments;            
+    else
+        comments = '';
+    end
+	hname               = getFilename(Parameters);        
+    filename            = [hname,'.mat'];
+    fileParamTxtname    = [hname,'.txt'];            
     %*****************************
 
     global dirData
@@ -29,13 +37,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         recompute = [];
     end
     
-    if(nargin >= 6)
-        ignoreList(end+1) = {'Results'};
-        ignoreList(end+1) = {'configName'};
-    else
-        ignoreList = {'Results','configName'};
-    end
-   
+    if(nargin < 6)
+        ignoreList = {};
+    end    	
    
     %1st Step: Search for File and load if found
     if((nargin >= 5) && ~(isempty(recompute)) &&  ischar(recompute)) 
@@ -46,94 +50,52 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         %(1)First Option: Select Input File
             [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
             load([DataFolder,FileName]);  
-            disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
-                        
-%            for i=1:length(index)
-%                [~,name,ext] = fileparts(index(i).Filename);
-%               if(strcmp(FileName,[name,ext]))
-%                    Parameters = index(i).Parameters;                    
-%                    break;
-%                end
-%            end            
+            disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                                                
             recompute = false;
     else
-        %(2) Second Option: Search file
-        if(isfield(Parameters,'Comments'))
-            comments            = Parameters.Comments;
-            Parameters          = rmfield(Parameters,'Comments');
-        else
-            comments = '';
-        end
-                        
-        Parameters.Function = func2str(func);
-        hname               = getFilename(Parameters);        
-        filename            = [hname,'.mat'];
-        fileParamTxtname    = [hname,'.txt'];
-            
-        [h1s,Parameters.Function] = fileparts(Parameters.Function);
-        if(nargin >= 6)
-            Parameters_comp = RemoveIgnoreFromStruct(Parameters,ignoreList);
-        else
-            Parameters_comp = Parameters;
-        end
-        for i=1:length(index)
-            if(isfield(index{i},'Filename'))
-                par_i = rmfield(index{i},'Filename');
-            else
-                par_i = index{i};
-            end
-                 
-            if(~isfield(par_i,'Function'))
-                continue;
-            end
-            [h1s,par_i.Function]      = fileparts(par_i.Function);
-              
-            
-            par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
-            
-            if(isequaln(Parameters_comp,par_i_comp))%index{i}.Parameters))
-                
-                filename            = index{i}.Filename;
-                Parameters.Filename = [DataFolder filesep filename(1:end-4)];
-                
-                fileParamTxtname    = [filename(1:end-4),'.txt'];
-                
-                load([DataFolder filesep filename]);
-                disp(['Data file found in ',DataFolder filesep filename,' ...']);
+        %(2) Second Option: Search file                                
+        i = DataStorage_FindFile(index,Parameters,ignoreList);
+        
+        if(~isempty(i))
+            filename            = index{i}.Filename;
+            Parameters.Filename = [DataFolder filesep filename(1:end-4)];
 
-                if(recomputeAll)
-                    recompute = true;
-                elseif((isempty(recompute)) && ((~PersonalUserOutput) || (loadAll)))
+            fileParamTxtname    = [filename(1:end-4),'.txt'];
+
+            load([DataFolder filesep filename]);
+            disp(['Data file found in ',DataFolder filesep filename,' ...']);
+
+            if(recomputeAll)
+                recompute = true;
+            elseif((isempty(recompute)) && ((~PersonalUserOutput) || (loadAll)))
+                recompute = false;
+            elseif((isempty(recompute)) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
+                no = fprintf('Do you want to load data (press "l"), recompute Data (press any other key), or wait for 2 seconds.');        
+                if(getkeywait(2) == 108)
+                    [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
+                    load([DataFolder,FileName]);  
+                    disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
+
                     recompute = false;
-                elseif((isempty(recompute)) && (PersonalUserOutput)) %ask if value of recompute is not given as an input
-                    no = fprintf('Do you want to load data (press "l"), recompute Data (press any other key), or wait for 2 seconds.');        
-                    if(getkeywait(2) == 108)
-                        [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
-                        load([DataFolder,FileName]);  
-                        disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
-                        
-                        recompute = false;
-                        
-                    elseif(getkeywait(2) == -1)
-                        for ih = 1:no
-                            fprintf('\b');
-                        end                        
-                        recompute = false;
-                    else
-                        for ih = 1:no
-                            fprintf('\b');
-                        end
-                        no = fprintf('Thanks. Data will be recomputed.\n');
-                        recompute = true;
-                    end                
-                end
-                if(~recompute)
-                    %append configuration to index file
-                     fileID = fopen([DataFolder filesep fileParamTxtname],'a');
-                     fprintf(fileID,'# %s \n',['loaded on ' datestr(clock) ' : ' comments]);
-                     fclose(fileID);
-                end
-                break;
+
+                elseif(getkeywait(2) == -1)
+                    for ih = 1:no
+                        fprintf('\b');
+                    end                        
+                    recompute = false;
+                else
+                    for ih = 1:no
+                        fprintf('\b');
+                    end
+                    no = fprintf('Thanks. Data will be recomputed.\n');
+                    recompute = true;
+                end                
+            end
+            if(~recompute)
+                %append configuration to index file
+                 fileID = fopen([DataFolder filesep fileParamTxtname],'a');
+                 fprintf(fileID,'# %s \n',['loaded on ' datestr(clock) ' : ' comments]);
+                 fclose(fileID);
             end
         end     
     
@@ -193,25 +155,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     end
 
     
-    function name = getFilename(params)
-        time   = clock;
-%        fnames = fieldnames(params);       
-%        name   = '';%[func2str(func),'_'];
-%         if(isempty(identifier))
-%             k = 0; kMax = 3;
-%             for j = 1:length(fnames)            
-%                 if(isfloat(params.(fnames{j})))
-%                     s    = num2str(params.(fnames{j}));
-%                     if(length(s) < 6)
-%                         name = [name,fnames{j},'_',s(:)','_'];
-%                         k = k +1;
-%                     end
-%                 end
-%                 if((k > kMax) || length(name) > 35)
-%                     break;
-%                 end
-%             end
-%         else
+    function name = getFilename(params)        
         if(isempty(identifier))
             name   = '';
         elseif(isfloat(params.(identifier)))
@@ -219,71 +163,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         else
             name = [identifier,'_',params.(identifier),'_'];
         end
-%       end
         name   = ([name,getTimeStr()]);        
     end
 
-%     function eq = isequalStruct(s1,s2)
-%         
-%         eq       = true;        
-%         f_names1 = fieldnames(s1);
-%         tol      = 1e-12;
-%         
-%         for j = 1:length(f_names1)
-%             fld = f_names1{j};
-%             if(~isfield(s2,fld))
-%               eq = false; return;
-%             else
-%                 if(isnumeric(s1.(fld)))
-%                     if(abs(s1.(fld)- s2.(fld)) > tol)
-%                         eq = false; return;
-%                     end
-%                 else
-%                     if(~strcmp(s1.(fld),s2.(fld)))
-%                         eq = false; return;
-%                     end
-%                 end
-%             end            
-%         end
-%        
-%     end
-
-    function s = RemoveIgnoreFromStruct(s,IgnoreList)
-        names = fieldnames(s);
-        for k = 1:length(names)
-            for j = 1:length(IgnoreList)            
-               if(strcmp(names{k},IgnoreList{j}))
-                    s = rmfield(s,names{k});
-               elseif(~isempty(strfind(names{k},[IgnoreList{j},'_'])))
-                    s = rmfield(s,[names{k}]);              
-               end
-            end           
-        end
-    end
-
 end
-
-
-%             %Save text file with Parameters
-%             [names,values] = fn_structdispList(newEntry); 
-%             
-%             fileID = fopen(fileParamTxtname,'w');       
-%             fprintf(fileID,'****** Data File *******\n');
-%             fprintf(fileID,'Filename: %s\n',filename);
-%             fprintf(fileID,'************************\n');
-%             for i = 1:length(names)      
-%                 if(ischar(values{i}))
-%                     fprintf(fileID,'%s : %s\n',names{i},values{i});
-%                 else
-%                     if(length(values{i}) == 1)
-%                         fprintf(fileID,'%s : %f\n',[names{i},values{i}]);                
-%                     else
-%                         fprintf(fileID,'%s : ',[names{i}]);                
-%                         for l = 1:length(values{i})
-%                             fprintf(fileID,'%f , ',values{i}(l));
-%                         end
-%                         fprintf(fileID,'\n');  
-%                     end
-%                 end
-%             end
-%             fclose(fileID);
