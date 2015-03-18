@@ -132,7 +132,7 @@ classdef DDFT_2D < Computation
                 paramsFex.Pts      = this.IDC.Pts;
                 ClearPts(folder,FexFun,paramsFex,{'physArea','kBT'});                
                 paramsFex          = rmfield(paramsFex,'Pts');  
-                this.IntMatrFex    = DataStorage(folder,FexFun,paramsFex,this.IDC,[],{'Pts','kBT'});   
+                this.IntMatrFex    = DataStorage(folder,FexFun,paramsFex,this.IDC,[],{'kBT'});   
                 
                 disp('*** Test FMT matrices ***');
                 if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))

@@ -153,8 +153,8 @@ function Check2DSumRule()
             
             res(i).config = conf;            
 
-            res(i).error_conv1 = preErr.error_conv1;
-            res(i).Conv        = CL.IntMatrV2.Conv;
+            %res(i).error_conv1 = preErr.error_conv1;
+            %res(i).Conv        = CL.IntMatrV2.Conv;
 
            % [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');
 %             res(i).error_wl = params.contactDensity_relError;
@@ -164,7 +164,7 @@ function Check2DSumRule()
             
             CL.ComputeEquilibrium();      
             [res(i).sumRuleII_relError,...
-             res(i).sumRuleII_eps] = CL.SumRuleIIError([-10,10]);
+             res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError([-10,10]);            
             %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       
