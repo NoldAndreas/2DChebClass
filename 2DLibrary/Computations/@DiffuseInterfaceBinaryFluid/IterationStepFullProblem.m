@@ -54,7 +54,7 @@ function IterationStepFullProblem(this)
     opts.optsPhys   = this.optsPhys;
     opts.configName = this.configName;    
      	            
-	[res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','noIterations','Function'});                
+	[res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','optsNum_PlotArea','noIterations','Function'});                
         
     SetResults(res);
 
@@ -63,7 +63,7 @@ function IterationStepFullProblem(this)
         opts.Seppecher_red = Seppecher_red;
         opts.lambda        = 0.6;    
         
-        [res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','noIterations','Function'});    
+        [res,~,Parameters] = DataStorage('ContactLineComputations',@SolveBinaryFluid,opts,[],[],{'optsNum_SubArea','optsNum_PlotArea','noIterations','Function'});    
         SetResults(res);
     end
 	           

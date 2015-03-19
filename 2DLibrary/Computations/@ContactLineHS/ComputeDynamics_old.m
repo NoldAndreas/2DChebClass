@@ -1,4 +1,4 @@
-function ComputeDynamics(this)
+function ComputeDynamics_old(this)
 %***************************************************************    
     %***************************************************************
     %   Dynamics:

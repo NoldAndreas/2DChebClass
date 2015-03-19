@@ -1,6 +1,5 @@
 function AddPaths(dirOrg)
    
-
     global dirData
     global dirDataOrg    
     

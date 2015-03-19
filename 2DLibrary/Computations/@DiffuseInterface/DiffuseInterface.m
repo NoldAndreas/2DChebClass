@@ -489,7 +489,7 @@ classdef DiffuseInterface < Computation
                 this.IDC.plotStreamlines(uv,y10,y20); %IDC.plotFlux(u_flow)(mu);
             end
         end
-        function PlotU(this,uv,y1Pts,y2Pts,opts) 
+        function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU(this,uv,y1Pts,y2Pts,opts) 
             
             n = 20;
             if((nargin<2) || isempty(uv))
@@ -499,8 +499,8 @@ classdef DiffuseInterface < Computation
                     uv = this.uv;
                 end
             end
-            y2Min = this.optsNum.PhysArea.y2Min;
-            y2Max = this.optsNum.PhysArea.y2Max;
+            y2Min = this.optsNum.PlotArea.y2Min;
+            y2Max = this.optsNum.PlotArea.y2Max;
             
             y1Min = this.optsNum.PlotArea.y1Min;
             y1Max = this.optsNum.PlotArea.y1Max;
@@ -519,9 +519,9 @@ classdef DiffuseInterface < Computation
             end
             
             if((nargin >= 5))
-                this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
+                [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
             else
-                this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
+                [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
             end
             hold on;
             this.IDC.plotFlux(uv);

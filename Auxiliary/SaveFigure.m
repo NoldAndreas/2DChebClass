@@ -10,7 +10,11 @@ function fullName = SaveFigure(filename,opts)
     
     [s,branch]= system('C:\git rev-parse --abbrev-ref HEAD');
 	
-    fullName = [dirData filesep filename];
+    if(isempty(fileparts(filename)));
+        fullName = [dirData filesep filename];
+    else
+        fullName = filename;
+    end
     
     DataFolder = fileparts(fullName);
 	if(~exist(DataFolder,'dir'))            

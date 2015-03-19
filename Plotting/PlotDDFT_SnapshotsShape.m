@@ -14,7 +14,7 @@ function PlotDDFT_SnapshotsShape(input,file_name)
     n       = length(plotTimes);
     d       = ceil((n-1)/(noPlots-1));
     ct      = 1:n;
-    mark    = (mod(ct,d) == 1);
+    mark    = (mod(ct-1,d) == 0);
     
     cols = 4;
     rows = ceil(sum(mark)/cols);
@@ -69,8 +69,9 @@ function PlotDDFT_SnapshotsShape(input,file_name)
         pl_j = pl_j +1;                
     end        
     if(nargin > 1)
-            print2eps(file_name,gcf);
-            saveas(gcf,[file_name,'.fig']);
-            disp(['Snapshots saved in ',file_name,'.eps/.fig.']);
+        SaveFigure(file_name);
+            %print2eps(file_name,gcf);
+            %saveas(gcf,[file_name,'.fig']);
+            %disp(['Snapshots saved in ',file_name,'.eps/.fig.']);
 	end
 end

@@ -5,9 +5,13 @@ function fig_h = PlotDDFT(input,Bool_Record)
     if((nargin < 2) && ~QuickOutput) 
         Bool_Record = false;
         gifFile = [];
-    else
+    else        
         if(isfield(input,'filename'))
-            gifFile = [dirData,'\Dynamics\',input.filename,'.gif'];
+            if(isempty(fileparts(input.filename)))
+                gifFile = [dirData,'\Dynamics\',input.filename,'.gif'];
+            else
+                gifFile = [input.filename,'.gif'];
+            end
         elseif(ischar(Bool_Record))
             gifFile = [Bool_Record,'.gif'];
         else

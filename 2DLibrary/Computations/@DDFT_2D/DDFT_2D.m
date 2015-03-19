@@ -276,5 +276,28 @@ classdef DDFT_2D < Computation
         
         ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
         ComputeDynamics(this)           
+        
+        function PostprocessDynamics(this)                    
+            subArea       = this.dynamicsResult.Subspace.subArea;
+            rho_t         = this.dynamicsResult.rho_t;
+            no_times      = length(this.optsNum.plotTimes);
+            accFlux       = this.dynamicsResult.accFlux;
+            nSpecies      = size(rho_t,2);
+            rho_ic        = rho_t(:,:,1);
+            
+            IP            = this.IDC.SubShapePtsCart(subArea.GetCartPts());
+            Int_SubOnFull = subArea.ComputeIntegrationVector()*IP;
+            
+            massError     = zeros(no_times,iSpecies);
+                                    
+            for iSpecies=1:nSpecies            
+                rho       = permute(rho_t(:,iSpecies,:),[1 3 2]);
+                rho_diff  = rho-rho_ic(:,iSpecies)*ones(1,no_times);
+                massError = Int_SubOnFull*rho_diff+accFlux(:,iSpecies)';                    
+            end
+            
+            this.dynamicsResult.Subspace.massError = massError;
+            
+        end
     end
 end

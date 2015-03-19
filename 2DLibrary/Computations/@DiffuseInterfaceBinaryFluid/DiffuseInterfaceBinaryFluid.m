@@ -26,7 +26,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.optsPhys.Cak = Cak;           
            SaveConfig(this);   
        end
-            
        function vec = GetInitialCondition(this,theta) 
             if(nargin == 1)
                 theta = pi/2;
@@ -383,7 +382,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            this.IDC.plot(this.p,'contour');     
            SaveCurrentFigure(this,'Pressure');
        end       
-       function PlotU(this,uv,opts) 
+       function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU(this,uv,opts) 
            
             if(nargin < 2)
                 %opts = [];
@@ -406,7 +405,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                      0.5;...
                      this.optsNum.PlotArea.y2Max-0.5];
             
-            PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
+            [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
        end       
        function PlotComponentVelocities(this)
            
@@ -507,7 +506,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            disp(['Error of flux through subArea: ',num2str(this.Int_of_path*uv)]);
            disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*this.flux)]);
        end
-       
        function PostProcessInterface(this)
             PostProcessInterface@DiffuseInterface(this);
             
@@ -526,14 +524,12 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                 this.IsoInterface.flux_t   = -sin(th).*(IP*fl_1) + cos(th).*(IP*fl_2);            
             end
        end
-       
        function PostProcess(this)
            GetYueParameters(this);           
            FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
            PostProcess_Flux(this);
            PostProcessInterface(this);
        end
-       
        function GetYueParameters(this)
            if(IsSeppecher(this))
                 Cak      = this.optsPhys.Cak;
@@ -546,7 +542,6 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            end            
            
        end
-       
        function Plot3DProfiles(this)
            figure('color','white','Position',[0 0 800 800]);
            this.IDC.plot(this.mu,{'SC'});
@@ -565,8 +560,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            PlotU(this);
            title('Pressure');
            SaveCurrentFigure(this,'3DPressure');
-       end
-       
+       end      
        function PlotValuesThroughStagnationPoint(this)
            
            figure('Position',[0 0 800 800],'color','white');

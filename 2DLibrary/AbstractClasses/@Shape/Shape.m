@@ -173,7 +173,7 @@ classdef (Abstract) Shape < handle
                 IP = ComputeInterpolationMatrix(this,y1Plot,y2Plot,true,false);           
             end
         end                   
-        function plotStreamlines(this,flux,startMask1,startMask2,opts)
+        function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = plotStreamlines(this,flux,startMask1,startMask2,opts)
             mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
                                (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
                                (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
@@ -198,12 +198,11 @@ classdef (Abstract) Shape < handle
             end
             
             if(islogical(startMask1))
-                h = streamline(y1M,y2M,fl_y1,fl_y2,...
-                       PtsYCart.y1_kv(mask&startMask1),...
-                       PtsYCart.y2_kv(mask&startMask2));
-            else
-                 h = streamline(y1M,y2M,fl_y1,fl_y2,startMask1,startMask2);                                       
+                startMask1 = PtsYCart.y1_kv(mask&startMask1);
+                startMask2 = PtsYCart.y2_kv(mask&startMask2);
             end
+            
+            h = streamline(y1M,y2M,fl_y1,fl_y2,startMask1,startMask2);                                                   
 %                hold on;
 %                streamline(y1M,y2M,-fl_y1,-fl_y2,...
 %                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
@@ -217,7 +216,7 @@ classdef (Abstract) Shape < handle
                 set(h,'linewidth',opts.linewidth);
             end
         end        
-        function plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
+        function [y1_s,y2_s,fl_y1,fl_y2] = plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -306,7 +305,7 @@ classdef (Abstract) Shape < handle
             hold off;   
                                             
         end            
-        function plot(this,V,options,optDetails)
+        function [y1M,y2M,VIM] = plot(this,V,options,optDetails)
             
             if((nargin >= 3) && ~(iscell(options)))
                 options = {options};
@@ -365,14 +364,14 @@ classdef (Abstract) Shape < handle
                 
                 if((nargin >= 3) && IsOption(options,'contour'))
                     if(nargin >= 4)         
-                        if(isfield(optDetails,'nContours'))                            
-                            [C,h] = contour(y1M,y2M,reshape(VI,...
-                                  this.Interp.Nplot2,this.Interp.Nplot1),...
+                        if(isfield(optDetails,'nContours'))
+                            VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                            [C,h] = contour(y1M,y2M,VIM,...
                                   optDetails.nContours,...
                                   'linewidth',lw);  
                         else
-                            [C,h] = contour(y1M,y2M,reshape(VI,...
-                                  this.Interp.Nplot2,this.Interp.Nplot1),...
+                            VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                            [C,h] = contour(y1M,y2M,VIM,...
                                   'linewidth',lw);  
                         end
                         if(isfield(optDetails,'linecolor'))
@@ -383,35 +382,26 @@ classdef (Abstract) Shape < handle
                         end
                            
                     else
-                        [C,h] = contour(y1M,y2M,reshape(VI,...
-                                  this.Interp.Nplot2,this.Interp.Nplot1),8,...
+                        VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        [C,h] = contour(y1M,y2M,VIM,8,...
                                   'linewidth',lw);  
                     end
                     % hh = clabel(C,h,'fontsize',20);
                 elseif((nargin >= 3) && IsOption(options,'flux'))
-                    fl_y1     = VI(1:end/2,iSpecies);
-                    fl_y2     = VI(end/2+1:end,iSpecies);
+                    VIM.fl_y1     = VI(1:end/2,iSpecies);
+                    VIM.fl_y2     = VI(end/2+1:end,iSpecies);
                     
-%                     if(strcmp(this.polar,'polar'))
-%                         [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);                    
-%                     end                
-                    
-%                     if(exist('fl_norm','var') && ~isempty(fl_norm))
-%                         O = ones(1,size(fl_y1,2));
-%                         fl_y1 = [fl_norm*O;fl_y1];
-%                         fl_y2 = [0*O;fl_y2];
-%                     end       
-                    %quiver(y1_s,y2_s,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
                     if((nargin >= 4) && isfield(optDetails,'linecolor'))
                         c = optDetails.linecolor;
                     else
                         c = 'k';
                     end
-                    
-                    quiver(yCart.y1_kv,yCart.y2_kv,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
+                    y1M = yCart.y1_kv;
+                    y2M = yCart.y2_kv;
+                    quiver(y1M,y2M,VIM.fl_y1,VIM.fl_y2,'LineWidth',lw,'Color',c);
                 else
-                    h = surf(y1M,y2M,reshape(VI,...
-                                  this.Interp.Nplot2,this.Interp.Nplot1)); %mesh
+                    VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                    h = surf(y1M,y2M,VIM); %mesh
                     if(nargin>3)
                         if(isfield(optDetails,'linecolor'))
                             set(h,'FaceColor',optDetails.linecolor);
