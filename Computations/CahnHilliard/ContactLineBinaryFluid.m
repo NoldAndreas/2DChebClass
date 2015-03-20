@@ -85,11 +85,30 @@ function ContactLineBinaryFluid
         DI.IterationStepFullProblem();                    
         DI.PostProcess();
                         
-                
+        %Plot flux j_1-j_2 next to stagnation point
+        [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
+        [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotFlux(); close all;        
+        [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.flux); close all;
+        
+        figure('Position',[0 0 800 800],'color','white');
+        [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
+        h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
+        quiver(y1_s,y2_s,fl_y1_q,fl_y2_q);        
+        plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
+        plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
+        
+        set(gca,'linewidth',1.5); set(gca,'fontsize',20);
+        xlabel('$y_1$','fontsize',20,'Interpreter','Latex');
+        ylabel('$y_2$','fontsize',20,'Interpreter','Latex');        
+        pbaspect([1 1 1]);
+        SaveFigure('StagnationPoint_Flux',config);
+        
+        %Plot velocities next to stagnation point
         [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
         [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;        
         [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.uv); close all;
         
+
         figure('Position',[0 0 800 800],'color','white');
         [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
         h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
@@ -103,6 +122,7 @@ function ContactLineBinaryFluid
         pbaspect([1 1 1]);
         SaveFigure('StagnationPoint',config);
         
+        %******* Plot 3D chemical potential, pressure and phi
         vals = {'mu','p','phi'};
         labs = {'$\mu$','p','$\phi$'};
         for k = 1:3            

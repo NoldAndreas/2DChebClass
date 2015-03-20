@@ -374,6 +374,9 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                               - Diff.grad*p;
        end       
 
+       function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotFlux(this)
+            [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU(this,this.flux); 
+       end
        function PlotResults(this)           
            PlotResults@DiffuseInterface(this);
            
@@ -384,7 +387,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
        end       
        function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU(this,uv,opts) 
            
-            if(nargin < 2)
+            if(nargin < 3)
                 %opts = [];
                 opts.linewidth = 1.5;
                 opts.color = 'm';
@@ -501,7 +504,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            Diff      = this.IDC.Diff;
            m         = this.optsPhys.mobility;
            uv        = this.uv;           
-           this.flux = repmat(this.phi,2,1).*uv - m*Diff.grad*this.mu;
+           %this.flux = repmat(1+this.phi,2,1).*uv/2 - m*(Diff.grad*this.mu)/2; %Particles 1
+           %this.flux = repmat(1-this.phi,2,1).*uv/2 + m*(Diff.grad*this.mu)/2; %Particles 2
+           %this.flux = -m*(Diff.grad*this.mu);            
+           this.flux = repmat(this.phi,2,1).*uv - m*(Diff.grad*this.mu); 
            
            disp(['Error of flux through subArea: ',num2str(this.Int_of_path*uv)]);
            disp(['Error of phasefield flux through subArea: ',num2str(this.Int_of_path*this.flux)]);
@@ -520,8 +526,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                 fl_1      = this.flux(1:end/2);
                 fl_2      = this.flux(1+end/2:end);
                 th        = this.IsoInterface.theta;
-                this.IsoInterface.flux_n   = cos(th).*(IP*fl_1)  + sin(th).*(IP*fl_2);
-                this.IsoInterface.flux_t   = -sin(th).*(IP*fl_1) + cos(th).*(IP*fl_2);            
+               % this.IsoInterface.flux_n   = cos(th).*(IP*fl_1)  + sin(th).*(IP*fl_2);
+               % this.IsoInterface.flux_t   = -sin(th).*(IP*fl_1) + cos(th).*(IP*fl_2);                  
+                this.IsoInterface.flux_n   = sin(th).*(IP*fl_1)  - cos(th).*(IP*fl_2);
+                this.IsoInterface.flux_t   = cos(th).*(IP*fl_1) + sin(th).*(IP*fl_2);                                  
             end
        end
        function PostProcess(this)
