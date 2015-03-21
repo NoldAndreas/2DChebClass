@@ -26,7 +26,7 @@ function DynamicContactLine()
                      'PlotAreaCart',PlotAreaCart,'SubArea',SubArea,...
                      'maxComp_y2',20,...
                      'y1Shift',0,...
-                     'plotTimes',0:0.05:4);
+                     'plotTimes',0:0.05:5);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
                 'tau',1,'epsilon_w_max',1.2);    
@@ -38,13 +38,21 @@ function DynamicContactLine()
 
     config = v2struct(optsNum,optsPhys);                                
     
+    N = 20:10:50;
     
-    CL = ContactLineHS(config);
-    CL.Preprocess(); 
-	CL.ComputeEquilibrium();              
-    CL.ComputeDynamics();
-    CL.PostprocessDynamics();
-    
-    CL.PlotDynamics();
-    
+    for i = 1:length(N)
+        config.optsNum.PhysArea.N = N(i)*[1,1];
+        
+        CL = ContactLineHS(config);
+        CL.Preprocess(); 
+        CL.ComputeEquilibrium();              
+        CL.ComputeDynamics();
+        CL.PostprocessDynamics();
+
+       % CL.PlotDynamics();
+        
+        close all;
+        clear all;
+    end
+
 end
