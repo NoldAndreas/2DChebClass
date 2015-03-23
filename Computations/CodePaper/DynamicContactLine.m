@@ -38,7 +38,7 @@ function DynamicContactLine()
 
     config = v2struct(optsNum,optsPhys);                                
     
-    N = 20:10:50;
+    N = 20:10:70;
     
     for i = 1:length(N)
         config.optsNum.PhysArea.N = N(i)*[1,1];

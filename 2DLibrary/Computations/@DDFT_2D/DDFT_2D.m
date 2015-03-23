@@ -281,7 +281,7 @@ classdef DDFT_2D < Computation
             subArea       = this.dynamicsResult.Subspace.subArea;
             rho_t         = this.dynamicsResult.rho_t;
             no_times      = length(this.optsNum.plotTimes);
-            accFlux       = this.dynamicsResult.accFlux;
+            accFlux       = this.dynamicsResult.Subspace.accFlux;
             nSpecies      = size(rho_t,2);
             rho_ic        = rho_t(:,:,1);
             

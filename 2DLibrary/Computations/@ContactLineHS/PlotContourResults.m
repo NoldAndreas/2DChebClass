@@ -59,7 +59,7 @@ function [fContour] =  PlotContourResults(this,options) %plain
     else
         optDetails.y2CartShift = -0.5;
         optDetails.clabel      = false;  
-        optDetails.linewidth   = 1.4;  
+        optDetails.linewidth   = 1.5;  
         
         %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
         drho = rhoLiq_sat - rhoGas_sat;

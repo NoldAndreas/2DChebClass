@@ -60,14 +60,14 @@ function CheckSumRule_BH_HalfSpace()
    
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-    config.optsPhys.V1.epsilon_w = 0.9;    
+    config.optsPhys.V1.epsilon_w = 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
     resC{3}.config = config;
     
     AddPaths('CodePaper');
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-    config.optsPhys.V1.epsilon_w = 0.9;    
+    config.optsPhys.V1.epsilon_w = 1.0;    
     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
     resC{4}.config = config;
     
@@ -76,7 +76,7 @@ function CheckSumRule_BH_HalfSpace()
     % **** 4 ****
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    config.optsPhys.V1.epsilon_w = 0.9;    
+    config.optsPhys.V1.epsilon_w = 1.0;    
     res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
     resC{5}.config = config;
     
@@ -85,7 +85,7 @@ function CheckSumRule_BH_HalfSpace()
     config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
-    config.optsPhys.V1.epsilon_w = 0.9;    
+    config.optsPhys.V1.epsilon_w = 1.45;    
     res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],true,ignoreList);    
     resC{6}.config = config;
     

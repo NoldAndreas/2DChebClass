@@ -40,7 +40,7 @@ function Check2DSumRule()
     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
     config.optsPhys.V1.epsilon_w = 0.94;                
-    res{1}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
+    res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
             
     AddPaths('CodePaper');
     config.optsNum.V2Num.Fex     = 'SplitDisk'; 
@@ -65,18 +65,17 @@ function Check2DSumRule()
     
     %**********************
     %**********************
-   % cols = {'b','m','k','r','g'};
-%    syms = {'o','>','*','^','h'};   
-    PlotDensityProfile(res{1}(3));
-    %resC = DataStorage([],@ComputeDensityProfile,config,res,[],ignoreList);
-    %PlotDensityProfiles(resC);
-         
+    %PlotDensityProfile(res{1}(3));
+    %PlotDensityProfile(res{2}(3));
+    %PlotDensityProfile(res{3}(3));         
     %**********************
     %**********************
-    figure('color','white','Position',[0 0 1700 800]); 
+    figure('color','white','Position',[0 0 2000 800]); 
     legendstring = {};
     subplot(1,2,1);
-    PlotErrorGraph(res{1},'sumRuleII_relError','s-','b','');            
+    PlotErrorGraph(res{1},'sumRuleII_relError','o-','k','');            
+    PlotErrorGraph(res{2},'sumRuleII_relError','^-','k','');            
+    PlotErrorGraph(res{3},'sumRuleII_relError','*-','k','');            
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
@@ -86,7 +85,9 @@ function Check2DSumRule()
     xlim([(N(1)-2),(N(end)+2)]);    
     
     subplot(1,2,2);
-    PlotErrorGraph(res{1},'sumRuleII_eps','s-','b','eps');     
+    PlotErrorGraph(res{1},'sumRuleII_eps','o-','k','eps');     
+    PlotErrorGraph(res{2},'sumRuleII_eps','^-','k','eps');     
+    PlotErrorGraph(res{3},'sumRuleII_eps','*-','k','eps');
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
@@ -136,8 +137,13 @@ function Check2DSumRule()
         CL = ContactLineHS(res.config);
         CL.Preprocess();
         CL.ComputeEquilibrium();                              
-        CL.InitInterpolation([-7.5 7.5],[0.5 15.5])
-        CL.PlotContourResults({'newFigure','save'})
+        CL.InitInterpolation([-12 12],[0.5 24.5]); close all;
+        figure('Color','white','Position',[0 0 800 800]);
+        CL.PlotContourResults({})
+        set(gca,'fontsize',35);  
+        xlabel('${y_1}/{\sigma}$','Interpreter','Latex','fontsize',35);
+        ylabel('${y_2}/{\sigma}$','Interpreter','Latex','fontsize',35);
+        CL.SaveCurrentFigure('EquilibriumContour');        
     end
     function res = ComputeError(in,h)
         conf = in.config;

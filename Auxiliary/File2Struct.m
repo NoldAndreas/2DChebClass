@@ -10,10 +10,9 @@ function st = File2Struct(filename)
     while ischar(tline)
                             
         if(tline(1) ~= '#')
-            ind  = strfind(tline,':');            
-            name = tline(1:ind-2);
-            data = tline(ind+2:end-1);                        
-            st.(name)      = data;            
+            ind        = strfind(tline,':');            
+            name       = strtrim(tline(1:ind-1));
+            st.(name)  = strtrim(tline(ind+1:end-1));
         elseif(line_no == 2)
             st.SecondLine = tline(2:end-1);
         end
