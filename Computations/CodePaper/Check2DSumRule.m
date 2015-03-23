@@ -16,7 +16,7 @@ function Check2DSumRule()
 
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',FexNum,'V2Num',V2Num,...
-                     'maxComp_y2',20,...
+                     'maxComp_y2',25,...
                      'y1Shift',0);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.0);%1.375);%1.25)s;
@@ -65,9 +65,9 @@ function Check2DSumRule()
     
     %**********************
     %**********************
-    %PlotDensityProfile(res{1}(3));
-    %PlotDensityProfile(res{2}(3));
-    %PlotDensityProfile(res{3}(3));         
+    PlotDensityProfile(res{1}(3));
+    PlotDensityProfile(res{2}(3));
+    PlotDensityProfile(res{3}(3));         
     %**********************
     %**********************
     figure('color','white','Position',[0 0 2000 800]); 
