@@ -29,7 +29,7 @@ function Check2DSumRule()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:10:70;        
+    N    = 20:10:60;        
     
     ignoreList = {'config_optsNum_PhysArea_N',...
                   'config_optsNum_PhysArea_N2bound'};

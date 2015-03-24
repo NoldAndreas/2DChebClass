@@ -86,7 +86,7 @@ function CheckSumRule_BH_HalfSpace()
     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 1.45;    
-    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],true,ignoreList);    
+    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList);    
     resC{6}.config = config;
     
     AddPaths('CodePaper');
@@ -148,7 +148,7 @@ function CheckSumRule_BH_HalfSpace()
             CLT.IDC.do1DPlotNormal(resC{k}.rho1D_WL,syms{k-2},'k'); hold on;
         end
         xlim([0 6]);
-        ylim([0 1.8]);
+        ylim([0 3]);
         xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',20);
         ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);    
 
@@ -157,7 +157,7 @@ function CheckSumRule_BH_HalfSpace()
             CLT.IDC.do1DPlotNormal(resC{k}.rho1D_WG,syms{k-2},'k'); hold on;
         end
         xlim([0 6]);
-        ylim([0 0.25]);
+        ylim([0 0.6]);
         xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',20);
         ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);
         SaveFigure('DensityProfiles',v2struct(N,NS,config));
