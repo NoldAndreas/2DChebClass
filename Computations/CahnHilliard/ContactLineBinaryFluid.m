@@ -83,7 +83,33 @@ function ContactLineBinaryFluid
         DI = DiffuseInterfaceBinaryFluid(config);
         DI.Preprocess();
         DI.IterationStepFullProblem();                    
-        DI.PostProcess();
+        DI.PostProcess();        
+        
+        %Plot Values at stagnation point
+        y2_SP = DI.StagnationPoint.y2_kv(1);
+        y1    = [-10,10]/Cn+DI.StagnationPoint.y1_kv(1);
+        [mu,pts] = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.mu); close all; mu = mu/(Cn*Cak);
+        [u,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.uv(1:end/2)); close all;
+        [v,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.uv(1+end/2:end)); close all;
+        [p,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.p); close all; p = p/Cn;
+        [j1,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.flux(1:end/2)); close all;
+        [j2,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.flux(1+end/2:end)); close all;
+        
+        lw  = 1.5;
+        y   = (pts.y1_kv - DI.StagnationPoint.y1_kv(1))*Cn;
+        figure('Position',[0 0 800 800],'color','white');
+        plot(y,mu,'-k','linewidth',lw); hold on;
+        plot(y,p,'--k','linewidth',lw);
+        plot(y,u,'-b','linewidth',lw);
+        plot(y,v,':b','linewidth',lw);
+        plot(y,j1,'-m','linewidth',lw);
+        plot(y,j2,':m','linewidth',lw);
+        
+        set(gca,'linewidth',1.5); set(gca,'fontsize',20);
+        xlabel('$y_1$','fontsize',20,'Interpreter','Latex');       
+        pbaspect([1 1 1]);        
+        config.stagnationPoint = DI.StagnationPoint;
+        SaveFigure('ValuesThroughStagnationPoint',config);
                         
         %Plot flux j_1-j_2 next to stagnation point
         [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
