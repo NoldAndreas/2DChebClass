@@ -1,4 +1,4 @@
-function [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
+function [err,epsRel,pi_II] = SumRuleIIError(this,interval_y1)
 
      shapeSL = struct('yMin',interval_y1(1),...
                       'yMax',interval_y1(2),...
@@ -14,9 +14,8 @@ function [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
      pi_II.y1 = this.y1_SpectralLine;
      
      %(2)Find correct interval
-     eps = abs((this.disjoiningPressure_II(1) -this.disjoiningPressure_II(end))/...
-                    this.disjoiningPressure_II(1));
-          
+     eps    = abs(this.disjoiningPressure_II(1) -this.disjoiningPressure_II(end));     
+
      i1 = find((abs(this.disjoiningPressure_II)- 2*eps) > 0,1);
      i2 = find((abs(this.disjoiningPressure_II)- 2*eps) > 0,1,'last');
      
@@ -37,8 +36,9 @@ function [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
      Compute_DisjoiningPressure_II(this);
      
      %(4) Compute Sum rule error
-     err = SumRule_DisjoiningPressure(this,'II');
-        
+     err    = SumRule_DisjoiningPressure(this,'II');     
+     epsRel = eps/max(abs(this.disjoiningPressure_II));         
+
      this.y1_SpectralLine = y1_SL_old;
 
 end  
