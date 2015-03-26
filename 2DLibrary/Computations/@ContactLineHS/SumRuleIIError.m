@@ -15,12 +15,13 @@ function [err,epsRel,pi_II] = SumRuleIIError(this,interval_y1)
      
      %(2)Find correct interval
      eps    = abs(this.disjoiningPressure_II(1) -this.disjoiningPressure_II(end));     
-
+     epsRel = eps/max(abs(this.disjoiningPressure_II));  
+     
      i1 = find((abs(this.disjoiningPressure_II)- 2*eps) > 0,1);
      i2 = find((abs(this.disjoiningPressure_II)- 2*eps) > 0,1,'last');
      
      if(isempty(i1) || isempty(i2))
-         err = 1;
+         err    = 1;     
          disp('Error of disjoining pressure computation too large to allow prediction')
          this.y1_SpectralLine = y1_SL_old;
          return;
@@ -36,8 +37,7 @@ function [err,epsRel,pi_II] = SumRuleIIError(this,interval_y1)
      Compute_DisjoiningPressure_II(this);
      
      %(4) Compute Sum rule error
-     err    = SumRule_DisjoiningPressure(this,'II');     
-     epsRel = eps/max(abs(this.disjoiningPressure_II));         
+     err    = SumRule_DisjoiningPressure(this,'II');                 
 
      this.y1_SpectralLine = y1_SL_old;
 

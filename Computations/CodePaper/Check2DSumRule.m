@@ -63,19 +63,30 @@ function Check2DSumRule()
      
     AddPaths('CodePaper');
     
+    cols = {}; %{'g','b','c','k','r'};  
+    nocols = length(res{1});%length(cols);
+    for iC = 1:nocols
+        cols{end+1} = (nocols-iC)/nocols*[1 1 1];
+	end
+    %cols = {'g','b','c','k','r'};  nocols = length(cols);
+	syms = {'o','^','*','<','d','s','>'};  nosyms = length(syms);
+    lines = {'-','--',':','.','-.'}; nolines = length(lines);                
+
+    
     %**********************
     %**********************
-    PlotDensityProfile(res{1}(3));
-    PlotDensityProfile(res{2}(3));
-    PlotDensityProfile(res{3}(3));         
+    PlotDisjoiningPressureProfiles(res);    
+    %**********************
+    %**********************
+    %PlotDensityProfile(res{1}(3));
+    %PlotDensityProfile(res{2}(3));
+    %PlotDensityProfile(res{3}(3));         
     %**********************
     %**********************
     figure('color','white','Position',[0 0 2000 800]); 
     legendstring = {};
     subplot(1,2,1);
-    PlotErrorGraph(res{1},'sumRuleII_relError','o-','k','');            
-    PlotErrorGraph(res{2},'sumRuleII_relError','^-','k','');            
-    PlotErrorGraph(res{3},'sumRuleII_relError','*-','k','');            
+    PlotErrorGraph(res,'sumRuleII_relError','k');            
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
@@ -85,9 +96,7 @@ function Check2DSumRule()
     xlim([(N(1)-2),(N(end)+2)]);    
     
     subplot(1,2,2);
-    PlotErrorGraph(res{1},'sumRuleII_eps','o-','k','eps');     
-    PlotErrorGraph(res{2},'sumRuleII_eps','^-','k','eps');     
-    PlotErrorGraph(res{3},'sumRuleII_eps','*-','k','eps');
+    PlotErrorGraph(res,'sumRuleII_eps','k','eps');     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
@@ -100,6 +109,35 @@ function Check2DSumRule()
         
     comment = '';
     SaveFigure('SumRuleError2D',v2struct(N,config,comment));
+    
+    function PlotDisjoiningPressureProfiles(res)
+        
+        K = length(res);
+        y = res{1}(1).piII.y1.Pts.y;
+        figure('color','white','Position',[0 0 2000 500]); 
+        
+        for k0 = 1:K
+            subplot(1,K,k0);
+            resK = res{k0};
+            for i = 1:length(resK)
+                plot(y,...
+                     resK(i).piII.DP,['-',syms{k0}],'color',cols{i},...
+                                    'linewidth',1.5,...
+                                    'MarkerFaceColor',cols{i},...
+                                    'MarkerFaceColor',cols{i},...
+                                    'MarkerSize',7); hold on;
+            end
+            plot([min(y) max(y)],[0 0],'k--','linewidth',1.5);
+            set(gca,'fontsize',25);
+            set(gca,'linewidth',1.5);
+            ylim([-0.1 0.02]);
+            xlabel('$y_1/\sigma$','Interpreter','Latex','fontsize',25);
+            ylabel('$\Pi \sigma^3/\varepsilon$','Interpreter','Latex','fontsize',25);
+        end
+        
+        
+        SaveFigure(['DisjoiningPressures'],res{k0}(1).config);        
+    end
     
     function PlotDensityProfiles(resC)
         CLT = ContactLineHS(config);
@@ -181,24 +219,28 @@ function Check2DSumRule()
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
-    function PlotErrorGraph(res,var_name,sym,col,name)
+    function PlotErrorGraph(resA,var_name,col,name)
         
         n = 1;
                 
-        for k1 = 1:size(res,1)
-            for k2 = 1:size(res,2)
-                line(n)   = abs(res(k1,k2).(var_name));
-                line_N(n) = (res(k1,k2).config.optsNum.PhysArea.N(1));%+res(k1,k2+1).NS)/2;
-                %plot(line_N(n),line(n),...
-                 %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
-                n = n+1;
+        for k0 = 1:length(resA)
+            resK = resA{k0};
+            for k1 = 1:size(resK,1)
+                for k2 = 1:size(resK,2)
+                    line(n)   = abs(resK(k1,k2).(var_name));
+                    line_N(n) = (resK(k1,k2).config.optsNum.PhysArea.N(1));%+res(k1,k2+1).NS)/2;
+                    %plot(line_N(n),line(n),...
+                     %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                    n = n+1;
 
+                end
             end
+            plot(line_N,line,...
+                        ['-',syms{k0},col],'MarkerSize',10,'MarkerFaceColor',col); hold on;        
+            %legendstring(end+1) = {name};
         end
-        plot(line_N,line,...
-                        [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;        
-                    
-        legendstring(end+1) = {name};
+                            
+        
     end
 
 end
