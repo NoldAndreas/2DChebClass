@@ -33,7 +33,8 @@ function DynamicContactLine()
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
                 'tau',1,'epsilon_w_max',1.2);    
 
-    optsPhys = struct('V1',V1,'V2',V2,...
+    optsPhys = struct('Inertial',true,'gammaS',3,'mS',1,...
+                      'V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
                       'Dmu',0.0,'nSpecies',1,...
                       'sigmaS',1);
@@ -59,7 +60,8 @@ function DynamicContactLine()
             CL = ContactLineHS(conf);
             CL.Preprocess(); 
             CL.ComputeEquilibrium();              
-            CL.ComputeDynamics();
+            %CL.ComputeDynamics();
+            CL.ComputeDynamicsInertia();
             CL.PostprocessDynamics();
 
            % CL.PlotDynamics();            

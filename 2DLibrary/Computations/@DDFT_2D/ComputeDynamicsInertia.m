@@ -23,7 +23,16 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     mS          = optsPhys.mS;
     mInv        = mS.^(-1);
     Diff        = this.IDC.Diff;
-    plotTimes   = this.optsNum.plotTimes;
+    
+    if(isstruct(this.optsNum.plotTimes))
+        tI         = this.optsNum.plotTimes.t_int;
+        t_n        = this.optsNum.plotTimes.t_n;
+        
+        plotTimes   = tI(1)+(tI(2)-tI(1))*(0:1:(t_n-1))/(t_n-1);
+    else
+        plotTimes   = this.optsNum.plotTimes;
+    end
+    
     nSpecies    = this.optsPhys.nSpecies;
     M           = this.IDC.M;
     Vext        = this.Vext;
@@ -64,9 +73,13 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 
     if(isfield(optsNum,'PlotArea'))
         optsNumT = rmfield(optsNum,'PlotArea');
+    else
+        optsNumT = optsNum;
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                        
+    this.dynamicsResult.t = plotTimes;                        
                      
     function data = ComputeDDFTDynamics(params,misc)        
        

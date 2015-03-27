@@ -85,6 +85,8 @@ function ContactLineBinaryFluid
         DI.IterationStepFullProblem();                    
         DI.PostProcess();        
         
+        PtsCart = DI.IDC.GetCartPts;
+        
         %Plot Values at stagnation point
         y2_SP = DI.StagnationPoint.y2_kv(1);
         y1    = [-10,10]/Cn+DI.StagnationPoint.y1_kv(1);
@@ -109,17 +111,19 @@ function ContactLineBinaryFluid
         xlabel('$y_1$','fontsize',20,'Interpreter','Latex');       
         pbaspect([1 1 1]);        
         config.stagnationPoint = DI.StagnationPoint;
-        SaveFigure('ValuesThroughStagnationPoint',config);
+        SaveFigure('ValuesThroughStagnationPoint',config);               
                         
         %Plot flux j_1-j_2 next to stagnation point
         [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
         [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotFlux(); close all;        
         [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.flux); close all;
+                
         
         figure('Position',[0 0 800 800],'color','white');
         [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
         h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
-        quiver(y1_s,y2_s,fl_y1_q,fl_y2_q);        
+        quiver(y1_s*Cn,y2_s*Cn,fl_y1_q,fl_y2_q);        
+        %quiver(y1_s_Sepp,y2_s_Sepp,fl_y1_q__Sepp,fl_y2_q__Sepp,'color','m');        
         plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
         plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
         
@@ -131,14 +135,15 @@ function ContactLineBinaryFluid
         
         %Plot velocities next to stagnation point
         [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
-        [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;        
+        [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;                
         [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.uv); close all;
         
 
         figure('Position',[0 0 800 800],'color','white');
         [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
         h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
-        quiver(y1_s,y2_s,fl_y1_q,fl_y2_q);        
+        quiver(y1_s*Cn,y2_s*Cn,fl_y1_q,fl_y2_q);        
+        %quiver(y1_s_Sepp,y2_s_Sepp,fl_y1_q__Sepp,fl_y2_q__Sepp,'color','m');        
         plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
         plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
         
@@ -170,7 +175,43 @@ function ContactLineBinaryFluid
             ylabel('$y_2$','fontsize',20,'Interpreter','Latex');
             zlabel(labs{k},'fontsize',20,'Interpreter','Latex');  
             SaveFigure([vals{k},'_3DPlot'],config);
-        end                   
+        end  
+        
+        %************************************
+        %************************************
+        %************************************
+        %Plot wider area
+        DI.optsNum.PlotArea = struct('y1Min',-10/Cn,'y1Max',10/Cn,...
+                                     'y2Min',0/Cn,'y2Max',20/Cn,'N1',80,'N2',80);   
+        DI.IDC.InterpolationPlotCart(DI.optsNum.PlotArea,true);
+        
+         %Plot flux j_1-j_2 next to stagnation point
+         %Plot velocities next to stagnation point         
+         uSepp = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - DI.deltaX,...
+                                                PtsCart.y2_kv],1,0,0,DI.theta);
+        [y1_s_Sepp,y2_s_Sepp,fl_y1_q__Sepp,fl_y2_q__Sepp] = DI.IDC.plotFlux(uSepp); close all;                                                             
+        [y1MU_Sepp,y2MU_Sepp,fl_y1_Sepp,fl_y2_Sepp,startMask1_Sepp,startMask2_Sepp] = DI.PlotU(uSepp); close all;                
+        
+        [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
+        [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;                
+        [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.uv); close all;
+        
+
+        figure('Position',[0 0 800 800],'color','white');
+        [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
+        streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
+        h = streamline(y1MU_Sepp*Cn,y2MU_Sepp*Cn,fl_y1_Sepp,fl_y2_Sepp,startMask1_Sepp*Cn,startMask2_Sepp*Cn);   hold on;
+        set(h,'color','m');
+        quiver(y1_s*Cn,y2_s*Cn,fl_y1_q,fl_y2_q);        
+        quiver(y1_s_Sepp*Cn,y2_s_Sepp*Cn,fl_y1_q__Sepp,fl_y2_q__Sepp,'color','m');        
+        plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
+        plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
+        
+        set(gca,'linewidth',1.5); set(gca,'fontsize',20);
+        xlabel('$y_1$','fontsize',20,'Interpreter','Latex');
+        ylabel('$y_2$','fontsize',20,'Interpreter','Latex');
+        pbaspect([1 1 1]);
+        SaveFigure('CoxComparison',config);                  
         
     end    
     function Plot3D(dataN,i_Cak,i_y2Max)        

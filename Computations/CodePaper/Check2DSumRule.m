@@ -101,7 +101,7 @@ function Check2DSumRule()
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
     xlabel('$N$','Interpreter','Latex','fontsize',20);
-    ylabel(['$|\Pi_{II,g}- \Pi_{II,l}|$'],...
+    ylabel('$\frac{\Delta \Pi_{II}}{\max|\Pi_{II}|}$',...
                             'Interpreter','Latex','fontsize',20);
     xlim([(N(1)-2),(N(end)+2)]);    
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
@@ -221,9 +221,10 @@ function Check2DSumRule()
     end     
     function PlotErrorGraph(resA,var_name,col,name)
         
-        n = 1;
+        
                 
         for k0 = 1:length(resA)
+            n    = 1;
             resK = resA{k0};
             for k1 = 1:size(resK,1)
                 for k2 = 1:size(resK,2)

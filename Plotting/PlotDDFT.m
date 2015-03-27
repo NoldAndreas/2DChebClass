@@ -6,7 +6,7 @@ function fig_h = PlotDDFT(input,Bool_Record)
         Bool_Record = false;
         gifFile = [];
     else        
-        if(isfield(input,'filename'))
+        if(isfield(input,'filename') && ~isempty(input.filename))
             if(isempty(fileparts(input.filename)))
                 gifFile = [dirData,'\Dynamics\',input.filename,'.gif'];
             else
