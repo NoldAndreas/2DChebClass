@@ -20,13 +20,15 @@ function DynamicContactLine()
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
+                   
+	plotTimes = struct('t_int',[0,5],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',FexNum,'V2Num',V2Num,...
                      'PlotAreaCart',PlotAreaCart,'SubArea',SubArea,...
                      'maxComp_y2',20,...
                      'y1Shift',0,...
-                     'plotTimes',0:0.05:5);
+                     'plotTimes',plotTimes);%0:0.05:5);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
                 'tau',1,'epsilon_w_max',1.2);    
@@ -40,19 +42,36 @@ function DynamicContactLine()
     
     N = 20:10:70;
     
-    for i = 1:length(N)
-        config.optsNum.PhysArea.N = N(i)*[1,1];
-        
-        CL = ContactLineHS(config);
-        CL.Preprocess(); 
-        CL.ComputeEquilibrium();              
-        CL.ComputeDynamics();
-        CL.PostprocessDynamics();
+    ignoreList = {'config_optsNum_PhysArea_N'};
+    
+    res = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],[],ignoreList);
+    
+    
+    function res = ComputeDynamicError(opts,h)
 
-       % CL.PlotDynamics();
+        conf = opts.config;
+        n      = opts.N;
         
-        close all;
-        clear all;
+        for i = 1:length(n)
+            conf.optsNum.PhysArea.N       = n(i)*[1,1];
+            conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
+
+            CL = ContactLineHS(conf);
+            CL.Preprocess(); 
+            CL.ComputeEquilibrium();              
+            CL.ComputeDynamics();
+            CL.PostprocessDynamics();
+
+           % CL.PlotDynamics();            
+            res(i).config       = conf;
+            res(i).t            = CL.dynamicsResult.t;
+            res(i).massError    = CL.dynamicsResult.Subspace.massError;
+            res(i).MaxmassError = max(abs(CL.dynamicsResult.Subspace.massError));
+
+            close all;
+            clear('CL');
+            
+        end
     end
 
 end

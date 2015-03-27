@@ -21,7 +21,14 @@ function ComputeDynamics(this,x_ic,mu)
     end
     D0          = optsPhys.D0;
     Diff        = this.IDC.Diff;
-    plotTimes   = this.optsNum.plotTimes;
+    if(isstruct(this.optsNum.plotTimes))
+        tI         = this.optsNum.plotTimes.t_int;
+        t_n        = this.optsNum.plotTimes.t_n;
+        
+        plotTimes   = tI(1)+(tI(2)-tI(1))*(0:1:(t_n-1))/(t_n-1);
+    else
+        plotTimes   = this.optsNum.plotTimes;
+    end
     nSpecies    = this.optsPhys.nSpecies;
     M           = this.IDC.M;
     Vext        = this.Vext;
@@ -65,6 +72,7 @@ function ComputeDynamics(this,x_ic,mu)
     optsF.Comments = this.configName;
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,optsF,[],[],{'PlotArea'}); %true
+	this.dynamicsResult.t = plotTimes;
     this.FilenameDyn  = paramsEq.Filename;                        
                      
     function data = ComputeDDFTDynamics(params,misc)        

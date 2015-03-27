@@ -43,7 +43,7 @@ classdef DDFT_2D < Computation
                 else
                     this.optsPhys.HSBulk = 'Fex_ZeroMap';
                 end
-            end
+            end                         
             
              % Determine number of species
             if(isfield(optsPhys,'nParticlesS'))
@@ -280,7 +280,7 @@ classdef DDFT_2D < Computation
         function PostprocessDynamics(this)                    
             subArea       = this.dynamicsResult.Subspace.subArea;
             rho_t         = this.dynamicsResult.rho_t;
-            no_times      = length(this.optsNum.plotTimes);
+            no_times      = length(this.dynamicsResult.t);
             accFlux       = this.dynamicsResult.Subspace.accFlux;
             nSpecies      = size(rho_t,2);
             rho_ic        = rho_t(:,:,1);
@@ -288,7 +288,7 @@ classdef DDFT_2D < Computation
             IP            = this.IDC.SubShapePtsCart(subArea.GetCartPts());
             Int_SubOnFull = subArea.ComputeIntegrationVector()*IP;
             
-            massError     = zeros(no_times,iSpecies);
+            massError     = zeros(no_times,nSpecies);
                                     
             for iSpecies=1:nSpecies            
                 rho       = permute(rho_t(:,iSpecies,:),[1 3 2]);
@@ -296,7 +296,7 @@ classdef DDFT_2D < Computation
                 massError = Int_SubOnFull*rho_diff+accFlux(:,iSpecies)';                    
             end
             
-            this.dynamicsResult.Subspace.massError = massError;
+            this.dynamicsResult.Subspace.massError = massError;            
             
         end
     end

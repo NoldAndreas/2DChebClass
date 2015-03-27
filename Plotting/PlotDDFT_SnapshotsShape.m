@@ -5,7 +5,7 @@ function PlotDDFT_SnapshotsShape(input,file_name)
     v2struct(input);
     v2struct(data);
     
-    plotTimes  = optsNum.plotTimes;    
+    plotTimes  = t;%optsNum.plotTimes;    
     fl_norm    = 0.1*max(max(max(abs(flux_t))));
     disp(['Flux normalized with ',num2str(fl_norm)]);
     

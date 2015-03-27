@@ -30,7 +30,7 @@ function fig_h = PlotDDFT(input,Bool_Record)
 %     else
 %         N1 = optsNum.PhysArea.N1; N2 = optsNum.PhysArea.N2;
 %     end
-    plotTimes  = optsNum.plotTimes;          
+    plotTimes  = t;%optsNum.plotTimes;          
     
     if(isfield(data,'Subspace'))
         v2struct(Subspace);        
