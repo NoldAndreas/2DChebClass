@@ -1,6 +1,7 @@
 function DynamicContactLine()
 
     AddPaths('CodePaper');            
+    close all;
     
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,'L2_AD',2.,...
@@ -13,7 +14,7 @@ function DynamicContactLine()
                           'N1',100,'N2',100);
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
-                          'N',[20,20]);
+                          'N',[40,40]);
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
     V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
@@ -50,7 +51,8 @@ function DynamicContactLine()
     %config.optsPhys.gammaS   = 3;
     %res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
-    
+    res = PostProcess(res);    
+   
     cols = {}; %{'g','b','c','k','r'};  
     nocols = length(res{1});%length(cols);
     for iC = 1:nocols
@@ -60,8 +62,46 @@ function DynamicContactLine()
 	syms = {'o','^','*','<','d','s','>'};  nosyms = length(syms);
     lines = {'-','--',':','.','-.'}; nolines = length(lines);   
     
-    PlotResults(res{1});
-    PlotResultsOverTime(res{1});
+    
+    saveC   = res{1}.config;
+	saveC.N = N;         
+        
+    %PlotResultsOverTime(res{1},'massError_dt');
+    %PlotResults(res{1},'massError_dtMax');        
+    
+    PlotResultsOverTime(res{1},'mass'); SaveFigure(['Dynamics_Mass'],saveC);
+    PlotResultsOverTime(res{1},'massErrorRel_dt'); SaveFigure(['Dynamics_MassErrorTime'],saveC);
+    PlotResults(res{1},'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
+    
+    %PlotResults(res{1},'MaxmassErrorRel');    
+    %PlotResultsOverTime(res{1},'massErrorRel');
+    
+    
+    function res = PostProcess(res)
+                
+        
+        for i0 = 1:length(res)
+            
+            NT = length(res{i0}(1).t);
+            T  = res{i0}(1).t(end);
+            [xt,w,D] = FDxw(NT);
+            if(max(abs((xt+1)*T/2 - res{i0}(1).t')) < 1e-12)
+                Dt = D*2/T;
+            else
+                disp('barychebdiff used');
+                Diff_T = barychebdiff(res{i0}(1).t',1);
+                Dt = Diff_T.Dx;
+            end
+            
+            for i1 = 1:length(res{i0})
+                res{i0}(i1).massError_dt = Dt*res{i0}(i1).massError';
+                res{i0}(i1).massError_dtMax = max(abs(res{i0}(i1).massError_dt));
+                
+                res{i0}(i1).massErrorRel_dt = Dt*res{i0}(i1).massErrorRel';
+                res{i0}(i1).massErrorRel_dtMax = max(abs(res{i0}(i1).massErrorRel_dt));
+            end
+        end
+    end
     
     function res = ComputeDynamicError(opts,h)
 
@@ -92,27 +132,22 @@ function DynamicContactLine()
         end        
     end
 
-    function PlotResultsOverTime(res)
+    function PlotResultsOverTime(res,var)
         figure('color','white','Position',[0 0 800 800]); 
         
         for i = 1:length(res)            
-            plot(res(i).t,res(i).massError,'o-','linewidth',1.5,'color',cols{i}); hold on;
+            plot(res(i).t,res(i).(var),'o-','linewidth',1.5,'color',cols{i}); hold on;
             n(i)  = res(i).config.optsNum.PhysArea.N(1);
         end
                 
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);            
         xlabel('$t$','Interpreter','Latex','fontsize',20);
-        ylabel(['Error of Mass in Subspace'],...
-                                'Interpreter','Latex','fontsize',20);
-        
-                
-        saveC   = res.config;
-        saveC.N = n;
-        SaveFigure('Dynamics_MassErrorTime',saveC);
+        ylabel(GetYLabel(var),'Interpreter','Latex','fontsize',20);
+                                       
     end
 
-    function PlotResults(res)
+    function PlotResults(res,var)
         figure('color','white','Position',[0 0 800 800]); 
         
         n   = zeros(1,length(res));
@@ -120,21 +155,38 @@ function DynamicContactLine()
         
         for i = 1:length(res)
             n(i)    = res(i).config.optsNum.PhysArea.N(1);
-            err(i) = res(i).MaxmassError;
+            err(i) = res(i).(var);
         end
-        plot(n,err,'o-','linewidth',1.5);
+        plot(n,err,'ko-','linewidth',1.5);
         set(gca,'YScale','log');
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);            
         xlabel('$N$','Interpreter','Latex','fontsize',20);
-        ylabel(['Error of Mass in Subspace'],...
+        ylabel(GetYLabel(var),...
                                 'Interpreter','Latex','fontsize',20);
-        xlim([(N(1)-2),(N(end)+2)]);    
-                
-        saveC   = res.config;
-        saveC.N = n;
-        SaveFigure('DynamicMaxMassError',saveC);
-
+        xlim([(n(1)-2),(n(end)+2)]);                           
     end
 
+    function str = GetYLabel(var)        
+
+        if(strcmp(var,'mass'))
+            str = '$m$';
+        elseif(strcmp(var,'massErrorRel_dt'))
+            str = '$\frac{d}{dt} \left( \frac{m_{err}}{m} \right)$';
+        elseif(strcmp(var,'massErrorRel_dtMax'))
+            str = '$\max |\frac{d}{dt} \left( \frac{m_{err}}{m} \right)|$';
+        elseif(strcmp(var,'massError_dtMax'))
+            str = '$\max|\frac{d m_{err}}{dt}|$';
+        elseif(strcmp(var,'massError_dt'))
+            str = '$\frac{d m_{err}}{dt}$';
+        elseif(strcmp(var,'MaxmassErrorRel'))
+            str = 'Relative error of Mass in Subspace';
+        elseif(strcmp(var,'MaxmassError'))
+            str = 'Error of Mass in Subspace';
+        elseif(strcmp(var,'massErrorRel'))
+            str = 'Relative error of Mass in Subspace';
+        elseif(strcmp(var,'massError'))       
+            str = 'Error Mass in Subspace';
+        end
+    end
 end
