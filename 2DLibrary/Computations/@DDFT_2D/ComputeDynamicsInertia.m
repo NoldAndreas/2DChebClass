@@ -20,7 +20,11 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         R       = [];
     end
     gammaS      = optsPhys.gammaS;
-    mS          = optsPhys.mS;
+    if(isfield(optsPhys,'mS'))
+        mS = optsPhys.mS;
+    else
+        mS = 1;
+    end
     mInv        = mS.^(-1);
     Diff        = this.IDC.Diff;
     
@@ -139,8 +143,8 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         Cv = zeros(M,nSpecies);
         for iSpecies = 1:nSpecies
             C(:,:,iSpecies)  = sparse(1:M,1:M,u(:,iSpecies))*Diff.Dy1 + sparse(1:M,1:M,v(:,iSpecies))*Diff.Dy2;
-            Cu(:,iSpecies) = C(:,:,iSpecies)*u(:,iSpecies);
-            Cv(:,iSpecies) = C(:,:,iSpecies)*v(:,iSpecies);
+            Cu(:,iSpecies)   = C(:,:,iSpecies)*u(:,iSpecies);
+            Cv(:,iSpecies)   = C(:,:,iSpecies)*v(:,iSpecies);
         end
         
         mu_s     = GetExcessChemPotential(y,t,mu);        

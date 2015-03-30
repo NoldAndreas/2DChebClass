@@ -1,5 +1,4 @@
-function ComputeDynamics(this,x_ic,mu)
-
+function ComputeDynamicsOverdamped(this,x_ic,mu)         
 %% Solves
 % 
 % $$\frac{\partial \varrho}{\partial t} = \nabla \cdot ( \varrho \nabla \mu )$$
@@ -21,7 +20,14 @@ function ComputeDynamics(this,x_ic,mu)
     end
     D0          = optsPhys.D0;
     Diff        = this.IDC.Diff;
-    plotTimes   = this.optsNum.plotTimes;
+    if(isstruct(this.optsNum.plotTimes))
+        tI         = this.optsNum.plotTimes.t_int;
+        t_n        = this.optsNum.plotTimes.t_n;
+        
+        plotTimes   = tI(1)+(tI(2)-tI(1))*(0:1:(t_n-1))/(t_n-1);
+    else
+        plotTimes   = this.optsNum.plotTimes;
+    end
     nSpecies    = this.optsPhys.nSpecies;
     M           = this.IDC.M;
     Vext        = this.Vext;
@@ -61,11 +67,12 @@ function ComputeDynamics(this,x_ic,mu)
     
     fprintf(1,'Computing dynamics ...'); 
 
-    if(isfield(optsNum,'PlotArea'))
-        optsNumT = rmfield(optsNum,'PlotArea');
-    end
+    optsF          = v2struct(optsNum,optsPhys);
+    optsF.Comments = this.configName;
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                            @ComputeDDFTDynamics,optsF,[],[],{'PlotArea'}); %true
+	this.dynamicsResult.t = plotTimes;
+    this.FilenameDyn  = paramsEq.Filename;                        
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        
@@ -97,7 +104,7 @@ function ComputeDynamics(this,x_ic,mu)
             V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
         end
 
-        data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
+        data       = v2struct(X_t,rho_t,mu,flux_t,V_t);
         data.shape = this.IDC;
         if(this.doSubArea) 
             data.Subspace = v2struct(subArea,accFlux);
@@ -116,24 +123,33 @@ function ComputeDynamics(this,x_ic,mu)
         h_s      = Diff.grad*x - Vext_grad;        
         h_s([markVinf;markVinf]) = 0;
         
-        %dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
-        dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
+        dxdt     = kBT*Diff.Lap*mu_s + eyes*(h_s.*(Diff.grad*mu_s));  
+        %dxdt     = kBT*Diff.div*(Diff.grad*mu_s) + eyes*(h_s.*(Diff.grad*mu_s));  
         
-        if(doHI)
-            rho_s    = exp((x-Vext)/kBT);
-            rho_s    = [rho_s;rho_s];
+        rho_s    = exp((x-Vext)/kBT);
+        rho_s2   = [rho_s;rho_s];
+        if(doHI)            
             gradMu_s = Diff.grad*mu_s;
-            HI_s     = ComputeHI(rho_s,gradMu_s,IntMatrHI);            
+            HI_s     = ComputeHI(rho_s2,gradMu_s,IntMatrHI);            
             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        flux_dir               = Diff.grad*mu_s;
-        dxdt(Ind.finite,:)     = Ind.normalFinite*flux_dir;                
+        gradMu               = Diff.grad*mu_s;
+        if(doHI)
+            gradMu           = gradMu + HI_s;
+        end
+        dxdt(Ind.finite,:)     = Ind.normalFinite*gradMu;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
         dxdt = D0*dxdt;
-                
-        dxdt = [(Int_of_path*GetFlux(x,t))';dxdt(:)];
+        
+        flux_dir               = GetFlux(x,t);
+        if(~isempty(this.subArea) && strcmp(this.subArea.polar,'polar'))
+            flux_dir = GetPolarFromCartesianFlux(flux_dir,ythS);
+        end
+        
+        fluxP = Int_of_path*flux_dir;
+        dxdt = [fluxP(:);dxdt(:)];        
     end
     function mu_s = GetExcessChemPotential(x,t,mu)
         rho_s    = exp((x-Vext)/kBT);

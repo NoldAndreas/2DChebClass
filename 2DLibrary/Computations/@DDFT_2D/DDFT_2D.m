@@ -274,8 +274,20 @@ classdef DDFT_2D < Computation
             end
         end
         
-        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
-        ComputeDynamics(this)           
+        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)        
+        
+        function ComputeDynamics(this)
+            if(this.doHIWall)
+                ComputeDynamicsWallHI(this);
+            elseif( (isfield(this.optsPhys,'Inertial') && this.optsPhys.Inertial) || ...
+                     (isfield(this.optsNum,'Inertial') && this.optsNum.Inertial) )
+                ComputeDynamicsInertia(this);
+            else
+                ComputeDynamicsOverdamped(this);
+            end
+        end                
+        ComputeDynamicsOverdamped(this,x_ic,mu)
+        ComputeDynamicsInertia(this,x_ic,mu)
         
         function PostprocessDynamics(this)                    
             subArea       = this.dynamicsResult.Subspace.subArea;
@@ -291,12 +303,16 @@ classdef DDFT_2D < Computation
             massError     = zeros(no_times,nSpecies);
                                     
             for iSpecies=1:nSpecies            
-                rho       = permute(rho_t(:,iSpecies,:),[1 3 2]);
-                rho_diff  = rho-rho_ic(:,iSpecies)*ones(1,no_times);
-                massError = Int_SubOnFull*rho_diff+accFlux(:,iSpecies)';                    
+                rho          = permute(rho_t(:,iSpecies,:),[1 3 2]);
+                rho_diff     = rho-rho_ic(:,iSpecies)*ones(1,no_times);
+                massError    = Int_SubOnFull*rho_diff+accFlux(:,iSpecies)';                    
+                mass         = (Int_SubOnFull*rho);              
+                massErrorRel = massError./mass;  
             end
             
-            this.dynamicsResult.Subspace.massError = massError;            
+            this.dynamicsResult.Subspace.mass         = mass;
+            this.dynamicsResult.Subspace.massError    = massError;            
+            this.dynamicsResult.Subspace.massErrorRel = massErrorRel;            
             
         end
     end

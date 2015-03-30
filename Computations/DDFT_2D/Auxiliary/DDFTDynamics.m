@@ -3,16 +3,8 @@ function [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot)
     AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
-    EX.ComputeEquilibrium();
- 
-    if(EX.doHIWall)
-        EX.ComputeDynamicsWallHI();
-    elseif( (isfield(optsPhys,'Inertial') && optsPhys.Inertial) || ...
-             (isfield(optsNum,'Inertial') && optsNum.Inertial) )
-        EX.ComputeDynamicsInertia();
-    else
-        EX.ComputeDynamics();
-    end
+    EX.ComputeEquilibrium(); 
+    EX.ComputeDynamics();
    
     if( (nargin < 3) || ...
         (isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots) || ...
