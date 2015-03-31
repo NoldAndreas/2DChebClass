@@ -54,7 +54,7 @@ function ContactLineBinaryFluid
     PlotAllAsymptotics({'y2Max'},parameters);
     PlotAllAsymptotics({'Cn'},parameters);
         
-    PlotAsymptoticResults(dataN,'d',{'mu_y2'},'$d$ at $y_2 = 0$');    
+    PlotAsymptoticResults(dataN,'d',{'mu_y2'});    
     SaveFigures(dataN,res,parameters);
      
   %  PlotAsymptoticInterfaceResults(dataN,1,'theta',{'IsoInterface'},'\theta');        
@@ -696,8 +696,9 @@ function ContactLineBinaryFluid
             VarName = parameter;
         end
         
-        
-        if(strcmp(VarName,'flux_t'))
+        if(strcmp(VarName,'d'))
+            str = '$d$ at $y_2 = 0$';        
+        elseif(strcmp(VarName,'flux_t'))
             str = '$j_t$';
         elseif(strcmp(VarName,'flux_n'))
             str = '$j_n$';
