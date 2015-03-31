@@ -32,7 +32,7 @@ function DynamicContactLine()
                      'plotTimes',plotTimes);%0:0.05:5);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
-                'tau',1,'epsilon_w_max',1.2);    
+                'tau',1,'epsilon_w_max',0.4);
 
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
@@ -43,13 +43,15 @@ function DynamicContactLine()
     
     N = 20:10:60;
     ignoreList = {'config_optsNum_PhysArea_N'};    
-    comp       = true;
+    comp       = [];
     
     res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
         
-    %config.optsPhys.Inertial = true;
-    %config.optsPhys.gammaS   = 3;
-    %res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    config.optsPhys.Inertial = true;
+    config.optsPhys.gammaS   = 3;
+    config.optsNum.SubArea.N = [20,20];
+    comp = true;
+    res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
     res = PostProcess(res);    
    
@@ -69,9 +71,9 @@ function DynamicContactLine()
     %PlotResultsOverTime(res{1},'massError_dt');
     %PlotResults(res{1},'massError_dtMax');        
     
-    PlotResultsOverTime(res{1},'mass'); SaveFigure(['Dynamics_Mass'],saveC);
-    PlotResultsOverTime(res{1},'massErrorRel_dt'); SaveFigure(['Dynamics_MassErrorTime'],saveC);
-    PlotResults(res{1},'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
+    PlotResultsOverTime(res,'mass'); SaveFigure(['Dynamics_Mass'],saveC);
+    PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure(['Dynamics_MassErrorTime'],saveC);
+    PlotResults(res,'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
     
     %PlotResults(res{1},'MaxmassErrorRel');    
     %PlotResultsOverTime(res{1},'massErrorRel');
@@ -101,8 +103,7 @@ function DynamicContactLine()
                 res{i0}(i1).massErrorRel_dtMax = max(abs(res{i0}(i1).massErrorRel_dt));
             end
         end
-    end
-    
+    end    
     function res = ComputeDynamicError(opts,h)
 
         conf = opts.config;
@@ -135,9 +136,12 @@ function DynamicContactLine()
     function PlotResultsOverTime(res,var)
         figure('color','white','Position',[0 0 800 800]); 
         
-        for i = 1:length(res)            
-            plot(res(i).t,res(i).(var),'o-','linewidth',1.5,'color',cols{i}); hold on;
-            n(i)  = res(i).config.optsNum.PhysArea.N(1);
+        for i0 = 1:length(res)
+            lin = lines{i0};
+            for i = 1:length(res{i0})            
+                plot(res{i0}(i).t,res{i0}(i).(var),[lin],'linewidth',1.5,'color',cols{i}); hold on;
+                n(i)  = res{i0}(i).config.optsNum.PhysArea.N(1);
+            end
         end
                 
         set(gca,'linewidth',1.5);
@@ -146,27 +150,30 @@ function DynamicContactLine()
         ylabel(GetYLabel(var),'Interpreter','Latex','fontsize',20);
                                        
     end
-
     function PlotResults(res,var)
-        figure('color','white','Position',[0 0 800 800]); 
+        figure('color','white','Position',[0 0 800 800]);                 
         
-        n   = zeros(1,length(res));
-        err = zeros(1,length(res));
-        
-        for i = 1:length(res)
-            n(i)    = res(i).config.optsNum.PhysArea.N(1);
-            err(i) = res(i).(var);
-        end
-        plot(n,err,'ko-','linewidth',1.5);
+        for i0 = 1:length(res)
+            
+            lin = lines{i0};
+            n   = zeros(1,length(res{i0}));
+            err = zeros(1,length(res{i0}));
+            
+            for i = 1:length(res{i0})
+                n(i)   = res{i0}(i).config.optsNum.PhysArea.N(1);
+                err(i) = res{i0}(i).(var);
+            end
+            
+            plot(n,err,['ko',lin],'linewidth',1.5); hold on;
+        end        
         set(gca,'YScale','log');
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);            
         xlabel('$N$','Interpreter','Latex','fontsize',20);
         ylabel(GetYLabel(var),...
                                 'Interpreter','Latex','fontsize',20);
-        xlim([(n(1)-2),(n(end)+2)]);                           
+        %xlim([(n(1)-2),(n(end)+2)]);                           
     end
-
     function str = GetYLabel(var)        
 
         if(strcmp(var,'mass'))

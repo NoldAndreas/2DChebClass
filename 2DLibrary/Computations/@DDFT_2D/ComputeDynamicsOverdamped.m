@@ -107,7 +107,7 @@ function ComputeDynamicsOverdamped(this,x_ic,mu)
         data       = v2struct(X_t,rho_t,mu,flux_t,V_t);
         data.shape = this.IDC;
         if(this.doSubArea) 
-            data.Subspace = v2struct(subArea,accFlux);
+            data.Subspace = v2struct(accFlux); %subArea
         end
     end   
     function dxdt = dx_dt(t,x)

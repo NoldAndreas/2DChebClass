@@ -73,7 +73,8 @@ function PlotDDFT_Snapshots(input)
         y1M     = reshape(Interp.pts1,Interp.Nplot2,Interp.Nplot1);
         y2M     = reshape(Interp.pts2,Interp.Nplot2,Interp.Nplot1);            
             
-        [C,h]   = contour(y1M,y2M,reshape(z,Interp.Nplot2,Interp.Nplot1),'LineWidth',1.0);    hold on;
+        nC      = min(z) + [0.25,0.5,0.75]*(max(z)-min(z));
+        [C,h]   = contour(y1M,y2M,reshape(z,Interp.Nplot2,Interp.Nplot1),nC,'LineWidth',1.0);    hold on;
         clabel(C,h,'FontSize',14);    
 
         

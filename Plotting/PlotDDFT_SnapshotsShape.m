@@ -53,11 +53,15 @@ function PlotDDFT_SnapshotsShape(input,file_name)
         
         subplot(rows,cols,pl_j);
         
+        rhoMin = min(min(min(rho)));
+        rhoMax = max(max(max(rho)));
+        
         for iSpecies=1:nSpecies
              optsPlot.linecolor = lineColour{iSpecies};              
              
              shape.plotFlux(flux_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
              shape.plotFlux(flux_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+             optsPlot.nContours = [0.1,0.3,0.6];%rhoMin + [0.25,0.5,0.75]*(rhoMax - rhoMin);
              shape.plot(rho(:,iSpecies),'contour',optsPlot); hold on;            
              if(bool_subSp)
                 subArea.PlotBorders();

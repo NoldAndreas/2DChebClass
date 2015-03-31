@@ -119,10 +119,10 @@ function ComputeDynamicsInertia(this,x_ic,mu)
             V_t(:,:,i)    = Vext + getVAdd(y1S,y2S,plotTimes(i),optsPhys.V1);
         end
        
-        data       = v2struct(IntMatrFex,X_t,UV_t,rho_t,mu,flux_t,V_t);
+        data       = v2struct(X_t,UV_t,rho_t,mu,flux_t,V_t); %IntMatrFex
         data.shape = this.IDC;
         if(this.doSubArea) 
-            data.Subspace = v2struct(subArea,accFlux);
+            data.Subspace = v2struct(accFlux); %subArea
         end
     end   
     function dxdt = dx_dt(t,x)

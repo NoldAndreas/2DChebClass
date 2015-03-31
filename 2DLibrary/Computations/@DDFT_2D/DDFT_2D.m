@@ -251,6 +251,7 @@ classdef DDFT_2D < Computation
                 rec = false;
             end                                                
             
+            plotData.subArea  = this.subArea;
             plotData.optsPhys = this.optsPhys;
             plotData.optsNum  = this.optsNum;
             plotData.data     = this.dynamicsResult;
@@ -290,7 +291,7 @@ classdef DDFT_2D < Computation
         ComputeDynamicsInertia(this,x_ic,mu)
         
         function PostprocessDynamics(this)                    
-            subArea       = this.dynamicsResult.Subspace.subArea;
+            subArea       = this.subArea;%dynamicsResult.Subspace.subArea;
             rho_t         = this.dynamicsResult.rho_t;
             no_times      = length(this.dynamicsResult.t);
             accFlux       = this.dynamicsResult.Subspace.accFlux;
