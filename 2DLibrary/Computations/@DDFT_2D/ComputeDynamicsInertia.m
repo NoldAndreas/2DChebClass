@@ -120,7 +120,7 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         end
        
         data       = v2struct(X_t,UV_t,rho_t,mu,flux_t,V_t); %IntMatrFex
-        data.shape = this.IDC;
+      %  data.shape = this.IDC;
         if(this.doSubArea) 
             data.Subspace = v2struct(accFlux); %subArea
         end

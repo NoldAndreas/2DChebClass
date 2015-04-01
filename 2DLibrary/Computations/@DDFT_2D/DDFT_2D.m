@@ -256,6 +256,7 @@ classdef DDFT_2D < Computation
             plotData.optsNum  = this.optsNum;
             plotData.data     = this.dynamicsResult;
             plotData.filename = this.FilenameDyn;
+            plotData.data.shape = this.IDC;
 
             figure('Position',[0 0 1000 1000]);
             fig_h = PlotDDFT(plotData,rec);

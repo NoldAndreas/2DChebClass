@@ -69,8 +69,9 @@ function ComputeDynamicsOverdamped(this,x_ic,mu)
 
     optsF          = v2struct(optsNum,optsPhys);
     optsF.Comments = this.configName;
+    ignoreList     = {'PlotArea','PlotAreaCart'};
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,optsF,[],[],{'PlotArea'}); %true
+                            @ComputeDDFTDynamics,optsF,[],[],ignoreList); %true
 	this.dynamicsResult.t = plotTimes;
     this.FilenameDyn  = paramsEq.Filename;                        
                      
@@ -105,7 +106,7 @@ function ComputeDynamicsOverdamped(this,x_ic,mu)
         end
 
         data       = v2struct(X_t,rho_t,mu,flux_t,V_t);
-        data.shape = this.IDC;
+        %data.shape = this.IDC;
         if(this.doSubArea) 
             data.Subspace = v2struct(accFlux); %subArea
         end

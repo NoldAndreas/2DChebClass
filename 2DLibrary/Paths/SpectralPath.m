@@ -81,7 +81,7 @@ classdef (Abstract) SpectralPath < handle
             else
                 pts = this.Pts;
             end
-            plot(pts.y1_kv,pts.y2_kv);            
+            plot(pts.y1_kv,pts.y2_kv,'m','linewidth',1.5);            
         end
         
         

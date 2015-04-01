@@ -9,9 +9,6 @@ function DynamicContactLine()
                       'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
                       'alpha_deg',90);
                   
-    PlotAreaCart = struct('y1Min',-10,'y1Max',10,...
-                          'y2Min',0.5,'y2Max',10,...
-                          'N1',100,'N2',100);
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
                           'N',[40,40]);
@@ -22,17 +19,17 @@ function DynamicContactLine()
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
                    
-	plotTimes = struct('t_int',[0,5],'t_n',100);
+	plotTimes = struct('t_int',[0,20],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'FexNum',FexNum,'V2Num',V2Num,...
-                     'PlotAreaCart',PlotAreaCart,'SubArea',SubArea,...
+                     'SubArea',SubArea,...%'PlotAreaCart',PlotAreaCart,
                      'maxComp_y2',20,...
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
-                'tau',1,'epsilon_w_max',0.4);
+                'tau',5,'epsilon_w_max',1);
 
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
@@ -42,15 +39,12 @@ function DynamicContactLine()
     config = v2struct(optsNum,optsPhys);                                
     
     N = 20:10:60;
-    ignoreList = {'config_optsNum_PhysArea_N'};    
-    comp       = [];
-    
+    ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
+    comp       = [];    
     res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
-        
-    config.optsPhys.Inertial = true;
-    config.optsPhys.gammaS   = 3;
-    config.optsNum.SubArea.N = [20,20];
-    comp = true;
+            
+    config.optsPhys.Inertial = true;    
+    config.optsPhys.gammaS   = 2;        
     res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
     res = PostProcess(res);    
@@ -71,6 +65,7 @@ function DynamicContactLine()
     %PlotResultsOverTime(res{1},'massError_dt');
     %PlotResults(res{1},'massError_dtMax');        
     
+    PlotExampleSnaptshots(res);
     PlotResultsOverTime(res,'mass'); SaveFigure(['Dynamics_Mass'],saveC);
     PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure(['Dynamics_MassErrorTime'],saveC);
     PlotResults(res,'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
@@ -78,6 +73,30 @@ function DynamicContactLine()
     %PlotResults(res{1},'MaxmassErrorRel');    
     %PlotResultsOverTime(res{1},'massErrorRel');
     
+    function PlotExampleSnaptshots(res)
+        conf = res{1}(3).config;
+        conf.optsNum.PlotAreaCart =     struct('y1Min',-5,'y1Max',5,...
+                                               'y2Min',0.5,'y2Max',10.5,...
+                                                'N1',100,'N2',100);        
+        CL = ContactLineHS(conf);
+        CL.Preprocess(); 
+        CL.ComputeEquilibrium();              
+        CL.ComputeDynamics();            
+        CL.PostprocessDynamics();
+            
+        plotData.subArea  = CL.subArea;
+        plotData.optsPhys = CL.optsPhys;
+        plotData.optsNum  = CL.optsNum;
+        plotData.data     = CL.dynamicsResult;
+        plotData.filename = CL.FilenameDyn;
+        plotData.data.shape = CL.IDC;
+        plotData.data.t = plotData.data.t(plotData.data.t < 3.1);
+        
+        figure('color','white','Position',[0 0 800 800]);
+        PlotDDFT_SnapshotsShape(plotData,[CL.FilenameDyn,'_4Snapshots'],{'4Snapshots','noNewFigure'});
+        
+        
+    end
     
     function res = PostProcess(res)
                 

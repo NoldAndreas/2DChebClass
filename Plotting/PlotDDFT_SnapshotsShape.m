@@ -1,4 +1,8 @@
-function PlotDDFT_SnapshotsShape(input,file_name)
+function PlotDDFT_SnapshotsShape(input,file_name,opts)
+
+    if(nargin < 3)
+        opts = {}; %possible opts: 4Snapshots        
+    end
 
     %*****************************
     %Initialization of Data     
@@ -6,18 +10,23 @@ function PlotDDFT_SnapshotsShape(input,file_name)
     v2struct(data);
     
     plotTimes  = t;%optsNum.plotTimes;    
+    n          = length(plotTimes);
     fl_norm    = 0.1*max(max(max(abs(flux_t))));
     disp(['Flux normalized with ',num2str(fl_norm)]);
     
     %Choose times for snapshots
-    noPlots = 12;
-    n       = length(plotTimes);
-    d       = ceil((n-1)/(noPlots-1));
+    if(IsOption(opts,'4Snapshots'))
+        noPlots = 4;                
+        cols    = 2;        
+    else
+        noPlots = 12;                                        
+        cols    = 4;        
+    end 
     ct      = 1:n;
-    mark    = (mod(ct-1,d) == 0);
+    d       = floor((n-1)/(noPlots-1));                
+	mark    = (mod(ct-1,d) == 0);
+	rows    = ceil(sum(mark)/cols);        
     
-    cols = 4;
-    rows = ceil(sum(mark)/cols);
         
 	if(size(rho_t,3) == 1)
         rho_s(:,1,:)   = rho_t;  rho_t = rho_s;
@@ -40,9 +49,11 @@ function PlotDDFT_SnapshotsShape(input,file_name)
         bool_subSp = false;
     end
     %**************************************
-    %Initialization of figure and screen, and movie
-    close all;
-    figure('Color','white','Position', [0 0 1500 (200+300*rows)]);            
+    %Initialization of figure and screen, and movie    
+    if(~IsOption(opts,'noNewFigure'))
+        %close all;
+        figure('Color','white','Position', [0 0 (200+300*cols) (200+300*rows)]);            
+    end
     %*****************************    
     
     pl_j = 1;
@@ -61,19 +72,45 @@ function PlotDDFT_SnapshotsShape(input,file_name)
              
              shape.plotFlux(flux_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
              shape.plotFlux(flux_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
-             optsPlot.nContours = [0.1,0.3,0.6];%rhoMin + [0.25,0.5,0.75]*(rhoMax - rhoMin);
-             shape.plot(rho(:,iSpecies),'contour',optsPlot); hold on;            
+             
+             if(isfield(optsPhys,'rhoLiq_sat') && isfield(optsPhys,'rhoGas_sat'))
+                %optDetails.y2CartShift = -0.5;
+                optDetails.clabel      = false;  
+                optDetails.linewidth   = 1.5;  
+
+                %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
+                rhoLiq_sat = optsPhys.rhoLiq_sat;
+                rhoGas_sat = optsPhys.rhoGas_sat;
+                drho = rhoLiq_sat - rhoGas_sat;
+
+                optDetails.nContours = rhoGas_sat + 0.1*drho;
+                optDetails.linecolor = 'b';
+                optDetails.linestyle = '--';
+                shape.plot(rho,'contour',optDetails);  hold on;  
+
+                optDetails.nContours = rhoGas_sat + 0.5*drho;
+                optDetails.linecolor = [0 0.75 0];
+                shape.plot(rho,'contour',optDetails);  hold on;  
+
+                optDetails.nContours = rhoGas_sat + 0.9*drho;
+                optDetails.linecolor = 'r';
+                shape.plot(rho,'contour',optDetails);  hold on;                  
+             else
+                 optsPlot.nContours = [0.1,0.3,0.6];%rhoMin + [0.25,0.5,0.75]*(rhoMax - rhoMin);
+                 shape.plot(rho(:,iSpecies),'contour',optsPlot); hold on;            
+             end                          
+             
              if(bool_subSp)
                 subArea.PlotBorders();
              end
 
         end
-        title(['t = ', num2str(t)]);%,...%,'\\ j_{max} = ',num2str(max(max(abs(flux_t(:,:,j)))),'%.1e'),'$'],...
+        title(['t = ', num2str(t,3)]);%,...%,'\\ j_{max} = ',num2str(max(max(abs(flux_t(:,:,j)))),'%.1e'),'$'],...
         %    'fontsize',15);
         pl_j = pl_j +1;                
     end        
     if(nargin > 1)
-        SaveFigure(file_name);
+        SaveFigure(file_name,v2struct(optsPhys,optsNum));
             %print2eps(file_name,gcf);
             %saveas(gcf,[file_name,'.fig']);
             %disp(['Snapshots saved in ',file_name,'.eps/.fig.']);
