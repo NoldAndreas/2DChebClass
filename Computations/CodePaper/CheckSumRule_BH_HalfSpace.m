@@ -45,15 +45,13 @@ function CheckSumRule_BH_HalfSpace()
     res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);
     resC{1}.config = config;
     resC{1}.eta    = eta;
-        	
-    AddPaths('CodePaper');
+        	    
     % **** 2 ****    
     eta = 0.15;    
     res{2}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);  
     resC{2}.config = config;
     resC{2}.eta    = eta;
-    
-    AddPaths('CodePaper');
+        
     % **** 3 ****
    % NS   = 80;
    % N    = 20:10:120;
@@ -63,33 +61,26 @@ function CheckSumRule_BH_HalfSpace()
     config.optsPhys.V1.epsilon_w = 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
     resC{3}.config = config;
-    
-    AddPaths('CodePaper');
+        
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
     config.optsPhys.V1.epsilon_w = 1.0;    
     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
-    resC{4}.config = config;
-    
-    AddPaths('CodePaper');
+    resC{4}.config = config;        
     
     % **** 4 ****
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
     config.optsPhys.V1.epsilon_w = 1.0;    
     res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
-    resC{5}.config = config;
-    
-    AddPaths('CodePaper');
+    resC{5}.config = config;       
     
     config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 1.45;    
     res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList);    
-    resC{6}.config = config;
-    
-    AddPaths('CodePaper');
+    resC{6}.config = config;    
     
     %**********************
     %**********************

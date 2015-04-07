@@ -29,6 +29,7 @@ function Check2DSumRule()
 
     config = v2struct(optsNum,optsPhys);                        
 
+    Interval_SumRule = [-10,15];
     N    = 20:10:60;        
     
     ignoreList = {'config_optsNum_PhysArea_N',...
@@ -40,28 +41,24 @@ function Check2DSumRule()
     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
     config.optsPhys.V1.epsilon_w = 0.94;                
-    res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);     
-            
-    AddPaths('CodePaper');
+    res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);     
+                
     config.optsNum.V2Num.Fex     = 'SplitDisk'; 
     config.optsPhys.V2.V2DV2     = 'ExponentialDouble';                          
     config.optsPhys.V1.V1DV1     = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 1.45;         
-    res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                
-    
-    AddPaths('CodePaper');    
+    res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);                
+        
     config.optsNum.V2Num.Fex     = 'SplitDisk';     
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D';     
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
     config.optsPhys.V1.epsilon_w = 1.0;                
-    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);
+    res{3} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);
     
      %AddPaths('CodePaper');
      %config.optsNum.V2Num.Fex = 'SplitAnnulus';
      %config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
-%     res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);               
-     
-    AddPaths('CodePaper');
+%     res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                        
     
     cols = {}; %{'g','b','c','k','r'};  
     nocols = length(res{1});%length(cols);
@@ -137,9 +134,8 @@ function Check2DSumRule()
         
         
         SaveFigure(['DisjoiningPressures'],res{k0}(1).config);        
-    end
-    
-    function PlotDensityProfiles(resC)
+    end    
+    function PlotDensityProfiles(resC,config)
         CLT = ContactLineHS(config);
         CLT.PreprocessIDC();         
 
@@ -168,7 +164,7 @@ function Check2DSumRule()
         ylim([0 0.25]);
         xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',20);
         ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);
-        SaveFigure('DensityProfiles',v2struct(N,NS,config));
+        %SaveFigure('DensityProfiles',v2struct(config)); %N
     end   
     function res = PlotDensityProfile(res)
         
@@ -185,7 +181,7 @@ function Check2DSumRule()
     end
     function res = ComputeError(in,h)
         conf = in.config;
-        n    = in.N;                        
+        n    = in.N;                          
                 
         for i = 1:length(n)
             
@@ -208,7 +204,7 @@ function Check2DSumRule()
             
             CL.ComputeEquilibrium();      
             [res(i).sumRuleII_relError,...
-             res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError([-10,10]);            
+             res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError(in.Interval_SumRule);   
             %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       

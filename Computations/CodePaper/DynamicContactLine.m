@@ -41,8 +41,8 @@ function DynamicContactLine()
     N = 20:10:60;
     ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
     comp       = [];    
-    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
-            
+    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);    
+                
     config.optsPhys.Inertial = true;    
     config.optsPhys.gammaS   = 2;        
     res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
@@ -59,19 +59,21 @@ function DynamicContactLine()
     lines = {'-','--',':','.','-.'}; nolines = length(lines);   
     
     
-    saveC   = res{1}.config;
+    saveC   = res{2}.config;
 	saveC.N = N;         
         
     %PlotResultsOverTime(res{1},'massError_dt');
     %PlotResults(res{1},'massError_dtMax');        
     
-    PlotExampleSnaptshots(res);
+   
     PlotResultsOverTime(res,'mass'); SaveFigure(['Dynamics_Mass'],saveC);
-    PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure(['Dynamics_MassErrorTime'],saveC);
+    PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure('Dynamics_MassErrorTime',saveC);
     PlotResults(res,'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
     
+     PlotExampleSnaptshots(res);
+    
     %PlotResults(res{1},'MaxmassErrorRel');    
-    %PlotResultsOverTime(res{1},'massErrorRel');
+    %PlotResultsOverTime(res{1},'massErrorRel');        
     
     function PlotExampleSnaptshots(res)
         conf = res{1}(3).config;

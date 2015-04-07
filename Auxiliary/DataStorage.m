@@ -30,6 +30,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
     %*****************************
 
     global dirData
+    old_dirData = dirData; 
     DataFolder = [dirData filesep nameDir]; 	        
     index      = LoadIndexFiles(DataFolder);   
     
@@ -153,6 +154,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             Parameters.Filename = Parameters.Filename(1:end-4);
          end       
     end
+    ChangeDirData(old_dirData);
 
     
     function name = getFilename(params)        
