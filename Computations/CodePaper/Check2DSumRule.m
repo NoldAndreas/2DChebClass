@@ -122,6 +122,7 @@ function Check2DSumRule()
             plot([min(y) max(y)],[0 0],'k--','linewidth',1.5);
             set(gca,'fontsize',25);
             set(gca,'linewidth',1.5);
+            xlim([min(y) max(y)]);
             ylim([-0.1 0.02]);
             xlabel('$y_1/\sigma$','Interpreter','Latex','fontsize',25);
             ylabel('$\Pi \sigma^3/\varepsilon$','Interpreter','Latex','fontsize',25);
