@@ -29,7 +29,7 @@ function Check2DSumRule()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    Interval_SumRule = [-10,15];
+    Interval_SumRule = [-10,20];
     N    = 20:10:60;        
     
     ignoreList = {'config_optsNum_PhysArea_N',...
@@ -60,12 +60,7 @@ function Check2DSumRule()
      %config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
 %     res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                        
     
-    cols = {}; %{'g','b','c','k','r'};  
-    nocols = length(res{1});%length(cols);
-    for iC = 1:nocols
-        cols{end+1} = (nocols-iC)/nocols*[1 1 1];
-	end
-    %cols = {'g','b','c','k','r'};  nocols = length(cols);
+    cols = GetGreyShades(length(res{1}));
 	syms = {'o','^','*','<','d','s','>'};  nosyms = length(syms);
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
 

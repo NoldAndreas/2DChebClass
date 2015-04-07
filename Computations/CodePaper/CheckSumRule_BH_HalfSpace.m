@@ -1,6 +1,7 @@
 function CheckSumRule_BH_HalfSpace()
     
-    AddPaths('CodePaper');            
+    AddPaths('CodePaper');  
+    close all;
     
     PhysArea = struct('N',[1,40],...
                       'L1',5,'L2',2,'L2_AD',2.,...
@@ -40,22 +41,19 @@ function CheckSumRule_BH_HalfSpace()
                   'config_optsNum_FexNum_N2disc'};
               
     comp = [];
-    % **** 1 ****        
+    
+    %**********************
+    %**********************
     eta = 0.3;    
     res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);
     resC{1}.config = config;
     resC{1}.eta    = eta;
         	    
-    % **** 2 ****    
-    eta = 0.15;    
-    res{2}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);  
+    eta            = 0.15;    
+    res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);  
     resC{2}.config = config;
     resC{2}.eta    = eta;
-        
-    % **** 3 ****
-   % NS   = 80;
-   % N    = 20:10:120;
-   
+            
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.94;    
@@ -84,9 +82,13 @@ function CheckSumRule_BH_HalfSpace()
     
     %**********************
     %**********************
-    cols = {'b','m','k','r','g'};
+    cols = GetGreyShades(length(N)); %cols = {'b','m','k','r','g'};
     syms = {'o','>','*','^','h'};        
     resC = DataStorage([],@ComputeDensityProfile,config,resC,[],ignoreList);
+    
+    PlotConvergenceDensityProfiles(res{1},N,[7 7 7]*1e-3,{[60,80],[80,100],[80 120]},'HS');    
+    PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,{[60,80],[80,100],[100 120]},'BH');
+    PlotConvergenceDensityProfiles(res{6},N,[7 7 7]*1e-2,{[60,80],[80,100],[100 120]},'exp');
     
     PlotDensityProfiles(resC);
          
@@ -122,6 +124,55 @@ function CheckSumRule_BH_HalfSpace()
     comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
     SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
     
+    function PlotConvergenceDensityProfiles(res,N,acc,ints,name)
+        figure('Position',[0 0 1800 500],'color','white');
+        subplot(1,3,1); PlotConvergenceDensityProfilesInt(res,N,ints{1},acc(1));
+        subplot(1,3,2); PlotConvergenceDensityProfilesInt(res,N,ints{2},acc(2));
+        subplot(1,3,3); PlotConvergenceDensityProfilesInt(res,N,ints{3},acc(3));
+        saveC   = res(1,1).config;
+        saveC.N = N;    
+        SaveFigure(['DensityProfiles_Convergence_',name],saveC);
+    end
+
+    function PlotConvergenceDensityProfilesInt(res,N,NInt,yLimMax)
+        conf = res.config;
+        CLT = ContactLineHS(conf);
+        CLT.PreprocessIDC();         
+
+        xIP = (-1:0.002:1)';
+        yIP = CLT.IDC.PhysSpace2(xIP);
+        
+        if(isfield(res(1,1),'rho_1D'))
+            rhoName = 'rho_1D';
+        else
+            rhoName = 'rho_1D_WL';
+        end
+        
+        rhoRef = res(1,1).(rhoName)(end);                
+        mark   = ( (N >= NInt(1)) & (N <= NInt(2)));        
+        is     = 1:size(res,1);
+        is     = is(mark);        
+        cls = GetGreyShades(length(is)); %cols = {'b','m','k','r','g'};
+                
+        for i = 1:sum(mark)
+            resI   = res(is(i),1);
+            rhoRefErr = abs(rhoRef-res(i,1).(rhoName)(end));
+            if(rhoRefErr > 1e-13)
+                error('reference density not unique');
+            end
+            disp(resI.config.optsNum.PhysArea.N(2))
+            plot(resI.y2-0.5,resI.(rhoName)-rhoRef,'o','color',cls{i},'MarkerSize',8,'MarkerFaceColor',cls{i}); hold on;
+            IP = barychebevalMatrix(resI.x2,xIP);
+            plot(yIP-0.5,IP*resI.(rhoName)-rhoRef,'-','color',cls{i},'linewidth',1.5); hold on;
+        end
+        xlim([3 7]);
+        ylim([-1 1]*yLimMax);
+        set(gca,'fontsize',20);
+        set(gca,'linewidth',1.5);
+        xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',25);
+        ylabel('$(n - n_{b})\sigma^3$','Interpreter','Latex','fontsize',25); 
+       
+    end    
     function PlotDensityProfiles(resC)
         CLT = ContactLineHS(config);
         CLT.PreprocessIDC();         
