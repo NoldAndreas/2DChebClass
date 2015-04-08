@@ -28,16 +28,22 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     mInv        = mS.^(-1);
     Diff        = this.IDC.Diff;
     
-    if(isstruct(this.optsNum.plotTimes))
-        tI         = this.optsNum.plotTimes.t_int;
-        t_n        = this.optsNum.plotTimes.t_n;
+    if(isfield(optsPhys,'viscosity'))
+        doVisc = true;
+    else
+        doVisc = false;
+    end
+        
+    if(isstruct(optsNum.plotTimes))
+        tI         = optsNum.plotTimes.t_int;
+        t_n        = optsNum.plotTimes.t_n;
         
         plotTimes   = tI(1)+(tI(2)-tI(1))*(0:1:(t_n-1))/(t_n-1);
     else
-        plotTimes   = this.optsNum.plotTimes;
+        plotTimes   = optsNum.plotTimes;
     end
     
-    nSpecies    = this.optsPhys.nSpecies;
+    nSpecies    = optsPhys.nSpecies;
     M           = this.IDC.M;
     Vext        = this.Vext;
     Vext_grad   = this.Vext_grad;
@@ -158,7 +164,33 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         
         dydt     = -kBT*(Diff.div*uv) - (u.*h_s1  + v.*h_s2);
         duvdt    = - [Cu;Cv] - gammaS*uv - mInv.*(Diff.grad*mu_s);
-  
+                
+        if(doVisc)
+            rho_s    = exp((y-Vext)/kBT);
+            [zeta,dzeta_drho] = BulkViscosity(rho_s,optsPhys.viscosity);
+            [eta,deta_drho]   = ShearViscosity(rho_s,optsPhys.viscosity);
+            
+            etaR       = repmat(eta./rho_s,2,1);
+            zetaR      = repmat(zeta./rho_s,2,1);
+            dzeta_drho = repmat(dzeta_drho,2,1);
+            deta_drho  = repmat(deta_drho,2,1);
+            
+            duvdt = duvdt + etaR.*(Diff.LapVec*uv) ...
+                          + (zetaR + etaR/3).*(Diff.gradDiv*uv);
+            
+            if((max(abs(dzeta_drho)) ~= 0) || (max(abs(deta_drho)) ~= 0))
+                dydy1      = (Diff.Dy1*y)/kBT;
+                dydy2      = (Diff.Dy2*y)/kBT;                
+                
+                duvdt      = duvdt + (dzeta_drho - 2/3*deta_drho).*repmat(Diff.div*uv,2,1).*[dydy1;dydy2];                                
+                dudy2dvdy1 = (Diff.Dy2*u + Diff.Dy1*v);
+                
+                visc1      = 2*(Diff.Dy1*u).*drhody1 + dudy2dvdy1.*dydy1;
+                visc2      = dudy2dvdy1.*drhody1 + 2*(Diff.Dy2*v).*dydy2;
+                duvdt      = duvdt + [visc1;visc2].*deta_drho;
+            end       
+        end
+        
         if(doHI)
             error('HI not implemented yet');
 %             rho_s    = exp((x-Vext)/kBT);
