@@ -104,7 +104,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
   
     if(nargin==5)
         if(sum(markYkv)>0)
-            AD(markYkv,:,:)   = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
+            AD(markYkv,:,:) = Conv_LinearGridX(this,ptsStrip,dataAD,weights,params);
         end
         AD(~markYkv,:,:)  = Conv_LinearGridXY(this,ptsHS,area,weights,params);    
     else

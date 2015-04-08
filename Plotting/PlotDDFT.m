@@ -80,7 +80,10 @@ function fig_h = PlotDDFT(input,Bool_Record)
         for iSpecies=1:nSpecies            
             rho     = permute(rho_t(:,iSpecies,:),[1 3 2]);
             rho_diff = rho-rho_ic(:,iSpecies)*ones(1,length(plotTimes));
-            plot(plotTimes,shape.Int*rho_diff,'Color',lineColour{iSpecies},'linewidth',1.5); hold on; 
+            if(~isa(shape,'HalfSpace') || max(abs(rho(shape.Ind.top))) < 1e-13)
+                plot(plotTimes,shape.Int*rho_diff,...
+                     'color',lineColour{iSpecies},'linewidth',1.5); hold on;
+            end            
             %plot(plotTimes,shape.Int*rho_diff,'o','Color',lineColour{iSpecies}); hold on; 
             if(bool_subSp)
                 plot(plotTimes,Int_SubOnFull*rho_diff+accFlux(:,iSpecies)','m','linewidth',1.5);                

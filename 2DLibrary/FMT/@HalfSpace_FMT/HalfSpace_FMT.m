@@ -127,9 +127,18 @@ classdef HalfSpace_FMT < HalfSpaceSkewed
             %
             % * AAD  : $A = area.GetCartPts() \cap this.AD.GetCartPts()$, and ${\bf r}_i \in this.GetCartPts()$
             %       (average the average densities to compute free energy)
-            %            
+            %     
             AAD  = this.AD.ComputeConvolutionFiniteSupport(area,weights,this.Pts);
             AD   = ComputeConvolutionFiniteSupport(this,area,weights,this.AD.Pts);  
+            
+%             parpool(2)
+%             parfor i = 1:2
+%                 if i == 1
+%                   AAD  = this.AD.ComputeConvolutionFiniteSupport(area,weights,this.Pts);
+%                 else
+%                   AD   = ComputeConvolutionFiniteSupport(this,area,weights,this.AD.Pts);  
+%                 end
+%             end                        
         end
 
         M_int  = ComputeAreaIntegrationFiniteSupport(this,areaGeom,f,params,convolution)

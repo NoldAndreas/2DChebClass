@@ -86,10 +86,13 @@ function CheckSumRule_BH_HalfSpace()
     syms = {'o','>','*','^','h'};        
     resC = DataStorage([],@ComputeDensityProfile,config,resC,[],ignoreList);
     
-    PlotConvergenceDensityProfiles(res{1},N,[7 7 7]*1e-3,{[60,80],[80,100],[80 120]},'HS');    
-    PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,{[60,80],[80,100],[100 120]},'BH');
-    PlotConvergenceDensityProfiles(res{6},N,[7 7 7]*1e-2,{[60,80],[80,100],[100 120]},'exp');
+    PlotConvergenceDensityProfiles(res{3},N,[],[0 100],{[60,80],[80,100],[100 120]},'BH_WG','rho_1D_WG');
+    PlotConvergenceDensityProfiles(res{6},N,[],[0 15],{[60,80],[80,100],[100 120]},'exp_WG','rho_1D_WG');    
     
+    PlotConvergenceDensityProfiles(res{1},N,[7 7 7]*1e-3,[3 7],{[60,80],[80,100],[80 120]},'HS','rho_1D');    
+    PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'BH_WL','rho_1D_WL');
+    PlotConvergenceDensityProfiles(res{6},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
+        
     PlotDensityProfiles(resC);
          
     %**********************
@@ -124,29 +127,28 @@ function CheckSumRule_BH_HalfSpace()
     comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
     SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
     
-    function PlotConvergenceDensityProfiles(res,N,acc,ints,name)
+    function PlotConvergenceDensityProfiles(res,N,acc,xlims,ints,name,varName)        
         figure('Position',[0 0 1800 500],'color','white');
-        subplot(1,3,1); PlotConvergenceDensityProfilesInt(res,N,ints{1},acc(1));
-        subplot(1,3,2); PlotConvergenceDensityProfilesInt(res,N,ints{2},acc(2));
-        subplot(1,3,3); PlotConvergenceDensityProfilesInt(res,N,ints{3},acc(3));
+        for i = 1:3            
+            subplot(1,3,i); 
+            if(~isempty(acc))
+                PlotConvergenceDensityProfilesInt(res,N,ints{i},acc(i),xlims,varName);
+            else
+                PlotConvergenceDensityProfilesInt(res,N,ints{i},[],xlims,varName);
+            end
+        end        
         saveC   = res(1,1).config;
         saveC.N = N;    
         SaveFigure(['DensityProfiles_Convergence_',name],saveC);
     end
 
-    function PlotConvergenceDensityProfilesInt(res,N,NInt,yLimMax)
+    function PlotConvergenceDensityProfilesInt(res,N,NInt,yLimMax,xlims,rhoName)
         conf = res.config;
         CLT = ContactLineHS(conf);
         CLT.PreprocessIDC();         
 
         xIP = (-1:0.002:1)';
-        yIP = CLT.IDC.PhysSpace2(xIP);
-        
-        if(isfield(res(1,1),'rho_1D'))
-            rhoName = 'rho_1D';
-        else
-            rhoName = 'rho_1D_WL';
-        end
+        yIP = CLT.IDC.PhysSpace2(xIP);                
         
         rhoRef = res(1,1).(rhoName)(end);                
         mark   = ( (N >= NInt(1)) & (N <= NInt(2)));        
@@ -160,13 +162,21 @@ function CheckSumRule_BH_HalfSpace()
             if(rhoRefErr > 1e-13)
                 error('reference density not unique');
             end
-            disp(resI.config.optsNum.PhysArea.N(2))
+            %disp(resI.config.optsNum.PhysArea.N(2))
             plot(resI.y2-0.5,resI.(rhoName)-rhoRef,'o','color',cls{i},'MarkerSize',8,'MarkerFaceColor',cls{i}); hold on;
             IP = barychebevalMatrix(resI.x2,xIP);
             plot(yIP-0.5,IP*resI.(rhoName)-rhoRef,'-','color',cls{i},'linewidth',1.5); hold on;
+        end        
+        xlim(xlims);
+        if(~isempty(yLimMax))                    
+            ylim([-1 1]*yLimMax);
+        else
+            set(gca,'YScale','log');            
+            ylim([1e-12 2]);
         end
-        xlim([3 7]);
-        ylim([-1 1]*yLimMax);
+        title(['$N \in [',num2str(NInt(1)),';',num2str(NInt(2)),']$'],...
+                                    'Interpreter','Latex',...
+                                    'fontsize',20);
         set(gca,'fontsize',20);
         set(gca,'linewidth',1.5);
         xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',25);

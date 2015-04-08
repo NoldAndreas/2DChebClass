@@ -41,39 +41,32 @@ function CheckSumRule_HalfSpace_L()
     % **** 1 ****    
     eta = 0.3;    
     res{1} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);
-        
-	AddPaths('CodePaper');        
+        	
     % **** 2 ****    
     eta = 0.15;    
     res{2} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);  
-    
-    AddPaths('CodePaper');    
+        
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-    config.optsPhys.V1.epsilon_w = 0.9;    
+    config.optsPhys.V1.epsilon_w = 0.94;    
     res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
-    
-	AddPaths('CodePaper');    
-    config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{4} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
-    
-	AddPaths('CodePaper');    
-	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{5} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);            
-
-    
-    AddPaths('CodePaper');        
+    	
+% %     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
+% %     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
+% %     config.optsPhys.V1.epsilon_w = 0.9;    
+% %     res{4} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
+%     
+% 	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+%     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+%     config.optsPhys.V1.epsilon_w = 0.9;    
+%     res{5} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);  
+   
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
-    config.optsPhys.V1.epsilon_w = 0.9;    
-    res{6}  = DataStorage(folder,@ComputeError,v2struct(L,config),[]);    
+    config.optsPhys.V1.epsilon_w = 1.45;    
+    res{4}  = DataStorage(folder,@ComputeError,v2struct(L,config),[]);    
         
-              
-    AddPaths('CodePaper');    
+                    
     figure('color','white','Position',[0 0 900 800]); 
     legendstring = {};
 	PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
