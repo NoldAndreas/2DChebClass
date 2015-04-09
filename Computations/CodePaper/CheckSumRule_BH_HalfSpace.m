@@ -64,19 +64,7 @@ function CheckSumRule_BH_HalfSpace()
     config.optsPhys.V1.epsilon_w = 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
-    resC{3}.config = config;
-        
-%     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-%     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-%     config.optsPhys.V1.epsilon_w = 1.0;    
-%     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
-%     resC{4}.config = config;        
-        
-%     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-%     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-%     config.optsPhys.V1.epsilon_w = 1.0;    
-%     res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
-%     resC{5}.config = config;       
+    resC{3}.config = config;           
     
     config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
@@ -99,13 +87,13 @@ function CheckSumRule_BH_HalfSpace()
     %**********************    
     PlotErrorVsY_Full(res,resC);
     
-    PlotFullErrorGraph(res,'error_wl');
-    ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
-                                'Interpreter','Latex','fontsize',20);        
-    comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
-    SaveFigure('SumRuleError',v2struct(N,config,comment));
+    PlotFullErrorGraph(res,'adsorption_err_wl','Relative adsorption error','AdsorptionError');
+    PlotFullErrorGraph(res,'error_wl',...
+                'Relative sum rule error $\frac{n(0)-n_C}{n_C}$',...
+                'SumRuleError');        
+    
         
-    PlotFullErrorGraph(res,'rho_y_err_max_wl');
+    PlotFullErrorGraph(res,'rho_y_err_max_wl','$\max_y |n_N(y) - n_{N+\Delta N}(y)|$','MaxDensityError_Y');
     %**********************
     %**********************
     PlotConvergenceDensityProfiles(res{3},N,[],[0 100],{[60,80],[80,100],[100 120]},'BH_WG','rho_1D_WG');
@@ -115,28 +103,39 @@ function CheckSumRule_BH_HalfSpace()
     PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'BH_WL','rho_1D_WL');
     PlotConvergenceDensityProfiles(res{4},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
         
-    PlotDensityProfiles(resC);
+    PlotDensityProfiles(resC);    
     
-    
-    function res = PostProcess(res,y)
+    function res = PostProcess(res,yIP)
         
         CLT = ContactLineHS(res{1}(1,1).config);
-        CLT.PreprocessIDC();                 
+        CLT.PreprocessIDC(); 
+        
         for i0 = 1:length(res)
             for i1 = 1:size(res{i0},1)
                 for i2 = 1:size(res{i0},2)
                     resI = res{i0}(i1,i2);
-                    xx   = CLT.IDC.CompSpace2(y);
+                    
+                    [x,w]  = ClenCurtFlip(length(resI.x2)-1);
+                    [yy,dy] = CLT.IDC.PhysSpace2(x);
+                    Int2   = dy'.*w;
+                    Int2(Int2==inf) = 0;
+                    %Int2(yy>) = 0;
+
+                    xx   = CLT.IDC.CompSpace2(yIP);
                     IP   = barychebevalMatrix(resI.x2,xx);
-                    res{i0}(i1,i2).y_IP = y;
+                    res{i0}(i1,i2).y_IP = yIP;
+                    res{i0}(i1,i2).Int2 = Int2;
                     if(isfield(resI,'rho_1D'))
-                        res{i0}(i1,i2).rho_y_wl = IP*resI.rho_1D;
+                        res{i0}(i1,i2).rho_y_wl      = IP*resI.rho_1D;
+                        res{i0}(i1,i2).adsorption_wl = Int2*(resI.rho_1D-resI.rho_1D(end));
                     end
                     if(isfield(resI,'rho_1D_WL'))
-                        res{i0}(i1,i2).rho_y_wl = IP*resI.rho_1D_WL;
+                        res{i0}(i1,i2).rho_y_wl      = IP*resI.rho_1D_WL;
+                        res{i0}(i1,i2).adsorption_wl = Int2*(resI.rho_1D_WL-resI.rho_1D_WL(end));
                     end
                     if(isfield(resI,'rho_1D_WG'))
-                        res{i0}(i1,i2).rho_y_wg = IP*resI.rho_1D_WG;
+                        res{i0}(i1,i2).rho_y_wg      = IP*resI.rho_1D_WG;
+                        res{i0}(i1,i2).adsorption_wg = Int2*(resI.rho_1D_WG-resI.rho_1D_WG(end));
                     end
                 end
             end
@@ -145,12 +144,15 @@ function CheckSumRule_BH_HalfSpace()
         for i0 = 1:length(res)
             for i1 = 1:(size(res{i0},1)-1)
                 for i2 = 1:size(res{i0},2)
-                    res{i0}(i1,i2).rho_y_err_wl     = abs(res{i0}(i1,i2).rho_y_wl-res{i0}(i1+1,i2).rho_y_wl);
-                    res{i0}(i1,i2).rho_y_err_max_wl = max(abs(res{i0}(i1,i2).rho_y_err_wl));               
-                    
+
+                    res{i0}(i1,i2).adsorption_err_wl = abs(res{i0}(i1,i2).adsorption_wl-res{i0}(i1+1,i2).adsorption_wl)/res{i0}(i1+1,i2).adsorption_wl;
+                    res{i0}(i1,i2).rho_y_err_wl      = abs(res{i0}(i1,i2).rho_y_wl-res{i0}(i1+1,i2).rho_y_wl);
+                    res{i0}(i1,i2).rho_y_err_max_wl  = max(abs(res{i0}(i1,i2).rho_y_err_wl));               
+
                     if(isfield(res{i0}(i1,i2),'rho_y_wg'))
-                        res{i0}(i1,i2).rho_y_err_wg     = abs(res{i0}(i1,i2).rho_y_wg-res{i0}(i1+1,i2).rho_y_wg);
-                        res{i0}(i1,i2).rho_y_err_max_wg = max(abs(res{i0}(i1,i2).rho_y_err_wg));                        
+                        res{i0}(i1,i2).adsorption_err_wg = abs(res{i0}(i1,i2).adsorption_wg - res{i0}(i1+1,i2).adsorption_wg)/res{i0}(i1+1,i2).adsorption_wg;
+                        res{i0}(i1,i2).rho_y_err_wg      = abs(res{i0}(i1,i2).rho_y_wg-res{i0}(i1+1,i2).rho_y_wg);
+                        res{i0}(i1,i2).rho_y_err_max_wg  = max(abs(res{i0}(i1,i2).rho_y_err_wg));                        
                     end
                 end
             end
@@ -319,8 +321,7 @@ function CheckSumRule_BH_HalfSpace()
         subplot(3,2,5); PlotErrorVsY(res{4},'rho_y_err_wl','-o',[resC{4}.name,'_{wl}']);
         subplot(3,2,6); PlotErrorVsY(res{4},'rho_y_err_wg','-o',[resC{4}.name,'_{wg}']);
         SaveFigure('ConvergenceError_Y');
-	end
-
+    end
     function PlotErrorVsY(res,var_name,sym,title_name)        
         ns   = 1:length(res);
         mark = 5:9;%length(res);
@@ -344,7 +345,7 @@ function CheckSumRule_BH_HalfSpace()
         title(title_name,'fontsize',20);
     end
        
-    function PlotFullErrorGraph(res,var_name)
+    function PlotFullErrorGraph(res,var_name,yLab,filename)
         figure('color','white','Position',[0 0 900 800]); 
         for i0 = 1:length(res)            
             var_name_wg = [var_name(1:end-3),'_wg'];
@@ -359,7 +360,9 @@ function CheckSumRule_BH_HalfSpace()
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
         xlabel('$N$','Interpreter','Latex','fontsize',20);
+        ylabel(yLab,'Interpreter','Latex','fontsize',20);
         xlim([(N(1)-2),(N(end)+2)]);    
+        SaveFigure(filename);
     end
     function PlotErrorGraph(res,var_name,sym,col)
         
