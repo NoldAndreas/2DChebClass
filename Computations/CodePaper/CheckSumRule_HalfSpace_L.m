@@ -1,7 +1,12 @@
-function CheckSumRule_HalfSpace_L()
+function CheckSumRule_HalfSpace_L(N)
     
+
     close all;
     AddPaths('CodePaper');    
+    
+    if(nargin == 0)
+        N = 100;
+    end    
 
     PhysArea = struct('N',[1,100],...
                       'L1',5,'L2',2,'L2_AD',2.,...

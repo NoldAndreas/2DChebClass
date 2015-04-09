@@ -50,8 +50,8 @@ function DynamicContactLine()
     config.optsPhys.gammaS   = 5;
     res{3} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
-    config.optsPhys.gammaS   = 10;
-    res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    %config.optsPhys.gammaS   = 10;
+    %res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
     res = PostProcess(res);    
    
@@ -76,7 +76,7 @@ function DynamicContactLine()
     PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure('Dynamics_MassErrorTime',saveC);
     PlotResults(res,'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
     
-     PlotExampleSnaptshots(res);
+    PlotExampleSnaptshots(res);
     
     %PlotResults(res{1},'MaxmassErrorRel');    
     %PlotResultsOverTime(res{1},'massErrorRel');        
