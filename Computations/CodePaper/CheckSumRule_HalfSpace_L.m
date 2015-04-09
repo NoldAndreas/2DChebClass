@@ -48,6 +48,7 @@ function CheckSumRule_HalfSpace_L()
         
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
+    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 0.94;    
     res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
     	

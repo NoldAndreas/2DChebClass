@@ -2,6 +2,8 @@ function CheckSumRule_BH_HalfSpace()
     
     AddPaths('CodePaper');  
     close all;
+    global loadAll
+    loadAll = true;
     
     PhysArea = struct('N',[1,40],...
                       'L1',5,'L2',2,'L2_AD',2.,...
@@ -31,102 +33,129 @@ function CheckSumRule_BH_HalfSpace()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:5:120;
-    NS   = 80;%10:10:40;        
+    N    = 20:5:120;    
+    y    = (0.5:0.1:20)';
     
     ignoreList = {'config_optsNum_PhysArea_N',...
                   'config_optsNum_PhysArea_N2bound',...
                   'config_optsNum_V2Num_N',...
                   'config_optsNum_FexNum_N1disc',...
-                  'config_optsNum_FexNum_N2disc'};
+                  'config_optsNum_FexNum_N2disc',...
+                  'NS'};
               
     comp = [];
     
     %**********************
     %**********************
     eta = 0.3;    
-    res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);
+    res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);    
     resC{1}.config = config;
+    resC{1}.name = 'HSeta0.3';
     resC{1}.eta    = eta;
         	    
     eta            = 0.15;    
-    res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config,eta),[],comp,ignoreList);  
+    res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);      
     resC{2}.config = config;
+    resC{2}.name = 'HSeta0.15';
     resC{2}.eta    = eta;
             
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.epsilon_w = 0.94;    
-    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
+    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
+    resC{3}.name = 'BH';
     resC{3}.config = config;
         
-    config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-    config.optsPhys.V1.epsilon_w = 1.0;    
-    res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
-    resC{4}.config = config;        
-    
-    % **** 4 ****
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-    config.optsPhys.V1.epsilon_w = 1.0;    
-    res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
-    resC{5}.config = config;       
+%     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
+%     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
+%     config.optsPhys.V1.epsilon_w = 1.0;    
+%     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList); 
+%     resC{4}.config = config;        
+        
+%     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+%     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
+%     config.optsPhys.V1.epsilon_w = 1.0;    
+%     res{5} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],comp,ignoreList);            
+%     resC{5}.config = config;       
     
     config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 1.45;    
-    res{6} = DataStorage('SumRuleError',@ComputeError,v2struct(N,NS,config),[],[],ignoreList);    
-    resC{6}.config = config;    
+    res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],[],ignoreList);    
+    resC{4}.name = 'exp';
+    resC{4}.config = config;    
     
     %**********************
     %**********************
+    res = PostProcess(res,y);
     cols = GetGreyShades(length(N)); %cols = {'b','m','k','r','g'};
-    syms = {'o','>','*','^','h'};        
-    resC = DataStorage([],@ComputeDensityProfile,config,resC,[],ignoreList);
+    syms = {'s','p','o','^','>','*','h'};
+    lines = {'-','--'};
     
+ %   resC = DataStorage([],@ComputeDensityProfile,config,resC,true,ignoreList);
+             
+    %**********************
+    %**********************    
+    PlotErrorVsY_Full(res,resC);
+    
+    PlotFullErrorGraph(res,'error_wl');
+    ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
+                                'Interpreter','Latex','fontsize',20);        
+    comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
+    SaveFigure('SumRuleError',v2struct(N,config,comment));
+        
+    PlotFullErrorGraph(res,'rho_y_err_max_wl');
+    %**********************
+    %**********************
     PlotConvergenceDensityProfiles(res{3},N,[],[0 100],{[60,80],[80,100],[100 120]},'BH_WG','rho_1D_WG');
-    PlotConvergenceDensityProfiles(res{6},N,[],[0 15],{[60,80],[80,100],[100 120]},'exp_WG','rho_1D_WG');    
+    PlotConvergenceDensityProfiles(res{4},N,[],[0 15],{[60,80],[80,100],[100 120]},'exp_WG','rho_1D_WG');    
     
     PlotConvergenceDensityProfiles(res{1},N,[7 7 7]*1e-3,[3 7],{[60,80],[80,100],[80 120]},'HS','rho_1D');    
     PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'BH_WL','rho_1D_WL');
-    PlotConvergenceDensityProfiles(res{6},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
+    PlotConvergenceDensityProfiles(res{4},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
         
     PlotDensityProfiles(resC);
-         
-    %**********************
-    %**********************
-    figure('color','white','Position',[0 0 900 800]); 
-    legendstring = {};
-    PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
-    PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
     
-    PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
-    PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
     
-    PlotErrorGraph(res{4},'error_wl','>-','k','BarkerHendersonHardCutoff_2D, liq');
-    PlotErrorGraph(res{4},'error_wg','>--','k','BarkerHendersonHardCutoff_2D, vap');
-    
-    PlotErrorGraph(res{5},'error_wl','*-','k','BarkerHenderson_2D, liq');
-    PlotErrorGraph(res{5},'error_wg','*--','k','BarkerHenderson_2D, vap');
+    function res = PostProcess(res,y)
         
-    PlotErrorGraph(res{6},'error_wl','^-','k','ExponentialDouble, liq');
-    PlotErrorGraph(res{6},'error_wg','^--','k','ExponentialDouble, vap');
-    
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
-    set(gca,'fontsize',20);
-    xlabel('$N$','Interpreter','Latex','fontsize',20);
-    ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
-                            'Interpreter','Latex','fontsize',20);
-    xlim([(N(1)-2),(N(end)+2)]);    
-    %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
-   % legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
-    
-    comment = 'Computed for hard wall, hard sphere fluid and BH fluid';    
-    SaveFigure('SumRuleError',v2struct(N,NS,config,comment));
-    
+        CLT = ContactLineHS(res{1}(1,1).config);
+        CLT.PreprocessIDC();                 
+        for i0 = 1:length(res)
+            for i1 = 1:size(res{i0},1)
+                for i2 = 1:size(res{i0},2)
+                    resI = res{i0}(i1,i2);
+                    xx   = CLT.IDC.CompSpace2(y);
+                    IP   = barychebevalMatrix(resI.x2,xx);
+                    res{i0}(i1,i2).y_IP = y;
+                    if(isfield(resI,'rho_1D'))
+                        res{i0}(i1,i2).rho_y_wl = IP*resI.rho_1D;
+                    end
+                    if(isfield(resI,'rho_1D_WL'))
+                        res{i0}(i1,i2).rho_y_wl = IP*resI.rho_1D_WL;
+                    end
+                    if(isfield(resI,'rho_1D_WG'))
+                        res{i0}(i1,i2).rho_y_wg = IP*resI.rho_1D_WG;
+                    end
+                end
+            end
+        end
+                
+        for i0 = 1:length(res)
+            for i1 = 1:(size(res{i0},1)-1)
+                for i2 = 1:size(res{i0},2)
+                    res{i0}(i1,i2).rho_y_err_wl     = abs(res{i0}(i1,i2).rho_y_wl-res{i0}(i1+1,i2).rho_y_wl);
+                    res{i0}(i1,i2).rho_y_err_max_wl = max(abs(res{i0}(i1,i2).rho_y_err_wl));               
+                    
+                    if(isfield(res{i0}(i1,i2),'rho_y_wg'))
+                        res{i0}(i1,i2).rho_y_err_wg     = abs(res{i0}(i1,i2).rho_y_wg-res{i0}(i1+1,i2).rho_y_wg);
+                        res{i0}(i1,i2).rho_y_err_max_wg = max(abs(res{i0}(i1,i2).rho_y_err_wg));                        
+                    end
+                end
+            end
+        end
+    end    
     function PlotConvergenceDensityProfiles(res,N,acc,xlims,ints,name,varName)        
         figure('Position',[0 0 1800 500],'color','white');
         for i = 1:3            
@@ -141,7 +170,6 @@ function CheckSumRule_BH_HalfSpace()
         saveC.N = N;    
         SaveFigure(['DensityProfiles_Convergence_',name],saveC);
     end
-
     function PlotConvergenceDensityProfilesInt(res,N,NInt,yLimMax,xlims,rhoName)
         conf = res.config;
         CLT = ContactLineHS(conf);
@@ -243,84 +271,110 @@ function CheckSumRule_BH_HalfSpace()
     end
     function res = ComputeError(in,h)
         conf = in.config;
-        N      = in.N;
-        NS     = in.NS;
-        
-        %error_wg    = zeros(length(N),length(NS));
-        %error_wl    = zeros(length(N),length(NS));
+        n    = in.n;                        
                 
-        for i = 1:length(N)
+        for i = 1:length(n)
             
-            conf.optsNum.PhysArea.N       = [1,N(i)];
-            conf.optsNum.PhysArea.N2bound = max(10,2*round(N(i)/6));
-            
-            for j = 1:length(NS)
-                if(isfield(conf.optsPhys,'V2'))
-                    conf.optsNum.V2Num.N       = [NS(j),NS(j)];
-                end
-                conf.optsNum.FexNum.N1disc = NS(j);
-                conf.optsNum.FexNum.N2disc = NS(j);
+            conf.optsNum.PhysArea.N       = [1,n(i)];
+            conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
 
-                CL = ContactLineHS(conf);
-                preErr = CL.Preprocess(); 
-                
-                res(i,j).config = conf;
-                res(i,j).y2      = CL.IDC.Pts.y2;
-                res(i,j).x2      = CL.IDC.Pts.x2;
-                
-                if(~isfield(conf.optsPhys,'V2'))                                        
-                    [~,res(i,j).rho_1D,params] = CL.Compute1D(in.eta);
-                    res(i,j).error_wl = params.contactDensity_relError;
-                else
-                    res(i,j).error_conv1 = preErr.error_conv1;
-                    res(i,j).Conv        = CL.IntMatrV2.Conv;
-                    
-                    [~,res(i,j).rho_1D_WL,params] = CL.Compute1D('WL');
-                    res(i,j).error_wl = params.contactDensity_relError;
+            CL = ContactLineHS(conf);
+            preErr = CL.Preprocess(); 
 
-                    [~,res(i,j).rho_1D_WG,params] = CL.Compute1D('WG');
-                    res(i,j).error_wg = params.contactDensity_relError;
-                end
-                %res(i,j).error_n2_1    = preErr.error_n2_1;
-                %res(i,j).error_n3_1    = preErr.error_n3_1;
-                %res(i,j).error_n2v2_1  = preErr.error_n2v2_1;                                
-                
-                res(i,j).N  = N(i);
-                res(i,j).NS = NS(j); 
-                %err         = CheckMeanfieldConvolution(CL);
-                %%res(i,j).error_conv1 = err.error_conv1;                 
-                
-                %res(i,j).A_n2       = CL.IntMatrFex.AD.n2;
-                %res(i,j).A_n3       = CL.IntMatrFex.AD.n3;
-                %res(i,j).A_n2_v_1   = CL.IntMatrFex.AD.n2_v_1;
-                %res(i,j).A_n2_v_2   = CL.IntMatrFex.AD.n2_v_2;                                
-                
-                close all;
-                clear('CL');                
+            [~,~,res(i).Int_1D]  = CL.IDC.ComputeIntegrationVector();
+
+            res(i).config = conf;
+            res(i).y2      = CL.IDC.Pts.y2;
+            res(i).x2      = CL.IDC.Pts.x2;
+
+            if(~isfield(conf.optsPhys,'V2'))                                        
+                [~,res(i).rho_1D,params] = CL.Compute1D(in.eta);
+                res(i).error_wl = params.contactDensity_relError;                                                                                
+            else
+                res(i).error_conv1 = preErr.error_conv1;
+                res(i).Conv        = CL.IntMatrV2.Conv;
+
+                [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');
+                res(i).error_wl = params.contactDensity_relError;
+
+                [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
+                res(i).error_wg = params.contactDensity_relError;
             end
+
+            res(i).N  = n(i);                
+                
+            close all;
+            clear('CL');                            
         end
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end     
-    function PlotErrorGraph(res,var_name,sym,col,name)
-        
-        n = 1;
-                
-        for k1 = 1:size(res,1)
-            for k2 = 1:size(res,2)
-                line(n)   = abs(res(k1,k2).(var_name));
-                line_N(n) = (res(k1,k2).N);%+res(k1,k2+1).NS)/2;
-                %plot(line_N(n),line(n),...
-                 %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
-                n = n+1;
-                
-                                
+
+    function PlotErrorVsY_Full(res,resC)
+        figure('color','white','Position',[0 0 1400 1400]); 
+        subplot(3,2,1); PlotErrorVsY(res{1},'rho_y_err_wl','-o',resC{1}.name);
+        subplot(3,2,2); PlotErrorVsY(res{2},'rho_y_err_wl','-o',resC{2}.name);
+        subplot(3,2,3); PlotErrorVsY(res{3},'rho_y_err_wl','-o',[resC{3}.name,'_{wl}']);
+        subplot(3,2,4); PlotErrorVsY(res{3},'rho_y_err_wg','-o',[resC{3}.name,'_{wg}']);
+        subplot(3,2,5); PlotErrorVsY(res{4},'rho_y_err_wl','-o',[resC{4}.name,'_{wl}']);
+        subplot(3,2,6); PlotErrorVsY(res{4},'rho_y_err_wg','-o',[resC{4}.name,'_{wg}']);
+        SaveFigure('ConvergenceError_Y');
+	end
+
+    function PlotErrorVsY(res,var_name,sym,title_name)        
+        ns   = 1:length(res);
+        mark = 5:9;%length(res);
+        ns   = ns(mark);
+        cls  = GetGreyShades(length(ns));
+        for j1 = 1:length(ns)                                    
+            col = cls{j1};
+            k1  = ns(j1); 
+            disp(res(k1).N);
+            if(isfield(res(k1,1),var_name) && ~isempty(res(k1,1).(var_name)))
+                plot(res(k1).y_IP,res(k1).(var_name),sym,'color',col,...
+                        'MarkerSize',10,'MarkerFaceColor',col);
+                hold on;
+            else
+                break;
+            end            
+        end        
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',20);
+        xlabel('$y_2$','Interpreter','Latex','fontsize',20);
+        title(title_name,'fontsize',20);
+    end
+       
+    function PlotFullErrorGraph(res,var_name)
+        figure('color','white','Position',[0 0 900 800]); 
+        for i0 = 1:length(res)            
+            var_name_wg = [var_name(1:end-3),'_wg'];
+            if(isfield(res{i0}(1,1),var_name_wg))
+                PlotErrorGraph(res{i0},var_name,['-',syms{i0}],'k');
+                PlotErrorGraph(res{i0},var_name_wg,['--',syms{i0}],'k');
+            else
+                PlotErrorGraph(res{i0},var_name,['-',syms{i0}],'b');                
             end
         end
-        plot(line_N,line,...
+        set(gca,'YScale','log');
+        set(gca,'linewidth',1.5);
+        set(gca,'fontsize',20);
+        xlabel('$N$','Interpreter','Latex','fontsize',20);
+        xlim([(N(1)-2),(N(end)+2)]);    
+    end
+    function PlotErrorGraph(res,var_name,sym,col)
+        
+        n = 1;                
+        for k1 = 1:size(res,1)            
+            if(isfield(res(k1,1),var_name) && ~isempty(res(k1,1).(var_name)))
+                line(n)   = abs(res(k1,1).(var_name));
+                line_n(n) = (res(k1,1).N);%+res(k1,k2+1).NS)/2;                
+                n = n+1;
+            else
+                break;
+            end
+        end
+        plot(line_n,line,...
                         [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;        
-                    
-        legendstring(end+1) = {name};
     end
 
 end
