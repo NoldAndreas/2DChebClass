@@ -340,8 +340,7 @@ classdef ContactLineHS < DDFT_2D
                                         this.optsNum.maxComp_y2);
             ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
         end
-        sol = Compute(this)        
-        ComputeDynamics_old(this)        
+        sol = Compute(this)                     
         
         %Compute disjoining pressure
         Compute_DisjoiningPressure_II(this,y1Int)

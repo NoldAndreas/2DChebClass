@@ -80,15 +80,19 @@ function fig_h = PlotDDFT(input,Bool_Record)
         for iSpecies=1:nSpecies            
             rho     = permute(rho_t(:,iSpecies,:),[1 3 2]);
             rho_diff = rho-rho_ic(:,iSpecies)*ones(1,length(plotTimes));
+            
+            if(bool_subSp)
+                plot(plotTimes,Int_SubOnFull*rho_diff+accFlux(:,iSpecies)','m','linewidth',1.5);                                
+            end
             if(~isa(shape,'HalfSpace') || max(abs(rho(shape.Ind.top))) < 1e-13)
                 plot(plotTimes,shape.Int*rho_diff,...
                      'color',lineColour{iSpecies},'linewidth',1.5); hold on;
+                 legend('Subdomain','Full Domain','location','NorthWest');
+            else
+                legend('Subdomain','location','NorthWest');
             end            
             %plot(plotTimes,shape.Int*rho_diff,'o','Color',lineColour{iSpecies}); hold on; 
-            if(bool_subSp)
-                plot(plotTimes,Int_SubOnFull*rho_diff+accFlux(:,iSpecies)','m','linewidth',1.5);                
-                legend('Full Domain','Subdomain','location','NorthWest');
-            end
+            
         end
          grid on;
          xlabel('t','fontsize',20);
@@ -142,8 +146,8 @@ function fig_h = PlotDDFT(input,Bool_Record)
                 if(nSpecies > 1)
                     optsPlot.linecolor = lineColour{iSpecies}; 
                 else
-                    optsPlot.nContours = 5;
-                                        
+                    %optsPlot.nContours = 5;
+%                    shape.PlotDensityContours(rho);
                     drho = optsPhys.rhoLiq_sat - optsPhys.rhoGas_sat;
                     
                     optsPlot.nContours = optsPhys.rhoGas_sat + 0.1*drho;

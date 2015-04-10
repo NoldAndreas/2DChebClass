@@ -61,21 +61,7 @@ function [fContour] =  PlotContourResults(this,options) %plain
         optDetails.clabel      = false;  
         optDetails.linewidth   = 1.5;  
         
-        %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
-        drho = rhoLiq_sat - rhoGas_sat;
-        
-        optDetails.nContours = rhoGas_sat + 0.1*drho;
-        optDetails.linecolor = 'b';
-        optDetails.linestyle = '--';
-        this.IDC.plot(rho,'contour',optDetails);  hold on;  
-        
-        optDetails.nContours = rhoGas_sat + 0.5*drho;
-        optDetails.linecolor = [0 0.75 0];
-        this.IDC.plot(rho,'contour',optDetails);  hold on;  
-        
-        optDetails.nContours = rhoGas_sat + 0.9*drho;
-        optDetails.linecolor = 'r';
-        this.IDC.plot(rho,'contour',optDetails);  hold on;                  
+        PlotDensityContours(this,rho,optDetails);                         
     end    
     %Plot Measured Contact Angle
     %plot([pt1.y1_kv;pt2.y1_kv],[pt1.y2_kv;pt2.y2_kv],'o','MarkerSize',8,'MarkerEdgeColor','k','MarkerFaceColor','g');        

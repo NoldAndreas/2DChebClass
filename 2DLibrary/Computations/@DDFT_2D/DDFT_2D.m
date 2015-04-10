@@ -118,6 +118,21 @@ classdef DDFT_2D < Computation
         function rho = GetRhoEq(this)
             rho = exp((this.x_eq-this.Vext)/this.optsPhys.kBT);
         end        
+        function ResetTemperature(this,T)
+            if(nargin > 1)
+                this.optsPhys.kBT = T;
+            end
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
+                this.do2Phase = true;
+            end
+        end
+        
         function res = Preprocess_HardSphereContribution(this)      
             res = struct();
             if(isfield(this.optsNum,'FexNum'))
@@ -245,7 +260,84 @@ classdef DDFT_2D < Computation
                 this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);                
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
-        end       
+        end        
+        
+
+        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)                
+        function ComputeDynamics(this)
+            if(this.doHIWall)
+                ComputeDynamicsWallHI(this);
+            elseif( (isfield(this.optsPhys,'Inertial') && this.optsPhys.Inertial) || ...
+                     (isfield(this.optsNum,'Inertial') && this.optsNum.Inertial) )
+                ComputeDynamicsInertia(this);
+            else
+                ComputeDynamicsOverdamped(this);
+            end
+        end                
+        ComputeDynamicsOverdamped(this,x_ic,mu)
+        ComputeDynamicsInertia(this,x_ic,mu)
+        
+        function PlotDensityContours(this,rho,optsPlot)
+                       
+            optsPhys = this.optsPhys;
+            if(isfield(this.optsPhys,'rhoGas_sat'))                
+                drho = optsPhys.rhoLiq_sat - optsPhys.rhoGas_sat;
+                    
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.1*drho;
+                optsPlot.linecolor = 'b';
+                optsPlot.linestyle = '--';
+                this.IDC.plot(rho,'contour',optsPlot);  hold on;  
+
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.5*drho;
+                optsPlot.linecolor = [0 0.75 0];
+                this.IDC.plot(rho,'contour',optsPlot);  hold on;  
+
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.9*drho;
+                optsPlot.linecolor = 'r';
+                this.IDC.plot(rho,'contour',optsPlot);  hold on;  
+            else
+                rho_tMin  = min(min(min(rho_t)));
+                rho_tMax  = max(max(max(rho_t)));            
+                optsPlot = struct('nContours',rho_tMin + [0.3,0.5,0.7]*(rho_tMax-rho_tMin));
+                this.IDC.plot(rho,'contour',optsPlot); 
+            end
+            
+        end        
+        function PlotDynamicValue(this,val)
+            
+            plotTimes = this.dynamicsResult.t;
+            rho_t     = this.dynamicsResult.rho_t;   
+            
+            doFlux    = (size(val,1) == 2*this.IDC.M);
+            
+            figure('Color','white','Position', [0 0 800 800]);
+            
+            T_n_Max = length(plotTimes);            
+            for i=1:T_n_Max
+            
+                t       = plotTimes(i);
+                hold off;
+                for iSpecies=1:size(val,2)      
+                    if(doFlux)                   
+                        PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
+                        this.IDC.plotFlux(val(:,iSpecies,i));
+                    else
+                        this.IDC.plot(val(:,iSpecies,i),'SC');                    
+                    end
+                end                
+                title(['t = ', num2str((t))]);               
+                set(gca,'fontsize',20);
+                set(gca,'linewidth',1.5);
+                %xlabel('$y_1$','Interpreter','Latex','fontsize',25);
+                %ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                %view([2,5,2]);
+
+                h = get(gca,'xlabel'); set(h,'fontsize',35);
+                h = get(gca,'ylabel'); set(h,'fontsize',35);
+                h = get(gca,'title');  set(h,'fontsize',35);
+                pause(0.2);
+            end
+        end                
         function fig_h = PlotDynamics(this,rec)
             if(nargin == 1)
                 rec = false;
@@ -260,37 +352,7 @@ classdef DDFT_2D < Computation
 
             figure('Position',[0 0 1000 1000]);
             fig_h = PlotDDFT(plotData,rec);
-        end            
-        function ResetTemperature(this,T)
-            if(nargin > 1)
-                this.optsPhys.kBT = T;
-            end
-            % Determine saturation point if a 2-Phase system is given
-            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
-                [this.optsPhys.rhoGas_sat,...
-                     this.optsPhys.rhoLiq_sat,...
-                    this.optsPhys.mu_sat,p] = BulkSatValues(this.optsPhys);
-                GetCriticalPoint(this.optsPhys);
-                % BulkPhaseDiagram(this.optsPhys);
-                this.do2Phase = true;
-            end
-        end
-        
-        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)        
-        
-        function ComputeDynamics(this)
-            if(this.doHIWall)
-                ComputeDynamicsWallHI(this);
-            elseif( (isfield(this.optsPhys,'Inertial') && this.optsPhys.Inertial) || ...
-                     (isfield(this.optsNum,'Inertial') && this.optsNum.Inertial) )
-                ComputeDynamicsInertia(this);
-            else
-                ComputeDynamicsOverdamped(this);
-            end
-        end                
-        ComputeDynamicsOverdamped(this,x_ic,mu)
-        ComputeDynamicsInertia(this,x_ic,mu)
-        
+        end              
         function PostprocessDynamics(this)                    
             subArea       = this.subArea;%dynamicsResult.Subspace.subArea;
             rho_t         = this.dynamicsResult.rho_t;

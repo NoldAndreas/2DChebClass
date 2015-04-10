@@ -200,8 +200,13 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 %             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        duvdt([Ind.finite1 ; false(M,1)],:)      = Ind.normalFinite1*u;
-        duvdt([false(M,1)  ; Ind.finite2],:)     = Ind.normalFinite2*v;
+        if(doVisc)
+            duvdt([Ind.finite ; false(M,1)],:)   = Ind.normalFinite*uv;
+            duvdt([false(M,1) ; Ind.finite],:)   = Ind.normalFinite*uv;
+        else
+            duvdt([Ind.finite1 ; false(M,1)],:)  = Ind.normalFinite1*u;
+            duvdt([false(M,1)  ; Ind.finite2],:) = Ind.normalFinite2*v;
+        end
         
         dydt(markVinf)         = y(markVinf) - x_ic(markVinf);
 
