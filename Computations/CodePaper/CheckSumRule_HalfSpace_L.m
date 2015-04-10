@@ -1,14 +1,13 @@
 function CheckSumRule_HalfSpace_L(N)
     
-
-    close all;
+    
     AddPaths('CodePaper');    
     
     if(nargin == 0)
         N = 100;
     end    
 
-    PhysArea = struct('N',[1,100],...
+    PhysArea = struct('N',[1,N],...
                       'L1',5,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
@@ -37,17 +36,12 @@ function CheckSumRule_HalfSpace_L(N)
 
     config = v2struct(optsNum,optsPhys);                        
 
-    L = 0.25:0.25:4;
-    
-    figure('color','white','Position',[0 0 900 800]); 
-    legendstring = {};
+    L = 0.25:0.25:4;    
     folder = 'SumRuleErrorL';
-    
-    % **** 1 ****    
+        
     eta = 0.3;    
     res{1} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);
-        	
-    % **** 2 ****    
+        	    
     eta = 0.15;    
     res{2} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);  
         
@@ -55,17 +49,7 @@ function CheckSumRule_HalfSpace_L(N)
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
     config.optsPhys.V1.epsilon_w = 0.94;    
-    res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
-    	
-% %     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-% %     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);   
-% %     config.optsPhys.V1.epsilon_w = 0.9;    
-% %     res{4} = DataStorage(folder,@ComputeError,v2struct(L,config),[]); 
-%     
-% 	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-%     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 
-%     config.optsPhys.V1.epsilon_w = 0.9;    
-%     res{5} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);  
+    res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);     	
    
     config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
@@ -80,30 +64,9 @@ function CheckSumRule_HalfSpace_L(N)
     
     PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
     PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
-    
-    PlotErrorGraph(res{4},'error_wl','>-','k','BarkerHendersonHardCutoff_2D, liq');
-    PlotErrorGraph(res{4},'error_wg','>--','k','BarkerHendersonHardCutoff_2D, vap');
-    
-    PlotErrorGraph(res{5},'error_wl','*-','k','BarkerHenderson_2D, liq');
-    PlotErrorGraph(res{5},'error_wg','*--','k','BarkerHenderson_2D, vap');
         
-    PlotErrorGraph(res{6},'error_wl','^-','k','ExponentialDouble, liq');
-    PlotErrorGraph(res{6},'error_wg','^--','k','ExponentialDouble, vap');
-    
-%     PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
-%     PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
-%     
-%     PlotErrorGraph(res{3},'error_wl','d-','b','BarkerHendersonCutoff_2D, liq');
-%     PlotErrorGraph(res{3},'error_wg','d--','b','BarkerHendersonCutoff_2D, vap');
-%     
-%     PlotErrorGraph(res{4},'error_wl','>-','b','BarkerHendersonHardCutoff_2D, liq');
-%     PlotErrorGraph(res{4},'error_wg','>--','b','BarkerHendersonHardCutoff_2D, vap');         
-%          
-%     PlotErrorGraph(res{5},'error_wl','^-','m','ExponentialDouble, liq');
-%     PlotErrorGraph(res{5},'error_wg','^--','m','ExponentialDouble, vap');
-%      
-%     PlotErrorGraph(res{6},'error_wl','<-','b','BarkerHenderson_2D, liq');
-%     PlotErrorGraph(res{6},'error_wg','<--','b','BarkerHenderson_2D, vap');
+    PlotErrorGraph(res{4},'error_wl','^-','k','ExponentialDouble, liq');
+    PlotErrorGraph(res{4},'error_wg','^--','k','ExponentialDouble, vap');   
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
