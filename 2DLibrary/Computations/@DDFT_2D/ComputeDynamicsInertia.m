@@ -12,14 +12,19 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     % Initialization
     optsPhys    = this.optsPhys;
     optsNum     = this.optsNum;
-    
-    kBT         = optsPhys.kBT;
+        
     if(isfield(optsPhys,'sigmaS'))    
         R       = optsPhys.sigmaS/2;
     else
         R       = [];
     end
-    gammaS      = optsPhys.gammaS;
+    
+    if(isfield(optsPhys,'Fext'))    
+        Fext    = optsPhys.Fext;
+    else
+        Fext    = [0,0];
+    end
+    
     if(isfield(optsPhys,'mS'))
         mS = optsPhys.mS;
     else
@@ -43,6 +48,8 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         plotTimes   = optsNum.plotTimes;
     end
     
+    kBT         = optsPhys.kBT;
+    gammaS      = optsPhys.gammaS;
     nSpecies    = optsPhys.nSpecies;
     M           = this.IDC.M;
     Vext        = this.Vext;
@@ -76,8 +83,6 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         x_ic = this.x_eq;
         mu   = this.mu;
     end
-        
-    %tic   
     
     fprintf(1,'Computing dynamics ...'); 
 
@@ -86,6 +91,7 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     else
         optsNumT = optsNum;
     end
+    
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
                         
@@ -164,6 +170,10 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         
         dydt     = -kBT*(Diff.div*uv) - (u.*h_s1  + v.*h_s2);
         duvdt    = - [Cu;Cv] - gammaS*uv - mInv.*(Diff.grad*mu_s);
+        
+        if(~isempty(Fext))
+            duvdt = duvdt + [Fext(1)*ones(M,1);Fext(2)*ones(M,1)];
+        end
                 
         if(doVisc)
             rho_s    = exp((y-Vext)/kBT);
