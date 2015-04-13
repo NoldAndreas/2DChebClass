@@ -1,7 +1,7 @@
 function Check2DSumRule()
     
-    AddPaths('CodePaper');            
-    
+    AddPaths('CodePaper');
+
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
@@ -9,7 +9,7 @@ function Check2DSumRule()
                       'alpha_deg',90);
                       
     V2Num    = struct('Fex','SplitDisk','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
@@ -40,7 +40,7 @@ function Check2DSumRule()
     AddPaths('CodePaper');    
     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
-    config.optsPhys.V1.epsilon_w = 0.94;                
+    config.optsPhys.V1.epsilon_w = 0.95;%0.94;                
     res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);     
                 
     config.optsNum.V2Num.Fex     = 'SplitDisk'; 

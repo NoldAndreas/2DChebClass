@@ -10,7 +10,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 
     %V2Num   = struct('Fex','SplitDisk','N',[30,30]);
     V2Num   = struct('Fex','SplitAnnulus','N',[10,10]);
-    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    V2 = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); %r_cutoff = 5
 %    V2Num   = struct('Fex','ConstShortRange','N',[30,30]);
 
 

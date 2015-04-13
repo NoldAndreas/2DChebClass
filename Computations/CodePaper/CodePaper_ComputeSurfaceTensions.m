@@ -28,8 +28,16 @@ function CodePaper_ComputeSurfaceTensions
                       'sigmaS',1);
                   
     config = v2struct(optsNum,optsPhys);      
-    epw    = [0.5:0.05:1.3];   
     
+    
+%     epw    = [0.5:0.05:1.3];   
+%     config.optsNum.V2Num.Fex     = 'ConstShortRange';
+%     config.optsPhys.V2.V2DV2     = 'ConstShortRange'; 
+%     config.optsPhys.V2.lambda    = 1.5;
+%     config.optsPhys.V1.V1DV1     = 'Vext_SquareWell';    
+%     [res{1},f1] = ComputeYoungContactAngle(config,epw); 
+    
+    epw    = [0.5:0.05:1.3];   
 	config.optsNum.V2Num.Fex     = 'SplitAnnulus';
 	config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';           
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
@@ -45,5 +53,6 @@ function CodePaper_ComputeSurfaceTensions
     config.optsNum.V2Num.Fex     = 'SplitDisk';
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D'; 
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
-	[res{3},f1] = ComputeYoungContactAngle(config,epw);       
+	[res{3},f1] = ComputeYoungContactAngle(config,epw);                
+    
 end

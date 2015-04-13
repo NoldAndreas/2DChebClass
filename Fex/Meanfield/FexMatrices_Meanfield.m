@@ -61,7 +61,7 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
                  
                 optsPhysIJ = getIJParams(iSpecies,jSpecies);
 
-                z(:,iSpecies,jSpecies) = f(r,optsPhysIJ);                
+                z(:,iSpecies,jSpecies) = optsPhysIJ.epsilon*f(r);   
              end
          end                 
     end

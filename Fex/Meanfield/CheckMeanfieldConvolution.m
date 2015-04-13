@@ -2,10 +2,9 @@ function res = CheckMeanfieldConvolution(this)
     %Test Convolution at infinity      
     global PersonalUserOutput
     
-     M         = this.IDC.M;         
-     fMF       = str2func(this.optsPhys.V2.V2DV2);
-     [h1,h2,a] = fMF(1,this.optsPhys.V2);
-
+     M         = this.IDC.M;              
+     [h1,h2,a] = getV2(0,this.optsPhys.V2);     
+     
      %Convolution profile
      if(isa(this.IDC,'HalfSpace'))
          

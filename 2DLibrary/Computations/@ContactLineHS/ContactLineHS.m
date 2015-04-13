@@ -116,7 +116,6 @@ classdef ContactLineHS < DDFT_2D
             fprintf(['Surface tension ',WLWGLG,' = ',num2str(om),'\n']);
         end                
         function alpha_YCA = ComputeST(this)                        
-            
             Compute1D(this,'WL');            
             Compute1D(this,'WG');
             if(this.IDC.N1 > 1)
@@ -127,8 +126,7 @@ classdef ContactLineHS < DDFT_2D
                 this.alpha_YCA = alpha_YCA;
             else
                 alpha_YCA = [];
-            end
-            
+            end            
         end        
         
         % Initialization
@@ -347,7 +345,6 @@ classdef ContactLineHS < DDFT_2D
         Compute_DisjoiningPressure_IV(this)
         errRel = SumRule_DisjoiningPressure(this,II_or_IV)      
         [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
-
         
         %Compute height profiles
         Compute_hI(this)

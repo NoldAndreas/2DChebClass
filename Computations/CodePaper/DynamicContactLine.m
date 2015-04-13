@@ -50,8 +50,8 @@ function DynamicContactLine()
     config.optsPhys.gammaS   = 5;
     res{3} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
-    %config.optsPhys.gammaS   = 10;
-    %res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    config.optsPhys.gammaS   = 10;
+    res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
     res = PostProcess(res);    
    
@@ -62,7 +62,7 @@ function DynamicContactLine()
 	end
     %cols = {'g','b','c','k','r'};  nocols = length(cols);
 	syms = {'o','^','*','<','d','s','>'};  nosyms = length(syms);
-    lines = {'-','--',':','.','-.'}; nolines = length(lines);   
+    lines = {'-','--',':','-.'}; nolines = length(lines);   
     
     
     saveC   = res{2}.config;

@@ -6,7 +6,7 @@ function [VBack_S,VAdd_S]=Vext_BarkerHenderson_HardWall(y1,y2,t,opts)
 
     
     epsilon_w       = opts.epsilon_w;        
-    if(t ~= 0)
+    if((t ~= 0) && (isfield(opts,'tau')))
         t           = t/opts.tau;
     end
 

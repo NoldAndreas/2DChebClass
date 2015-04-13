@@ -9,10 +9,14 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     %************************************************
     %***************  Initialization ****************
     %************************************************
-    kBT       = optsPhys.kBT;           
-    R         = optsPhys.sigmaS/2;
-    fBulk     = str2func(['FexBulk_',FexNum.Fex]);  
+    kBT             = optsPhys.kBT;           
+    R               = optsPhys.sigmaS/2;
+    fBulk           = str2func(['FexBulk_',FexNum.Fex]);  
     optsPhys.HSBulk = (['FexBulk_',FexNum.Fex]);
+    getFex          = str2func(['Fex_',FexNum.Fex]);
+	markComp        = (HS.Pts.y1_kv==inf);        
+    nSpecies        = 1;
+    Pts             = HS.Pts;
     
     if(~isfield(optsPhys,'V2'))
         optsPhys.V2 = struct('V2DV2','zeroPotential');                  
@@ -23,8 +27,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     elseif(isfield(optsPhys,'eta'))
         eta       = optsPhys.eta;
         rhoBulk   = eta*6/pi;
-        mu        = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);       
-        %pBulk     =
+        mu        = kBT*log(rhoBulk) + fBulk(rhoBulk,kBT);               
     end    
     
     [rhoGas_eq,rhoLiq_eq,pLiq,pGas] = BulkValues(mu,optsPhys,[],false);    
@@ -35,18 +38,10 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         rhoBulk = rhoLiq_eq;
         pBulk   = pLiq;
     end
-    
-    
-    
-    getFex = str2func(['Fex_',FexNum.Fex]);
-    
-    markComp  = (HS.Pts.y1_kv==inf);        
-    nSpecies  = 1;
-    Pts       = HS.Pts;
+                
     %************************************************
     %****************  Preprocess  ******************
-    %************************************************
-	
+    %************************************************	
     y1S     = Pts.y1_kv(markComp); 
     y2S     = Pts.y2_kv(markComp);
     ptsCart = HS.GetCartPts(y1S,y2S);
@@ -70,7 +65,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         Conv = Conv(markComp,markComp);
     end                   
     
-    y2MaxInt = inf;%inf;%inf;%40;
+    y2MaxInt = 10;%inf;%inf;%inf;%40;
 	Int_1D(ptsCart.y2_kv>y2MaxInt) = 0;
     mark      = (HS.AD.Pts.y1_kv == inf);
     PtsADCart = HS.AD.GetCartPts();
@@ -98,8 +93,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     y0 = y0(markComp);
     
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
-    fsolveOpts=optimset('MaxFunEvals',2000000,'MaxIter',200000,...
-                        'Display','off','TolFun',1e-10,'TolX',1e-10);
+    fsolveOpts=optimset('Display','off','TolFun',1e-10,'TolX',1e-10);%'MaxFunEvals',2000000,'MaxIter',200000,...
     [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
     if(flag ~= 1)
         cprintf('red','Error in fsolve, FMT_1D_Interface');
@@ -113,11 +107,15 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     
     %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
     
-    checkContactDensity = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
-    %checkContactDensity = (p)/kBT;
-    postParms.contactDensity_relError = ((rho_ic1D(1)-checkContactDensity)/checkContactDensity);
-    PrintErrorPos(rho_ic1D(1)-checkContactDensity,'First Sum Rule - for Contact Density');
-    PrintErrorPos(postParms.contactDensity_relError*100,'First Sum Rule - for contact density (in per cent)');
+    if(~isempty(dVAdd.dy2))
+        checkContactDensity = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
+        %checkContactDensity = (p)/kBT;
+        postParms.contactDensity_relError = ((rho_ic1D(1)-checkContactDensity)/checkContactDensity);
+        PrintErrorPos(rho_ic1D(1)-checkContactDensity,'First Sum Rule - for Contact Density');
+        PrintErrorPos(postParms.contactDensity_relError*100,'First Sum Rule - for contact density (in per cent)');
+    else
+        checkContactDensity = [];
+    end
     
     %****************************
     %********** Plot   **********
@@ -128,7 +126,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         HS.do1DPlotNormal(rho_ic1D); hold on;
         
         plot([0 10],[rhoBulk,rhoBulk],'--','linewidth',2);
-        if(~isempty(IntMatrFex))
+        if(~isempty(IntMatrFex) && ~isempty(checkContactDensity))
             plot([0 10],[checkContactDensity,checkContactDensity],'--','linewidth',2);
         end
         hold off;
@@ -212,8 +210,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         %Compute excess grand potential
         f_id       = kBT*rho.*(log(rho)-1);
         [h1s,h2s,f_hs] = getFex(rho,IntMatrFex,kBT,R);
-        f_attr     = 0.5*rho.*(Conv*rho);
-        f_Vmu      = rho.*(VAdd- mu);        
+        f_attr         = 0.5*rho.*(Conv*rho);
+        f_Vmu          = rho.*(VAdd- mu);        
         
         f_loc  = f_id + f_attr + f_Vmu;   
         
@@ -233,7 +231,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         rho_Bulk          = rho(end);        
         [h1s,f_hs_Bulk,h2s,h3s] = fBulk(rho_Bulk,kBT);%FexBulk_FMTRosenfeld_3DFluid(rho_Bulk,kBT);
         Phi_r             = str2func(optsPhys.V2.V2DV2);        
-        [h1s,h2s,alpha]   = Phi_r(0,optsPhys.V2);    
+        [h1s,h2s,alpha]   = getV2(0,optsPhys.V2);    
         f_attr_Bulk       = alpha*rho_Bulk^2;
         f_id_Bulk         = kBT*rho_Bulk.*(log(rho_Bulk)-1);
         f_Vmu_Bulk        = -mu*rho_Bulk;

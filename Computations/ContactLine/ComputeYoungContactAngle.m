@@ -25,9 +25,9 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
     set(gca,'fontsize',20); 
     xlim([0.5 1.52]);
     
-    print2eps([dirData filesep 'ContactAngleMeasurements90'],gcf);
-    saveas(gcf,[dirData filesep 'ContactAngleMeasurements90.fig']);      
+    SaveFigure('ContactAngleMeasurements90');
     
+   
     function res = MeasureYoungContactAngles(opts,h)
 
         epw_YCA  = opts.epw_YCA; 

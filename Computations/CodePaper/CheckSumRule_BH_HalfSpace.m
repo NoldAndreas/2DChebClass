@@ -57,11 +57,11 @@ function CheckSumRule_BH_HalfSpace()
     res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);      
     resC{2}.config = config;
     resC{2}.name = 'HSeta0.15';
-    resC{2}.eta    = eta;
+    resC{2}.eta    = eta;    
             
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-    config.optsPhys.V1.epsilon_w = 0.94;    
+    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
+    config.optsPhys.V1.epsilon_w = 0.95;% 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
     resC{3}.config = config;           
@@ -72,7 +72,7 @@ function CheckSumRule_BH_HalfSpace()
     config.optsPhys.V1.epsilon_w = 1.45;    
     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],[],ignoreList);    
     resC{4}.name = 'exp';
-    resC{4}.config = config;    
+    resC{4}.config = config;               
     
     %**********************
     %**********************
@@ -273,7 +273,7 @@ function CheckSumRule_BH_HalfSpace()
     end
     function res = ComputeError(in,h)
         conf = in.config;
-        n    = in.n;                        
+        n    = in.N;                        
                 
         for i = 1:length(n)
             
