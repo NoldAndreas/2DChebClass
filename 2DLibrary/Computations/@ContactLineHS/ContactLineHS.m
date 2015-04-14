@@ -277,6 +277,7 @@ classdef ContactLineHS < DDFT_2D
             SaveCurrentFigure(this,'DisjoiningPressures');
 
         end
+        PlotDensitySlicesNormalInterface(this)
         PlotDensitySlices(this)
         PlotDensitySlicesMovie(this);  
                 

@@ -18,7 +18,7 @@ function Compute_hI(this)
     yN = 0; hN = hmax;    
     yC = []; hC = [];
     
-    while(( max(abs(imag(hN))) == 0) && ...
+    while( (max(abs(imag(hN))) == 0) && ...
       (yN(1) > -(this.optsNum.PlotAreaCart.y1Max- this.optsNum.PlotAreaCart.y1Min)))
   
         yC = [yN;yC];

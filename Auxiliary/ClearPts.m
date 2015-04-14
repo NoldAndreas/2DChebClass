@@ -22,17 +22,18 @@ function ClearPts(nameDir,func,Parameters,ignoreList)
         s                = RemovePts(index{ind});
         s                = AddPhysArea(s,Parameters);
         Struct2File(filename,s);        
-        disp(['Pts cleared from found in ',filename,' ...']);
+        disp(['Pts cleared from ',filename,' ...']);
     end
     
-    function s = RemovePts(s)
+    
+    function sOut = RemovePts(s)
         names = fieldnames(s);
         for k = 1:length(names)            
-            if(~isempty(strfind(names{k},'Pts_')))
-                s = rmfield(s,[names{k}]);              
+            if(isempty(strfind(names{k},'Pts_')))
+                sOut.(names{k}) = s.(names{k});                
             end
         end   
-    end
+    end        
 
     function s = AddPhysArea(s,parameters)
                 
