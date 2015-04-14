@@ -25,6 +25,12 @@ function ComputeDynamicsInertia(this,x_ic,mu)
         Fext    = [0,0];
     end
     
+    if(isfield(optsPhys,'BCWall_U'))
+        BCWall_U = optsPhys.BCWall_U;
+    else
+        BCWall_U = [];
+    end
+    
     if(isfield(optsPhys,'mS'))
         mS = optsPhys.mS;
     else
@@ -95,14 +101,19 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
                         
-    this.dynamicsResult.t = plotTimes;                        
+    this.dynamicsResult.t = plotTimes;            
+    this.FilenameDyn      = paramsEq.Filename;            
                      
     function data = ComputeDDFTDynamics(params,misc)        
        
         mMx              = ones(M,nSpecies);        
         mMx(markVinf)    = 0;
         mMuv             = ones(2*M,nSpecies);
-        mMuv([Ind.finite1;Ind.finite2],:) = 0;
+        if(doVisc)
+            mMuv([Ind.finite;Ind.finite],:)   = 0;
+        else
+            mMuv([Ind.finite1;Ind.finite2],:) = 0;
+        end
         mM = [mMx;mMuv];
         mM = mM(:);
 
@@ -210,12 +221,12 @@ function ComputeDynamicsInertia(this,x_ic,mu)
 %             dxdt     = dxdt + kBT*Diff.div*HI_s + eyes*( h_s.*HI_s );  
         end
         
-        if(doVisc)
-            duvdt([Ind.finite ; false(M,1)],:)   = Ind.normalFinite*uv;
-            duvdt([false(M,1) ; Ind.finite],:)   = Ind.normalFinite*uv;
-        else
-            duvdt([Ind.finite1 ; false(M,1)],:)  = Ind.normalFinite1*u;
-            duvdt([false(M,1)  ; Ind.finite2],:) = Ind.normalFinite2*v;
+        duvdt([Ind.finite1 ; false(M,1)],:)  = Ind.normalFinite1*u;
+        duvdt([false(M,1)  ; Ind.finite2],:) = Ind.normalFinite2*v;
+        
+        if(doVisc) %set velocities parallel to the interface 
+            duvdt([Ind.finite2 ; false(M,1)],:)   = u(Ind.finite2) - WallBC(t,Ind,BCWall_U); 
+            duvdt([false(M,1) ; Ind.finite1],:)   = v(Ind.finite1);
         end
         
         dydt(markVinf)         = y(markVinf) - x_ic(markVinf);

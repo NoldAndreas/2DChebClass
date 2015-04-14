@@ -30,13 +30,11 @@ function I  = GetIndicesBox(this)
         leftFinite   = any(isfinite(y1_kv(left)));
         rightFinite  = any(isfinite(y1_kv(right)));
         topFinite    = any(isfinite(y2_kv(top)));
-        bottomFinite = any(isfinite(y2_kv(bottom)));
-        
-        finite = ( (leftFinite & left) | (rightFinite & right) ...
-                   | (topFinite & top) | (bottomFinite & bottom) );
+        bottomFinite = any(isfinite(y2_kv(bottom)));                
         
         finite1 = ( (leftFinite & left) | (rightFinite & right) );
-        finite2 = ( (topFinite & top) | (bottomFinite & bottom) );
+        finite2 = ( (topFinite & top) | (bottomFinite & bottom) );        
+        finite  = (finite1 | finite2);
                
         infinite = ( (~leftFinite & left) | (~rightFinite & right) ...
                    | (~topFinite & top) | (~bottomFinite & bottom) );
@@ -57,8 +55,8 @@ function I  = GetIndicesBox(this)
         nx2Top(top,top)        = speye(sum(top));
         nx2Bottom(bottom,bottom)  = -speye(sum(bottom));
         
-        normalFinite = sparse( [(leftFinite*nx1Left(finite,:) + rightFinite*nx1Right(finite,:)) ...
-                        (topFinite*nx2Top(finite,:) + bottomFinite*nx2Bottom(finite,:))] );
+        normalFinite = sparse([(leftFinite*nx1Left(finite,:) + rightFinite*nx1Right(finite,:)) ...
+                               (topFinite*nx2Top(finite,:) + bottomFinite*nx2Bottom(finite,:))] );
                     
         normalFinite1 = sparse( (leftFinite*nx1Left(finite1,:) + rightFinite*nx1Right(finite1,:)) );
         normalFinite2 = sparse( (topFinite*nx2Top(finite2,:) + bottomFinite*nx2Bottom(finite2,:)) );

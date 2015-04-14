@@ -317,10 +317,11 @@ classdef DDFT_2D < Computation
             
                 t       = plotTimes(i);
                 hold off;
-                for iSpecies=1:size(val,2)      
+                for iSpecies=1:size(val,2)   
+                    maxVal = max(max(max(abs(val))));
                     if(doFlux)                   
                         PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
-                        this.IDC.plotFlux(val(:,iSpecies,i));
+                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal);
                     else
                         this.IDC.plot(val(:,iSpecies,i),'SC');                    
                     end

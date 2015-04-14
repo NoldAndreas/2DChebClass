@@ -24,12 +24,6 @@ function fig_h = PlotDDFT(input,Bool_Record)
     v2struct(input);
     v2struct(data);
     
-%     if(isfield(optsNum.PhysArea,'N'))
-%         N1 = optsNum.PhysArea.N(1);
-%         N2 = optsNum.PhysArea.N(2);
-%     else
-%         N1 = optsNum.PhysArea.N1; N2 = optsNum.PhysArea.N2;
-%     end
     plotTimes  = t;%optsNum.plotTimes;          
     
     if(isfield(data,'Subspace'))
@@ -99,9 +93,8 @@ function fig_h = PlotDDFT(input,Bool_Record)
          ylabel('Mass error','fontsize',20);         
          set(gca,'fontsize',20);                        
          set(gca,'linewidth',1.5);      
-                  
-         print2eps([gifFile(1:end-4) , '_Mass'],gcf);
-         saveas(gcf,[gifFile(1:end-4) , '_Mass.fig']);         
+         
+         SaveFigure([gifFile(1:end-4) , '_Mass']);
          
         if(QuickOutput)
             return;
@@ -163,37 +156,6 @@ function fig_h = PlotDDFT(input,Bool_Record)
                     optsPlot.linecolor = 'r';
                     shape.plot(rho,'contour',optsPlot);  hold on;  
                 end                
-               % shape.plot(rho,'contour',optsPlot); hold on;                                         
-
-%                  if(nSpecies > 1)
-%                      optsPlot.linecolor = lineColour{iSpecies}; 
-%                      shape.plot(rho,'contour',optsPlot); hold on;                                         
-%                  else
-%                                      
-%                     optDetails.clabel      = false;  
-%                     optDetails.linewidth   = 3;%1.4;  
-% 
-%                     rhoLiq_sat    = optsPhys.rhoLiq_sat;
-%                     rhoGas_sat    = optsPhys.rhoGas_sat;
-% 
-%                     %optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
-%                     drho = rhoLiq_sat - rhoGas_sat;
-% 
-%                     optDetails.nContours = rhoGas_sat + 0.1*drho;
-%                     optDetails.linecolor = 'b';
-%                     optDetails.linestyle = '--';
-%                     shape.plot(rho,'contour',optDetails);  hold on;  
-% 
-%                     optDetails.nContours = rhoGas_sat + 0.5*drho;
-%                     optDetails.linecolor = [0 0.75 0];
-%                     shape.plot(rho,'contour',optDetails);  hold on;  
-% 
-%                     optDetails.nContours = rhoGas_sat + 0.9*drho;
-%                     optDetails.linecolor = 'r';
-%                     shape.plot(rho,'contour',optDetails);  hold on;  
-% 
-%                  end                                
-
             end
             %plot([0;0],[i;i]);
             title(['t = ', num2str(round(t))]);               
@@ -224,6 +186,7 @@ function fig_h = PlotDDFT(input,Bool_Record)
 
         system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
         system(['C:\pdf2swf.exe -s framerate=5 -o ',swfFile,' ', allPdfFiles]);
+        disp(['Concatenated pdf file saved in: ',allPdfFiles]);
         system(['copy ',getPDFMovieFile('Movie1',1),' ',str,'POSTER.pdf']);
         system(['del ',fileNames]);       
         disp(['Swf Movie` saved in: ',swfFile]);
