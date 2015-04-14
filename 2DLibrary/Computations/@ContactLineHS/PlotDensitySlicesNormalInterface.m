@@ -60,4 +60,33 @@ function PlotDensitySlicesNormalInterface(this)
                0.502 0.251 0]; %	Brown
     end
 
+   function [DeltaY1_II,DeltaY1_III] = ComputeDeltaFit()            
+        
+        dP1D        = GetDisjoiningPressure_I_ell(this,this.hI);
+        [min_I,i_I] = min(dP1D);
+        [min_III,i_III] = min(GetDisjoiningPressure_III(this));
+        DeltaY1_III = this.y1_SpectralLine.Pts.y(i_III) - this.y1_I(i_I);
+
+        hS           = max(this.hI);
+        h0           = min(this.hIII);
+
+        fsolveOpts   = optimset('Display','off');            
+        f            = this.hIII-h0;
+        %f = GetDisjoiningPressure_III(this);
+        [~,j]        = max(this.hIII);
+     
+
+        f            = this.hII;
+        [~,j]        = max(this.hII);
+        [DeltaY1_II,~,exitflag] = fsolve(@fX,this.y1_SpectralLine.Pts.y(j),fsolveOpts);            
+        if(exitflag < 1)
+            cprintf('*r','ComputeDeltaFit: Fitting hII vs hI: no solution found');
+        end
+
+        function z = fX(y1)                
+            IP_h = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1);
+            z    = IP_h*f-hS;
+        end    
+	end
+
 end
