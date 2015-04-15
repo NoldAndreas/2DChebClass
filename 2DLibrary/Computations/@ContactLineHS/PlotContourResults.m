@@ -6,6 +6,8 @@ function [fContour] =  PlotContourResults(this,options) %plain
         options = {options};
     end
     
+    deltaY2 = -0.5;
+    
     if(IsOption(options,'newFigure'))
         fContour = figure('Color','white','Position',[0 0 1200 800]);
     end
@@ -57,7 +59,7 @@ function [fContour] =  PlotContourResults(this,options) %plain
         optDetails.nContours = [0.1,0.3,0.5,0.6,0.7];        
         this.IDC.plot(rho,'contour',optDetails);  hold on;                               	
     else
-        optDetails.y2CartShift = -0.5;
+        optDetails.y2CartShift = deltaY2;
         optDetails.clabel      = false;  
         optDetails.linewidth   = 1.5;  
         
@@ -80,7 +82,7 @@ function [fContour] =  PlotContourResults(this,options) %plain
 %     adsorption     = Int2BX*IP_BX*(rho - rhoGas_sat);%rho_wg_ref);
 %     hold on;     
     if(IsOption(options,'hIII') && ~isempty(this.hIII))% && ((nargin == 1) || ~plain))
-        plot(y1,this.hIII+R,'k','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)%%%%
+        plot(y1,this.hIII+R+deltaY2,'k','linewidth',2.5); %adsorption/(rhoLiq_sat-rhoGas_sat)%%%%
         h0 = min(this.hIII);
     else
         h0 = 0;
@@ -88,20 +90,20 @@ function [fContour] =  PlotContourResults(this,options) %plain
 
     if(IsOption(options,'hI_alignedwith_hII') && ~isempty(this.hI))        
         [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();                
-        plot(this.y1_I+DeltaY1_II,this.hI+R+h0,'k-.','linewidth',2.5);         
+        plot(this.y1_I+DeltaY1_II,this.hI+R+h0+deltaY2,'k-.','linewidth',2.5);         
     end
     
 	if(IsOption(options,'hI') && ~isempty(this.hI))        
         [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();                
-        plot(this.y1_I+DeltaY1_III,this.hI+R+h0,'k-.','linewidth',2.5); 
+        plot(this.y1_I+DeltaY1_III,this.hI+R+h0+deltaY2,'k-.','linewidth',2.5); 
     end
     
     if(IsOption(options,'hII') && ~isempty(this.hII))
-        plot(y1,this.hII+R+h0,'k--','linewidth',2.5);
+        plot(y1,this.hII+R+h0+deltaY2,'k--','linewidth',2.5);
     end  
     
     if(IsOption(options,'hIV') && ~isempty(this.hIV))
-        plot(y1,this.hIV+R+h0,'r--','linewidth',2.5);
+        plot(y1,this.hIV+R+h0+deltaY2,'r--','linewidth',2.5);
     end  
     
     

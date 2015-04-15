@@ -43,7 +43,7 @@ function MMNP_Fig3_ComputeContactAngles()
         CLT.ComputeEquilibrium();      
         CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
-        CLT.PlotDisjoiningPressures();        
+        CLT.PlotDisjoiningPressures();                
     end
     function config = GetStandardConfig(opts)
         

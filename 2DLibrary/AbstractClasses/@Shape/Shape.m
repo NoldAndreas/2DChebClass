@@ -612,6 +612,7 @@ classdef (Abstract) Shape < handle
                 dist = sqrt( (xi*(y1P(2)-y1P(1))).^2 + ...
                              (xi*(y2P(2)-y2P(1))).^2 );
             end
+            pts.z = dist;
                         
             %Plot Grid Lines that are crossed:
             %(a) Get x-Values of initial points

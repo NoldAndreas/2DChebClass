@@ -82,6 +82,8 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
     else
         y0 = kBT*log(optsPhys.rho_iguess);                    
     end     
+    
+    IP0 = barychebevalMatrix(Pts.x1,0);
    
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
     fsolveOpts       = optimset('MaxFunEvals',2000000,'MaxIter',200000,'Algorithm','Levenberg-Marquardt','Display','off','TolFun',1e-10,'TolX',1e-10);
@@ -146,9 +148,7 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
                 mkdir(dirData);
             end
             
-            print2eps([dirData filesep 'Density_Interface'],gcf);    
-            saveas(gcf,[dirData filesep 'Density_Interface.fig']);                
-        
+            SaveFigure('Density_Interface');                        
          end
     end
     
@@ -159,7 +159,9 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
     function y = f(x)
         %solves for T*log*rho + Vext                        
         y            = GetExcessChemPotential(x,0,mu);         
-        y            = [y(:).*exp(-x/kBT);x(ceil(end/2))-y0(ceil(end/2))];
+        y            = [y(:).*exp(-x/kBT);...
+                        IP0*(x - y0)];
+                        %x(ceil(end/2))-y0(ceil(end/2))];
     end
     function mu_s = GetExcessChemPotential(x,t,mu_offset)
         rho_s = exp(x/kBT);                
