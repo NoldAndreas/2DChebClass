@@ -26,7 +26,7 @@
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
                    
-	plotTimes = struct('t_int',[0,4],'t_n',50);
+	plotTimes = struct('t_int',[0,20],'t_n',50);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -40,7 +40,8 @@
                 %'tau',5,'epsilon_w_end',1.0);
             
     optsViscosity = struct('etaC',1,'zetaC',0);    
-    BCwall        = struct('bc','sinHalf','tau',1);
+    %BCwall        = struct('bc','sinHalf','tau',1);
+	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
 
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
@@ -58,7 +59,7 @@
     CL.ComputeDynamics();            
     CL.PostprocessDynamics();
     
-    CL.optsPhys.BCWall_U.bc = 'exp';
+    CL.optsPhys.BCWall_U.bc = 'exp';    
     CL.ComputeDynamics();            
     CL.PostprocessDynamics();
                 
