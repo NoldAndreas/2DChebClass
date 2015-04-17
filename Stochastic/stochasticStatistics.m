@@ -162,7 +162,7 @@ parfor iRun=1:nRuns
 
             progString = num2str(progress,printFormat);
             if(length(progString)==printLength)
-                disp(delString);
+                %disp(delString);
 
                 tTaken = etime(clock,tStart);
                 tLeft  = (100-progress)/progress*tTaken;

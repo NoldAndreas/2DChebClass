@@ -79,8 +79,6 @@ initialGuess='makeGrid';
 % number of runs of stochastic dynamics to do, and average over
 nRuns=1000;
 
-%nRuns = 1000;
-
 % number of cores to use in parallel processing
 poolsize=12;
 %poolsize=1;
@@ -97,11 +95,12 @@ stocHIType={[],[]};
 stocName={'r0','rv0'};
 
 % whether to do Langevin and Brownian dynamics
-%doStoc={true,true};
-doStoc={false,false};
+doStoc={true,true};
+%doStoc={false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true};
+%loadStoc={false,false};
 
 % number of time steps
 tSteps={10^3,10^3};

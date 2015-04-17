@@ -19,6 +19,12 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
     
     f11      = str2func(optsNum.HI11);
     f12      = str2func(optsNum.HI12);
+    
+    if(isfield(optsNum,'HIg'))
+        g = str2func(optsNum.HIg);
+    else
+        g = str2func(g_id_Spherical);
+    end
 
     if(isfield(optsNum,'N'))
         params.N = optsNum.N;
@@ -53,11 +59,11 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
 
     %--------------------------------------------------------------------------
     function z = F11(x,y)         
-        z = f11(x,y,paramsIJ);                    
+        z = f11(x,y,paramsIJ).*g(x,y,paramsIJ);                    
     end
 
     function z = F12(x,y)         
-        z = f12(x,y,paramsIJ);                    
+        z = f12(x,y,paramsIJ).*g(x,y,paramsIJ);                    
     end
 
     function paramsIJ = getIJParams(iS,jS)
