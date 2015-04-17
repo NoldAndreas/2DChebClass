@@ -38,7 +38,8 @@
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94);%,...
                 %'tau',5,'epsilon_w_end',1.0);
             
-    optsViscosity = struct('etaC',1,'zetaC',0);    
+    %optsViscosity = struct('etaC',1,'zetaC',0);    
+    optsViscosity = struct('etaL',2,'zetaC',1);
     %BCwall        = struct('bc','sinHalf','tau',1);
 	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
 
