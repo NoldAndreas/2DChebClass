@@ -206,8 +206,8 @@ function ComputeDynamicsInertia(this,x_ic,mu)
                 duvdt      = duvdt + (dzeta_drho - 2/3*deta_drho).*repmat(Diff.div*uv,2,1).*[dydy1;dydy2];                                
                 dudy2dvdy1 = (Diff.Dy2*u + Diff.Dy1*v);
                 
-                visc1      = 2*(Diff.Dy1*u).*drhody1 + dudy2dvdy1.*dydy1;
-                visc2      = dudy2dvdy1.*drhody1 + 2*(Diff.Dy2*v).*dydy2;
+                visc1      = 2*(Diff.Dy1*u).*dydy1 + dudy2dvdy1.*dydy2;
+                visc2      = dudy2dvdy1.*dydy1 + 2*(Diff.Dy2*v).*dydy2;
                 duvdt      = duvdt + [visc1;visc2].*deta_drho;
             end       
         end

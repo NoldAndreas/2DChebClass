@@ -2,7 +2,7 @@ function [eta,deta_drho] = ShearViscosity(rho,optsShearViscosity)
     O = ones(size(rho));    
     if(isfield(optsShearViscosity,'etaC'))
         eta        = optsShearViscosity.etaC*O;
-        deta_drho  = 0;
+        deta_drho  = 0*O;
     elseif(isfield(optsShearViscosity,'etaL1'))
         eta        = optsShearViscosity.etaL1*rho;
         deta_drho  = optsShearViscosity.etaL1*O;
