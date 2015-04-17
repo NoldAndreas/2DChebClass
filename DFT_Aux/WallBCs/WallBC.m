@@ -12,7 +12,7 @@ function uwall = WallBC(t,Ind,BCWall)
     if(strcmp(bc,'exp'))        
         uwall = (1-exp(-t/tau))*ones(M,1);
         if(isfield(BCWall,'u_max'))
-            uwall = u_max*uwall;
+            uwall = BCWall.u_max*uwall;
         end
     elseif(strcmp(bc,'sinHalf'))
         sinHalf          = sin(pi*t/tau);
