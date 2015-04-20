@@ -74,6 +74,7 @@ function res = CheckMeanfieldConvolution(this)
          end
      else
          cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
+         res.checkedMeanField='Not implemented';
      end
           
      

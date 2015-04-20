@@ -10,8 +10,10 @@ AddPaths();
 % Choose input file
 %--------------------------------------------------------------------------
 
-inputFile='APS12HS50';
+%inputFile='APS12HS50';
 %inputFile='APS12G50';
+
+inputFile = 'ThreeSpeciesTest';
 
 %inputFile = 'HIWallTestTowards';
 %inputFile = 'HIWallTestAway';

@@ -42,6 +42,8 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
     
     if(isfield(optsPhys,'FexNum'))
         convTemp = IDC.ComputeConvolutionMatrix(@PhiUniversal,optsPhys.FexNum);  
+    elseif(isfield(optsNum,'FexNum'))
+        convTemp = IDC.ComputeConvolutionMatrix(@PhiUniversal,optsNum.FexNum);  
     else
         convTemp = IDC.ComputeConvolutionMatrix(@PhiUniversal);  
     end
@@ -60,8 +62,11 @@ function convStruct = FexMatrices_Meanfield(optsPhys,IDC)
              for jSpecies = 1:nSpecies
                  
                 optsPhysIJ = getIJParams(iSpecies,jSpecies);
-
-                z(:,iSpecies,jSpecies) = optsPhysIJ.epsilon*f(r);   
+                if(nargin(f)==1)
+                    z(:,iSpecies,jSpecies) = optsPhysIJ.epsilon*f(r);   
+                else
+                    z(:,iSpecies,jSpecies) = f(r,optsPhysIJ);   
+                end
              end
          end                 
     end

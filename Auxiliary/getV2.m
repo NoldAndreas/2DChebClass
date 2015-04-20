@@ -13,8 +13,12 @@ else
 end
 
 % retrieve rescaled values
-[z,dzdr_r,alpha] = getV2DV2(r);
-
+if(nargin(getV2DV2) == 1)
+    [z,dzdr_r,alpha] = getV2DV2(r);
+else
+    [z,dzdr_r,alpha] = getV2DV2(r,V2);
+end
+    
 z      = V2.epsilon*z;
 dzdr_r = V2.epsilon*dzdr_r;
 alpha  = V2.epsilon*alpha;
