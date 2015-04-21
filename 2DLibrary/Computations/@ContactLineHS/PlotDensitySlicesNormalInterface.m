@@ -26,6 +26,7 @@ function PlotDensitySlicesNormalInterface(this)
     dhIIIdx = this.y1_SpectralLine.Diff.Dy*h_full;
     %str = {'','','m','','c'};
                 
+    L2_AdIso = input('Parameter L_2 used for computation of adsorption isotherm: ');
     for i = 1:n
         y1              = y1P(i);
         IP              = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i));
@@ -34,13 +35,28 @@ function PlotDensitySlicesNormalInterface(this)
         [pts_y1{i},pts_y2{i}] = GetStartEndNormalPts(y1,h,dhdx,deltaZ);
         [f_p{i},pts{i}] = this.IDC.plotLine(pts_y1{i},0.5+pts_y2{i},this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:))); %'plain',true        
         
+        %rho_Ana = rholv(z)*rho_wl(y_2)/rho_liq
         IP_WL      = this.IDC.SubShapePtsCart(pts{i});                
         rho1D_wl_i = IP_WL*rho1D_WL_full;
                 
         IP_LV      = barychebevalMatrix(this.IDC.Pts.x1,this.IDC.CompSpace1((pts{i}.z-deltaZ)/sin(this.IDC.alpha)));
         rho1D_lv_i = IP_LV*rho1D_LV;
         rho_Ana{i} = (rho1D_lv_i.*rho1D_wl_i)/rhoLiq_sat;
-        plot(pts{i}.z-deltaZ,rho_Ana{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        %plot(pts{i}.z-deltaZ,rho_Ana{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        
+        %rho_Ana2 = rho_dp(y_2)
+        th       = atan(dhdx);
+        ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII/cos(th);        
+        [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
+        y2_AdIso = this.AdsorptionIsotherm.Pts.y2;
+        x2_AdIso = this.AdsorptionIsotherm.Pts.x2;
+        
+        x2       = InvQuotientMap((pts{i}.y2_kv-0.5)/cos(th)+0.5,L2_AdIso,0.5,inf);
+        IP_AdIso = barychebevalMatrix(x2_AdIso,x2);
+        rho_Ana2{i} = IP_AdIso*rho';
+        %plot(y2_AdIso,rho); hold on;
+        %plot(this.IDC.Pts.y1*sin(this.IDC.alpha)+ell+0.5,flipud(rho1D_LV),'m')
+        %plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
     end
     
     close all
@@ -49,7 +65,8 @@ function PlotDensitySlicesNormalInterface(this)
     subplot(1,2,1);
     for i = 1:n
         plot(pts{i}.z-deltaZ,f_p{i},'color',col(i,:),'linewidth',1.5); hold on;
-        plot(pts{i}.z-deltaZ,rho_Ana{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        %plot(pts{i}.z-deltaZ,rho_Ana1{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
     end    
     dz = (-deltaZ:0.05:deltaZ)';
     IP_LV      = barychebevalMatrix(this.IDC.Pts.x1,this.IDC.CompSpace1(dz/sin(this.IDC.alpha)));

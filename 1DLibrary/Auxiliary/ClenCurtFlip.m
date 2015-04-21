@@ -19,14 +19,14 @@ v    = ones(N-1,1);
 
 % For even numbers
 if mod(N,2)==0          % Check for even total cheb points
-    w(1) = 1/(N^2-1);   
+    w(1)    = 1/(N^2-1);   
     w(N+1)  = w(1);     
     for k=1:N/2-1       
         v = v - 2*cos(2*k*theta(ii))/(4*k^2 - 1);   
     end
     v = v - cos(N*theta(ii))/(N^2-1);               
 else
-    w(1) = 1/N^2;      
+    w(1)   = 1/N^2;      
     w(N+1) = w(1);     
     for k=1:(N-1)/2    
         v = v - 2*cos(2*k*theta(ii)) / (4*k^2 - 1);

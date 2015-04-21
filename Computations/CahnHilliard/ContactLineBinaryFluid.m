@@ -26,7 +26,7 @@ function ContactLineBinaryFluid
     parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
 	%parameters.l_d   = 2.25:0.25:3.0;%0.25:0.25:2.5;                    
 
-    [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],true);
+    [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
     dataN = Rescale(dataM);clear('dataM');
     
     
@@ -380,7 +380,7 @@ function ContactLineBinaryFluid
                         val = dataM{j0}(j1,j2).IsoInterface.(value); 
                         y  = dataM{j0}(j1,j2).IsoInterface.y2;
                     elseif(IsOption(opts,'mu_y2'))                        
-                        val = dataM{j0}(j1,j2).mu_y2{value.i}.(value.val);
+                        val = dataM{j0}(j1,j2).mu_y2{value.i}.(value.val);                        
                         y  = dataM{j0}(j1,j2).mu_y2{value.i}.pts.y1_kv;   
                     elseif(IsOption(opts,'mu_y1'))
                         val = dataM{j0}(j1,j2).mu_y1{value.i}.(value.val);
@@ -656,6 +656,10 @@ function ContactLineBinaryFluid
                             
                             if(strcmp(mu_str,'mu_y2'))
                                 dataN{k0}(k1,k2).(mu_str){kk}.y2        = dataM{k0}(k1,k2).(mu_str){kk}.y2*Cn;
+                                dataN{k0}(k1,k2).(mu_str){kk}.flux1     = dataM{k0}(k1,k2).(mu_str){kk}.flux1;
+                                dataN{k0}(k1,k2).(mu_str){kk}.phi       = dataM{k0}(k1,k2).(mu_str){kk}.phi;
+                                dataN{k0}(k1,k2).(mu_str){kk}.phiflux1  = (dataM{k0}(k1,k2).(mu_str){kk}.flux1)./(dataM{k0}(k1,k2).(mu_str){kk}.phi);
+
                             elseif(strcmp(mu_str,'mu_y1'))
                                 dataN{k0}(k1,k2).(mu_str){kk}.y1        = dataM{k0}(k1,k2).(mu_str){kk}.y1*Cn;
                             end
