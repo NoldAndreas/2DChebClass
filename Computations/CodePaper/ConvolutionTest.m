@@ -15,7 +15,7 @@ function ConvolutionTest
     infLine = InfSpectralLine(geom);
     
     % for Gaussian plots
-    PlotArea = struct('N',1000,'yMin',-20,'yMax',20);
+    PlotArea = struct('N',1500,'yMin',-25,'yMax',25);
     
     % for kernel plots
     %PlotArea = struct('N',1000,'yMin',-10,'yMax',10);
@@ -46,19 +46,45 @@ function ConvolutionTest
 
     
     y = Pts.y;
+    sigma1 = 1;
+    figure('Position',[0 0 1700 500],'color','white');        
     
-%     yTest = y(geom.N-20);
-%     shiftedKernel = Gaussian1(y-yTest);
-%     figure('Position',defaultPos);
-%     plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');
-%     hold on
-%     plot(y,shiftedKernel,'ok');
-%     xlim([-10,10]);
-%     ylim([-0.5,1.7]);
-%     xlabel('$y$','interpreter','latex');
-%     ylabel(['$g(y-y_0)$, $y_0=' num2str(yTest) '$'],'interpreter','latex');
-%     save2pdf([saveDir 'kernel1.pdf'],gcf);
-% 
+    subplot(1,3,1);
+    k = geom.N-20;
+    yTest = y(k);
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k'); hold on;
+    plot(y,shiftedKernel,'ok');
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    ylabel(['$g(y-y_{',num2str(k),'})$'],'interpreter','latex');
+    pbaspect([1 1 1]);
+    
+    subplot(1,3,2);
+    k = geom.N-6;
+    yTest = y(k);    
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');hold on;
+    plot(y,shiftedKernel,'ok');
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    ylabel(['$g(y-y_{',num2str(k),'})$'],'interpreter','latex');
+    pbaspect([1 1 1]);
+    
+    subplot(1,3,3);
+    k = geom.N-3;
+    yTest = y(k);   
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k'); hold on;
+    plot(y,shiftedKernel,'ok');
+    pbaspect([1 1 1]);
+    
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    ylabel(['$g(y-y_{',num2str(k),'})$'],'interpreter','latex');
+    SaveFigure([saveDir 'kernel_all']);
+    %save2pdf([saveDir 'kernel1.pdf'],gcf);
+
 %     yTest = y(geom.N-10);
 %     shiftedKernel = Gaussian1(y-yTest);
 %     figure('Position',defaultPos);
@@ -69,7 +95,7 @@ function ConvolutionTest
 %     ylim([-0.5,1.7]);
 %     xlabel('$y$','interpreter','latex');
 %     ylabel(['$g(y-y_0)$, $y_0=' num2str(yTest) '$'],'interpreter','latex');
-%     save2pdf([saveDir 'kernel2.pdf'],gcf);
+%    % save2pdf([saveDir 'kernel2.pdf'],gcf);
 % 
 %     yTest = y(geom.N-6);
 %     shiftedKernel = Gaussian1(y-yTest);
@@ -84,7 +110,7 @@ function ConvolutionTest
 %     save2pdf([saveDir 'kernel3.pdf'],gcf);
 %     
 %     return
-    
+    sigma1 = 0.25;
     g1 = Gaussian1(y);
     g2 = Gaussian2(y);
     g3 = Gaussian3(y);

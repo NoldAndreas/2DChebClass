@@ -138,6 +138,8 @@ function fig_h = PlotDDFT(input,Bool_Record)
 
                 if(nSpecies > 1)
                     optsPlot.linecolor = lineColour{iSpecies}; 
+                    optsPlot.nContours = 5;
+                    shape.plot(rho,'contour',optsPlot); hold on;
                 else
                     %optsPlot.nContours = 5;
 %                    shape.PlotDensityContours(rho);

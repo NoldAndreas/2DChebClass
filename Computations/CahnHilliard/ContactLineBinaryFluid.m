@@ -39,9 +39,10 @@ function ContactLineBinaryFluid
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);            
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
 
+    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});    
     PlotExample(dataN,1,4,7,parameters);
-    PlotAllInterfaceData(dataN,1,parameters)
-    PlotAllInterfaceData(dataN,2,parameters)
+    PlotAllInterfaceData(dataN,1,parameters);
+    PlotAllInterfaceData(dataN,2,parameters);
    
     CompareAllData(dataN,1,parameters);
     CompareAllData(dataN,2,parameters);
@@ -381,7 +382,7 @@ function ContactLineBinaryFluid
                         y  = dataM{j0}(j1,j2).IsoInterface.y2;
                     elseif(IsOption(opts,'mu_y2'))                        
                         val = dataM{j0}(j1,j2).mu_y2{value.i}.(value.val);                        
-                        y  = dataM{j0}(j1,j2).mu_y2{value.i}.pts.y1_kv;   
+                        y  = dataM{j0}(j1,j2).mu_y2{value.i}.pts.y1_kv - dataN{j0}(j1,j2).mu_y2{value.i}.y1_contactLine;   
                     elseif(IsOption(opts,'mu_y1'))
                         val = dataM{j0}(j1,j2).mu_y1{value.i}.(value.val);
                         y  = dataM{j0}(j1,j2).mu_y1{value.i}.pts.y2_kv;   
@@ -410,7 +411,7 @@ function ContactLineBinaryFluid
         set(gca,'fontsize',20);        
         
         if(IsOption(opts,'mu_y2'))
-            xlabel('$y_1$','Interpreter','Latex','fontsize',20);
+            xlabel('$y_1 - y_{1,CL}$','Interpreter','Latex','fontsize',20);
         else
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
         end
@@ -657,8 +658,20 @@ function ContactLineBinaryFluid
                             if(strcmp(mu_str,'mu_y2'))
                                 dataN{k0}(k1,k2).(mu_str){kk}.y2        = dataM{k0}(k1,k2).(mu_str){kk}.y2*Cn;
                                 dataN{k0}(k1,k2).(mu_str){kk}.flux1     = dataM{k0}(k1,k2).(mu_str){kk}.flux1;
+                                dataN{k0}(k1,k2).(mu_str){kk}.flux1Slip = 1 - abs(dataM{k0}(k1,k2).(mu_str){kk}.flux1);
                                 dataN{k0}(k1,k2).(mu_str){kk}.phi       = dataM{k0}(k1,k2).(mu_str){kk}.phi;
                                 dataN{k0}(k1,k2).(mu_str){kk}.phiflux1  = (dataM{k0}(k1,k2).(mu_str){kk}.flux1)./(dataM{k0}(k1,k2).(mu_str){kk}.phi);
+                                
+                                %Get Contact Line Position:
+                                y1  = dataN{k0}(k1,k2).(mu_str){kk}.pts.y1_kv;
+                                phi = dataN{k0}(k1,k2).(mu_str){kk}.phi;
+                                i1 = find(phi < 0,1,'last');
+                                i2 = find(phi > 0,1,'first');
+                                if((i2-i1) ~= 1)
+                                    error('something weird happened');
+                                end
+                                y10 = y1(i1) - (y1(i2)-y1(i1))*phi(i1)/(phi(i2)-phi(i1));
+                                dataN{k0}(k1,k2).(mu_str){kk}.y1_contactLine = y10;
 
                             elseif(strcmp(mu_str,'mu_y1'))
                                 dataN{k0}(k1,k2).(mu_str){kk}.y1        = dataM{k0}(k1,k2).(mu_str){kk}.y1*Cn;
@@ -798,13 +811,14 @@ function ContactLineBinaryFluid
 
                     y2 = 0:0.5:3;
                     for kk = 1:length(y2)
-                        [mu,pts]      = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.mu);                    
-                        [mu_dy1,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
-                        [mu_dy2,pts]  = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.mu);
-                        [mu_ddy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.DDy2*DI.mu);
-                        [flux1,pts]   = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.flux(1:end/2));                    
-                        [phi,pts]     = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.phi);            
-                        %[v_dy2,pts] = DI.IDC.plotLine(l_diff*[-10 10],l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.uv(1+end/2:end));
+                        interval = l_diff*[-50,50];
+                        [mu,pts]      = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.mu);                    
+                        [mu_dy1,pts]  = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy1*DI.mu);
+                        [mu_dy2,pts]  = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.mu);
+                        [mu_ddy2,pts] = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.IDC.Diff.DDy2*DI.mu);
+                        [flux1,pts]   = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.flux(1:end/2));                    
+                        [phi,pts]     = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.phi);            
+                        %[v_dy2,pts] = DI.IDC.plotLine(interval,l_diff*y2(kk)*[1 1],DI.IDC.Diff.Dy2*DI.uv(1+end/2:end));
                         dataM{k0}(i,j).mu_y2{kk} = struct('mu',mu,...%'v_dy2',v_dy2,...
                                                           'phi',phi,...
                                                           'flux1',flux1,...

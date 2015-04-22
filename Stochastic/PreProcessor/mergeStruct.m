@@ -23,4 +23,8 @@ for iStruct = 1:nStruct
 end
 
 % convert from cells back to a structure
-outStruct = cell2struct(cells, fNames, 1);
+if(isempty(cells) && isempty(fNames))
+    outStruct = struct();
+else
+    outStruct = cell2struct(cells, fNames, 1);
+end

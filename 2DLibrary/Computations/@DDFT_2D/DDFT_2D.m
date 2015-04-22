@@ -72,7 +72,7 @@ classdef DDFT_2D < Computation
             Preprocess_ExternalPotential(this);
             Preprocess_SubArea(this);
             
-            res = mergeStruct(res_conv,res_fex);
+             res = mergeStruct(res_conv,res_fex);
         end                
         function y0  = getInitialGuess(this,rho_ig)
             

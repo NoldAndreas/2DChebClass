@@ -51,6 +51,7 @@ function res = CheckMeanfieldConvolution(this)
              res.error_conv1_posy2 = y2_h(ind_conv1);                      
          else                          
              cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
+             res = struct();
          end  
      elseif(isa(this.IDC,'InfCapillary'))
          if(PersonalUserOutput)
@@ -70,10 +71,12 @@ function res = CheckMeanfieldConvolution(this)
                 res.error_conv1_posy2 = this.IDC.Pts.y2_kv(ind_conv1);                
             else(strcmp(this.optsPhys.V2.V2DV2,'Phi2DLongRange'))
                  cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
+                 res = struct();
             end
          end
      else
          cprintf('m','CheckMeanfieldConvolution: Case not yet implemented\n');
+         res = struct();
      end
           
      

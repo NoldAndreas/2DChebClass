@@ -26,7 +26,7 @@ function PlotDensitySlicesNormalInterface(this)
     dhIIIdx = this.y1_SpectralLine.Diff.Dy*h_full;
     %str = {'','','m','','c'};
                 
-    L2_AdIso = input('Parameter L_2 used for computation of adsorption isotherm: ');
+    L2_AdIso = 4;%input('Parameter L_2 used for computation of adsorption isotherm: ');
     for i = 1:n
         y1              = y1P(i);
         IP              = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i));
