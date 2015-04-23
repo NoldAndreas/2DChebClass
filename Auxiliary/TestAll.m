@@ -1,6 +1,6 @@
 function TestAll(dirTest)
     global recomputeAll QuickOutput dirData dirDataOrg
-
+    dbclear all;
     
     no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 3 seconds.');
     if(getkeywait(3) == -1)
