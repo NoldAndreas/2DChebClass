@@ -10,37 +10,33 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=10;
+nParticlesS=[20;20;20];
 
 kBT=1;          % temperature
-mS=1;
+%mS=[1;1;1];
 
-gammaS=1;
+mS = 1;
+
+%gammaS=[1;1;1];
+gammaS  = 1;
 D0S=kBT./mS./gammaS;
+
 
 %--------------------------------------------------------------------------
 % V1 parameters
 %--------------------------------------------------------------------------
 
-%V1DV1='free2D_Box';
-V1DV1 = 'quad_Box';
+V1DV1='V1_Test_Box_Eq';
 
 % appropriate physical parameters for potentials in V1DV1
-L1S = 8;
-L2S = 6;
-kBTS = kBT;
-
-tauS = 1;
-y10S = 5;
-y20S = 5;
-B10S = 1;
-B20S = 1;
-V0AddS  = 1;
+V0S = 2;
+y10S = 7;
+y20S = 6;
+tauS = 10;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
-potParamsNames = {'L1','L2', ...
-                  'tau','y10','y20','B10','B20','V0Add'};
+potParamsNames = {'V0','tau','y10','y20'};
 
 %--------------------------------------------------------------------------
 % V2 parameters
@@ -48,25 +44,30 @@ potParamsNames = {'L1','L2', ...
 
 V2DV2='Gaussian';
 
-epsilonS = 1;
-alphaS   = 1;
+ epsilonS=2*[ 1 1 1 ;
+                 1 1 1 ;
+                 1 1 1 ] ;
+
+alpha1 = 0.5;
+alpha2 = 1;
+alpha3 = 1.5;
+
+alpha12=(alpha1+alpha2)/2;
+alpha13=(alpha1+alpha3)/2;
+alpha23=(alpha2+alpha3)/2;
+
+alphaS=[alpha1  alpha12 alpha13 ; 
+        alpha12 alpha2  alpha23 ;
+        alpha13 alpha23 alpha3  ];
 
 potParams2Names={'epsilon','alpha'};
-
-%--------------------------------------------------------------------------
-% HI parameters
-%--------------------------------------------------------------------------
-
-sigmaHS = 0.5;
-
-HIParamsNames={'sigmaH'};
 
 %--------------------------------------------------------------------------
 % Save time setup
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax = 5;
+tMax=7;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -77,17 +78,16 @@ tMax = 5;
 % only relevant if fixedInitial=false or sampleFinal=true
 %nSamples=50000;  
 
-nSamples=50000;  
+nSamples=10000;  
 
-initialGuess='makeGridPos';
+initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=500000;
-nRuns=20;
+nRuns=10;
 
 % number of cores to use in parallel processing
 %poolsize=12;
-poolsize=4;
+poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r','rv','r','rv'};
@@ -102,6 +102,7 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
+%doStoc={false,false,false,false};
 doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
@@ -113,24 +114,24 @@ tSteps={10^3,10^3,2*10^4,10^3};
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
-stocColour = {{'r'},{'g'},{'b'},{'m'}};
+stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
 %--------------------------------------------------------------------------
 
-y0 = 3;
+y0 = 10;
 
-Phys_Area = struct('shape','Box','N',[30,30],'L1',L1S,'L2',L2S);
-Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',100,...
-                       'y2Min',0,'y2Max',L2S,'N2',100);
-V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',2);
+Phys_Area = struct('shape','Box','N',[20,20],'y1Min',0,'y1Max',y0,...
+                   'y2Min',0,'y2Max',y0);
+Plot_Area = struct('y1Min',0,'y1Max',y0,'N1',100,...
+                       'y2Min',0,'y2Max',y0,'N2',100);
+V2Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
+               
 
 PhysArea = {Phys_Area, Phys_Area};
 PlotArea = {Plot_Area, Plot_Area};
-
-
-V2Num  =  {V2_Num, V2_Num};
+V2Num   = {V2Num, V2Num};
 
 DDFTCode = {'DDFTDynamics', ...
             'DDFTDynamics'};
@@ -157,7 +158,7 @@ doDDFT={true,false};
 % do we load and save the DDFT data
 loadDDFT={true,true};
 
-DDFTColour = {{'g'},{'m'}};
+DDFTColour = {{'g','m'},{'r','b'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -166,36 +167,32 @@ DDFTColour = {{'g'},{'m'}};
 plotType = 'surf';
 
 % x axis for position and velocity plots
-% rMin=[0;0];
-% rMax=[L1S;L2S];
-rMin=[-2;-2];
-rMax=[L1S+2;L2S+2];
-
-
+rMin=[-y0;-y0];
+rMax=[y0;y0];
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.5;
+RMax=0.2;
 
 PMin=[-1;-1];
 PMax=[1;1];
 
 % y axis for mean position and velocity plots
-RMMin=[0;max(L1S,L2S)];
-RMMax=[0;max(L1S,L2S)];
+RMMin=[-y0;-y0];
+RMMax=[y0;y0];
 PMMin=[-1;-1];
 PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=[30;30];
+nBins=[50;50];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = false;          % .gif movie
-doInitialFinal = false;
-doMeans        = false;
-doEquilibria   = true;
+doMovieGif=false;          % .gif movie
+doInitialFinal=false;
+doMeans=false;
+doEquilibria = false;
 
 %sendEmail = true;

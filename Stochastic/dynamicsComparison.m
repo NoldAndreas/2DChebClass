@@ -13,7 +13,8 @@ AddPaths();
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
 
-inputFile = 'ThreeSpeciesTest';
+%inputFile = 'ThreeSpeciesTest';
+%inputFile = 'ThreeSpeciesTestEq';
 
 %inputFile = 'HIWallTestTowards';
 %inputFile = 'HIWallTestAway';
@@ -27,7 +28,7 @@ inputFile = 'ThreeSpeciesTest';
 %inputFile = 'GaussianTest';
 %inputFile = 'GaussianTest_2Species';
 
-%inputFile = 'GaussianBoxTest';
+inputFile = 'GaussianBoxTest';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

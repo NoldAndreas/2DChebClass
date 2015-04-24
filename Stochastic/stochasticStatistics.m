@@ -96,18 +96,25 @@ for iWorker=1:poolsize
 end
 
 % if there's already a pool open, close it and kill all jobs
-if(matlabpool('size')>0)
-    fprintf(1,'\n');
-    matlabpool('close','force','local')
+poolobj = gcp('nocreate'); % If no pool, do not create new one.
+if (~isempty(poolobj))
+    poolobj.delete;
 end
 
-if(poolsize>1)
-    fprintf(1,'\n');
-    % open pool for parallel computing
-    matlabpool('open','local',poolsize);
-    %oldPath = path;
-    %addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
-end
+poolobj = parpool(poolsize);
+
+% if(matlabpool('size')>0)
+%     fprintf(1,'\n');
+%     matlabpool('close','force','local')
+% end
+
+% if(poolsize>1)
+%     fprintf(1,'\n');
+%     % open pool for parallel computing
+%     matlabpool('open','local',poolsize);
+%     %oldPath = path;
+%     %addpath('Stochastic',['Stochastic' filesep 'HI'],'Potentials');
+% end
 
 ndp = 3;
 printLength = 4+ndp;
@@ -162,7 +169,7 @@ parfor iRun=1:nRuns
 
             progString = num2str(progress,printFormat);
             if(length(progString)==printLength)
-                %disp(delString);
+                disp(delString);
 
                 tTaken = etime(clock,tStart);
                 tLeft  = (100-progress)/progress*tTaken;
@@ -180,10 +187,12 @@ end
 
 toc
 
-if(poolsize>1)
-    matlabpool close
-    %path(oldPath);
-end
+% if(poolsize>1)
+%     matlabpool close
+%     %path(oldPath);
+% end
+
+delete(gcp('nocreate'))
 
 delete([tempDir filesep '*'])
 rmdir(tempDir);
