@@ -1,4 +1,4 @@
-clear all; close all;
+close all;
 
 L      = 1;
 R      = 1;

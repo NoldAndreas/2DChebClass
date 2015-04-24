@@ -152,7 +152,11 @@
             iPts = (ptsC.y1_kv == ptsC.y1(i1Pts)) & (ptsC.y2_kv == ptsC.y2(i2Pts));
             X(iPts,:,1)       = ones(sum(iPts),1)*(data.int*IP);            
             for k = 1:noW
-                f             = str2func(weights{k});
+                if(ischar(weights{k}))
+                    f             = str2func(weights{k});
+                else
+                    f             = (weights{k});
+                end
                 if(nargin == 5)
                     F = f(data.ptsPolLoc,params);
                 else

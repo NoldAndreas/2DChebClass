@@ -63,7 +63,7 @@
             %L1_r              = min(O*this.L1,rd/3);
             L1_r              = this.L1*rd./(this.L1*3+rd);
             L1_r(rd==inf)     = this.L1;
-            [y1_kv,dy1] = QuotientMap(x1,L1_r,O*this.R,max(rMax,this.R));
+            [y1_kv,dy1]       = QuotientMap(x1,L1_r,O*this.R,max(rMax,this.R));
             
              n = this.N1*this.N2;
              if(nargout >= 3)

@@ -1,12 +1,11 @@
-function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r) 
+function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r,V2) 
 %[z,dzdr_r,alpha] = Phi2DLongRange(r,parameter) 
 %
 %z      = f(r);
 %dzdr_r = 0
 %alpha  =/2*( 2*pi*int( r*f(r), r = 0..infinity ))
-
-    global r_cutoff    
-        
+    r_cutoff = V2.r_cutoff;
+    epsilon  = V2.epsilon;
         
     if(isstruct(r))
         r = r.y1_kv;
@@ -25,7 +24,7 @@ function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r)
     alpha        = 1/2*( BH_0D_I(r_cutoff) - BH_0D_I(1) );
     
     %Rescale
-    c = (-16/9*pi)/alpha;    
+    c      = epsilon*(-16/9*pi)/alpha;    
     z      = c*z;
     dzdr_r = c*dzdr_r;
     alpha  = c*alpha;

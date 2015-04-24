@@ -4,16 +4,9 @@ function [z,dzdr_r,alpha] = BarkerHendersonHardCutoff_2D(r,parameter)
 %z      = -3/2*pi./((1+r.^2).^(5/2))*epsilon;
 %dzdr_r = 1/r * dz/dr
 %alpha  = -(pi^2/2)*epsilon = 1/2*( 2*pi*int( r*f(r), r = 0..infinity ))
-
-    global r_cutoff    
-    
-    if(nargin < 2)
-        epsilon = 1;
-    elseif(isstruct(parameter))
-        epsilon = parameter.epsilon;
-        r_cutoff = parameter.r_cutoff;
-    else
-        epsilon = parameter;
+    epsilon = parameter.epsilon;
+    if( (nargin > 1) && (isstruct(parameter)))        
+        r_cutoff = parameter.r_cutoff;    
     end    
 
     CutD       = 0.49;    

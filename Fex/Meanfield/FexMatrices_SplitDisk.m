@@ -3,6 +3,7 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     params = optsPhys.V2;
     
     fstr      = (params.V2DV2);    
+    f         = func2str(fstr);
     
     params     = rmfield(params,'V2DV2');
     paramNames = fieldnames(params);
@@ -25,14 +26,13 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     %diskArea    = Disc(shapeDisc);
     diskArea    = Sphere(shapeDisc);
 
-    conv1 = IDC.ComputeConvolutionFiniteSupport(annulusArea,{fstr},IDC.Pts);
-    conv2 = IDC.ComputeConvolutionFiniteSupport(diskArea,{fstr},IDC.Pts);
+    conv1 = IDC.ComputeConvolutionFiniteSupport(annulusArea,{@PhiUniversal},IDC.Pts);
+    conv2 = IDC.ComputeConvolutionFiniteSupport(diskArea,{@PhiUniversal},IDC.Pts);
 
-    convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2);
-    
-    if(isfield(params,'epsilon'))
-        convStruct.Conv = convStruct.Conv*params.epsilon;
+    convStruct.Conv =  conv1(:,:,2) + conv2(:,:,2);          
+        
+    function z = PhiUniversal(r)         
+        z = f(r,params);
     end
-    
 
 end

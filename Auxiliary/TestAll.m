@@ -89,10 +89,10 @@ function TestAll(dirTest)
                     
                     for k = 1:length(res.fig_handles)
                         fh = res.fig_handles{k};
-                        ax = get(fh,'children');
-                        xlim = get(ax,'xlim');
-                        ylim = get(ax,'ylim');
-                        pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+                        %ax = get(fh,'children');
+                        %xlim = get(ax,'xlim');
+                        %ylim = get(ax,'ylim');
+                        %pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
 
                         str_fig = [strf,num2str(k)];
                         print2eps([dirDDFT_2D_LatexReport filesep str_fig],fh);

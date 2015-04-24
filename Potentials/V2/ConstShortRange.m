@@ -1,4 +1,6 @@
-function [z,dzdr_r,alpha] = ConstShortRange(r) 
+function [z,dzdr_r,alpha] = ConstShortRange(r,V2) 
+    epsilon = V2.epsilon;
+
     lambda  = 1.5;
     LJsigma = 1;       
 
@@ -6,7 +8,7 @@ function [z,dzdr_r,alpha] = ConstShortRange(r)
     dzdr_r = zeros(size(r));        
     alpha  = -2/3*pi*(lambda^3 - LJsigma^3);    
     
-    c      = (-16/9*pi)/alpha;    
+    c      = epsilon*(-16/9*pi)/alpha;    
     z      = c*z;
     dzdr_r = c*dzdr_r;
     alpha  = c*alpha;

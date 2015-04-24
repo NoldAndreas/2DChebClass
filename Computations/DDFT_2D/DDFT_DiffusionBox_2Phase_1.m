@@ -1,4 +1,4 @@
-                 
+                   
 function [config,res] = DDFT_DiffusionBox_2Phase_1()
 
     %Numerical Parameters    
