@@ -188,8 +188,8 @@ function ComputeDynamicsInertia(this,x_ic,mu)
                 
         if(doVisc)
             rho_s    = exp((y-Vext)/kBT);
-            [zeta,dzeta_drho] = BulkViscosity(rho_s,optsPhys.viscosity);
-            [eta,deta_drho]   = ShearViscosity(rho_s,optsPhys.viscosity);
+            [zeta,dzeta_drho] = BulkViscosity(rho_s,optsPhys);
+            [eta,deta_drho]   = ShearViscosity(rho_s,optsPhys);
             
             etaR       = repmat(eta./rho_s,2,1);
             zetaR      = repmat(zeta./rho_s,2,1);

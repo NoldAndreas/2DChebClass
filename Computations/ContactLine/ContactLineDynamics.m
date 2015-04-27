@@ -40,6 +40,7 @@
             
     %optsViscosity = struct('etaC',1,'zetaC',0);    
     optsViscosity = struct('etaL1',2,'zetaC',1);
+    optsViscosity = struct('etaLiq',5,'etaVap',1,'zetaC',1);
     %BCwall        = struct('bc','sinHalf','tau',1);
 	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
 

@@ -109,7 +109,7 @@ function res = CheckMeanfieldConvolution(this)
     end
 
     function z = conv_BarkerHendersonCutoff2D(y2_h)
-        z = 2*a-this.optsPhys.V2.epsilon*BH_Psi(y2_h);
+        z = 2*a-BH_Psi(y2_h,this.optsPhys.V2);
     end
     function z = conv_ConstShortRange(y2_h)
         z = zeros(size(y2_h));

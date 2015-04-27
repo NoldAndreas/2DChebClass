@@ -1,9 +1,8 @@
-function z = BH_Psi(y)
+function z = BH_Psi(y,V2)
+    
+    rc  = V2.r_cutoff;        
 
-    global r_cutoff
-    rc  = r_cutoff;
-
-    markG1 = (y > 1) & (y < r_cutoff);
+    markG1 = (y > 1) & (y < rc);
     markL1 = (y <= 1);
 
     yG1 = y(markG1);
@@ -15,8 +14,8 @@ function z = BH_Psi(y)
 
 
     %Rescale
-    alpha        = 1/2*( BH_0D_I(r_cutoff) - BH_0D_I(1) );
-    c = (-16/9*pi)/alpha;    
-    z      = c*z;    
-    alpha  = c*alpha;
+    alpha     = 1/2*( BH_0D_I(rc) - BH_0D_I(1) );
+    c         = V2.epsilon*(-16/9*pi)/alpha;    
+    z         = c*z;    
+    alpha     = c*alpha;
 end

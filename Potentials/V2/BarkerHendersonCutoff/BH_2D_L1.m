@@ -1,6 +1,4 @@
-function z = BH_2D_L1(r)
-    global r_cutoff
-    rc = r_cutoff;
+function z = BH_2D_L1(r,rc)   
     
     CutD       = 0.5;    
 	if(f_LL1(CutD) - f_L1(CutD) > 1e-9)
@@ -14,7 +12,7 @@ function z = BH_2D_L1(r)
     z(markLL1) = f_LL1(r(markLL1));
     
     function z = f_L1(r)        
-        z = 2*( BH_2D_I(r,sqrt(r_cutoff^2-r.^2)) - BH_2D_I(r,sqrt(1-r.^2)) );    
+        z = 2*( BH_2D_I(r,sqrt(rc^2-r.^2)) - BH_2D_I(r,sqrt(1-r.^2)) );    
     end
     
     
