@@ -39,5 +39,5 @@
     CheckAverageDensities_Rosenfeld_3D(EX.IDC,EX.IntMatrFex,'checkTop');
 	optsPhys.rho_iguess = optsPhys.eta*6/pi;
     FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
-    EX.fig_handles{1} = gcf;
+    res.fig_handles{1} = gcf;
 end

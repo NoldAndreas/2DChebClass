@@ -1,7 +1,8 @@
 # ************************************************************ 
-# Computed at: 24-Apr-2015 16:44:56 Cumulative computation time: 00:23:48.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 27-Apr-2015 15:46:06 Cumulative computation time: 00:23:36.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
-CheckFMTComputation : 63
+SecondLine : Computed at: 24-Apr-2015 16:44:56 Cumulative computation time: 00:23:48.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.
+CheckFMTComputation : 61
 CheckFMTComputation_InfCapillary : -2
 Check_FMT_SumRule : -2
 DDFT_Diffusion1D_HalfSpace_FMT : -2
@@ -19,15 +20,15 @@ DDFT_DiffusionHalfSpace_2Phase_Sat_2 : -2
 DDFT_DiffusionHalfSpace_BH_2Phase_Sat_2 : -2
 DDFT_DiffusionHalfSpace_FMT : 117
 DDFT_DiffusionHalfSpace_FMT_HIWall : 40
-DDFT_DiffusionHalfSpace_FMT_HIWall_1 : 128
+DDFT_DiffusionHalfSpace_FMT_HIWall_1 : 125
 DDFT_DiffusionHalfSpace_FMT_HIWall_2 : -2
-DDFT_DiffusionHalfSpace_FMT_Triangle : 41
+DDFT_DiffusionHalfSpace_FMT_Triangle : 39
 DDFT_DiffusionHalfSpace_MF : -2
 DDFT_DiffusionInfCapillary_FMT : -2
 DDFT_DiffusionInfCapillary_FMT_Case1 : -2
 DDFT_DiffusionInfCapillary_MF : -2
 DDFT_DiffusionInfDisc_MF : -2
-DDFT_DiffusionInfSpace_FMT : 301
+DDFT_DiffusionInfSpace_FMT : 300
 DDFT_DiffusionInfSpace_MF : -2
 DDFT_DiffusionPolarDisk : -2
 DDFT_DiffusionPolarInfinity_Case1 : -2
@@ -42,8 +43,8 @@ DDFT_InfiniteCapillary_LDA_Case1 : -2
 DDFT_InfiniteCapillary_LDA_Case2 : -2
 DFT_EqInfCapillary_Slit : -2
 GravityBox_MF : -2
-Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New : 93
-Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New2 : 515
+Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New : 90
+Test_DDFT_DiffusionHalfSpace_FMT_Triangle_New2 : 510
 Test_DDFT_InertiaInfDisc_MF_osc : -2
-Test_DDFT_InertiaInfSpace_FMT : 82
+Test_DDFT_InertiaInfSpace_FMT : 86
 Test_DDFT_InertiaInfSpace_MF_osc : -2

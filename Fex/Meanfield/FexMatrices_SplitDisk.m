@@ -3,7 +3,7 @@ function convStruct = FexMatrices_SplitDisk(optsPhys,IDC)
     params = optsPhys.V2;
     
     fstr      = (params.V2DV2);    
-    f         = func2str(fstr);
+    f         = str2func(fstr);
     
     params     = rmfield(params,'V2DV2');
     paramNames = fieldnames(params);

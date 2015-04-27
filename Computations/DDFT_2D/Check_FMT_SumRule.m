@@ -86,7 +86,6 @@ function Check_FMT_SumRule()
         res.error_wl = error_wl;
         res.error_wg = error_wg; 
     end     
-
     function [error_wl,error_wg] = CheckConfig(config)
         CL = ContactLineHS(config);        
         CL.Preprocess();    
