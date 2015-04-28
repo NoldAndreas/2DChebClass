@@ -81,7 +81,7 @@ for iSpecies=1:nSpecies
       
     mask= (RS1boxes>0) & (RS1boxes<=nBins1) & (RS2boxes>0) & (RS2boxes<=nBins2);
     counter=ones(size(RS1));
-    
+     
     %RS1Min=min(RS1boxes(mask));
     RS1Max=max(RS1boxes(mask));
     %RS2Min=min(RS2boxes(mask));

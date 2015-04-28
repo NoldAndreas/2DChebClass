@@ -75,7 +75,7 @@ tMax = 5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=50000;  
+%nSamples=100000;  
 
 nSamples=50000;  
 
@@ -83,7 +83,7 @@ initialGuess='makeGridPos';
 
 % number of runs of stochastic dynamics to do, and average over
 %nRuns=500000;
-nRuns=20;
+nRuns=200;
 
 % number of cores to use in parallel processing
 %poolsize=12;
@@ -105,7 +105,7 @@ stocName={'r0','rv0','r1','rv1'};
 doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={false,true,true,true};
+loadStoc={true,true,true,true};
 
 % number of time steps
 tSteps={10^3,10^3,2*10^4,10^3};

@@ -246,7 +246,7 @@ end
 %--------------------------------------------------------------------------
 
 if(optsPlot.doEquilibria)
-    eqFile = plotEquilibria(stocStruct,DDFTStruct,optsPlot,equilibria);
+    eqFile = plotEquilibria(stocStruct,DDFTStruct,optsPlot,optsPhys,equilibria);
     plotFiles = cat(2,plotFiles,eqFile);
 end
 

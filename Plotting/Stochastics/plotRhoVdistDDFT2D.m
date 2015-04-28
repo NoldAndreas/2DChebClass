@@ -185,7 +185,7 @@ for iSpecies=1:nSpecies
     rhoS(rhoS<cutoff)=0;
     
     [C,h]=contour(hCa,y1,y2,rhoS);     
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth);
+    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',optsPlot.lineStyle);
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');
     

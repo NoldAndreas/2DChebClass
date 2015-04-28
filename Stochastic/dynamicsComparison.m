@@ -28,7 +28,11 @@ AddPaths();
 %inputFile = 'GaussianTest';
 %inputFile = 'GaussianTest_2Species';
 
-inputFile = 'GaussianBoxTest';
+%inputFile = 'GaussianBoxTest';
+%inputFile = 'GaussianBoxTest2';
+%inputFile = 'GaussianBoxTest3';
+
+inputFile = 'BoxTest3';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

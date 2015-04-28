@@ -1,4 +1,4 @@
-function outputFile = plotEquilibria(stoc,ddft,optsPlotGIF,equilibria)
+function outputFile = plotEquilibria(stoc,ddft,optsPlotGIF,optsPhys,equilibria)
 
 geom=optsPlotGIF(1).geom;
 
@@ -13,9 +13,9 @@ switch geom         % for different geometries
         disp('Not implemented for 1D')
         
     case 'planar2D'
-        outputFile = plotEquilibria2D(stoc,ddft,optsPlotGIF,equilibria);
+        outputFile = plotEquilibria2D(stoc,ddft,optsPlotGIF,optsPhys,equilibria);
         
     case 'polar2D'
-        outputFile = plotEquilibria2D(stoc,ddft,optsPlotGIF,equilibria);
+        outputFile = plotEquilibria2D(stoc,ddft,optsPlotGIF,optsPhys,equilibria);
         
 end

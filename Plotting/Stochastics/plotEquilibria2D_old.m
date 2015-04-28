@@ -1,4 +1,4 @@
-function outputFile = plotEquilibria2D(stoc,ddft,optsPlot,optsPhys,equilibria)
+function outputFile = plotEquilibria2D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -69,48 +69,19 @@ hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
 % set background colour to white
 set(hRPf,'Color','w');
 
-
-separateSpecies = optsPlot.separateSpecies;
-
-if(separateSpecies)
-    nSpecies = length(optsPhys.nParticlesS);
-end
-
 switch optsPlot.plotType
     case 'surf'  
-        if(~separateSpecies)
-            handles=tightsubplot(1,2,0.075,0.075,0.075);
-            hRa=handles(1);
-            hPa=handles(2);
-            % figure and axes handles to be passed to plotting functions
-            handlesRP = struct('hRPf',hRPf,'hRa',hRa,'hPa',hPa);
-        else
-            %handles=tightsubplot(nSpecies,2,0.075,0.075,0.075);
-            %hRa = handles(1:2:end);
-            %hPa = handles(2:2:end);
-            handles=tightsubplot(2,nSpecies,0.075,0.075,0.075);
-            hRa = handles(1:nSpecies);
-            hPa = handles(nSpecies+1:end);
-            for iSpecies = 1:nSpecies
-                handlesRP(iSpecies) = struct('hRPf',hRPf,'hRa',hRa(iSpecies),'hPa',hPa(iSpecies));%#ok
-            end
-        end
+        handles=tightsubplot(1,2,0.075,0.075,0.075);
+        hRa=handles(1);
+        hPa=handles(2);
     case 'contour'
-        if(~separateSpecies)
-            hRa=axes;
-            % invisible axes off the figure
-            hPa= axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
-        else
-            hRa = tightsubplot(nSpecies,1,0.075,0.075,0.075);
-            hPa= axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
-            hPa = hPa*ones(1,nSpecies);
-            for iSpecies = 1:nSpecies
-                handlesRP(iSpecies) = struct('hRPf',hRPf,'hRa',hRa(iSpecies),'hPa',hPa(iSpecies));%#ok
-            end
-        end          
+        hRa=axes;
+        % invisible axes off the figure
+        hPa= axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
 end
 
-
+% figure and axes handles to be passed to plotting functions
+handlesRP = struct('hRPf',hRPf,'hRa',hRa,'hPa',hPa);
 
 %----------------------------------------------------------------------
 % Set up legend
@@ -156,25 +127,13 @@ if(nStoc>0)
     boxes = equilibria(1).data.xEq;
     
     optsPlot.type=stocType(1,:);
-    optsPlot.lineStyle = '-';
 
-    colours = optsPlot.lineColourStoc{1};
-    nParticlesS = optsPlot.nParticlesS;
+    optsPlot.faceColour = optsPlot.lineColourStoc{1};
 
-    if(~separateSpecies)
-        optsPlot.faceColour = colours;
-        plotRhoVdistStoc2D(rho,v,boxes,optsPlot,handlesRP);
-        hold(hRa,'on');
-        hold(hPa,'on');
-    else
-        for iSpecies = 1:nSpecies
-            optsPlot.faceColour = colours(iSpecies);
-            optsPlot.nParticlesS = nParticlesS(iSpecies);
-            plotRhoVdistStoc2D(rho(:,:,iSpecies),v,boxes,optsPlot,handlesRP(iSpecies));
-            hold(hRa(iSpecies),'on');
-            hold(hPa(iSpecies),'on');
-        end
-    end
+    plotRhoVdistStoc2D(rho,v,boxes,optsPlot,handlesRP);
+
+    hold(hRa,'on');
+    hold(hPa,'on');
 
 end
 
@@ -188,34 +147,23 @@ if(nDDFT>0)
     % get rho, v and r values
     rho = ddft(1).dynamicsResult.rho_t;
     flux = ddft(1).dynamicsResult.flux_t;
-   
+    
+
     optsPlot.type=DDFTType(1,:);
-    optsPlot.lineStyle = '--';
 
     % get values at appropriate time
-    rhot  = rho(:,:,1);
-    fluxt = flux(:,:,:,1);
+    rhot  = rho(:,:,:,1);
+    fluxt = flux(:,:,:,:,1);
 
-    %optsPlot.faceColour=optsPlot.lineColourDDFT{1};
+    optsPlot.faceColour=optsPlot.lineColourDDFT{1};
     optsPlot.fluxNorm = 1;
     
-    colours = optsPlot.lineColourDDFT{1};
-    
-    if(~separateSpecies)
-        optsPlot.faceColour = colours;
-        % plot the distributions
-        plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP);
+    % plot the distributions
+    plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP);
 
-        hold(hRa,'on');
-        hold(hPa,'on');
-    else
-        for iSpecies = 1:nSpecies
-            optsPlot.faceColour = colours(iSpecies);
-            plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP(iSpecies));
-            hold(hRa(iSpecies),'on');
-            hold(hPa(iSpecies),'on');
-        end
-    end
+    hold(hRa,'on');
+    hold(hPa,'on');
+
 
 end
 
@@ -223,8 +171,7 @@ end
 % Set axes, legend, add time
 %----------------------------------------------------------------------
 
-%optsPlot.time=plotTime;
-optsPlot.time=[];
+optsPlot.time=plotTime;
 
 optsPlot.xLab='x';
 optsPlot.yLab='y';
@@ -241,29 +188,11 @@ optsPlot.zLab='Density';
 
 %optsPlot.legText=optsPlot.legTextR{iSpecies};
 if(strcmp(optsPlot(1).plotType,'surf'))
-    if(~separateSpecies)
-        fixPlot2Dsurf(hRa,optsPlot);
-        optsPlot.time=[];
-        fixPlot2Dcontour(hPa,optsPlot);
-    else
-        for iSpecies = 1:nSpecies
-            fixPlot2Dsurf(hRa(iSpecies),optsPlot);
-            optsPlot.time=[];
-            fixPlot2Dcontour(hPa(iSpecies),optsPlot);
-        end
-    end
+    fixPlot2Dsurf(hRa,optsPlot);
+    optsPlot.time=[];
+    fixPlot2Dcontour(hPa,optsPlot);
 else
-    
-    if(~separateSpecies)
-        fixPlot2Dcontour(hRa,optsPlot);
-    else
-        for iSpecies = 1:nSpecies
-            fixPlot2Dcontour(hRa(iSpecies),optsPlot);
-        end
-    end
-
-    
-
+    fixPlot2Dcontour(hRa,optsPlot);
 end
 
 if(doP)  
@@ -278,14 +207,7 @@ if(doP)
     optsPlot.zMin=optsPlot.PMin(1);
     optsPlot.zMax=optsPlot.PMax(1);
 
-    if(~separateSpecies)
-        fixPlot2D(hPa,optsPlot);
-    else
-        for iSpecies = 1:nSpecies
-            fixPlot2D(hPa(iSpecies),optsPlot);
-        end
-    end
-    
+    fixPlot2D(hPa,optsPlot);
 end
 
 
