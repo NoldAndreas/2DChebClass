@@ -18,13 +18,7 @@
     end
     
     opts.PhysArea    = this.optsNum.PhysArea;
-    opts.optsPhys    = this.optsPhys; 
-    if(isfield(this.optsNum,'FexNum'));
-        opts.optsNum.FexNum = this.optsNum.FexNum;
-    end
-    if(isfield(this.optsNum,'V2Num'));
-        opts.optsNum.V2Num = this.optsNum.V2Num;
-    end
+    opts.optsPhys    = this.optsPhys;    
     
     % Clean optsPhys from unnecessary information
     if(isfield(opts.optsPhys,'Inertial'))
@@ -36,8 +30,13 @@
     if(isfield(opts.optsPhys,'nParticles'))
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
-   
-                   
+    
+    %opts.maxComp_y2  = this.optsNum.maxComp_y2;
+%    opts.Comments    = this.configName;    
+    %mark             = (PtsCart.y2_kv <= this.optsNum.maxComp_y2);     
+            
+    %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
+    %misc.mark = mark;           
     misc.Vext       = this.Vext; 
     misc.VAdd       = this.VAdd;
     misc.x_ig       = x_ig;

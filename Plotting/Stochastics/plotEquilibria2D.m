@@ -156,7 +156,7 @@ if(nStoc>0)
     boxes = equilibria(1).data.xEq;
     
     optsPlot.type=stocType(1,:);
-    optsPlot.lineStyle = '-';
+    optsPlot.lineStyle = optsPlot.lineStyleStoc{1};
 
     colours = optsPlot.lineColourStoc{1};
     nParticlesS = optsPlot.nParticlesS;
@@ -190,7 +190,7 @@ if(nDDFT>0)
     flux = ddft(1).dynamicsResult.flux_t;
    
     optsPlot.type=DDFTType(1,:);
-    optsPlot.lineStyle = '--';
+    optsPlot.lineStyle = optsPlot.lineStyleDDFT{1};
 
     % get values at appropriate time
     rhot  = rho(:,:,1);

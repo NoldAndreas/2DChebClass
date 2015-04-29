@@ -80,6 +80,7 @@ y1Max=optsPlot.rMax(1);
 y2Max=optsPlot.rMax(2);
 
 faceColour=optsPlot.faceColour;
+lineStyle = optsPlot.lineStyle;
 
 x1=Interp.pts1;
 x2=Interp.pts2;
@@ -185,7 +186,13 @@ for iSpecies=1:nSpecies
     rhoS(rhoS<cutoff)=0;
     
     [C,h]=contour(hCa,y1,y2,rhoS);     
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',optsPlot.lineStyle);
+    
+    if(strcmp(lineStyle{iSpecies},'none'))
+        lineStyle{iSpecies} = '-';
+    end
+    
+    
+    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');
     

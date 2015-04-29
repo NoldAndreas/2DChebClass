@@ -138,19 +138,23 @@ for iPlot=1:2
     % surface colours and types
     if(nStoc>0)
          lineColourStoc=optsPlot.lineColourStoc;
+         lineStyleStoc = optsPlot.lineStyleStoc;
          % get type info -- used to decide whether to plot the velocity
          stocType=optsPlot.stocType;
     else
         lineColourStoc=[];
+        lineStyleStoc=[];
         stocType=[];
     end
    
     if(nDDFT>0)
         lineColourDDFT=optsPlot.lineColourDDFT;
+        lineStyleDDFT=optsPlot.lineStyleDDFT;
         % get type info -- used to decide whether to plot the velocity
         DDFTType=optsPlot.DDFTType;
     else
         lineColourDDFT=[];
+        lineStyleDDFT=[];
         % get type info -- used to decide whether to plot the velocity
         DDFTType=[];
     end
@@ -165,6 +169,7 @@ for iPlot=1:2
     for iStoc=1:nStoc
     
         optsPlot.faceColour=lineColourStoc{iStoc};
+        optsPlot.lineStyle = lineStyleStoc{iStoc};
                    
         rho   = stoc(iStoc).rho(:,:,:,plotPos(iPlot));
         %v     = stoc(iStoc).v(:,:,:,:plotPos(iPlot));
@@ -176,8 +181,8 @@ for iPlot=1:2
         
         plotRhoVdistStoc2D(rho,flux,boxes,optsPlot,handlesRP(iPlot));
         
-%         hold(hRa,'on');
-%         hold(hPa,'on');
+        hold(hRa,'on');
+        hold(hPa,'on');
         
     end
        
@@ -208,11 +213,13 @@ for iPlot=1:2
         end
         
         optsPlot.faceColour=lineColourDDFT{iDDFT};
+        optsPlot.lineColour=lineColourDDFT{iDDFT};
+        optsPlot.lineStyle=lineStyleDDFT{iDDFT};
         
         % plot the distributions
         %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
         plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
-
+        
         hold(hRa,'on');
         hold(hPa,'on');
     end

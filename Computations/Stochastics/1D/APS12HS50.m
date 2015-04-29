@@ -124,7 +124,7 @@ saveStoc={true,true,true,true};
 
 
 Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
-Plot_Area = struct('N',200,'yMin',0,'yMax',8);
+Plot_Area = struct('N',200,'yMin',0,'yMax',12);
 Fex_Num   = struct('Fex','FMT','N',100);
 
 PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area, Phys_Area};

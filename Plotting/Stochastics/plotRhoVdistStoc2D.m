@@ -66,6 +66,7 @@ end
 
 % plotting options
 faceColour=optsPlot.faceColour;
+lineStyle = optsPlot.lineStyle;
 
 % handles of lines
 hr=zeros(nSpecies,1);
@@ -98,8 +99,12 @@ for iSpecies=1:nSpecies
 
     hold(hRa(iSpecies),'on')
     
+    if(strcmp(lineStyle{iSpecies},'none'))
+        lineStyle{iSpecies} = '--';
+    end
+    
     [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',optsPlot.lineStyle);
+    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');
 
