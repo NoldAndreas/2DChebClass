@@ -10,7 +10,7 @@ function [data,res] = SimulationHalfSpace(N1,N2,L1,L2,vext)
     if(nargin == 0)        
         vext  = @Vext15;        
         Phys_Area = struct('y1Min',-inf,'y1Max',inf,...
-                           'L1',3,'L2',2,'N',[20;20],...
+                           'L1',2,'L2',2,'N',[20;20],...
                            'y2Min',0);
 
         PlotArea       = struct('y1Min',-5,'y1Max',5,'L1',3,'L2',2,...
@@ -61,17 +61,19 @@ function [data,res] = SimulationHalfSpace(N1,N2,L1,L2,vext)
     title('Convolution');
     pbaspect([1 1 1]);
 
-    figure;
+    figure('color','white','Position',[0 0 600 600]);
     HS.PlotGridLines();    
     HS.PlotGrid();
     HS.PlotIsoline(0,'y2');
     HS.PlotIsoline(-1/sqrt(2),'y1');
     HS.PlotIsoline(1/sqrt(2),'y1');
-    ylim([0 10]);
-    xlim([-10 10]);
+    set(gca,'fontsize',20); set(gca,'linewidth',1.5);
+    ylim([-0.5 10]); xlim([-0.5 0.5]*10);
     	
-    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
-    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    xlabel('$y_1$','Interpreter','Latex','fontsize',25);
+    ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+    
+    %SaveFigure('HalfSpaceGrid');
     res.fig_handles{1} = gcf;
                                                        
  

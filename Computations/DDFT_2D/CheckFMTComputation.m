@@ -3,7 +3,7 @@
     disp('** CheckFMTComputationSkewed **');
     
     Phys_Area = struct('shape','HalfSpace_FMT',...
-                       'N',[1;80],'L1',4,'L2',2.,'y2wall',0.,...
+                       'N',[1;60],'L1',4,'L2',2.,'y2wall',0.,...
                        'N2bound',16,'h',1,'L2_AD',2.,...
                        'alpha',pi/2);
 
@@ -21,7 +21,7 @@
 
     optsPhys = struct('V1',V1,...
                       'kBT',1,...
-                      'eta',0.4257,...%0.4783
+                      'eta',0.3744,...%0.4257,...%0.4783
                       'sigmaS',1,... 
                       'nSpecies',1);
 
@@ -36,6 +36,7 @@
     EX.Preprocess();
     CheckAverageDensities_Rosenfeld_3D(EX.IDC,EX.IntMatrFex);
 	optsPhys.rho_iguess = optsPhys.eta*6/pi;
-    FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
+    %FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
+    FMT_1D(EX.IDC,EX.IntMatrFex,optsPhys,optsNum.FexNum,[],true);
     res.fig_handles{1} = gcf; 
 end

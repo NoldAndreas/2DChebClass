@@ -83,7 +83,6 @@
            this.mark_12(1,1) = 1;
            this.mark_12(1,2) = 2;
        end       
-
        function ptsCart = GetCartPts(this,pts_y1,pts_y2)            
             if(nargin == 1)
                 pts_y1 = this.Pts.y1_kv;
@@ -187,7 +186,13 @@
            id = ones(size(y2));
            id(y2 >= this.Sub_Strip.y2Max) = 2;
        end
-	   function do1DPlotNormal(this,V)
+	   function do1DPlotNormal(this,V,sym,deltaY)
+            if(nargin < 4)
+                deltaY = 0;
+            end
+            if(nargin < 3)
+                sym = 'o';
+            end 
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -195,14 +200,15 @@
             %V: Vector of length N2
             y2Max       = 5;
             mark        = (this.Pts.y1_kv == inf);            
-            y2IP        = (0:0.1:y2Max)';
+            y2IP        = (0:0.01:y2Max)';
             [h_1,IP]      = ComputeInterpolationMatrix12(this,1,CompSpace2(this,y2IP));
             
             PtsCart     = GetCartPts(this);
             y2IPCart    = y2IP*sin(this.alpha);            
-            plot(PtsCart.y2_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
-            hold on;
-            plot(y2IPCart,IP*V,'linewidth',1.5);
+            plot(y2IPCart+deltaY,IP*V,'k','linewidth',1.5); hold on;
+            if(~isempty(sym))
+                plot(PtsCart.y2_kv(mark)+deltaY,V,sym,'MarkerEdgeColor','k','MarkerFaceColor','g'); 
+            end            
             xlim([min(y2IPCart) max(y2IPCart)]);
             xlabel('$y_{2,Cart}$','Interpreter','Latex','fontsize',25);            
             set(gca,'fontsize',20);                        
@@ -237,7 +243,13 @@
        function PlotGrid(this)
             this.Sub_HalfSpace.PlotGrid(); hold on;
             this.Sub_Strip.PlotGrid();
-       end           
+            plot([-1 1]*1000,min(this.Sub_HalfSpace.GetCartPts.y2_kv)*[1,1],'k','linewidth',2);
+       end        
+       
+       function PlotIsoline(this,x,y1y2)
+           this.Sub_HalfSpace.PlotIsoline(x,y1y2);
+           this.Sub_Strip.PlotIsoline(x,y1y2);
+       end
        
 %        function PlotGrid(this)
 %             scatter(this.Sub_Strip.Pts.y1_kv,...

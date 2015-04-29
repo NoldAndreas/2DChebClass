@@ -62,43 +62,42 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %    PlotMatrixErrorOverY('AAD_n3');%res(j1,j2).A_n2-res(j1,j2+1).A_n2,syms{j2},cols{j2},['NS = ',num2str(res(j1,j2).NS)]);            
 %    xlim([0,10]);    
     %**********************************************
-    
-    figure('color','white','Position',[0 0 1600 800]); 
-    
-    legendstring = {};
-    subplot(1,2,1);    
-    PlotMatrixError('ConvBH_HardCutoff','>','k','\phi_{HC}');
-    PlotMatrixError('ConvSplitDiskExp','^','k','\phi_{Exp}');
+    gray = 0.5*[1 1 1];
+    figure('color','white','Position',[0 0 900 800]);     
+    legendstring = {};    
+    %PlotMatrixError('ConvBH_HardCutoff','>','k','\phi_{HC}');
+    %PlotMatrixError('ConvSplitDiskExp','^','k','\phi_{Exp}');
     PlotMatrixError('ConvSplitDisk','*','k','\phi_{SD}');
-    PlotMatrixError('ConvShortRange','d','k','\phi_{SR}');
+    %PlotMatrixError('ConvShortRange','d','k','\phi_{SR}');
     PlotMatrixError('Conv','o','k','\phi_{LR}');
     
-    PlotMatrixError('A_n2','s','g','w_2'); %    PlotMatrixError('A_n2','d','m','w_2'); 
-    PlotMatrixError('A_n3','p','g','w_3');
-    PlotMatrixError('A_n2_v_1','v','g','w_{2,1}'); %PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
-    PlotMatrixError('A_n2_v_2','<','g','w_{2,2}'); %PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
+    PlotMatrixError('A_n2','s','k','w_2'); %    PlotMatrixError('A_n2','d','m','w_2'); 
+    PlotMatrixError('A_n3','p','k','w_3');
+    PlotMatrixError('A_n2_v_1','v','k','w_{2,1}'); %PlotMatrixError('A_n2_v_1','<','b','w_{2,1}');
+    PlotMatrixError('A_n2_v_2','<','k','w_{2,2}'); %PlotMatrixError('A_n2_v_2','>','r','w_{2,2}');
     
-    PlotMatrixError('AAD_n2','s','b','w_{2,AD}'); %PlotMatrixError('AAD_n2','*','m','w_{2,AD}');
-    PlotMatrixError('AAD_n3','p','b','w_{3,AD}'); %PlotMatrixError('AAD_n3','x','g','w_{3,AD}');
-    PlotMatrixError('AAD_n2_v_1','v','b','w_{2AD,1}');
-    PlotMatrixError('AAD_n2_v_2','<','b','w_{2AD,2}');%PlotMatrixError('AAD_n2_v_2','v','r','w_{2AD,2}');
+    PlotMatrixError('AAD_n2','s',gray,'w_{2,AD}'); %PlotMatrixError('AAD_n2','*','m','w_{2,AD}');
+    PlotMatrixError('AAD_n3','p',gray,'w_{3,AD}'); %PlotMatrixError('AAD_n3','x','g','w_{3,AD}');
+    PlotMatrixError('AAD_n2_v_1','v',gray,'w_{2AD,1}');
+    PlotMatrixError('AAD_n2_v_2','<',gray,'w_{2AD,2}');%PlotMatrixError('AAD_n2_v_2','v','r','w_{2AD,2}');
     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
-    set(gca,'fontsize',15);
-    xlabel('$N$','Interpreter','Latex','fontsize',15);
-    ylabel(['$\|A_N-A_{N+',num2str(NS_d),'}\|_2$'],...
-                            'Interpreter','Latex','fontsize',15);
+    set(gca,'fontsize',20);
+    xlabel('$M$','Interpreter','Latex','fontsize',20);
+    ylabel(['$\|{\bf C}_{\phi}(M)-{\bf C}_\phi(M+',num2str(NS_d),')\|_2$'],...
+                            'Interpreter','Latex','fontsize',20);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     ylim([1e-16 1]);
+    SaveFigure('ConvolutionError1',v2struct(N,NS,config));
     %legend(legendstring,'Location','northOutside','Orientation','horizontal');
    
 %     filename = 'ConvolutionMatrixError';
 % 	print2eps([dirData filesep filename],gcf);
 % 	saveas(gcf,[dirData filesep filename '.fig']);        
-%     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);
+%     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);    
     
-    subplot(1,2,2);        
+    figure('color','white','Position',[0 0 800 800]); 
     PlotErrorGraph('error_convBH_HardCutoff','>','k');
     PlotErrorGraph('error_conv_SplitDiskExp','^','k');
     PlotErrorGraph('error_conv_SplitDisk','*','k');
@@ -120,7 +119,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     ylim([1e-16 1]);
     
-    SaveFigure('ConvolutionError',v2struct(N,NS,config));
+    SaveFigure('ConvolutionError2',v2struct(N,NS,config));
     
     function res = ComputeError(in,h)
         conf = in.config;
@@ -191,15 +190,15 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 res(i,j).ConvShortRange         = CL.IntMatrV2.Conv;
                 
                 
-                CL.optsNum.V2Num.Fex     = 'SplitDisk';
-                CL.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D'; 
-                preErr             = CL.Preprocess_MeanfieldContribution();                
+                CL.optsNum.V2Num.Fex            = 'SplitDisk';
+                CL.optsPhys.V2.V2DV2            = 'BarkerHenderson_2D'; 
+                preErr                          = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
                 res(i,j).ConvSplitDisk          = CL.IntMatrV2.Conv;
                 
-                CL.optsNum.V2Num.Fex     = 'SplitDisk';                
-                CL.optsPhys.V2.V2DV2     = 'ExponentialDouble';
-                preErr             = CL.Preprocess_MeanfieldContribution();                
+                CL.optsNum.V2Num.Fex               = 'SplitDisk';                
+                CL.optsPhys.V2.V2DV2               = 'ExponentialDouble';
+                preErr                             = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_conv_SplitDiskExp   = preErr.error_conv1;
                 res(i,j).ConvSplitDiskExp          = CL.IntMatrV2.Conv;
                 
@@ -291,7 +290,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
             end
         end     
         plot(line_N,line,...
-                        ['-',sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                        ['-',sym],'color',col,'MarkerSize',10,'MarkerFaceColor',col); hold on;
         %plot(line_N,line,col);        
         
         legendstring(end+1) = {name};
@@ -313,7 +312,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
             end
         end
         plot(line_N,line,...
-                        ['-',sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;        
+                        ['-',sym],'color',col,'MarkerSize',10,'MarkerFaceColor',col); hold on;        
     end
 
 end

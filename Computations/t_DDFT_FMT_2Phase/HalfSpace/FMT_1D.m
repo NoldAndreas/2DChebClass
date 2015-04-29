@@ -1,5 +1,5 @@
 function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,BoolPlot)
-    global PersonalUserOutput dirData
+    global PersonalUserOutput 
             
     saveFigs = true;
     if(nargin < 6)
@@ -118,69 +118,97 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     end
     
     %****************************
-    %********** Plot   **********
+    %********** Plot ************
     %****************************
-    if(BoolPlot && (PersonalUserOutput))
-        f1 = figure('Color','white');
-        set(f1, 'Position', [0 0 1000 1000]);
-        HS.do1DPlotNormal(rho_ic1D); hold on;
+    if(BoolPlot && (PersonalUserOutput))        
+        bool_collPts = []; %'o'
+        f1 = figure;
         
-        plot([0 10],[rhoBulk,rhoBulk],'--','linewidth',2);
+        subplot(3,3,[1,2,4,5,7,8]);
+        HS.do1DPlotNormal(rho_ic1D,bool_collPts); hold on;
+        ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',25);
+        xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
+        
+        plot([0 10],[rhoBulk,rhoBulk],'k--','linewidth',2);
         if(~isempty(IntMatrFex) && ~isempty(checkContactDensity))
-            plot([0 10],[checkContactDensity,checkContactDensity],'--','linewidth',2);
-        end
-        hold off;
+            plot([0 10],[checkContactDensity,checkContactDensity],'k--','linewidth',2);
+        end       
+        xlim([0 7]);
+            
+        deltaY = 0.5;
+        if(strcmp(optsPhys.V2.V2DV2,'zeroPotential') && strcmp(optsPhys.HSBulk,'FexBulk_FMTRosenfeld_3DFluid'))                
+            Interp1D                  = HS.ComputeInterpolationMatrix(1,(-1:0.01:0.7)',true,true);        
+            Interp1D.InterPol         = Interp1D.InterPol(:,markComp);
+            Interp1D.ptsCart          = HS.GetCartPts(Interp1D.pts1,Interp1D.pts2);
+            dataMC = LoadGrootData(eta*6/pi);                        
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markersize',8,'markerFace','k'); hold on;
+            
+            f2 = figure('Color','white');
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markersize',8,'markerFace','k'); hold on;
+            if(eta == 0.4783)
+                %shift = struct('xmin',0.5,'xmax',.6,'ymin',0.,'ymax',11.,'yref',0,'xref',0.5);
+                %PlotBackgroundImage(['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'Inset_PackingFraction0_4783_RothFMTReview.gif'],shift);
+                xlim([0.5 .6]-0.5);   ylim([0 12]);
+            elseif(eta == 0.3744)
+                xlim([0.8 1.4]);   ylim([0.5 1.2]);
+            elseif(eta == 0.4257)
+                %shift = struct('xmin',1.3,'xmax',1.8,'ymin',0.65,'ymax',1.55,'yref',0.65,'xref',1.3);
+                %PlotBackgroundImage(['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'Inset_PackingFraction0_4257_RothFMTReview.gif'],shift);
+                xlim([1.3 1.8]-0.5);   ylim([0.65 1.55]);
+            end
+            %plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
+            plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k','linewidth',1.5);  %Interp1D.pts2
+            h = xlabel('$y_{2,cart}/\sigma$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+            h = ylabel('$n\sigma^3$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+            pbaspect([1 1 1]);                
+            set(gca,'fontsize',20);                        
+            set(gca,'linewidth',1.5);                
+            hold off;           
 
-        %*************** Plot Average Densities ***************        
-        if(saveFigs && ~isempty(IntMatrFex))
+            inset(f1,f2,0.35,[.35 .6]);   colormap(gray);    
+            set(gcf,'Color','white');  close(f2); close(f1);
+            set(gcf, 'Position', [0 0 1400 1000]);            
+        end
+
+               
+         %*************** Plot Average Densities ***************        
+        if(~isempty(IntMatrFex)) %PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex(1),rho_ic1D);                
+            
+            
             nStruct = IntMatrFex(1).AD; 
             
-            f2 = figure('Color','white');
-            set(f2, 'Position', [0 0 400 400]);
-            do1Dplot(nStruct.n2*rho_ic1D,false); 
-            hh = title('$n_2\sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            %f2 = figure('Color','white');
+            %set(f2, 'Position', [0 0 400 400]);
+            subplot(3,3,3);
+            do1Dplot(nStruct.n2*rho_ic1D,bool_collPts);             
+            ylabel('$n_2 \sigma^3$','Interpreter','Latex','fontsize',25);
+            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
-            xlim([0 4]);
-            set(gca,'Xtick',[0 4]);
-            inset2(f1,f2,0.25,[0.2,0.6]);
-            close(f2);            
+            xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
+            %inset2(f1,f2,0.25,[0.2,0.6]); close(f2);            
             
-            f2 = figure('Color','white');
-            set(f2, 'Position', [0 0 400 400]);
-            do1Dplot(nStruct.n3*rho_ic1D,false); 
-            hh = title('$n_3 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            %f2 = figure('Color','white'); set(f2, 'Position', [0 0 400 400]);
+            subplot(3,3,6);
+            do1Dplot(nStruct.n3*rho_ic1D,bool_collPts);             
+            ylabel('$n_3 \sigma^3$','Interpreter','Latex','fontsize',25);
+            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
-            xlim([0 4]);
-            set(gca,'Xtick',[0 4]);
-            inset2(f1,f2,0.25,[0.45,0.6]);
-            close(f2);            
+            xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
+            %inset2(f1,f2,0.25,[0.45,0.6]); close(f2); 
             
-            f2 = figure('Color','white');
-            set(f2, 'Position', [0 0 400 400]);
-            do1Dplot(nStruct.n2_v_2*rho_ic1D,false); 
-            hh = title('$n_3 \sigma^3$'); set(hh,'Interpreter','Latex'); set(hh,'fontsize',25);
+            %f2 = figure('Color','white'); set(f2, 'Position', [0 0 400 400]);
+            subplot(3,3,9);
+            do1Dplot(nStruct.n2_v_2*rho_ic1D,bool_collPts); 
+            ylabel('${\left(\bf n_{2}\right)}_2 \sigma^3$','Interpreter','Latex','fontsize',25);
+            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
-            xlim([0 4]);
-            set(gca,'Xtick',[0 4]);
-            inset2(f1,f2,0.25,[0.7,0.6]);
-            close(f2);            
+            xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
+            %inset2(f1,f2,0.25,[0.7,0.6]); close(f2);            
             
             colormap(gray);    
             set(gcf,'Color','white');            
-            
-            filename = ['Density_Wall_rho=0_',num2str(ceil(100*rho_ic1D(end)))];
-            
-            if(~exist(dirData,'dir'))                        
-                mkdir(dirData);
-            end
-            
-            print2eps([dirData filesep filename],gcf);    
-            saveas(gcf,[dirData filesep filename '.fig']);                
-        
-        elseif(~isempty(IntMatrFex))
-            PlotRosenfeldFMT_AverageDensitiesInf(IntMatrFex(1),rho_ic1D);    
-        end        
-        
+        end
+        SaveFigure(['Density_Wall_rho=0_',num2str(ceil(100*rho_ic1D(end)))]);                        
         %***************************************************************
         %figure('name','Variation of FMT Excess Free Energy for initial condition');
         %do1Dplot_D(Fex_FMTRosenfeld_3DFluid(rho_ic1D,IntMatrFex,kBT));
@@ -275,9 +303,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     
    function PlotRosenfeldFMT_AADInf(FMTMatrices,rho)
         
-        f1 = figure('name','AAD');
-        set(gcf,'Color','white');
-        set(f1, 'Position', [0 0 1300 400]);
+        figure('name','AAD','Color','white','Position', [0 0 1300 400]);
         nStruct = FMTMatrices.AAD;                
         
         subplot(1,3,1); 
@@ -296,11 +322,37 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         pbaspect([1 1 1]);
 
     end
-   function do1Dplot(val,BoolSC)
-       HS.AD.do1DPlotNormal(val);
+   function do1Dplot(val,bool_collPts)
+       if(nargin == 1)
+           bool_collPts = 'o';
+       end       
+       HS.AD.do1DPlotNormal(val,bool_collPts,-0.5);
    end
-   function do1Dplot_D(val)
-            HS.do1DPlotNormal(val);
+   function do1Dplot_D(val,bool_collPts)
+       if(nargin == 1)
+           bool_collPts = 'o';
+       end
+        HS.do1DPlotNormal(val,bool_collPts);
    end
+
+    function data = LoadGrootData(rhoB)
+        filename = ['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'GrootEtAlData.txt'];                
+        
+        fid = fopen(filename);
+        y = textscan(fid,'',1,'headerlines',3); %[T, rhoG, rhoL]        
+        x = textscan(fid,'%f %f %f %f %f %f'); %[T, rhoG, rhoL]
+        fclose(fid);         
+                
+        data = struct('y',[],'rho',[]);
+        for i = 2:(length(y))
+            if(abs(rhoB - y{i})<1e-4)
+                data.rho = x{i};
+                data.y   = x{1};
+                break;
+            end            
+        end                
+               
+    end
+
 
 end
