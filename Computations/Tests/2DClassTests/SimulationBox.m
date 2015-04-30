@@ -11,6 +11,8 @@ function [data,res] = SimulationBox(N1,N2,L1,L2,vext)
         N1 =  15;    N2 = 15;
         L1    = 2;  L2    = 2;
         Origin = [-L1;-L2]/2;
+        
+        
         vext  = @Vext2;
         N     = [N1,N2];
     end        
@@ -64,12 +66,19 @@ function [data,res] = SimulationBox(N1,N2,L1,L2,vext)
     title('Convolution');
     pbaspect([1 1 1]);
     
-    figure;
+    figure('Color','white','Position',[0 0 500 500]);
     abox.PlotGridLines();    
     abox.PlotGrid();
     	
-    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
-    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    hl = xlabel('$x_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    hl = ylabel('$x_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
+    
+    set(gca,'linewidth',1.5);
+    set(gca,'fontsize',20);
+    set(gca,'xtick',[-1 0 1])
+    set(gca,'ytick',[-1 0 1])
+    
+   % SaveFigure('BoxGrid');
     res.fig_handles{1} = gcf;
     
 

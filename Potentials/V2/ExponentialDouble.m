@@ -5,6 +5,7 @@ function [z,dzdr_r,alpha] = ExponentialDouble(r,V2)
 %dzdr_r = 1/r * dz/dr
 %alpha  = -(pi^2/2)*epsilon = 1/2*( 2*pi*int( r*f(r), r = 0..infinity ))
     lambda = 1;%parameter.lambda;        
+        
     epsilon = V2.epsilon;
 
     if(isstruct(r))

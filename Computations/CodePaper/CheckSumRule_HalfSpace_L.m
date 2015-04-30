@@ -47,34 +47,35 @@ function CheckSumRule_HalfSpace_L(N)
         
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
     config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
-    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
-    config.optsPhys.V1.epsilon_w = 0.94;    
+    config.optsPhys.V1.V1DV1 = 'Vext_BarkerHenderson_HardWall';
+    config.optsPhys.V1.epsilon_w = 0.9; %0.95    
     res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);     	
    
-    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
-    config.optsPhys.V1.epsilon_w = 1.45;    
-    res{4}  = DataStorage(folder,@ComputeError,v2struct(L,config),[]);    
+%    config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
+%    config.optsPhys.V2    = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+%    config.optsPhys.V1.epsilon_w = 1.45;    
+%    res{4}  = DataStorage(folder,@ComputeError,v2struct(L,config),[]);    
         
                     
     figure('color','white','Position',[0 0 900 800]); 
     legendstring = {};
-	PlotErrorGraph(res{1},'error_wl','s-','b',['Hard sphere, eta = ',num2str(0.3)]); 
-    PlotErrorGraph(res{2},'error_wl','p-','b',['Hard sphere, eta = ',num2str(0.15)]);     
+	PlotErrorGraph(res{1},'error_wl','s-','k',['Hard sphere, eta = ',num2str(0.3)]); 
+    PlotErrorGraph(res{2},'error_wl','p-','k',['Hard sphere, eta = ',num2str(0.15)]);     
     
     PlotErrorGraph(res{3},'error_wl','o-','k','BarkerHendersonCutoff_2D, liq');
     PlotErrorGraph(res{3},'error_wg','o--','k','BarkerHendersonCutoff_2D, vap');
         
-    PlotErrorGraph(res{4},'error_wl','^-','k','ExponentialDouble, liq');
-    PlotErrorGraph(res{4},'error_wg','^--','k','ExponentialDouble, vap');   
-    
-    set(gca,'YScale','log');
+%    PlotErrorGraph(res{4},'error_wl','^-','k','ExponentialDouble, liq');
+%    PlotErrorGraph(res{4},'error_wg','^--','k','ExponentialDouble, vap');   
+       
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);
     xlabel('$L$','Interpreter','Latex','fontsize',20);
     ylabel(['Relative sum rule error $\frac{n(0)-n_C}{n_C}$'],...
                             'Interpreter','Latex','fontsize',20);
     xlim([0,(L(end)+0.5)]);    
+    
+     set(gca,'YScale','log');
     %legend(legendstring,'Location','northeast');%,'Orientation','horizontal');
    % legend(legendstring,'Location','eastOutside');%,'Orientation','horizontal');
     

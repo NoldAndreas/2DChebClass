@@ -60,19 +60,19 @@ function CheckSumRule_BH_HalfSpace()
     resC{2}.eta    = eta;    
             
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
-    config.optsPhys.V1.epsilon_w = 0.95;% 0.94;    
+    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
+    config.optsPhys.V1.epsilon_w = 0.94;% 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
     resC{3}.config = config;           
     
-    config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
-    config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
-    config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
-    config.optsPhys.V1.epsilon_w = 1.45;    
-    res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],[],ignoreList);    
-    resC{4}.name = 'exp';
-    resC{4}.config = config;               
+%     config.optsNum.V2Num     = struct('Fex','SplitDisk','N',[80,80]); 
+%     config.optsPhys.V2       = struct('V2DV2','ExponentialDouble','epsilon',1,'LJsigma',1);
+%     config.optsPhys.V1.V1DV1 = 'Vext_Exp_HardWall';
+%     config.optsPhys.V1.epsilon_w = 1.45;    
+%     res{4} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],[],ignoreList);    
+%     resC{4}.name = 'exp';
+%     resC{4}.config = config;               
     
     %**********************
     %**********************
@@ -85,6 +85,16 @@ function CheckSumRule_BH_HalfSpace()
              
     %**********************
     %**********************    
+    figure('color','white','Position',[0 0 600 600]);
+    %PlotConvergenceDensityProfilesInt(res{3},N,0.17,[1 7],[60,100],'rho_1D_WL'); title([]);
+    PlotConvergenceDensityProfilesInt(res{3},N,0.05,[3 7],[60,100],'rho_1D_WL'); title([]);
+    SaveFigure('BH_ConvergingDensityProfiles');
+    
+    figure('color','white','Position',[0 0 600 600]);
+    PlotConvergenceDensityProfilesInt(res{1},N,0.007,[3 7],[60,100],'rho_1D'); title([]);
+    %PlotConvergenceDensityProfilesInt(res{1},N,0.17,[1 7],[60,100],'rho_1D');
+    SaveFigure('HS_ConvergingDensityProfiles');
+    
     PlotErrorVsY_Full(res,resC);
     
     PlotFullErrorGraph(res,'adsorption_err_wl','Relative adsorption error','AdsorptionError');
@@ -97,13 +107,13 @@ function CheckSumRule_BH_HalfSpace()
     %**********************
     %**********************
     PlotConvergenceDensityProfiles(res{3},N,[],[0 100],{[60,80],[80,100],[100 120]},'BH_WG','rho_1D_WG');
-    PlotConvergenceDensityProfiles(res{4},N,[],[0 15],{[60,80],[80,100],[100 120]},'exp_WG','rho_1D_WG');    
+%    PlotConvergenceDensityProfiles(res{4},N,[],[0 15],{[60,80],[80,100],[100 120]},'exp_WG','rho_1D_WG');    
     
     PlotConvergenceDensityProfiles(res{1},N,[7 7 7]*1e-3,[3 7],{[60,80],[80,100],[80 120]},'HS','rho_1D');    
     PlotConvergenceDensityProfiles(res{3},N,[5 5 5]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'BH_WL','rho_1D_WL');
-    PlotConvergenceDensityProfiles(res{4},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
+%    PlotConvergenceDensityProfiles(res{4},N,[7 7 7]*1e-2,[3 7],{[60,80],[80,100],[100 120]},'exp_WL','rho_1D_WL');
         
-    PlotDensityProfiles(resC);    
+    %PlotDensityProfiles(resC);    
     
     function res = PostProcess(res,yIP)
         
@@ -163,16 +173,16 @@ function CheckSumRule_BH_HalfSpace()
         for i = 1:3            
             subplot(1,3,i); 
             if(~isempty(acc))
-                PlotConvergenceDensityProfilesInt(res,N,ints{i},acc(i),xlims,varName);
+                PlotConvergenceDensityProfilesInt(res,N,acc(i),xlims,ints{i},varName);
             else
-                PlotConvergenceDensityProfilesInt(res,N,ints{i},[],xlims,varName);
+                PlotConvergenceDensityProfilesInt(res,N,[],xlims,ints{i},varName);
             end
         end        
         saveC   = res(1,1).config;
         saveC.N = N;    
         SaveFigure(['DensityProfiles_Convergence_',name],saveC);
     end
-    function PlotConvergenceDensityProfilesInt(res,N,NInt,yLimMax,xlims,rhoName)
+    function PlotConvergenceDensityProfilesInt(res,N,yLimMax,xlims,NInt,rhoName)
         conf = res.config;
         CLT = ContactLineHS(conf);
         CLT.PreprocessIDC();         
@@ -314,12 +324,12 @@ function CheckSumRule_BH_HalfSpace()
 
     function PlotErrorVsY_Full(res,resC)
         figure('color','white','Position',[0 0 1400 1400]); 
-        subplot(3,2,1); PlotErrorVsY(res{1},'rho_y_err_wl','-o',resC{1}.name);
-        subplot(3,2,2); PlotErrorVsY(res{2},'rho_y_err_wl','-o',resC{2}.name);
-        subplot(3,2,3); PlotErrorVsY(res{3},'rho_y_err_wl','-o',[resC{3}.name,'_{wl}']);
-        subplot(3,2,4); PlotErrorVsY(res{3},'rho_y_err_wg','-o',[resC{3}.name,'_{wg}']);
-        subplot(3,2,5); PlotErrorVsY(res{4},'rho_y_err_wl','-o',[resC{4}.name,'_{wl}']);
-        subplot(3,2,6); PlotErrorVsY(res{4},'rho_y_err_wg','-o',[resC{4}.name,'_{wg}']);
+        subplot(2,2,1); PlotErrorVsY(res{1},'rho_y_err_wl','-o',resC{1}.name);
+        subplot(2,2,2); PlotErrorVsY(res{2},'rho_y_err_wl','-o',resC{2}.name);
+        subplot(2,2,3); PlotErrorVsY(res{3},'rho_y_err_wl','-o',[resC{3}.name,'_{wl}']);
+        subplot(2,2,4); PlotErrorVsY(res{3},'rho_y_err_wg','-o',[resC{3}.name,'_{wg}']);
+%        subplot(3,2,5); PlotErrorVsY(res{4},'rho_y_err_wl','-o',[resC{4}.name,'_{wl}']);
+%        subplot(3,2,6); PlotErrorVsY(res{4},'rho_y_err_wg','-o',[resC{4}.name,'_{wg}']);
         SaveFigure('ConvergenceError_Y');
     end
     function PlotErrorVsY(res,var_name,sym,title_name)        
@@ -353,7 +363,7 @@ function CheckSumRule_BH_HalfSpace()
                 PlotErrorGraph(res{i0},var_name,['-',syms{i0}],'k');
                 PlotErrorGraph(res{i0},var_name_wg,['--',syms{i0}],'k');
             else
-                PlotErrorGraph(res{i0},var_name,['-',syms{i0}],'b');                
+                PlotErrorGraph(res{i0},var_name,['-',syms{i0}],'k');                
             end
         end
         set(gca,'YScale','log');
