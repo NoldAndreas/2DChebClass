@@ -98,10 +98,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);    
     
     figure('color','white','Position',[0 0 800 800]); 
-    PlotErrorGraph('error_convBH_HardCutoff','>','k');
-    PlotErrorGraph('error_conv_SplitDiskExp','^','k');
+%    PlotErrorGraph('error_convBH_HardCutoff','>','k');
+%    PlotErrorGraph('error_conv_SplitDiskExp','^','k');
     PlotErrorGraph('error_conv_SplitDisk','*','k');
-    PlotErrorGraph('error_convShortRange','d','k');
+    %PlotErrorGraph('error_convShortRange','d','k');
     PlotErrorGraph('error_conv1','o','k');
     
     PlotErrorGraph('error_n2_1','s','g');
@@ -174,33 +174,33 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 preErr                 = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_conv1   = preErr.error_conv1; 
                 res(i,j).Conv          = CL.IntMatrV2.Conv;                
+%                 
+%                 CL.optsNum.V2Num.Fex   = 'SplitAnnulus'; 
+%                 CL.optsPhys.V2.V2DV2   = 'BarkerHendersonHardCutoff_2D';
+%                 preErr                 = CL.Preprocess_MeanfieldContribution();                
+%                 res(i,j).error_convBH_HardCutoff   = preErr.error_conv1;
+%                 res(i,j).ConvBH_HardCutoff         = CL.IntMatrV2.Conv;
                 
-                CL.optsNum.V2Num.Fex   = 'SplitAnnulus'; 
-                CL.optsPhys.V2.V2DV2   = 'BarkerHendersonHardCutoff_2D';
-                preErr                 = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_convBH_HardCutoff   = preErr.error_conv1;
-                res(i,j).ConvBH_HardCutoff         = CL.IntMatrV2.Conv;
                 
-                
-                CL.optsNum.V2Num.Fex   = 'ConstShortRange';
-                CL.optsPhys.V2.V2DV2   = 'ConstShortRange';
-                CL.optsPhys.V2.lambda  = 1.5;
-                preErr                 = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_convShortRange   = preErr.error_conv1;
-                res(i,j).ConvShortRange         = CL.IntMatrV2.Conv;
-                
+%                 CL.optsNum.V2Num.Fex   = 'ConstShortRange';
+%                 CL.optsPhys.V2.V2DV2   = 'ConstShortRange';
+%                 CL.optsPhys.V2.lambda  = 1.5;
+%                 preErr                 = CL.Preprocess_MeanfieldContribution();                
+%                 res(i,j).error_convShortRange   = preErr.error_conv1;
+%                 res(i,j).ConvShortRange         = CL.IntMatrV2.Conv;
+%                 
                 
                 CL.optsNum.V2Num.Fex            = 'SplitDisk';
                 CL.optsPhys.V2.V2DV2            = 'BarkerHenderson_2D'; 
                 preErr                          = CL.Preprocess_MeanfieldContribution();                
                 res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
                 res(i,j).ConvSplitDisk          = CL.IntMatrV2.Conv;
-                
-                CL.optsNum.V2Num.Fex               = 'SplitDisk';                
-                CL.optsPhys.V2.V2DV2               = 'ExponentialDouble';
-                preErr                             = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_conv_SplitDiskExp   = preErr.error_conv1;
-                res(i,j).ConvSplitDiskExp          = CL.IntMatrV2.Conv;
+%                 
+%                 CL.optsNum.V2Num.Fex               = 'SplitDisk';                
+%                 CL.optsPhys.V2.V2DV2               = 'ExponentialDouble';
+%                 preErr                             = CL.Preprocess_MeanfieldContribution();                
+%                 res(i,j).error_conv_SplitDiskExp   = preErr.error_conv1;
+%                 res(i,j).ConvSplitDiskExp          = CL.IntMatrV2.Conv;
                 
                % [~,~,params] = CL.Compute1D('WL');
                % res(i,j).error_wl = params.contactDensity_relError;

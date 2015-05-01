@@ -54,9 +54,11 @@
     
 	CL     = ContactLineHS(config);
     CL.Preprocess();    
+    CL.Compute1D('WL');
+    CL.Compute1D('WG');
     %optsPhys.rho_iguess = optsPhys.eta*6/pi;
     %FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
-    FMT_1D(EX.IDC,EX.IntMatrFex,EX.optsPhys,EX.optsNum.FexNum,[],true);
+   % FMT_1D(EX.IDC,EX.IntMatrFex,EX.optsPhys,EX.optsNum.FexNum,[],true);
         
     
 end

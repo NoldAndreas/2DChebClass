@@ -47,20 +47,22 @@ function CheckSumRule_BH_HalfSpace()
     
     %**********************
     %**********************
-    eta = 0.3;    
+    %eta = 0.3;
+    eta = 0.3257;
     res{1} = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);    
     resC{1}.config = config;
     resC{1}.name = 'HSeta0.3';
     resC{1}.eta    = eta;
         	    
-    eta            = 0.15;    
+    %eta            = 0.15;    
+    eta            = 0.0147;    
     res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);      
     resC{2}.config = config;
     resC{2}.name = 'HSeta0.15';
     resC{2}.eta    = eta;    
             
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
+    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
     config.optsPhys.V1.epsilon_w = 0.94;% 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
@@ -152,19 +154,16 @@ function CheckSumRule_BH_HalfSpace()
         end
                 
         for i0 = 1:length(res)
-            for i1 = 1:(size(res{i0},1)-1)
-                for i2 = 1:size(res{i0},2)
+            for i1 = 1:(length(res{i0})-1)  
+                res{i0}(i1).adsorption_err_wl = abs(res{i0}(i1).adsorption_wl-res{i0}(i1+1).adsorption_wl)/res{i0}(i1+1).adsorption_wl;
+                res{i0}(i1).rho_y_err_wl      = abs(res{i0}(i1).rho_y_wl-res{i0}(i1+1).rho_y_wl);
+                res{i0}(i1).rho_y_err_max_wl  = max(abs(res{i0}(i1).rho_y_err_wl));               
 
-                    res{i0}(i1,i2).adsorption_err_wl = abs(res{i0}(i1,i2).adsorption_wl-res{i0}(i1+1,i2).adsorption_wl)/res{i0}(i1+1,i2).adsorption_wl;
-                    res{i0}(i1,i2).rho_y_err_wl      = abs(res{i0}(i1,i2).rho_y_wl-res{i0}(i1+1,i2).rho_y_wl);
-                    res{i0}(i1,i2).rho_y_err_max_wl  = max(abs(res{i0}(i1,i2).rho_y_err_wl));               
-
-                    if(isfield(res{i0}(i1,i2),'rho_y_wg'))
-                        res{i0}(i1,i2).adsorption_err_wg = abs(res{i0}(i1,i2).adsorption_wg - res{i0}(i1+1,i2).adsorption_wg)/res{i0}(i1+1,i2).adsorption_wg;
-                        res{i0}(i1,i2).rho_y_err_wg      = abs(res{i0}(i1,i2).rho_y_wg-res{i0}(i1+1,i2).rho_y_wg);
-                        res{i0}(i1,i2).rho_y_err_max_wg  = max(abs(res{i0}(i1,i2).rho_y_err_wg));                        
-                    end
-                end
+                if(isfield(res{i0}(i1),'rho_y_wg'))
+                    res{i0}(i1).adsorption_err_wg = abs(res{i0}(i1).adsorption_wg - res{i0}(i1+1).adsorption_wg)/res{i0}(i1+1).adsorption_wg;
+                    res{i0}(i1).rho_y_err_wg      = abs(res{i0}(i1).rho_y_wg-res{i0}(i1+1).rho_y_wg);
+                    res{i0}(i1).rho_y_err_max_wg  = max(abs(res{i0}(i1).rho_y_err_wg));                        
+                end                
             end
         end
     end    
@@ -190,15 +189,15 @@ function CheckSumRule_BH_HalfSpace()
         xIP = (-1:0.002:1)';
         yIP = CLT.IDC.PhysSpace2(xIP);                
         
-        rhoRef = res(1,1).(rhoName)(end);                
+        rhoRef = res(1).(rhoName)(end);                
         mark   = ( (N >= NInt(1)) & (N <= NInt(2)));        
-        is     = 1:size(res,1);
+        is     = 1:length(res);
         is     = is(mark);        
         cls = GetGreyShades(length(is)); %cols = {'b','m','k','r','g'};
                 
         for i = 1:sum(mark)
-            resI   = res(is(i),1);
-            rhoRefErr = abs(rhoRef-res(i,1).(rhoName)(end));
+            resI   = res(is(i));
+            rhoRefErr = abs(rhoRef-res(i).(rhoName)(end));
             if(rhoRefErr > 1e-13)
                 error('reference density not unique');
             end
@@ -341,7 +340,7 @@ function CheckSumRule_BH_HalfSpace()
             col = cls{j1};
             k1  = ns(j1); 
             disp(res(k1).N);
-            if(isfield(res(k1,1),var_name) && ~isempty(res(k1,1).(var_name)))
+            if(isfield(res(k1),var_name) && ~isempty(res(k1).(var_name)))
                 plot(res(k1).y_IP,res(k1).(var_name),sym,'color',col,...
                         'MarkerSize',10,'MarkerFaceColor',col);
                 hold on;
@@ -377,10 +376,10 @@ function CheckSumRule_BH_HalfSpace()
     function PlotErrorGraph(res,var_name,sym,col)
         
         n = 1;                
-        for k1 = 1:size(res,1)            
-            if(isfield(res(k1,1),var_name) && ~isempty(res(k1,1).(var_name)))
-                line(n)   = abs(res(k1,1).(var_name));
-                line_n(n) = (res(k1,1).N);%+res(k1,k2+1).NS)/2;                
+        for k1 = 1:length(res)
+            if(isfield(res(k1),var_name) && ~isempty(res(k1).(var_name)))
+                line(n)   = abs(res(k1).(var_name));
+                line_n(n) = (res(k1).N);%+res(k1,k2+1).NS)/2;                
                 n = n+1;
             else
                 break;

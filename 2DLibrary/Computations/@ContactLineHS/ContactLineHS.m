@@ -423,7 +423,7 @@ classdef ContactLineHS < DDFT_2D
         %Postprocess
         [CA_measured,err] = MeasureContactAngle(this,type,yInt)
         [y1Cart]          = ComputeInterfaceContourY2(this,level,y2)
-        function SaveCurrentFigure(this,filename,foldername)
+        function fullName = SaveCurrentFigure(this,filename,foldername)
             if(nargin < 3)
                 foldername = 'Equilibrium';
             end
@@ -439,7 +439,7 @@ classdef ContactLineHS < DDFT_2D
             if(nargin>2)
                 filename = [foldername filesep filename];
             end
-            SaveCurrentFigure@Computation(this,filename);            
+            fullName = SaveCurrentFigure@Computation(this,filename);            
         end
         
         %to delete
