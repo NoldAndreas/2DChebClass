@@ -62,8 +62,9 @@ function CheckSumRule_BH_HalfSpace()
     resC{2}.eta    = eta;    
             
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
-    config.optsPhys.V1.epsilon_w = 0.94;% 0.94;    
+    %config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
+    config.optsPhys.V2   = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
+    config.optsPhys.V1.epsilon_w = 0.928;%94;% 0.94;    
     res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
     resC{3}.config = config;           

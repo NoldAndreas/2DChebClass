@@ -14,7 +14,8 @@ function DynamicContactLine()
                           'N',[40,40]);
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
+    %V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
@@ -28,7 +29,7 @@ function DynamicContactLine()
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.928,...%0.94,...
                 'tau',5,'epsilon_w_max',1);
 
     optsPhys = struct('V1',V1,'V2',V2,...
@@ -72,9 +73,12 @@ function DynamicContactLine()
     %PlotResults(res{1},'massError_dtMax');        
     
    
-    PlotResultsOverTime(res,'mass'); SaveFigure(['Dynamics_Mass'],saveC);
-    PlotResultsOverTime(res,'massErrorRel_dt'); SaveFigure('Dynamics_MassErrorTime',saveC);
-    PlotResults(res,'massErrorRel_dtMax');     SaveFigure(['DynamicMaxMassError'],saveC);   
+    %PlotResultsOverTime(res,'massErrorRel_dt');  %SaveFigure('Dynamics_MassErrorTime',saveC);
+    PlotResultsOverTime(res,'mass',{'maxN'}); ylim([2 2.6]); f1 = gcf; %SaveFigure(['Dynamics_Mass'],saveC);        
+    PlotResults(res,'massErrorRel_dtMax');    f2 = gcf;  
+    inset2(f2,f1,0.3,[0.27,0.2]);   %close(f1);    
+    
+    SaveFigure(['DynamicMaxMassError'],saveC);   
     
     PlotExampleSnaptshots(res);
     
@@ -160,14 +164,21 @@ function DynamicContactLine()
         end        
     end
 
-    function PlotResultsOverTime(res,var)
+    function PlotResultsOverTime(res,var,opts)
+        if(nargin < 3)
+            opts = {};
+        end
         figure('color','white','Position',[0 0 800 800]); 
         
         for i0 = 1:length(res)
             lin = lines{i0};
-            for i = 1:length(res{i0})            
-                plot(res{i0}(i).t,res{i0}(i).(var),[lin],'linewidth',1.5,'color',cols{i}); hold on;
-                n(i)  = res{i0}(i).config.optsNum.PhysArea.N(1);
+            if(IsOption(opts,'maxN'))
+                plot(res{i0}(end).t,res{i0}(end).(var),[lin],'linewidth',1.5,'color','k'); hold on;                
+            else
+                for i = 1:length(res{i0})            
+                    plot(res{i0}(i).t,res{i0}(i).(var),[lin],'linewidth',1.5,'color',cols{i}); hold on;
+                    n(i)  = res{i0}(i).config.optsNum.PhysArea.N(1);
+                end
             end
         end
                 

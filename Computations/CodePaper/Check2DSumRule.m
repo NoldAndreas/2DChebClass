@@ -9,7 +9,7 @@ function Check2DSumRule()
                       'alpha_deg',90);
                       
     V2Num    = struct('Fex','SplitDisk','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
@@ -37,16 +37,17 @@ function Check2DSumRule()
     dirRes = 'SumRuleError2D';
     
     AddPaths('CodePaper');    
-    config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
-    config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
-    config.optsPhys.V1.epsilon_w = 0.94;%0.94;                
-    res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);     
-                        
-    config.optsNum.V2Num.Fex     = 'SplitDisk';     
+%     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
+%     config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
+%     config.optsPhys.V1.epsilon_w = 0.94;%0.94;                
+%     res{1}                       = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);     
+%                         
+    %config.optsNum.V2Num.Fex     = 'SplitDisk';     
+	config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D';     
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
-    config.optsPhys.V1.epsilon_w = 1.0;                
-    res{2} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);
+    config.optsPhys.V1.epsilon_w = 0.928; %1.0;                
+    res{1} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);
     
     %     config.optsNum.V2Num.Fex     = 'SplitDisk'; 
 %     config.optsPhys.V2.V2DV2     = 'ExponentialDouble';                          

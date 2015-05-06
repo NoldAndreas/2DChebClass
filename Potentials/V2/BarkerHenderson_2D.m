@@ -12,6 +12,12 @@ function [z,dzdr_r,alpha] = BarkerHenderson_2D(r,parameter)
     else
         epsilon = parameter;
     end
+    
+    if((nargin == 2) && isfield(parameter,'r_cutoff'))
+        rc = parameter.r_cutoff;
+    else
+        rc = inf;
+    end
 
     CutD       = 0.49;    
     %if(f_LL1(CutD) - f_L1(CutD) > 1e-9)
@@ -31,12 +37,15 @@ function [z,dzdr_r,alpha] = BarkerHenderson_2D(r,parameter)
     z(markG1)  = -3/2*pi*(1-(21/32)./(rt.^6))./(rt.^5);
     z(markL1)  = f_L1(r(markL1));    
     z(markLL1) = f_LL1(r(markLL1));
-    
-    z = z*epsilon;
-    
     dzdr_r     = 0;    
-    alpha  = -16/9*pi*epsilon;       
     
+    alpha      = (16*pi*(1/(3*rc^3) - 1/(9*rc^9)) - 32/9*pi )/2; % 1 - (3/rc^3 - 1/rc^9)/2;    
+	c          = epsilon*(-16/9*pi)/alpha;
+
+    z          = c*z;
+    dzdr_r     = c*dzdr_r;
+    alpha      = c*alpha;
+        
     function z = f_L1(r)
         z = 3*sqrt(1-r.^2)./(160*r.^10).*...
                         (-105-70*r.^2-56*r.^4+112*r.^6+64*r.^8) ...
