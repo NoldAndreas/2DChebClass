@@ -39,6 +39,15 @@ function Check_FMT_SumRule()
     config = v2struct(optsNum,optsPhys);                            
     
     CheckConfig(config);
+    
+ %   config.optsNum.V2Num  = struct('Fex','SplitAnnulus','N',[80,80]); 
+%    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
+%    CheckConfig(config);
+
+   config.optsNum.V2Num  = struct('Fex','SplitAnnulus','N',[80,80]); 
+    %config.optsPhys.V2    = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
+    config.optsPhys.V2    = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5.0); 
+    CheckConfig(config);
             
 	config.optsNum.V2Num  = struct('Fex','SplitDisk','N',[80,80]); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1); 

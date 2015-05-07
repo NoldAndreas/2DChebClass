@@ -121,7 +121,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     %********** Plot ************
     %****************************
     if(BoolPlot && (PersonalUserOutput))        
-        bool_collPts = []; %'o'
+        bool_collPts = 'o';%[]; %'o'
         f1 = figure;
         
         subplot(3,3,[1,2,4,5,7,8]);

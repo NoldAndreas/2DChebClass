@@ -39,7 +39,7 @@ function [z,dzdr_r,alpha] = BarkerHenderson_2D(r,parameter)
     z(markLL1) = f_LL1(r(markLL1));
     dzdr_r     = 0;    
     
-    alpha      = (16*pi*(1/(3*rc^3) - 1/(9*rc^9)) - 32/9*pi )/2; % 1 - (3/rc^3 - 1/rc^9)/2;    
+    alpha      = 1/2*(-32/9*pi + pi^2*(1/rc^3 - 7/(32*rc^9))); %(16*pi*(1/(3*rc^3) - 1/(9*rc^9)) - 32/9*pi )/2; % 1 - (3/rc^3 - 1/rc^9)/2;    
 	c          = epsilon*(-16/9*pi)/alpha;
 
     z          = c*z;

@@ -10,8 +10,8 @@ function [z,dzdr_r,alpha] = BarkerHendersonCutoff_2D(r,V2)
     if(isstruct(r))
         r = r.y1_kv;
     end
-        
-    markG1 = (r <= r_cutoff) & (r >= 1);      
+
+    markG1 = (r <= r_cutoff) & (r >= 1);
     markL1 = (r < 1);
     
     rG1    = r(markG1);
