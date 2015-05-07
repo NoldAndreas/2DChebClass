@@ -65,7 +65,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
         Conv = Conv(markComp,markComp);
     end                   
     
-    y2MaxInt = 10;%inf;%inf;%inf;%40;
+    y2MaxInt = inf;%inf;%inf;%inf;%40;
 	Int_1D(ptsCart.y2_kv>y2MaxInt) = 0;
     mark      = (HS.AD.Pts.y1_kv == inf);
     PtsADCart = HS.AD.GetCartPts();

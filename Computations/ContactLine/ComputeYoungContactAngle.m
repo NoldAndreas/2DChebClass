@@ -15,7 +15,7 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
     	
     opts.epw_YCA = epw;
     opts.config  = config;
-    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[]);    
+    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[],true);    
     
   	f1 = figure('Color','white','Position',[0 0 800 800]);
     plot(res.epw,180/pi*res.theta_CA,'k','linewidth',1.5); hold on;        

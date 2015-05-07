@@ -5,10 +5,10 @@ function [data,res] = SimulationAnnulus()
     close all;
     
     %Initialization
-    N1 =  140;   N2 = 10;
+    N1 =  20;   N2 = 20;
     RMin     = 1;
-    RMax     = 5;
-    Origin  = [-2;3];
+    RMax     = 2.55;
+    Origin  = [0,0];%[-2;3];
     N       = [N1;N2];    
 
     AS                 = Annulus(v2struct(Origin,RMin,RMax,N));
@@ -16,12 +16,25 @@ function [data,res] = SimulationAnnulus()
     Interp             = AS.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
     
     
-    figure;
+    figure('color','white','Position',[0 0 600 600]);
     AS.PlotGridLines();    
-    AS.PlotGrid();
-    	
+    AS.PlotGrid();    	
+    AS.PlotIsoline(0,'y1');
+    
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
-    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);            
+    
+    set(gca,'fontsize',20); set(gca,'linewidth',1.5);
+    xlim([-3 3]); ylim([-3 3]);
+    
+    ax = get(gcf,'children');
+    xl = get(ax,'xlim');
+    yl = get(ax,'ylim');
+	pbaspect(ax,[(xl(2)-xl(1)) (yl(2)-yl(1)) 1]);
+    
+    %pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1])
+    SaveFigure('FiniteAnnulus');
+    
     res.fig_handles{1} = gcf;    
  
     Origin = [2;3];

@@ -40,10 +40,10 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
     N    = 20;%:10:50;    
-    NS_d = 10; %2;  %10;
+    NS_d = 5; %2;  %10;
     NS   = 10:NS_d:100;%[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
-    res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
+    res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],true,{'config_optsNum_PhysArea_N'});
     
 	%CLT = ContactLineHS(config);
 	%CLT.PreprocessIDC();     

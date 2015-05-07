@@ -52,7 +52,8 @@
             end
             
             y2_kv   = LinearMap(x2,th1,th2);
-            r_out   = (this.h)./abs(cos(y2_kv-3/2*pi));
+            %r_out   = (this.h)./abs(cos(y2_kv-3/2*pi));
+            r_out   = (this.h)./abs(sin(y2_kv));
             y1_kv   = LinearMap(x1,this.R_in*ones(size(x1)),r_out);
             
             
