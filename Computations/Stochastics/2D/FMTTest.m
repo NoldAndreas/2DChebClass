@@ -75,8 +75,9 @@ tMax=0.25;
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
 
-nSamples=500000;  
+%nSamples=500000;  
  
+nSamples=2000000;
 
 initialGuess='makeGrid';
 
@@ -102,7 +103,7 @@ stocName={'r0','rv0','r1','rv1'};
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
 %doStoc={true,false,true,false};
-doStoc={false,false,false,false};
+doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -119,11 +120,13 @@ stocColour = {{'r'},{'g'},{'b'},{'m'}};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[18,18],'L1',4,...
+boxL = 2;
+
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[50,50],'L1',4,...
                    'y2Min',-inf,'y2Max',inf,'L2',4);
 
-Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',100,...
-                   'y2Min',-5,'y2Max',5,'N2',100);
+Plot_Area = struct('y1Min',-boxL,'y1Max',boxL,'N1',100,...
+                   'y2Min',-boxL,'y2Max',boxL,'N2',100);
                    
 Fex_Num1   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',10,'N1disc',10,'N2disc',10);
@@ -156,7 +159,8 @@ DDFTType={'r','r'};
 
 % whether to do DDFT calculations
 %doDDFT={false,true};
-doDDFT={true,true};
+doDDFT={true,false};
+%doDDFT={true,true};
 
 % do we load and save the DDFT data
 loadDDFT={true,true};
@@ -174,8 +178,8 @@ plotType = 'surf';
 viewPoint = [-56;7];
 
 % x axis for position and velocity plots
-rMin=[-2;-2];
-rMax=[2;2];
+rMin=[-boxL;-boxL];
+rMax=[boxL;boxL];
 pMin=rMin;
 pMax=rMax;
 
@@ -193,7 +197,7 @@ PMMin=[-1;-1];
 PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=[30;30];
+nBins=[50;50];
 
 % determine which movies/plots to make
 % distribution movies/plots

@@ -100,7 +100,7 @@ for iSpecies=1:nSpecies
     hold(hRa(iSpecies),'on')
     
     if(strcmp(lineStyle{iSpecies},'none'))
-        lineStyle{iSpecies} = '--';
+        lineStyle{iSpecies} = ':';
     end
     
     [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);

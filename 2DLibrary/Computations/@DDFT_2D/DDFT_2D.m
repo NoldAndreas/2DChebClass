@@ -194,7 +194,7 @@ classdef DDFT_2D < Computation
                 error('Define V2Num structure in optsNum')
             else
                 res = struct();
-                this.IntMatrV2 = 0;
+                this.IntMatrV2 = [];
             end
         end
         function Preprocess_HIContribution(this)

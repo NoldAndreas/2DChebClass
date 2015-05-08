@@ -50,7 +50,7 @@ function AddPaths(dirOrg)
     
     if(isempty(QuickOutput))
         QuickOutput = false;
-    end        
+    end
     
     %recomputeAll = true;
     

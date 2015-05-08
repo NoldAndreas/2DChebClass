@@ -102,9 +102,9 @@ tMax = 5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=100000;  
+nSamples=2000000;  
 
-nSamples=500000;  
+%nSamples=500000;  
 
 sampleFinal = false;
 
@@ -131,7 +131,7 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-doStoc={true,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -143,6 +143,7 @@ tSteps={10^4,10^3,2*10^4,10^3};
 saveStoc={true,true,true,true};
 
 stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
+stocStyle = {{'--','--','--'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -150,56 +151,69 @@ stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
 
 y0 = 3;
 
-Phys_Area = struct('shape','Box','N',[35;35],'L1',L1S,'L2',L2S);
+Phys_Area10 = struct('shape','Box','N',[10;10],'L1',L1S,'L2',L2S);
+Phys_Area20 = struct('shape','Box','N',[20;20],'L1',L1S,'L2',L2S);
+Phys_Area30 = struct('shape','Box','N',[30;30],'L1',L1S,'L2',L2S);
+Phys_Area50 = struct('shape','Box','N',[50;50],'L1',L1S,'L2',L2S);
+
 Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',50,...
                        'y2Min',0,'y2Max',L2S,'N2',50);
+
 V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
 
-PhysArea = {Phys_Area, Phys_Area};
-PlotArea = {Plot_Area, Plot_Area};
+PhysArea = {Phys_Area10, Phys_Area20, Phys_Area30, Phys_Area50};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
 
 
-V2Num  =  {V2_Num, V2_Num};
+V2Num  =  {V2_Num, V2_Num, V2_Num, V2_Num};
 
-DDFTCode = {'DDFTDynamics', ...
-            'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','V2Num','doPlots'}, ...
-                   {'PhysArea','PlotArea','V2Num','doPlots'}};
+paramList = {'PhysArea','PlotArea','V2Num','doPlots'};
+
+DDFTParamsNames = {paramList, paramList, paramList, paramList};
 
 % HIParamsNamesDDFT={'sigmaH','sigma'};               
 HIParamsNamesDDFT={};
                
-DDFTName={'r0','r1'};
+DDFTName={'r10','r20','r30','r50'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r'};
+DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,false};
-%doDDFT={false,false};
+doDDFT={true,true,true,true};
 
 % do we load and save the DDFT data
-loadDDFT={true,true};
+loadDDFT={true,true,true,true};
 
-DDFTColour = {{'k','c','m'},{'m'}};
+% for stochastic comparison
+%DDFTColour = {{'k','c','m'},{'k','c','m'},{'k','c','m'},{'k','c','m'}};
+%DDFTStyle = {{':',':',':'},{'-.','-.','-.'},{'--','--','--'},{'-','-','-'}};
+
+% for N computations
+DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
+DDFTStyle = {{':',':',':'},{'--','--','--'},{'-','-','-'},{':',':',':'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
 
-plotType = 'surf';
+plotType = 'contour';
 
 % x axis for position and velocity plots
- rMin=[0;0];
- rMax=[L1S;L2S];
-%rMin=[-2;-2];
-%rMax=[L1S+2;L2S+2];
 
+%for stochastic comparison
+%rMin=[0;0];
+%rMax=[L1S;L2S];
+
+% for N computation
+rMin = [0;0];
+rMax = [10;10];
 
 pMin=rMin;
 pMax=rMax;

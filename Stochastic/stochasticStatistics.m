@@ -120,6 +120,8 @@ ndp = 3;
 printLength = 4+ndp;
 printFormat = ['%0' num2str(printLength) '.' num2str(ndp) 'f'];
 
+printList = 1;
+
 nowLength = length(datestr(now));
 
 delString = repmat(char(8),1,printLength + nowLength + 4);
@@ -158,7 +160,8 @@ parfor iRun=1:nRuns
         fprintf(fid,num2str(newProgress));
         fclose(fid);
 
-        if(worker == 1)
+        %if(worker == 1)
+        if(any(worker==printList))
             progress = 0;
 
             for iWorker = 1:poolsize
@@ -168,7 +171,8 @@ parfor iRun=1:nRuns
             end
 
             progString = num2str(progress,printFormat);
-            if(length(progString)==printLength)
+            
+            if(length(progString)==printLength) % prevent error when empty string returned
                 disp(delString);
 
                 tTaken = etime(clock,tStart);
