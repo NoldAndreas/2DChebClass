@@ -43,7 +43,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     NS_d = 5; %2;  %10;
     NS   = 10:NS_d:100;%[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
-    res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],true,{'config_optsNum_PhysArea_N'});
+    res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N'});
     
 	%CLT = ContactLineHS(config);
 	%CLT.PreprocessIDC();     
@@ -103,8 +103,8 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %    PlotErrorGraph('error_conv_SplitDiskExp','^','k');
     PlotErrorGraph('error_conv_SplitDisk','*','k');
     %PlotErrorGraph('error_convShortRange','d','k');
-    PlotErrorGraph('error_conv1','o','k');
-    
+%    PlotErrorGraph('error_conv1','o','k');
+
     PlotErrorGraph('error_n2_1','s','g');
     PlotErrorGraph('error_n3_1','p','g');
     PlotErrorGraph('error_n2v2_1','v','g');        
@@ -173,14 +173,14 @@ function CheckConvolutionHalfSpace_BH_Conv1()
                 CL.optsNum.V2Num.Fex            = 'SplitAnnulus';
                 CL.optsPhys.V2.V2DV2            = 'BarkerHenderson_2D'; 
                 preErr                          = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
+                res(i,j).error_conv_BHcutoff    = preErr.error_conv1;
                 res(i,j).ConvBHCutoff           = CL.IntMatrV2.Conv;
 
-                CL.optsNum.V2Num.Fex   = 'SplitAnnulus';
-                CL.optsPhys.V2.V2DV2   = 'BarkerHendersonCutoff_2D';                            
-                preErr                 = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_conv1   = preErr.error_conv1; 
-                res(i,j).Conv          = CL.IntMatrV2.Conv;                
+%                 CL.optsNum.V2Num.Fex   = 'SplitAnnulus';
+%                 CL.optsPhys.V2.V2DV2   = 'BarkerHendersonCutoff_2D';                            
+%                 preErr                 = CL.Preprocess_MeanfieldContribution();                
+%                 res(i,j).error_conv1   = preErr.error_conv1; 
+%                 res(i,j).Conv          = CL.IntMatrV2.Conv;                
 %                 
 %                 CL.optsNum.V2Num.Fex   = 'SplitAnnulus'; 
 %                 CL.optsPhys.V2.V2DV2   = 'BarkerHendersonHardCutoff_2D';
@@ -222,7 +222,6 @@ function CheckConvolutionHalfSpace_BH_Conv1()
 %        res.error_wl = error_wl;
 %        res.error_wg = error_wg; 
     end   
-
     function PlotMatrixErrorOverY_OnePoint(A_name,kP)
         figure('color','white','Position',[0 0 800 800]);         
         leg_string = {};

@@ -26,8 +26,7 @@ function CheckSumRule_BH_HalfSpace()
                      'maxComp_y2',-1,...
                      'y1Shift',0);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.);%1.375);%1.25)s;
-    
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.);%1.375);%1.25);
 
     optsPhys = struct('V1',V1,...%'V2',V2,...
                       'kBT',0.75,...                                               
