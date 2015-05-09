@@ -46,7 +46,7 @@ function Check2DSumRule()
 	config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D';     
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
-    config.optsPhys.V1.epsilon_w = 0.928; %1.0;                
+    config.optsPhys.V1.epsilon_w = 0.865;%0.928; %1.0;                
     res{1} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);
     
     %     config.optsNum.V2Num.Fex     = 'SplitDisk'; 

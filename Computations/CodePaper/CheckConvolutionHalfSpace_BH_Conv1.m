@@ -37,7 +37,7 @@ function CheckConvolutionHalfSpace_BH_Conv1()
     config = v2struct(optsNum,optsPhys);                        
     
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
-    config.optsPhys.V1.epsilon_w = 0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
+    config.optsPhys.V1.epsilon_w = 0.865;%0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
     N    = 20;%:10:50;    
     NS_d = 5; %2;  %10;
