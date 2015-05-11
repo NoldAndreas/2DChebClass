@@ -105,7 +105,13 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
              end
 
         end
-        title(['t = ', num2str(t,3)]);%,...%,'\\ j_{max} = ',num2str(max(max(abs(flux_t(:,:,j)))),'%.1e'),'$'],...
+        if(IsOption(opts,'NumericsManuscript'))                        
+            xlabel('$y_1$','Interpreter','Latex','fontsize',20);
+            ylabel('$y_2$','Interpreter','Latex','fontsize',20);
+            title(['t = ', num2str(t,2)]);%,...%,'\\ j_{max} = ',num2str(max(max(abs(flux_t(:,:,j)))),'%.1e'),'$'],...            
+        else
+            title(['t = ', num2str(t,3)]);%,...%,'\\ j_{max} = ',num2str(max(max(abs(flux_t(:,:,j)))),'%.1e'),'$'],...        
+        end
         %    'fontsize',15);
         pl_j = pl_j +1;                
     end        

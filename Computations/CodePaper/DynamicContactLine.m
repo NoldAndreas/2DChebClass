@@ -48,11 +48,11 @@ function DynamicContactLine()
     config.optsPhys.gammaS   = 2;        
     res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
-    config.optsPhys.gammaS   = 5;
-    res{3} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    %config.optsPhys.gammaS   = 5;
+    %res{3} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
-    config.optsPhys.gammaS   = 10;
-    res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    %config.optsPhys.gammaS   = 10;
+    %res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
     
     res = PostProcess(res);    
    
@@ -74,9 +74,10 @@ function DynamicContactLine()
     
    
     %PlotResultsOverTime(res,'massErrorRel_dt');  %SaveFigure('Dynamics_MassErrorTime',saveC);
-    PlotResultsOverTime(res,'mass',{'maxN'}); ylim([2 2.6]); f1 = gcf; %SaveFigure(['Dynamics_Mass'],saveC);        
+    PlotResultsOverTime(res,'mass',{'maxN'}); ylim([2.2 3]); f1 = gcf; %SaveFigure(['Dynamics_Mass'],saveC);        
     PlotResults(res,'massErrorRel_dtMax');    f2 = gcf;  
     inset2(f2,f1,0.3,[0.27,0.2]);   %close(f1);    
+    
     
     SaveFigure(['DynamicMaxMassError'],saveC);   
     
@@ -105,8 +106,7 @@ function DynamicContactLine()
         plotData.data.t = plotData.data.t(plotData.data.t < 3.1);
         
         figure('color','white','Position',[0 0 800 800]);
-        PlotDDFT_SnapshotsShape(plotData,[CL.FilenameDyn,'_4Snapshots'],{'4Snapshots','noNewFigure'});
-        
+        PlotDDFT_SnapshotsShape(plotData,[CL.FilenameDyn,'_4Snapshots'],{'4Snapshots','noNewFigure','NumericsManuscript'});                
         
     end
     
@@ -182,6 +182,7 @@ function DynamicContactLine()
             end
         end
                 
+        ylim([2.2 3]);
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);            
         xlabel('$t$','Interpreter','Latex','fontsize',20);

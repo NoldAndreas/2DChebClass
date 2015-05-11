@@ -60,22 +60,22 @@ function Check2DSumRule()
      %config.optsNum.V2Num.Fex = 'SplitAnnulus';
      %config.optsPhys.V2.V2DV2 = 'BarkerHendersonHardCutoff_2D';                
 %     res{2}                   = DataStorage(dirRes,@ComputeError,v2struct(N,config),[],comp,ignoreList);                        
-    
+    res = PostProcess(res);
+
     cols = GetGreyShades(length(res{1}));
 	syms = {'o','*','^','<','d','s','>'};  nosyms = length(syms);
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
 
-    
     %**********************
     %**********************    
     PlotDisjoiningPressureProfiles(res);
     
     %fullname = PlotDensityProfile(res{1}(3));
-    %open([fullname,'.fig']);
-    open('D:\2DChebData\CodePaper\deg90\2015_3_24_14_7_2_EquilibriumContour.fig');    
+    %open([fullname,'.fig']);    
+    open('D:\2DChebData\CodePaper\deg90\2015_5_9_17_1_53_EquilibriumContour.fig');
     set(gca,'fontsize',15); set(gca,'linewidth',1.5);
-    xlabel('${y_1}/{\sigma}$','Interpreter','Latex','fontsize',20);
-        ylabel('${y_2}/{\sigma}$','Interpreter','Latex','fontsize',20);
+    xlabel('${y_1}$','Interpreter','Latex','fontsize',20);%/{\sigma}
+	ylabel('${y_2}$','Interpreter','Latex','fontsize',20); %/{\sigma}
     f1 = gcf;
     %**********************
     %**********************
@@ -87,7 +87,8 @@ function Check2DSumRule()
     f2 = figure('color','white','Position',[0 0 800 800]); 
 %    legendstring = {};
     %subplot(1,2,1);
-    PlotErrorGraph(res,'sumRuleII_eps','-m','m');     
+    PlotErrorGraph(res,'sumRuleII_epsMax','-k','k');     
+    %PlotErrorGraph(res,'sumRuleII_eps','-m','m');
     PlotErrorGraph(res,'sumRuleII_relError','k');                
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
@@ -101,7 +102,7 @@ function Check2DSumRule()
     SaveFigure('SumRuleError2D',v2struct(N,config));
     
     figure('color','white','Position',[0 0 800 800]);  %subplot(1,2,2);
-    PlotErrorGraph(res,'sumRuleII_eps','-k');     
+    PlotErrorGraph(res,'sumRuleII_eps','-k','k');     
     set(gca,'YScale','log');
     set(gca,'linewidth',1.5);
     set(gca,'fontsize',20);            
@@ -119,7 +120,7 @@ function Check2DSumRule()
         
         K = length(res);
         y = res{1}(1).piII.y1.Pts.y;
-        figure('color','white','Position',[0 0 600 800]); 
+        figure('color','white','Position',[0 0 800 800]); 
         
         for k0 = 1:K
             subplot(K,1,k0);
@@ -133,12 +134,12 @@ function Check2DSumRule()
                                     'MarkerSize',7); hold on;
             end
             plot([min(y) max(y)],[0 0],'k--','linewidth',1.5);
-            set(gca,'fontsize',25);
+            set(gca,'fontsize',20);
             set(gca,'linewidth',1.5);
             xlim([min(y) max(y)]);
             ylim([-0.1 0.02]);
-            xlabel('$y_1/\sigma$','Interpreter','Latex','fontsize',25);
-            ylabel('$\Pi \sigma^3/\varepsilon$','Interpreter','Latex','fontsize',25);
+            xlabel('$y_1$','Interpreter','Latex','fontsize',20); %/\sigma
+            ylabel('$\Pi$','Interpreter','Latex','fontsize',20); %\sigma^3/\varepsilon
         end
         
         
@@ -153,8 +154,8 @@ function Check2DSumRule()
         CLT.IDC.do1DPlotNormal(resC{1}.rho1D,'s','b'); hold on;
         CLT.IDC.do1DPlotNormal(resC{2}.rho1D,'p','b');
         xlim([0 6]);
-        xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',20);
-        ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);            
+        xlabel('$y_2$','Interpreter','Latex','fontsize',20);%/\sigma
+        ylabel('$n$','Interpreter','Latex','fontsize',20);   %\sigma^3
 
         figure('color','white','Position',[0 0 600 600]);  %subplot(3,1,2);
         for k = 3:length(resC)
@@ -162,8 +163,8 @@ function Check2DSumRule()
         end
         xlim([0 6]);
         ylim([0 1.8]);
-        xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',20);
-        ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',20);    
+        xlabel('$y_2$','Interpreter','Latex','fontsize',20); %/\sigma
+        ylabel('$n$','Interpreter','Latex','fontsize',20);    %\sigma^3
 
         figure('color','white','Position',[0 0 600 600]);  %subplot(3,1,3);
         for k = 3:length(resC)
@@ -185,8 +186,8 @@ function Check2DSumRule()
         figure('Color','white','Position',[0 0 800 800]);
         CL.PlotContourResults({})
         set(gca,'fontsize',35);  
-        xlabel('${y_1}/{\sigma}$','Interpreter','Latex','fontsize',35);
-        ylabel('${y_2}/{\sigma}$','Interpreter','Latex','fontsize',35);
+        xlabel('${y_1}$','Interpreter','Latex','fontsize',35); %/{\sigma}
+        ylabel('${y_2}$','Interpreter','Latex','fontsize',35);%/{\sigma}
         fullname = CL.SaveCurrentFigure('EquilibriumContour');                
     end
     function res = ComputeError(in,h)
@@ -247,6 +248,15 @@ function Check2DSumRule()
             hold on;
             %legendstring(end+1) = {name};
         end        
+    end
+
+    function res = PostProcess(res)
+        for i0 = 1:length(res)
+            for i1 = 1:length(res{i0})
+                DP = res{i0}(i1).piII.DP;
+                res{i0}(i1).sumRuleII_epsMax = max(abs(DP(1)),abs(DP(end)))/max(abs(DP));
+            end
+        end
     end
 
 end

@@ -87,14 +87,12 @@ function CheckSumRule_BH_HalfSpace()
  %   resC = DataStorage([],@ComputeDensityProfile,config,resC,true,ignoreList);
              
     %**********************
-    %**********************    
-    figure('color','white','Position',[0 0 600 600]);
+    %**********************        
     %PlotConvergenceDensityProfilesInt(res{3},N,0.17,[1 7],[60,100],'rho_1D_WL'); title([]);
-    PlotConvergenceDensityProfilesInt(res{3},N,0.05,[3 7],[60,100],'rho_1D_WL'); title([]);
+    PlotConvergenceDensityProfilesInt(res{3},N,0.05*[-1 1],[3 7],[60,100],'rho_1D_WL'); title([]);
     SaveFigure('BH_ConvergingDensityProfiles');
-    
-    figure('color','white','Position',[0 0 600 600]);
-    PlotConvergenceDensityProfilesInt(res{1},N,0.007,[3 7],[60,100],'rho_1D'); title([]);
+        
+    PlotConvergenceDensityProfilesInt(res{1},N,[-0.0075 0.015],[3 7],[60,100],'rho_1D'); title([]);
     %PlotConvergenceDensityProfilesInt(res{1},N,0.17,[1 7],[60,100],'rho_1D');
     SaveFigure('HS_ConvergingDensityProfiles');
     
@@ -196,6 +194,16 @@ function CheckSumRule_BH_HalfSpace()
         is     = is(mark);        
         cls = GetGreyShades(length(is)); %cols = {'b','m','k','r','g'};
                 
+        f1 = figure('color','white','Position',[0 0 600 600]);
+       %plot(res(end).y2-0.5,res(end).(rhoName),'o','color','k','MarkerSize',8,'MarkerFaceColor','k'); hold on;
+        IP = barychebevalMatrix(res(end).x2,xIP);
+        plot(yIP-0.5,IP*res(end).(rhoName),'-','color','k','linewidth',1.5); hold on;
+        xlim([0 10])
+        set(gca,'fontsize',20); set(gca,'linewidth',1.5);
+        xlabel('$y_2$','Interpreter','Latex','fontsize',25); %/\sigma
+        ylabel('$n$','Interpreter','Latex','fontsize',25); %\sigma^3
+        
+        f2 = figure('color','white','Position',[0 0 600 600]);
         for i = 1:sum(mark)
             resI   = res(is(i));
             rhoRefErr = abs(rhoRef-res(i).(rhoName)(end));
@@ -209,19 +217,19 @@ function CheckSumRule_BH_HalfSpace()
         end        
         xlim(xlims);
         if(~isempty(yLimMax))                    
-            ylim([-1 1]*yLimMax);
+            ylim(yLimMax);
         else
             set(gca,'YScale','log');            
             ylim([1e-12 2]);
         end
-        title(['$N \in [',num2str(NInt(1)),';',num2str(NInt(2)),']$'],...
-                                    'Interpreter','Latex',...
-                                    'fontsize',20);
-        set(gca,'fontsize',20);
-        set(gca,'linewidth',1.5);
-        xlabel('$y_2/\sigma$','Interpreter','Latex','fontsize',25);
-        ylabel('$(n - n_{b})\sigma^3$','Interpreter','Latex','fontsize',25); 
+      %  title(['$N \in [',num2str(NInt(1)),';',num2str(NInt(2)),']$'],...
+%                                    'Interpreter','Latex',...
+%                                    'fontsize',20);
+        set(gca,'fontsize',15); set(gca,'linewidth',1.5);
+        xlabel('$y_2$','Interpreter','Latex','fontsize',20); %/\sigma
+        ylabel('$n - n_{b}$','Interpreter','Latex','fontsize',20); %\sigma^3        
        
+        inset2(f1,f2,0.5,[0.5,0.5]);   close(f2);    
     end    
     function PlotDensityProfiles(resC)
         CLT = ContactLineHS(config);

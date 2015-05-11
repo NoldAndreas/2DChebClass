@@ -35,7 +35,7 @@ function [WDG,res] = SimulationWedgeCutSide
 	pbaspect(ax,[(xl(2)-xl(1)) (yl(2)-yl(1)) 1]);
     
     %pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1])
-    SaveFigure('WedgeCutSide');
+    %SaveFigure('WedgeCutSide');
     res.fig_handles{1} = gcf;    
     
      %Check Polar Spectral/Spectral map in 2D:                                             
