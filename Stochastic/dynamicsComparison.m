@@ -33,11 +33,11 @@ AddPaths();
 %inputFile = 'GaussianBoxTest3';
 
 %inputFile = 'BoxTest3';
-inputFile = 'BoxTest3N';
+%inputFile = 'BoxTest3N';
 
 %inputFile = 'FMTTest_2Species'; % higher density, less accurate
 %inputFile = 'FMTTest_2Species2';
-%inputFile = 'FMTTest_2Species2N';
+inputFile = 'FMTTest_2Species2N';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file
