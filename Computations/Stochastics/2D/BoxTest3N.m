@@ -104,7 +104,7 @@ tMax = 5;
 % only relevant if fixedInitial=false or sampleFinal=true
 %nSamples=100000;  
 
-nSamples=500000;  
+nSamples=5000000;  
 
 sampleFinal = false;
 
@@ -131,7 +131,7 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-doStoc={false,false,false,false};
+doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -142,7 +142,7 @@ tSteps={10^4,10^3,2*10^4,10^3};
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
-stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
+stocColour = {{'r','b','g'}};
 stocStyle = {{'--','--','--'}};
 
 %--------------------------------------------------------------------------
@@ -154,8 +154,8 @@ y0 = 3;
 
 Phys_Area = struct('shape','Box','L1',L1S,'L2',L2S);
 
-Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',100,...
-                       'y2Min',0,'y2Max',L2S,'N2',100);
+Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',50,...
+                       'y2Min',0,'y2Max',L2S,'N2',50);
 
 V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
 
@@ -173,7 +173,8 @@ DDFTName = {};
 doDDFT = {};
 loadDDFT = {};
 
-for N = 10:2:50
+%for N = 10:2:50
+for N = 50:50
     Phys_Area.N = [N,N];
     PhysArea = cat(2,PhysArea,Phys_Area);
     PlotArea = cat(2,PlotArea,Plot_Area);
@@ -192,8 +193,8 @@ end
 doPlots = false;
 
 % for stochastic comparison
-%DDFTColour = {{'k','c','m'},{'k','c','m'},{'k','c','m'},{'k','c','m'}};
-%DDFTStyle = {{':',':',':'},{'-.','-.','-.'},{'--','--','--'},{'-','-','-'}};
+DDFTColour = {{'k','c','m'}};
+DDFTStyle = {{'-','-','-'}};
 
 % for N computations
 %DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
@@ -203,17 +204,18 @@ doPlots = false;
 % Plotting setup
 %--------------------------------------------------------------------------
 
-plotType = 'contour';
+%plotType = 'contour';
+plotType = 'surf';
 
 % x axis for position and velocity plots
 
 %for stochastic comparison
-%rMin=[0;0];
-%rMax=[L1S;L2S];
+rMin=[0;0];
+rMax=[L1S;L2S];
 
 % for N computation
-rMin = [4;4];
-rMax = [10;10];
+% rMin = [4;4];
+% rMax = [10;10];
 
 pMin=rMin;
 pMax=rMax;

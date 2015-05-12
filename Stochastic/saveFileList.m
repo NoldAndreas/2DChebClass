@@ -12,7 +12,8 @@ function saveFileList(inputFile,potNames,stocStruct,DDFTStruct)
     
     divString = '%%--------------------------------------------------------------------------\n';
     
-    gitCmd = '/usr/local/git/bin/git';
+    %gitCmd = '/usr/local/git/bin/git';
+    gitCmd = 'git';
     [~,gitBranch] = system([gitCmd ' rev-parse --abbrev-ref HEAD']);
     [~,gitHash]   = system([gitCmd ' rev-parse HEAD']);
     fprintf(fid,'\n');
