@@ -1,10 +1,22 @@
-function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,BoolPlot)
+function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opts)
     global PersonalUserOutput 
-            
-    saveFigs = true;
+                
     if(nargin < 6)
-        BoolPlot = true;
+        opts = {};
+    else
+        if(islogical(opts))
+            if(opts)
+                opts = {'plot'};
+            else
+                opts = {};
+            end            
+        end
     end
+    if(IsOption(opts,'NumericsManuscript'))
+        xLabelTxt = '$y_2$'; yLabelTxt = '$n$';
+    else
+        xLabelTxt = '$y_2/\sigma$'; yLabelTxt = '$n\sigma^3$';
+    end        
 
     %************************************************
     %***************  Initialization ****************
@@ -120,14 +132,18 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     %****************************
     %********** Plot ************
     %****************************
-    if(BoolPlot && (PersonalUserOutput))        
-        bool_collPts = 'o';%[]; %'o'
+    if(IsOption(opts,'plot') && (PersonalUserOutput))        
+        if(IsOption(opts,'NoCollPts'))
+            bool_collPts = [];
+        else
+            bool_collPts = 'o';%[]; %'o'
+        end
         f1 = figure;
         
         subplot(3,3,[1,2,4,5,7,8]);
         HS.do1DPlotNormal(rho_ic1D,bool_collPts); hold on;
-        ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',25);
-        xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
+        h = xlabel(xLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+        h = ylabel(yLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
         
         plot([0 10],[rhoBulk,rhoBulk],'k--','linewidth',2);
         if(~isempty(IntMatrFex) && ~isempty(checkContactDensity))
@@ -158,8 +174,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             end
             %plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
             plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k','linewidth',1.5);  %Interp1D.pts2
-            h = xlabel('$y_{2,cart}/\sigma$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-            h = ylabel('$n\sigma^3$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+            h = xlabel(xLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
+            h = ylabel(yLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
             pbaspect([1 1 1]);                
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);                
@@ -181,8 +197,12 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             %set(f2, 'Position', [0 0 400 400]);
             subplot(3,3,3);
             do1Dplot(nStruct.n2*rho_ic1D,bool_collPts);             
-            ylabel('$n_2 \sigma^3$','Interpreter','Latex','fontsize',25);
-            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
+            if(IsOption(opts,'NumericsManuscript'))            
+                ylabel('$n_2$','Interpreter','Latex','fontsize',25);
+            else
+                ylabel('$n_2 \sigma^3$','Interpreter','Latex','fontsize',25);
+            end
+            xlabel(xLabelTxt,'Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
             xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
             %inset2(f1,f2,0.25,[0.2,0.6]); close(f2);            
@@ -190,8 +210,12 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             %f2 = figure('Color','white'); set(f2, 'Position', [0 0 400 400]);
             subplot(3,3,6);
             do1Dplot(nStruct.n3*rho_ic1D,bool_collPts);             
-            ylabel('$n_3 \sigma^3$','Interpreter','Latex','fontsize',25);
-            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
+            if(IsOption(opts,'NumericsManuscript'))            
+                ylabel('$n_3$','Interpreter','Latex','fontsize',25);
+            else
+                ylabel('$n_3 \sigma^3$','Interpreter','Latex','fontsize',25);
+            end
+            xlabel(xLabelTxt,'Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
             xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
             %inset2(f1,f2,0.25,[0.45,0.6]); close(f2); 
@@ -199,8 +223,13 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
             %f2 = figure('Color','white'); set(f2, 'Position', [0 0 400 400]);
             subplot(3,3,9);
             do1Dplot(nStruct.n2_v_2*rho_ic1D,bool_collPts); 
-            ylabel('${\left(\bf n_{2}\right)}_2 \sigma^3$','Interpreter','Latex','fontsize',25);
-            xlabel('$y_{2,cart}/\sigma$','Interpreter','Latex','fontsize',25);
+            if(IsOption(opts,'NumericsManuscript'))            
+                ylabel('${\left(\bf n_{2}\right)}_2$','Interpreter','Latex','fontsize',25);
+            else
+                ylabel('${\left(\bf n_{2}\right)}_2 \sigma^3$','Interpreter','Latex','fontsize',25);
+            end            
+            %ylabel('${\left(\bf n_{2}\right)}_2 \sigma^3$','Interpreter','Latex','fontsize',25);
+            xlabel(xLabelTxt,'Interpreter','Latex','fontsize',25);
             pbaspect([1 1 1]);            
             xlim([-0.5 3.5]); set(gca,'Xtick',[-0.5 3.5]);
             %inset2(f1,f2,0.25,[0.7,0.6]); close(f2);            
@@ -218,7 +247,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,Boo
     
     
     %***************************************************************
-    %   Physical Auxiliary functions:
+    %   Physical Auxiliary functions:    
     %***************************************************************             
     function y = f(x)
         %solves for T*log*rho + Vext                        

@@ -37,6 +37,6 @@
     CheckAverageDensities_Rosenfeld_3D(EX.IDC,EX.IntMatrFex);
 	optsPhys.rho_iguess = optsPhys.eta*6/pi;
     %FMT_1D_HardWall(EX.IDC,EX.IntMatrFex,optsPhys,optsNum);
-    FMT_1D(EX.IDC,EX.IntMatrFex,optsPhys,optsNum.FexNum,[],true);
+    FMT_1D(EX.IDC,EX.IntMatrFex,optsPhys,optsNum.FexNum,[],{'plot','NumericsManuscript','NoCollPts'});
     res.fig_handles{1} = gcf; 
 end

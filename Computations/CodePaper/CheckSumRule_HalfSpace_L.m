@@ -8,7 +8,7 @@ function CheckSumRule_HalfSpace_L(N)
     end    
 
     PhysArea = struct('N',[1,N],...
-                      'L1',5,'L2',2,'L2_AD',2.,...
+                      'L1',4,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
                       'N2bound',16,'h',1,...
                       'alpha_deg',90);
@@ -46,7 +46,8 @@ function CheckSumRule_HalfSpace_L(N)
     res{2} = DataStorage(folder,@ComputeError,v2struct(L,config,eta),[]);  
         
     config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
-    config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
+    %config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);
+    config.optsPhys.V2   = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
     config.optsPhys.V1.V1DV1 = 'Vext_BarkerHenderson_HardWall';
     config.optsPhys.V1.epsilon_w = 0.9; %0.95    
     res{3} = DataStorage(folder,@ComputeError,v2struct(L,config),[]);     	
