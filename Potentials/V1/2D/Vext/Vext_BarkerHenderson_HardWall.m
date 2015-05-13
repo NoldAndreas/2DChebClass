@@ -42,19 +42,19 @@ function [VBack_S,VAdd_S]=Vext_BarkerHenderson_HardWall(y1,y2,t,opts)
     VAdd           = epsilon_w * wall;
     dVAdd          = epsilon_w * dwall;
     
-    if(isfield(opts,'epsilon_w_end'))        
+    if(isfield(opts,'epsilon_w_end'))
         VAdd    = VAdd + wall*(epsilon_w_end - epsilon_w)*(1 -exp(-t^2));
         dVAdd   = dVAdd + dwall*(epsilon_w_end - epsilon_w)*(1 -exp(-t^2));
     elseif(isfield(opts,'epsilon_w_Amplitude'))
          VAdd    = VAdd  + wall*(opts.epsilon_w_Amplitude)*sin(pi*t);
          dVAdd   = dVAdd + dwall*(opts.epsilon_w_Amplitude)*sin(pi*t);
-	elseif(isfield(opts,'epsilon_w_max'))        
+	elseif(isfield(opts,'epsilon_w_max'))
         if(t<1)
             VAdd    = VAdd  + wall*(opts.epsilon_w_max)*sin(pi*t);
             dVAdd   = dVAdd + dwall*(opts.epsilon_w_max)*sin(pi*t);
         end
     end
-    
+
     if(isfield(opts,'epsilon_w1'))
         w1_steepness = opts.epsilon_w1;
         L1           = opts.L1;

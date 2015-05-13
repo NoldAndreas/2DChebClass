@@ -3,8 +3,6 @@
     AddPaths('CodePaper');            
     close all;
     
-%PhysArea = struct('N',[20,20],...
-%                      'L1',4,'L2',2,'L2_AD',2.,...                       
     PhysArea = struct('N',[40,40],...
                       'L1',4,'L2',2,'L2_AD',2.,...                                            
                       'y2wall',0.,...
@@ -25,7 +23,7 @@
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
                    
-	plotTimes = struct('t_int',[0,20],'t_n',50);
+	plotTimes = struct('t_int',[0,5],'t_n',50);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -60,8 +58,21 @@
     CL.ComputeDynamics();            
     CL.PostprocessDynamics();
     
-    CL.optsPhys.BCWall_U.bc = 'exp';    
-    CL.ComputeDynamics();            
+    %***********************    
+    CL.optsPhys.V1.tau           = 5;
+    %CL.optsPhys.V1.epsilon_w_max = 1;%epsilon_w_end
+    CL.optsPhys.V1.epsilon_w_end = 1.5;%epsilon_w_end
+    CL.optsNum.plotTimes.t_int(2) = 40;
+    
+    CL.optsPhys                  = rmfield(CL.optsPhys,'BCWall_U');
+    CL.ComputeDynamics();
     CL.PostprocessDynamics();
+    
+    %***********************    
+    CL.optsNum.plotTimes.t_int(2) = 100;
+    CL.optsPhys.V1             = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94);
+    CL.optsPhys.ModifyEq_to_IC = struct('Mode','expY2','a0',3,'a1',3);
+    CL.ComputeDynamics();
+    CL.PostprocessDynamics();    
                 
 %end

@@ -131,6 +131,23 @@ classdef DDFT_2D < Computation
                 % BulkPhaseDiagram(this.optsPhys);
                 this.do2Phase = true;
             end
+        end        
+        function x_ic = GetInitialCondition(this)
+            if(~isfield(this.optsPhys,'ModifyEq_to_IC'))
+                x_ic = this.x_eq;
+            elseif(strcmp(this.optsPhys.ModifyEq_to_IC.Mode,'expY2'))
+                %needed elements of struct ModifyEq_to_IC:
+                % - Mode {expY2}
+                % - a0,a1                
+                opts                  = this.optsPhys.ModifyEq_to_IC;
+                
+                ptsCart_Shifted       = this.IDC.GetCartPts();
+                y2C                   = ptsCart_Shifted.y2_kv;
+                ptsCart_Shifted.y1_kv = ptsCart_Shifted.y1_kv + opts.a0*exp(-y2C/opts.a1);
+                IP                    = this.IDC.SubShapePtsCart(ptsCart_Shifted);
+                x_ic                  = IP*this.x_eq;
+                
+            end
         end
         
         function res = Preprocess_HardSphereContribution(this)      
@@ -273,9 +290,9 @@ classdef DDFT_2D < Computation
             else
                 ComputeDynamicsOverdamped(this);
             end
-        end                
-        ComputeDynamicsOverdamped(this,x_ic,mu)
-        ComputeDynamicsInertia(this,x_ic,mu)
+        end
+        ComputeDynamicsOverdamped(this)
+        ComputeDynamicsInertia(this)
         
         function PlotDensityContours(this,rho,optsPlot)
                        

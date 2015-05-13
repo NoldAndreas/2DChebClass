@@ -1,7 +1,7 @@
 function uwall = WallBC(t,Ind,BCWall)    
 
     if(isempty(BCWall))
-        uwall = zeros(size(Ind.normalFinite,1));
+        uwall = zeros(sum(Ind.finite2),1);
         return;
     end
 

@@ -1,4 +1,4 @@
-function ComputeDynamicsInertia(this,x_ic,mu)
+function ComputeDynamicsInertia(this)
 
 %% Solves
 % 
@@ -86,7 +86,7 @@ function ComputeDynamicsInertia(this,x_ic,mu)
     ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
     
     if(nargin < 2)
-        x_ic = this.x_eq;
+        x_ic = GetInitialCondition(this);
         mu   = this.mu;
     end
     

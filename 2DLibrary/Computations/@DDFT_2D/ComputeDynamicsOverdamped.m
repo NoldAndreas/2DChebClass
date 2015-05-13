@@ -1,4 +1,4 @@
-function ComputeDynamicsOverdamped(this,x_ic,mu)         
+function ComputeDynamicsOverdamped(this)    
 %% Solves
 % 
 % $$\frac{\partial \varrho}{\partial t} = \nabla \cdot ( \varrho \nabla \mu )$$
