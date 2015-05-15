@@ -98,13 +98,31 @@ inside = @(x,th) (logpdf(x) > th);
 
 wb=waitbar(0,'');
 
+tStart = clock;
+
+tString = '???';
+
+updateCount = 0;
+updateThreshold = (nsamples*thin + burnin)/100;
+
 % update using stepping-out and shrinkage procedures.
 for i = 1-burnin:nsamples*thin
+
+    updateCount = updateCount + 1;
+    
+    if(updateCount>=updateThreshold)
+        updateCount = 0;
+        tTaken = etime(clock,tStart);
+        tLeft  = (nsamples*thin - i)/(i+burnin)*tTaken;
+        tEst   = addtodate(now,round(tLeft),'second');
+        tString    = datestr(tEst);
+    end
     
     if i<0
         waitbar( -i/burnin, wb, 'burn-in');
     else
-        waitbar( i/(nsamples*thin), wb, ['slice sampling ' num2str(i) '/' num2str(nsamples*thin) ]);
+        waitbar( i/(nsamples*thin), wb, ['slice sampling ' num2str(i) '/' num2str(nsamples*thin) '; ' ...
+                    'Est. finish ' tString]);
     end
     
     % A vertical level is drawn uniformly from (0,f(x0)) and used to define

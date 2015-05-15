@@ -67,9 +67,9 @@ tMax=0.25;
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
 
-nSamples=5000000;  
+%nSamples=5000000;  
  
-%nSamples=200;
+nSamples=20000;
 
 initialGuess='makeGrid';
 
@@ -107,7 +107,7 @@ tSteps={10^4,10^3,10^4,10^3};
 saveStoc={true,true,true,true};
 
 stocColour = {{'g','m'},{'g'},{'b'},{'m'}};
-stocStyle = {{'--','--'}};
+stocStyle = {{':',':'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
