@@ -55,23 +55,48 @@
     CL = ContactLineHS(config);
     CL.Preprocess(); 
     CL.ComputeEquilibrium();              
+    
+    %**********************************************
+    % Moving the wall - forced wetting
+    %**********************************************
+    
+    CL.optsNum.plotTimes.t_int(2) = 10;
     CL.ComputeDynamics();            
     CL.PostprocessDynamics();
     
-    %***********************    
-    CL.optsPhys.V1.tau           = 5;
-    %CL.optsPhys.V1.epsilon_w_max = 1;%epsilon_w_end
-    CL.optsPhys.V1.epsilon_w_end = 1.5;%epsilon_w_end
-    CL.optsNum.plotTimes.t_int(2) = 40;
+    %***********************        
+    CL.optsPhys.BCWall_U.u_max = -0.2;
+    CL.ComputeDynamics();
+    CL.PostprocessDynamics();
+    
+    %*************************************************************
+    % Increasing/Decreasing attraction of wall - Spontaneous spreading
+    %*************************************************************
+    CL.optsPhys.V1.tau            = 5;    
+    CL.optsPhys.V1.epsilon_w_end  = 1.5;%epsilon_w_end
+    CL.optsNum.plotTimes.t_int(2) = 100;
     
     CL.optsPhys                  = rmfield(CL.optsPhys,'BCWall_U');
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
     
-    %***********************    
+    %***********************            
+    CL.optsPhys.V1.epsilon_w_end  = 0.5;%epsilon_w_end    
+    CL.optsPhys                   = rmfield(CL.optsPhys,'BCWall_U');
+    CL.ComputeDynamics();
+    CL.PostprocessDynamics();
+    
+    %**********************************************
+    % Equilibration from off-equilibrium IC
+    %**********************************************
     CL.optsNum.plotTimes.t_int(2) = 100;
     CL.optsPhys.V1             = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94);
     CL.optsPhys.ModifyEq_to_IC = struct('Mode','expY2','a0',3,'a1',3);
+    CL.ComputeDynamics();
+    CL.PostprocessDynamics();    
+    
+    %***********************
+    CL.optsPhys.ModifyEq_to_IC.a0 = -3;
     CL.ComputeDynamics();
     CL.PostprocessDynamics();    
                 

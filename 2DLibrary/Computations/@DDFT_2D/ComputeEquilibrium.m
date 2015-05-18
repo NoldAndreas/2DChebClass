@@ -30,6 +30,7 @@
     if(isfield(opts.optsPhys,'nParticles'))
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
+    opts.FexNum     = this.optsNum.FexNum;
     
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
 %    opts.Comments    = this.configName;    
@@ -41,8 +42,7 @@
     misc.VAdd       = this.VAdd;
     misc.x_ig       = x_ig;
     misc.Conv       = this.IntMatrV2;  
-    misc.IntMatrFex = this.IntMatrFex;
-    misc.FexNum     = this.optsNum.FexNum;
+    misc.IntMatrFex = this.IntMatrFex;    
     misc.Int        = this.IDC.Int;
     
     opts.Comments = this.configName;
@@ -55,10 +55,18 @@
                   'optsPhys_V1_epsilon_w_Amplitude',...
                   'optsPhys_V1_epsilon_w_max',...
                   'optsPhys_V1_tau',...
-                  'optsPhys_viscosity'};
-	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
+                  'optsPhys_viscosity',...
+                  'FexNum',...
+                  'Iterative'};
+
+    if(isfield(opts,'Iterative') && opts.Iterative)
+        [sol,recEq,paramsEq] = DataStorage('EquilibriumIterative',...
+                            @ComputeEquilibriumCondition_Iter,opts,misc,[],ignoreList);
+    else        
+        [sol,recEq,paramsEq] = DataStorage('Equilibrium',...
                             @ComputeEquilibriumCondition,opts,misc,[],ignoreList);
-         
+    end
+
     this.x_eq   = sol.x;
     this.mu     = sol.mu;
     if(isfield(paramsEq,'Filename'))

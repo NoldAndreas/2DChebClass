@@ -58,8 +58,8 @@ classdef (Abstract) Spectral < Interval
 
             % find size of function matrix by making a dummy version
             fPTemp = f(Pts.y-Pts.y);
-            fDim = size(fPTemp);
-            nElts = prod(fDim(2:end)); % first dimension stores values
+            fDim   = size(fPTemp);
+            nElts  = prod(fDim(2:end)); % first dimension stores values
             
             IntT = Int.';  % N x 1
             

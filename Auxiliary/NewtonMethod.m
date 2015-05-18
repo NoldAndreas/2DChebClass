@@ -32,9 +32,9 @@ function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
     end
     
     if(err > TolFun)
-        rho = [];        
+        rho = [];
     end
     
-     display(['Error: ',num2str(err)]);
-     display(['No of iterations: ' , num2str(i)]);
+    display(['Error: ',num2str(err)]);
+    display(['No of iterations: ' , num2str(i)]);
 end

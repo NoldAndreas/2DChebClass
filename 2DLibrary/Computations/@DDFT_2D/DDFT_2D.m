@@ -320,16 +320,22 @@ classdef DDFT_2D < Computation
             end
             
         end        
-        function PlotDynamicValue(this,val)
+        function PlotDynamicValue(this,varName,opts)
+            if(nargin < 3)
+                opts = {};
+            end
             
             plotTimes = this.dynamicsResult.t;
             rho_t     = this.dynamicsResult.rho_t;   
+            val       = this.dynamicsResult.(varName);
             
             doFlux    = (size(val,1) == 2*this.IDC.M);
             
             figure('Color','white','Position', [0 0 800 800]);
             
             T_n_Max = length(plotTimes);            
+            fileNames = [];
+            
             for i=1:T_n_Max
             
                 t       = plotTimes(i);
@@ -354,6 +360,22 @@ classdef DDFT_2D < Computation
                 h = get(gca,'ylabel'); set(h,'fontsize',35);
                 h = get(gca,'title');  set(h,'fontsize',35);
                 pause(0.2);
+                
+                
+                if(IsOption(opts,'save'))
+                    fileName = getPDFMovieFile('Movie1',i);
+                    save2pdf(fileName,gcf);
+                    fileNames = [fileNames,' ',fileName];
+                end                
+                
+            end
+            
+            if(IsOption(opts,'save'))                
+                allPdfFiles = [this.FilenameDyn,'_',varName,'.pdf'];                
+    
+                system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
+                disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
+                system(['del ',fileNames]);           
             end
         end                
         function fig_h = PlotDynamics(this,rec)

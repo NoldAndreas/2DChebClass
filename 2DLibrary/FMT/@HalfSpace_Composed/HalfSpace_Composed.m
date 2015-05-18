@@ -9,7 +9,7 @@
        %mark_id_1,mark_id_2,mark_id,mark_12
        Pts,N1,N2
        Mstrip,MHS,M     %no of points (in both dimensions)
-       alpha                
+       alpha           
    end
    
    methods
@@ -249,6 +249,13 @@
        function PlotIsoline(this,x,y1y2)
            this.Sub_HalfSpace.PlotIsoline(x,y1y2);
            this.Sub_Strip.PlotIsoline(x,y1y2);
+       end
+       function Diff   = ComputeDifferentiationMatrix(this)
+           Diff_ST  = this.Sub_Strip.ComputeDifferentiationMatrix();
+           Diff_HS  = this.Sub_HalfSpace.ComputeDifferentiationMatrix();
+           
+           Diff.Dy1 = blkdiag(Diff_ST.Dy1,Diff_HS.Dy1);
+           Diff.Dy2 = blkdiag(Diff_ST.Dy2,Diff_HS.Dy2);                      
        end
        
 %        function PlotGrid(this)

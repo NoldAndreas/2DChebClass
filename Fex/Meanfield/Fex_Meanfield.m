@@ -1,4 +1,4 @@
-function MeanField = Fex_Meanfield(rho,IntMatrFex,kBT)
+function [MeanField,J] = Fex_Meanfield(rho,IntMatrFex,kBT)
     % get number of species
 
     nSpecies=size(rho,2);
@@ -12,7 +12,9 @@ function MeanField = Fex_Meanfield(rho,IntMatrFex,kBT)
                   + IntMatrFex(iSpecies,jSpecies).Conv*rho(:,jSpecies);
             end
         end    
+        J = [];
     else
         MeanField = IntMatrFex*rho;
+        J         = IntMatrFex;
     end
 end
