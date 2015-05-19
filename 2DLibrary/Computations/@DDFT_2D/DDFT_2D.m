@@ -29,6 +29,14 @@ classdef DDFT_2D < Computation
                 this.optsPhys.D0 = 1;
             end                
             
+            
+            if((isfield(this.optsPhys,'Inertial') && this.optsPhys.Inertial) || ...
+                     (isfield(this.optsNum,'Inertial') && this.optsNum.Inertial)) 
+                 this.optsPhys.Inertial = true;
+            else
+                this.optsPhys.Inertial = false;
+            end
+            
         end        
         function res = Preprocess(this)
 
@@ -148,7 +156,7 @@ classdef DDFT_2D < Computation
                 x_ic                  = IP*this.x_eq;
                 
             end
-        end
+        end        
         
         function res = Preprocess_HardSphereContribution(this)      
             res = struct();
@@ -284,8 +292,7 @@ classdef DDFT_2D < Computation
         function ComputeDynamics(this)
             if(this.doHIWall)
                 ComputeDynamicsWallHI(this);
-            elseif( (isfield(this.optsPhys,'Inertial') && this.optsPhys.Inertial) || ...
-                     (isfield(this.optsNum,'Inertial') && this.optsNum.Inertial) )
+            elseif(this.optsPhys.Inertial)
                 ComputeDynamicsInertia(this);
             else
                 ComputeDynamicsOverdamped(this);
@@ -326,28 +333,46 @@ classdef DDFT_2D < Computation
             end
             
             plotTimes = this.dynamicsResult.t;
-            rho_t     = this.dynamicsResult.rho_t;   
-            val       = this.dynamicsResult.(varName);
+            rho_t     = this.dynamicsResult.rho_t;  
             
-            doFlux    = (size(val,1) == 2*this.IDC.M);
+            if(iscell(varName))
+                val       = this.dynamicsResult.(varName{1});
+                val2      = this.dynamicsResult.(varName{2});
+                name      = [varName{1},'_',varName{2}];
+            else
+                val       = this.dynamicsResult.(varName);
+                val2      = [];
+                name      = varName;
+            end
+                        
             
             figure('Color','white','Position', [0 0 800 800]);
             
             T_n_Max = length(plotTimes);            
             fileNames = [];
+            maxV2     = max(max(max(val2)));
             
             for i=1:T_n_Max
             
                 t       = plotTimes(i);
                 hold off;
                 for iSpecies=1:size(val,2)   
-                    maxVal = max(max(max(abs(val))));
-                    if(doFlux)                   
-                        PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
-                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal);
-                    else
-                        this.IDC.plot(val(:,iSpecies,i),'SC');                    
+                    if(~isempty(val2))                        
+                        this.IDC.plot(val2(:,iSpecies,i),'color'); hold on;
+                        colormap(b2r(0,max(max(val2(:,iSpecies,i)))));
+                        colorbar;
+                        %set(gca, 'CLim', [min(min(min(val2))) max(max(max(val2)))]);
                     end
+                    
+                    maxVal = max(max(max(abs(val))));
+                    if(size(val,1) == 2*this.IDC.M)                   
+                        PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
+                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal,1.5,'k'); 
+                    else
+                        %this.IDC.plot(val(:,iSpecies,i),'SC');                    
+                        this.IDC.plot(val(:,iSpecies,i),'contour');
+                    end
+                    
                 end                
                 title(['t = ', num2str((t))]);               
                 set(gca,'fontsize',20);
@@ -371,7 +396,7 @@ classdef DDFT_2D < Computation
             end
             
             if(IsOption(opts,'save'))                
-                allPdfFiles = [this.FilenameDyn,'_',varName,'.pdf'];                
+                allPdfFiles = [this.FilenameDyn,'_',name,'.pdf'];                
     
                 system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
                 disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
@@ -394,6 +419,7 @@ classdef DDFT_2D < Computation
             fig_h = PlotDDFT(plotData,rec);
         end              
         function PostprocessDynamics(this)                    
+            optsPhys      = this.optsPhys;
             subArea       = this.subArea;%dynamicsResult.Subspace.subArea;
             rho_t         = this.dynamicsResult.rho_t;
             no_times      = length(this.dynamicsResult.t);
@@ -416,7 +442,33 @@ classdef DDFT_2D < Computation
             
             this.dynamicsResult.Subspace.mass         = mass;
             this.dynamicsResult.Subspace.massError    = massError;            
-            this.dynamicsResult.Subspace.massErrorRel = massErrorRel;            
+            this.dynamicsResult.Subspace.massErrorRel = massErrorRel;    
+            
+            %Add entropy production
+            if(isfield(optsPhys,'viscosity') && optsPhys.Inertial && (nSpecies == 1))
+            
+                entropy = zeros(size(rho_t));
+                Diff = this.IDC.Diff;
+                
+                for nt = 1:size(rho_t,3)
+                    %go through time steps
+                    
+                    rho  = rho_t(:,:,nt);
+                    
+                    zeta = BulkViscosity(rho,optsPhys);
+                    eta  = ShearViscosity(rho,optsPhys);
+                    u    = this.dynamicsResult.UV_t(1:end/2,:,nt);
+                    v    = this.dynamicsResult.UV_t(1+end/2:end,:,nt);
+
+                    divUV = Diff.div*[u;v];
+                    entropy(:,:,nt) = zeta.*(divUV.^2) +...
+                                      eta/2.*( ((2*Diff.Dy1)*u - 2/3*divUV).^2 ...
+                                             + ((2*Diff.Dy2)*v - 2/3*divUV).^2 ...
+                                             + 2*(Diff.Dy1*v+Diff.Dy2*u).^2 );     
+                end                
+                this.dynamicsResult.entropy = entropy;
+            end
+            
             
         end
     end

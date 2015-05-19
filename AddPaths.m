@@ -40,19 +40,24 @@
         ChangeDirData([dirDataOrg filesep dirOrg],'ORG');
     end
     
+    no = fprintf('Do you want to be asked if data should be recomputed? (press any key)\n');            
+	if(getkeywait(1) == -1)
+        loadAll = true;
+    else
+        loadAll = false;
+    end
+                  
     if(isempty(recomputeAll))
         recomputeAll = false;
     end
-    
-	if(isempty(loadAll))
-        loadAll = false;
-    end
-    
+    	
     if(isempty(QuickOutput))
         QuickOutput = false;
     end        
     
     if(recomputeAll)
         cprintf('*m','!!! No precomputed data will be used. recomputeAll = true !!!\n');
+    elseif(loadAll)
+        cprintf('*m','Data will be used loaded if available. loadAll = true \n');
     end
 end

@@ -4,6 +4,7 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
     Vext       = misc.Vext;
     VAdd       = misc.VAdd;
     Conv       = misc.Conv;
+    Int        = misc.Int;
     IntMatrFex = misc.IntMatrFex;    
     nSpecies   = params.optsPhys.nSpecies;
     N          = size(Vext,1);
@@ -13,6 +14,7 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
     else
         mark = misc.mark;
     end
+    markF = repmat(mark,nSpecies,1);
     
     kBT    = params.optsPhys.kBT;    
     
@@ -29,21 +31,25 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
        params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.Dmu;       
     end
     
-    if(isfield(params.optsPhys,'mu'))   
+    if(isfield(params.optsPhys,'mu'))
         mu                      = params.optsPhys.mu;
-        [x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
-    else        
-        Int                     = misc.Int;
+        [x_ic,errorHistory]    = NewtonMethod(x_ig(mark),@fs,1e-10,100,1);
+        %[x_ic,errorHistory2]     = NewtonMethod(x_ic,@fs,1e-10,100,1);
+        %[x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
+    else                
         nParticlesS             = params.optsPhys.nParticlesS;
-        [x_ic,errorHistory1]     = NewtonMethod(x_ig([true;mark],:),@fs_canonical,1,100,0.05);
-        [x_ic,errorHistory2]     = NewtonMethod(x_ic,@fs_canonical,1e-10,100,0.5);
+        x_ig_n                  = x_ig([true;mark],:);
+        [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,10,100,0.7);
+        [x_ic,errorHistory2]     = NewtonMethod(x_ic,@fs_canonical,1e-10,100,1);
         %[x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig([true;mark],:),fsolveOpts);
+        errorHistory = [errorHistory1 errorHistory2];
         
         if(isempty(x_ic))
             disp('error');
         else
-            mu    = x_ic(1,:);
-            x_ic  = x_ic(2:end,:);        
+            mu    = (x_ic(1:nSpecies))';
+            x_ic  = x_ic(nSpecies+1:end);
+            x_ic  = reshape(x_ic,N,nSpecies);
         end
     end
     
@@ -55,23 +61,31 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
     sol   = v2struct(rho,mu);    
     sol.x = x_ic_full;
     
-    function mu_sRel = fs(xm)                
-        mu_sRel = GetExcessChemPotentialPart(xm,mu);%./exp((xm-Vext(mark,:))/kBT);
+    function [mu_sRel,J] = fs(xm)                
+        [mu_sRel,J] = GetExcessChemPotentialPart(xm,mu);%./exp((xm-Vext(mark,:))/kBT);
+        J           = J(:,2:end);
     end
 
     function [y,J] = fs_canonical(x)
-        mu_s         = x(1,:);
-        x            = x(2:end,:);       
+        mu_s         = (x(1:nSpecies))';
+        x            = x(nSpecies+1:end);       
+        x            = reshape(x,N,nSpecies);
         
         [y,J]        = GetExcessChemPotentialPart(x,mu_s);%./exp((x-Vext(mark,:))/kBT);
         
         xf(mark,:)   = x;
         xf(~mark,:)  = x_ig(~mark,:);        
         rho_full     = exp((xf-Vext)/kBT);
-        y            = [Int*rho_full - nParticlesS';y];
-        y            = y(:);   
         
-        J            = [0,Int*diag(rho_full)/kBT;J];
+        %Add mass constraint
+        yP           = Int*rho_full - nParticlesS';        
+        y            = [yP(:);y(:)];        
+        
+        JP = zeros(nSpecies,nSpecies*N);
+        for i = 1:nSpecies
+            JP(i,1+(i-1)*N:i*N) = Int*diag(rho_full(:,i))/kBT;
+        end        
+        J            = [zeros(nSpecies),JP;J];
     end
 
     function [mu_s,J_s] = GetExcessChemPotentialPart(xm,mu)        
@@ -79,28 +93,25 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         x(~mark,:) = x_ig(~mark,:);        
         [mu_s,J_s] = GetExcessChemPotential(x,mu);
         mu_s       = mu_s(mark,:);
-        J_s        = J_s(mark,[true;mark]);
+        J_s        = J_s(markF,[true(nSpecies,1);markF]);
     end   
     function [mu_s,J_s] = GetExcessChemPotential(x,mu)
         rho_s            = exp((x-Vext)/kBT);
         [mu_HS,~,~,J_HS] = getFex(rho_s,IntMatrFex,kBT,R);
         if(size(J_HS,2) == nSpecies)
-            J_HS = diag(J_HS);
+            J_HS = diag(J_HS(:));
         end        
-        [mu_attr] = Fex_Meanfield(rho_s,Conv,kBT);
+        [mu_attr,J_attr] = Fex_Meanfield(rho_s,Conv,kBT);
                             
-        %mu_s = mu_HS + mu_attr + x + VAdd;
-        %J_s  = (J_HS + Conv.Conv)*diag(rho_s)/kBT + eye(N);
+        mu_s = mu_HS + mu_attr + x + VAdd;
+        J_s  = (J_HS + J_attr)*diag(rho_s(:))/kBT + eye(N*nSpecies);
         
-        mu_s = mu_HS + Conv.Conv*rho_s + x + VAdd;
-        J_s  = (J_HS + Conv.Conv)*diag(rho_s)/kBT + eye(N);
-        
-        mu_s = mu_s - mu;
-        J_s  = [-ones(N,1),J_s];
-        %for iSpecies=1:nSpecies
-        %   mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu(iSpecies);
-        %end
-        
+                        
+        J_s = [zeros(nSpecies*N,nSpecies),J_s];
+        for iSpecies=1:nSpecies
+           mu_s(:,iSpecies)                     = mu_s(:,iSpecies) - mu(iSpecies);           
+           J_s((1+(iSpecies-1)*N):(iSpecies*N),iSpecies) = -ones(N,1);
+        end
     end   
 
 end

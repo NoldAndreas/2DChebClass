@@ -364,13 +364,12 @@ classdef (Abstract) Shape < handle
                 
                 if((nargin >= 3) && IsOption(options,'contour'))
                     if(nargin >= 4)         
-                        if(isfield(optDetails,'nContours'))
-                            VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        if(isfield(optDetails,'nContours'))                            
                             [C,h] = contour(y1M,y2M,VIM,...
                                   optDetails.nContours,...
                                   'linewidth',lw);  
-                        else
-                            VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        else                            
                             [C,h] = contour(y1M,y2M,VIM,...
                                   'linewidth',lw);  
                         end
@@ -387,6 +386,16 @@ classdef (Abstract) Shape < handle
                                   'linewidth',lw);  
                     end
                     % hh = clabel(C,h,'fontsize',20);
+                elseif((nargin >= 3) && IsOption(options,'color'))
+                    VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                    pcolor(y1M,y2M,VIM);
+                    shading flat;
+                    %colorbar;
+                    %minV = min(min(VIM));
+                    %maxV = max(max(VIM));
+                    %if(abs(maxV - minV)> 0)
+%                        set(gca, 'CLim', [minV maxV]);
+%                    end
                 elseif((nargin >= 3) && IsOption(options,'flux'))
                     VIM.fl_y1     = VI(1:end/2,iSpecies);
                     VIM.fl_y2     = VI(end/2+1:end,iSpecies);

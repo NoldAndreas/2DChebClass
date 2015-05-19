@@ -6,9 +6,9 @@
     %Initialization
     %*****************************	    
     if((nargin == 1) || isempty(rho_ig))
-        x_ig         = getInitialGuess(this);
+        x_ig         = getInitialGuess(this);	
     else
-        x_ig         = getInitialGuess(this,rho_ig);
+        x_ig         = getInitialGuess(this,rho_ig);    
     end
     if(nargin>2)
         opts = optsIn;
@@ -39,11 +39,12 @@
     %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
     %misc.mark = mark;           
     misc.Vext       = this.Vext; 
-    misc.VAdd       = this.VAdd;
-    misc.x_ig       = x_ig;
+    misc.VAdd       = this.VAdd;    
+    misc.x_ig       = x_ig;%   0.01*this.Vext];%x_ig;
     misc.Conv       = this.IntMatrV2;  
     misc.IntMatrFex = this.IntMatrFex;    
     misc.Int        = this.IDC.Int;
+    
     
     opts.Comments = this.configName;
     
@@ -60,6 +61,7 @@
                   'Iterative'};
 
     if(isfield(opts,'Iterative') && opts.Iterative)
+        misc.x_ig            =  [zeros(1,size(this.Vext,2));zeros(size(this.Vext))];
         [sol,recEq,paramsEq] = DataStorage('EquilibriumIterative',...
                             @ComputeEquilibriumCondition_Iter,opts,misc,[],ignoreList);
     else        

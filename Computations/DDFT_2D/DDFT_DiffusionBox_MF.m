@@ -43,8 +43,21 @@
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
+    
+	AddPaths();
+    EX   = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    EX.ComputeEquilibrium([],struct('Iterative',true));
+   % EX.ComputeEquilibrium(); 
+    EX.ComputeDynamics();
+   
+    if( (nargin < 3) || ...
+        (isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots) || ...
+        (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        res.fig_handles = EX.PlotDynamics();
+    end
                   
-    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    %[EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
 
 end                 
 
