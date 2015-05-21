@@ -1,4 +1,4 @@
-function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opts)
+function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opts)
     global PersonalUserOutput 
                 
     if(nargin < 6)
@@ -29,6 +29,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
 	markComp        = (HS.Pts.y1_kv==inf);        
     nSpecies        = 1;
     Pts             = HS.Pts;
+    N               = HS.M;
+    N_AD            = HS.AD.M;
     
     if(~isfield(optsPhys,'V2'))
         optsPhys.V2 = struct('V2DV2','zeroPotential');                  
@@ -68,7 +70,8 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
         [h1,h2,Int_1D_AD]  = HS.AD.ComputeIntegrationVector();
         
         IntMatrFex_1D     = Get1DMatrices(IntMatrFex_2D,HS);    
-        IntMatrFex        = IntMatrFex_1D;        
+        IntMatrFex        = IntMatrFex_1D;
+   %     IntMatrFex.DiffAD = HS.AD.ComputeDifferentiationMatrix;                 
     end
     
     if(isempty(Conv))
@@ -106,16 +109,19 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
     
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
     fsolveOpts=optimset('Display','off','TolFun',1e-10,'TolX',1e-10);%'MaxFunEvals',2000000,'MaxIter',200000,...
-    [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
+    [x_ic_1D,errorHistory] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,200,0.3);
+    [x_ic_1D,errorHistory] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);
+    
+    %[x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
     if(flag ~= 1)
         cprintf('red','Error in fsolve, FMT_1D_Interface');
     end
-    rho_ic1D  = exp(x_ic_1D/kBT); 
+    rho_ic1D  = exp(x_ic_1D(1:N)/kBT); 
     
 	%*****************************************
     %**************** PostProcess   **********
     %*****************************************
-    postParms.Fex = GetExcessGrandPotential(rho_ic1D);   
+    %postParms.Fex = GetExcessGrandPotential(rho_ic1D);   
     
     %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
     
@@ -249,19 +255,30 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
     %***************************************************************
     %   Physical Auxiliary functions:    
     %***************************************************************             
-    function y = f(x)
+    function [y,J] = f(x)
         %solves for T*log*rho + Vext                        
-        y            = GetExcessChemPotential(x,0,mu);         
-        y            = y(:);
+        [y,J]        = GetExcessChemPotential(x,0,mu);         
+        y            = y(:);        
     end
-    function mu_s = GetExcessChemPotential(x,t,mu_offset)
-        rho_s = exp(x/kBT);                
-        mu_s  = getFex(rho_s,IntMatrFex,kBT,R);
-                       
-        for iSpecies=1:nSpecies
-           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
-        end        
-        mu_s = mu_s + x + Conv*rho_s + VAdd;
+    function [mu_s,J_s] = GetExcessChemPotential(x,t,mu_offset)
+        xR        = (x(1:N));
+        
+        rho_s     = exp(xR/kBT);
+        n2_i      = x((1:N_AD)+N);
+        n3_i      = x((1:N_AD)+N+N_AD);
+        n2_v_1_i  = x((1:N_AD)+N+2*N_AD);
+        n2_v_2_i  = x((1:N_AD)+N+3*N_AD);
+        
+        [mu_s,~,~,J_s]  = Fex_FMTRosenfeld_3DFluid_Full(rho_s,n2_i,n3_i,n2_v_1_i,n2_v_2_i,IntMatrFex,kBT,R);
+        %getFex(rho_s,IntMatrFex,kBT,R);
+        
+        mu_s(1:N)     = mu_s(1:N) + Conv*rho_s + xR + VAdd - mu_offset(1);                                
+        J_s(1:N,1:N)  = (J_s(1:N,1:N) + Conv)*diag(rho_s(:))/kBT + eye(N*nSpecies);      
+
+        %for iSpecies=1:nSpecies
+%           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
+%        end        
+ %       mu_s = mu_s + x + Conv*rho_s + VAdd;
     end
     function Fex = GetExcessGrandPotential(rho)
         %Compute excess grand potential
