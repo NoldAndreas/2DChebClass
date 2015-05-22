@@ -1,4 +1,9 @@
-function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)     
+function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda,opts)
+
+    if(nargin < 6)
+        opts = {};
+    end
+
      if(nargin == 2)
          TolFun  = 10^(-10);
          MaxIter = 2000;
@@ -31,7 +36,7 @@ function [rho,errorHistory] = NewtonMethod(rho,f,TolFun,MaxIter,lambda)
         %end                 
     end
     
-    if(err > TolFun)
+    if((err > TolFun) && ~IsOption(opts,'returnLastIteration'))
         rho = [];
     end
     

@@ -1,7 +1,20 @@
-function [FMT,phi,upsilon,J_FMT] = Fex_FMTRosenfeld_3DFluid(rho,IntMatrFex,kBT,RS)
-    % get number of species
-    nSpecies=size(rho,2);
+function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n2_i,n3_i,n2_v_1_i,n2_v_2_i
 
+    N    = size(IntMatrFex(1).AD.n2,2); %size(n_i,1);
+    N_AD = size(IntMatrFex(1).AD.n2,1); %size(n2_i,1);
+
+    % get number of species
+    nSpecies = size(x,2);    
+    
+    if(size(x,1) > N)
+        fullInput = true;  %this case is only implemented for one species!!
+    else
+        fullInput = false;
+    end
+    
+    rho     = x(1:N,:);    
+    %rhoS = n_i;
+    
     n0      = zeros(size(IntMatrFex(1).AD.n2,1),1);
     n1      = n0;
     n2      = n0;
@@ -19,16 +32,24 @@ function [FMT,phi,upsilon,J_FMT] = Fex_FMTRosenfeld_3DFluid(rho,IntMatrFex,kBT,R
         rhoS = rho(:,iSpecies);
         R    = RS(iSpecies);
         
-        n2Add       = IntMatrFex(iSpecies).AD.n2 * rhoS;
-        n3Add       = IntMatrFex(iSpecies).AD.n3 * rhoS;
-
-        if(isfield(IntMatrFex(iSpecies),'DiffAD'))
-            n2_v_1Add   = -IntMatrFex(iSpecies).DiffAD.Dy1*n3Add;
-            n2_v_2Add   = -IntMatrFex(iSpecies).DiffAD.Dy2*n3Add;
-        else        
-            n2_v_1Add   = IntMatrFex(iSpecies).AD.n2_v_1 * rhoS;
-            n2_v_2Add   = IntMatrFex(iSpecies).AD.n2_v_2 * rhoS;
-        end
+        if(fullInput)
+            n2Add      = x((1:N_AD)+N,iSpecies);
+            n3Add      = x((1:N_AD)+N+N_AD,iSpecies);
+            n2_v_1Add  = x((1:N_AD)+N+2*N_AD,iSpecies);
+            n2_v_2Add  = x((1:N_AD)+N+3*N_AD,iSpecies);
+        else
+            n2Add       = IntMatrFex(iSpecies).AD.n2 * rhoS;
+            n3Add       = IntMatrFex(iSpecies).AD.n3 * rhoS;
+            
+            if(isfield(IntMatrFex(iSpecies),'DiffAD'))
+                n2_v_1Add   = -IntMatrFex(iSpecies).DiffAD.Dy1*n3Add;
+                n2_v_2Add   = -IntMatrFex(iSpecies).DiffAD.Dy2*n3Add;
+            else        
+                n2_v_1Add   = IntMatrFex(iSpecies).AD.n2_v_1 * rhoS;
+                n2_v_2Add   = IntMatrFex(iSpecies).AD.n2_v_2 * rhoS;
+            end
+                
+        end                
         
         n0     = n0   +  n2Add/(4*pi*R^2);
         n1     = n1   +  n2Add/(4*pi*R);        
@@ -53,7 +74,8 @@ function [FMT,phi,upsilon,J_FMT] = Fex_FMTRosenfeld_3DFluid(rho,IntMatrFex,kBT,R
     % ones need to have the opposite sign due to sign change replacing r-r'
     % with r'-r.
 
-    FMT = zeros(size(rho));
+    %FMT = zeros(size(rho));
+    FMT = zeros(N,1);
     
     phi.n0     = -log(1-n3);
     phi.n1     = n2./(1-n3);
@@ -77,22 +99,75 @@ function [FMT,phi,upsilon,J_FMT] = Fex_FMTRosenfeld_3DFluid(rho,IntMatrFex,kBT,R
         FMT(:,iSpecies) = h;
     end
     
-    % rescale for temperature
-    FMT = real(FMT)*kBT;
-    
-    
-    %********************************
-    % Compute Jacobian
-    %********************************
-    
-    
     %Compute grand potential
-    if(nargout == 3)
+    if(nargout >= 3)
         %first, add scalar
         upsilon = - n0.*log(1-n3) + n1.*n2./(1-n3) + (n2.^3)./(24*pi*(1-n3).^2);
         upsilon = upsilon -  n1_dot_n2./(1-n3) - (n2.*n2_dot_n2)./(8*pi*(1-n3).^2);        
         upsilon = upsilon*kBT;
     end
+    
+    % rescale for temperature
+    FMT = real(FMT)*kBT;
+    
+    if(~fullInput)
+        y = FMT;
+        return;
+    end
+    
+    %********************************
+    % Compose full vector
+    %********************************
+    y   = [FMT;...
+           IntMatrFex(iSpecies).AD.n2 * rho - n2;...
+           IntMatrFex(iSpecies).AD.n3 * rho - n3;
+           IntMatrFex(iSpecies).AD.n2_v_1 * rho - n2_v_1
+           IntMatrFex(iSpecies).AD.n2_v_2 * rho - n2_v_2];
+        
+    %********************************
+    % Compute Jacobian
+    %********************************
+    AAD_IM       = IntMatrFex(iSpecies).AAD;
+    AD_IM        = IntMatrFex(iSpecies).AD;
+    
+    n3M1         = 1./(1-n3);
+    n3M2         = 1./(1-n3).^2;
+    n3M3         = 1./(1-n3).^3;
+    n3M4         = 1./(1-n3).^4;
+    
+    J_FMT_Full_AADn0 = [zeros(N_AD),diag(n3M1),zeros(N_AD),zeros(N_AD)];
+    J_FMT_Full_AADn1 = [diag(n3M1),diag(n2.*n3M2),zeros(N_AD),zeros(N_AD)];    
+    J_FMT_Full_AADn2 = [diag(n3M1/(4*pi*R)+n2.*n3M2/(4*pi)),...
+                        diag(n1.*n3M2 +(n2.^2 - n2_dot_n2).*n3M3/(4*pi)),...
+                        diag(-n2_v_1.*n3M2/(4*pi)),...
+                        diag(-n2_v_2.*n3M2/(4*pi))];
+                    
+    J_FMT_Full_AADn3 = [diag(n3M1/(4*pi*R^2) + n2.*n3M2/(4*pi*R) + n1.*n3M2 + (n2.^2 - n2_dot_n2).*n3M3/(4*pi)),...
+                        diag(n0.*n3M2 + 2*(n1.*n2-n1_dot_n2).*n3M3+(n2.^3-3*n2.*n2_dot_n2).*n3M4/(4*pi)),...
+                        diag( (-n2_v_1.*n3M2/(4*pi*R)-n1_v_1.*n3M2-n2.*n2_v_1.*n3M3/(2*pi))),...
+                        diag( (-n2_v_2.*n3M2/(4*pi*R)-n1_v_2.*n3M2-n2.*n2_v_2.*n3M3/(2*pi)))];
+                    
+    J_FMT_Full_AADn2_v_1 = [diag(-n2_v_1.*n3M2/(4*pi)),...
+                            diag(-n2_v_1.*n3M2/(4*pi*R)-n1_v_1.*n3M2-n2.*n2_v_1.*n3M3/(2*pi)),...
+                            diag(-2*n3M1/(4*pi*R)-n2.*n3M2/(4*pi)),...
+                            zeros(N_AD)];
+                        
+    J_FMT_Full_AADn2_v_2 = [diag(-n2_v_2.*n3M2/(4*pi)),...
+                            diag(-n2_v_2.*n3M2/(4*pi*R)-n1_v_2.*n3M2-n2.*n2_v_2.*n3M3/(2*pi)),...                            
+                            zeros(N_AD),...
+                            diag(-2*n3M1/(4*pi*R)-n2.*n3M2/(4*pi))];
+                    
+    J_FMT_Full =   AAD_IM.n2*(J_FMT_Full_AADn0/(4*pi*R^2)+J_FMT_Full_AADn1/(4*pi*R)+J_FMT_Full_AADn2)  ...
+                 + AAD_IM.n3*J_FMT_Full_AADn3  ...
+                 - AAD_IM.n2_v_1*J_FMT_Full_AADn2_v_1 ...
+                 - AAD_IM.n2_v_2*J_FMT_Full_AADn2_v_2;
+    
+    %J_FMT_n2Full = J_FMT_n2 + J_FMT_n1/(4*pi*R) + J_FMT_n0/(4*pi*R^2);
+    
+    J        = [zeros(N),J_FMT_Full;...%J_FMT_n2Full  ,J_FMT_n3   ,J_FMT_n2_v_1,J_FMT_n2_v_1;...
+                [AD_IM.n2;AD_IM.n3;AD_IM.n2_v_1;AD_IM.n2_v_2],-eye(4*N_AD)];
+    
+    
     
 end
 

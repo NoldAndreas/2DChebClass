@@ -15,7 +15,11 @@
 
     PlotAreaCart =     struct('y1Min',-5,'y1Max',5,...
                               'y2Min',0.5,'y2Max',10.5,...
-                              'N1',100,'N2',100);                              
+                              'N1',100,'N2',100);   
+                          
+    PlotAreaCart =     struct('y1Min',-10,'y1Max',10,...
+                              'y2Min',0.5,'y2Max',22.5,...
+                              'N1',100,'N2',100);                             
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
     V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
@@ -54,6 +58,7 @@
         
     CL = ContactLineHS(config);
     CL.Preprocess(); 
+    CL.ComputeEquilibrium(struct('Iterative',true));
     CL.ComputeEquilibrium();              
     
     %**********************************************

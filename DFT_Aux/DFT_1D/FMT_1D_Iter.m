@@ -109,8 +109,12 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
     
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
     fsolveOpts=optimset('Display','off','TolFun',1e-10,'TolX',1e-10);%'MaxFunEvals',2000000,'MaxIter',200000,...
-    [x_ic_1D,errorHistory] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,200,0.3);
-    [x_ic_1D,errorHistory] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);
+    
+    [x_ic_1D,errorHistory1] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
+    [x_ic_1D,errorHistory2] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);   
+    
+    errorHistory = [errorHistory1,errorHistory2];
+    semilogy(errorHistory);
     
     %[x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
     if(flag ~= 1)
@@ -261,16 +265,10 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         y            = y(:);        
     end
     function [mu_s,J_s] = GetExcessChemPotential(x,t,mu_offset)
-        xR        = (x(1:N));
-        
-        rho_s     = exp(xR/kBT);
-        n2_i      = x((1:N_AD)+N);
-        n3_i      = x((1:N_AD)+N+N_AD);
-        n2_v_1_i  = x((1:N_AD)+N+2*N_AD);
-        n2_v_2_i  = x((1:N_AD)+N+3*N_AD);
-        
-        [mu_s,~,~,J_s]  = Fex_FMTRosenfeld_3DFluid_Full(rho_s,n2_i,n3_i,n2_v_1_i,n2_v_2_i,IntMatrFex,kBT,R);
-        %getFex(rho_s,IntMatrFex,kBT,R);
+        xR              = (x(1:N));        
+        rho_s           = exp(xR/kBT);
+        x(1:N)          = rho_s;
+        [mu_s,~,~,J_s]  = getFex(x,IntMatrFex,kBT,R);        
         
         mu_s(1:N)     = mu_s(1:N) + Conv*rho_s + xR + VAdd - mu_offset(1);                                
         J_s(1:N,1:N)  = (J_s(1:N,1:N) + Conv)*diag(rho_s(:))/kBT + eye(N*nSpecies);      
