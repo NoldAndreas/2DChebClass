@@ -59,7 +59,7 @@
     CL = ContactLineHS(config);
     CL.Preprocess(); 
     CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));
-    CL.ComputeEquilibrium();              
+    %CL.ComputeEquilibrium();              
     
     %**********************************************
     % Moving the wall - forced wetting

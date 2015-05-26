@@ -12,6 +12,12 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
         fullOutput = false;
     end
     
+    if(size(x,1) > N)
+        fullInput = true;
+    else
+        fullInput = false;
+    end
+    
     rho     = x(1:N,:);    
     %rhoS = n_i;
     
@@ -32,7 +38,7 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
         rhoS = rho(:,iSpecies);
         R    = RS(iSpecies);
         
-        if(fullOutput)
+        if(fullInput)
             n2Add      = x((1:N_AD)+N,iSpecies);
             n3Add      = x((1:N_AD)+N+N_AD,iSpecies);
             n2_v_1Add  = x((1:N_AD)+N+2*N_AD,iSpecies);
