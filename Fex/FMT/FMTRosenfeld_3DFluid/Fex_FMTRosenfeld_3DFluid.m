@@ -188,10 +188,10 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
                  - AAD_IM.n2_v_2*(J_FMT_Full_AADn1_v_2/(4*pi*R) + ...
                                   J_FMT_Full_AADn2_v_2);        
     
-    J        = [zeros(N),J_FMT_Full;...
+    J        = [zeros(N),J_FMT_Full*kBT;...
                 -[AD_IM.n2;AD_IM.n3;AD_IM.n2_v_1;AD_IM.n2_v_2],eye(4*N_AD)];
             
-    J = kBT*J;
+    
         
 end
 
