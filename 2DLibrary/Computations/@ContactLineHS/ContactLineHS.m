@@ -333,11 +333,16 @@ classdef ContactLineHS < DDFT_2D
         end
         
         %Compute functions 
-        function ComputeEquilibrium(this,optsIn)            
-            optsIn.maxComp_y2 = this.optsNum.maxComp_y2;
-            miscIn.mark       = (this.IDC.GetCartPts.y2_kv <= ...
+        function ComputeEquilibrium(this,optsIn)
+            %if(isfield(this.optsNum,'maxComp_y2'))
+                optsIn.maxComp_y2 = this.optsNum.maxComp_y2;
+                miscIn.mark       = (this.IDC.GetCartPts.y2_kv <= ...
                                         this.optsNum.maxComp_y2);
-            ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
+                ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
+            %else
+%                ComputeEquilibrium@DDFT_2D(this,this.optsPhys.rhoLiq_sat,optsIn,[]);
+%            end
+            
         end
         sol = Compute(this)                     
         
@@ -444,7 +449,7 @@ classdef ContactLineHS < DDFT_2D
         
         %to delete
         [f,y1]  = PostProcess(this,y1Int)
-        I = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
+        I       = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)
         [rho,mu] = GetPointAdsorptionIsotherm(this,ell);
         
         PlotDisjoiningPressureAnalysis(this)    

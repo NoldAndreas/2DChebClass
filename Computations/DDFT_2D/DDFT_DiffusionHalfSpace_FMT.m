@@ -47,7 +47,7 @@ function [EX,res] = DDFT_DiffusionHalfSpace_FMT(doHI)
     AddPaths();
     EX = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();        
-    EX.ComputeEquilibrium([],struct('Iterative',true)); 
+    EX.ComputeEquilibrium([],struct('Iterative',true,'solver','Newton')); 
     %EX.ComputeEquilibrium(); 
  %   EX.ComputeDynamics();
    

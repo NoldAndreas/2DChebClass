@@ -105,21 +105,82 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
     else
         y0        = zeros(length(Pts.y1_kv),nSpecies);%getInitialGuess(VAdd0);                
     end       
-    y0 = y0(markComp);
+    y0 = y0(markComp);    
+    %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                           
     
-    %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
-    fsolveOpts=optimset('Display','off','TolFun',1e-10,'TolX',1e-10);%'MaxFunEvals',2000000,'MaxIter',200000,...
-    
-    [x_ic_1D,errorHistory1] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
-    [x_ic_1D,errorHistory2] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);   
-    
-    errorHistory = [errorHistory1,errorHistory2];
-    semilogy(errorHistory);
-    
-    %[x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
-    if(flag ~= 1)
-        cprintf('red','Error in fsolve, FMT_1D_Interface');
+    if(IsOption(opts,'Newton'))
+        [x_ic_1D,errorHistory1] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
+        [x_ic_1D,errorHistory2] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);   
+        errorHistory            = [errorHistory1,errorHistory2];
+        semilogy(errorHistory);
+    elseif(IsOption(opts,'Picard'))
+        xmin = -10;%kBT*log(0.1*rhoGas_eq);
+        xmax = 20;%kBT*log(10*rhoLiq_eq);
+        x_ic = y0;
+        err  = 1; it = 1;
+        while((err > 1e-10) && (it < 4000))
+            [dx,err]   = GetdX_nP1(x_ic);
+            x_ic       = x_ic + 0.05*dx;
+            x_ic       = max(min(x_ic,xmax),xmin);
+            disp(['Iteration ',num2str(it),': ',num2str(err)]);
+            it = it+1;
+        end
+        x_ic_1D = x_ic;
+	elseif(IsOption(opts,'PicardBound'))
+        xmin = kBT*log(0.5*rhoGas_eq);
+        xmax = kBT*log(10*rhoLiq_eq);
+        x_ic = y0;
+        err  = 1; it = 1; 
+        while((err > 1e-10) && (it < 600))
+                        
+            [dx,err]   = GetdX_nP1(x_ic);
+            l_max  = (xmax - x_ic)./dx; l_max(l_max < 0) = 100;
+            l_min  = (xmin - x_ic)./dx; l_min(l_min < 0) = 100;
+            %lambda = min(1,0.8*min(min(l_max),0.8*min(l_min)));
+            %x_ic       = x_ic + lambda*dx;
+            %disp(['Iteration ',num2str(it),': ',num2str(err),' lambda = ',num2str(lambda)]);
+            lambda = min(1,0.1*min(l_max,l_min));
+            x_ic       = x_ic + lambda.*dx;            
+            x_ic(HS.Pts.y2 > 5) = kBT*log(rhoGas_eq);
+            %x_ic       = max(min(x_ic,xmax),xmin);
+            disp(['Iteration ',num2str(it),': ',num2str(err),' min(lambda) = ',num2str(min(lambda)),' max(lambda) = ',num2str(max(lambda))]);
+            it = it+1;
+        end
+        x_ic_1D = x_ic;	
+    elseif(IsOption(opts,'PicardRho'))  
+        rho_min = (0.5*rhoGas_eq);
+        rho_max = (7*rhoLiq_eq);
+        rho_ic = rhoGas_eq*ones(N,1);
+        err  = 1; it = 1; 
+        while((err > 1e-10) && (it < 600))                        
+            [drho,err]   = GetdRho_nP1(rho_ic);
+            drho(HS.Pts.y2 > 10) = 0;
+            l_max  = (rho_max - rho_ic)./drho; l_max(l_max < 0) = 100;
+            l_min  = (rho_min - rho_ic)./drho; l_min(l_min < 0) = 100;
+            %lambda = min(0.05,0.1*min(min(l_max),0.8*min(l_min)));
+            %x_ic       = x_ic + lambda*dx;
+            %disp(['Iteration ',num2str(it),': ',num2str(err),' lambda = ',num2str(lambda)]);            
+            lambda_maxAbs = 0.05;
+            lambda = min(lambda_maxAbs,0.8*min(l_max,l_min));            
+            %lambda = 0.1;
+            rho_ic       = rho_ic + lambda.*drho;            
+            rho_ic(HS.Pts.y2 > 10) = rhoGas_eq;
+            [err,i_err] = max(abs(drho));
+            %x_ic       = max(min(x_ic,xmax),xmin);
+            disp(['Iteration ',num2str(it),' , error  : ',num2str(err),' at y_2 = ',num2str(HS.Pts.y2(i_err)),' min(lambda) = ',num2str(min(lambda)),' max(lambda) = ',num2str(max(lambda))]);
+            it = it+1;
+        end
+        x_ic_1D = kBT*log(rho_ic);	        
+	else
+        disp('solver not working in this file yet. Check FMT_1D.m');
+        fsolveOpts=optimset('Display','off','TolFun',1e-10,'TolX',1e-10);%'MaxFunEvals',2000000,'MaxIter',200000,...
+        [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);     
+        if(flag ~= 1)
+            cprintf('red','Error in fsolve, FMT_1D_Interface');
+        end
     end
+    
+    
     rho_ic1D  = exp(x_ic_1D(1:N)/kBT); 
     
 	%*****************************************
@@ -270,8 +331,11 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         x(1:N)          = rho_s;
         [mu_s,~,~,J_s]  = getFex(x,IntMatrFex,kBT,R);        
         
-        mu_s(1:N)     = mu_s(1:N) + Conv*rho_s + xR + VAdd - mu_offset(1);                                
-        J_s(1:N,1:N)  = (J_s(1:N,1:N) + Conv)*diag(rho_s(:))/kBT + eye(N*nSpecies);      
+        mu_s(1:N)     = mu_s(1:N) + Conv*rho_s + xR + VAdd - mu_offset(1);   
+        
+        if(~isempty(J_s))            
+            J_s(1:N,1:N)  = (J_s(1:N,1:N) + Conv)*diag(rho_s(:))/kBT + eye(N*nSpecies);      
+        end
 
         %for iSpecies=1:nSpecies
 %           mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu_offset(iSpecies);
@@ -313,6 +377,24 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         PrintErrorPos(floc_Bulk-(f_loc(end-1)+f_hs(end-1)),...
             ['Bulk Free Energy in 1D Computation for rho=',num2str(rho(end),2),'at ',num2str(y2S(end-1),2)]);
     end
+
+    function [dx,err] = GetdX_nP1(x)
+        %x       = GetFullX(x);
+        dx      = -GetExcessChemPotential(x,0,mu);    
+        %dx      = dx(markFull);
+        err     = max(abs(dx));
+    end
+
+    function [drho,err] = GetdRho_nP1(rho)
+        %x       = GetFullX(x);
+        x       = kBT*log(rho);
+        Dx      = -GetExcessChemPotential(x,0,mu);    
+        rho_n1  = exp((x+Dx)/kBT);        
+        drho    = rho_n1-rho;
+        %dx      = dx(markFull);
+        err     = max(abs(drho));
+    end
+
 
     %***************************************************************
     %   Plotting Auxiliary functions:

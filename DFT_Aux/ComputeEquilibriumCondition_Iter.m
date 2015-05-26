@@ -22,9 +22,7 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         R      = params.optsPhys.sigmaS/2;
     else
         R = [];
-    end
-    
-    fsolveOpts       = optimset('TolFun',1e-8,'TolX',1e-8);
+    end        
     
     if(isfield(params.optsPhys,'mu_sat') && isfield(params.optsPhys,'Dmu'))
        params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.Dmu;       
@@ -52,7 +50,7 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         NFull    = N+4*N_AD;         
         if(isfield(params,'maxComp_y2'))
             markFull = [(misc.PtsCart.y2_kv <= params.maxComp_y2);...
-                    repmat(misc.AD.PtsCart.y2_kv <= params.maxComp_y2,4,1)];   
+                         repmat(misc.AD.PtsCart.y2_kv <= params.maxComp_y2+R,4,1)];   
         else
             markFull = true(N+4*N_AD,1);
         end
@@ -68,44 +66,87 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         mu                     = params.optsPhys.mu;
         
         %Picard-Iteration
-        markFull = mark;
-        it   = 1;
-        x_ic = x_ig_n(1:N);
-        x_ic = x_ic(markFull);
-        err  = 1;
-        while((err > 0.1) && (it < 100))
-            [dx,err]   = GetdX_nP1(x_ic);
-            x_ic       = x_ic + 0.01*dx;
-            disp(['Iteration ',num2str(it),': ',num2str(err)]);
-            it = it+1;
+        if(isfield(params,'solver') && ...
+            (strcmp(params.solver,'PicardBound') || strcmp(params.solver,'Picard')))
+           % markFull = mark;
+            it   = 1; err  = 1;
+            %x_ic = x_ig_n(1:N);
+            %x_ic = x_ic(markFull);            
+            x_ic = x_ig_n(markFull);
         end
         
-        while((err > 1e-10) && (it < 400))
-            [dx,err]   = GetdX_nP1(x_ic);
-            x_ic       = x_ic + 0.1*dx;
-            disp(['Iteration ',num2str(it),': ',num2str(err)]);
-            it = it+1;
-        end
-         while((err > 1e-10) && (it < 1000))
-            [dx,err]   = GetdX_nP1(x_ic);
-            x_ic       = x_ic + 0.3*dx;
-            disp(['Iteration ',num2str(it),': ',num2str(err)]);
-            it = it+1;
-        end
-        %        
-        [x_ic,errorHistory]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,0.6,{'returnLastIteration'});
-        [x_ic,errorHistory]    = NewtonMethod(x_ic,@fs,1e-10,100,1,{'returnLastIteration'});
+        %
+        if(isfield(params,'solver') && strcmp(params.solver,'PicardBound'))
+            xmin = kBT*log(params.optsPhys.rhoGas_sat);
+            xmax = kBT*log(5*params.optsPhys.rhoLiq_sat);
+            while((err > 1e-10) && (it < 500))
+                [dx,err]   = GetdX_nP1(x_ic);
+                x_ic       = x_ic + 0.05*dx;
+                x_ic       = max(min(x_ic,xmax),xmin);
+                disp(['Iteration ',num2str(it),': ',num2str(err)]);
+                it = it+1;
+            end
+            while((err > 1e-10) && (it < 1000))
+                [dx,err]   = GetdX_nP1(x_ic);
+                x_ic       = x_ic + 0.1*dx;
+                x_ic       = max(min(x_ic,xmax),xmin);
+                disp(['Iteration ',num2str(it),': ',num2str(err)]);
+                it = it+1;
+            end
+        elseif(isfield(params,'solver') && strcmp(params.solver,'Picard'))        
+            no = 0;
+            while((err > 0.1) && (it < 100))
+                [dx,err]   = GetdX_nP1(x_ic);
+                x_ic       = x_ic + 0.01*dx;
+                
+                for ih = 1:no
+                        fprintf('\b');
+                end 
+                no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
+                it = it+1;
+            end
+
+            while((err > 1e-10) && (it < 400))
+                [dx,err]   = GetdX_nP1(x_ic);
+                x_ic       = x_ic + 0.1*dx;
+                for ih = 1:no
+                        fprintf('\b');
+                end 
+                no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
+                it = it+1;
+            end
+             while((err > 1e-10) && (it < 20000))
+                [dx,err]   = GetdX_nP1(x_ic);
+                x_ic       = x_ic + 0.2*dx;
+                for ih = 1:no
+                        fprintf('\b');
+                end 
+                no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
+                it = it+1;
+             end                                   
+        elseif(isfield(params,'solver') && strcmp(params.solver,'Newton'))
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,0.2,{'returnLastIteration'});
+            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs,1e-10,100,1,{'returnLastIteration'});
+            errorHistory            = [errorHistory1 errorHistory2];
+        else
+            fsolveOpts             = optimset('TolFun',1e-8,'TolX',1e-8);
+            [x_ic,~,flag_fsolve]   = fsolve(@fs,x_ig(mark),fsolveOpts);
+        end        
         
-        %[x_ic,~,flag_fsolve]    = fsolve(@fs,x_ig(mark),fsolveOpts);
     else                
         nParticlesS             = params.optsPhys.nParticlesS;
         %x_ig_n                  = x_ig([true;mark],:);        
         
-        x_ig_n = zeros(NFull+1,nSpecies);
-        [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
-        [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
-        %[x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig([true;mark],:),fsolveOpts);
-        errorHistory = [errorHistory1 errorHistory2];
+        if(isfield(params,'solver') && strcmp(params.solver,'Newton'))
+            x_ig_n = zeros(NFull+1,nSpecies);
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
+            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
+            errorHistory            = [errorHistory1 errorHistory2];
+        else
+            fsolveOpts              = optimset('TolFun',1e-8,'TolX',1e-8);
+            [x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig_n(:),fsolveOpts);
+            %[x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig([true;mark],:),fsolveOpts);
+        end        
         
         if(isempty(x_ic))
             disp('error');
@@ -131,7 +172,6 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         [mu_sRel,J] = GetExcessChemPotentialPart(xm,mu);%./exp((xm-Vext(mark,:))/kBT);
         J           = J(:,2:end);
     end
-
     function [y,J] = fs_canonical(x)
         mu_s         = (x(1:nSpecies))';
         x            = x(nSpecies+1:end);       
@@ -152,7 +192,6 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         end        
         J            = [zeros(nSpecies),JP;J];
     end
-
     function [mu_s,J_s] = GetExcessChemPotentialPart(xm,mu)        
         x          = GetFullX(xm);
         [mu_s,J_s] = GetExcessChemPotential(x,mu);
@@ -160,34 +199,36 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         markF      = repmat(markFull,nSpecies,1);
         mu_s       = mu_s(markFull,:);
         %mu_s       = mu_s(:);
-        J_s        = J_s(markF,[true(nSpecies,1);markF]);
+        if(~isempty(J_s))
+            J_s        = J_s(markF,[true(nSpecies,1);markF]);
+        end
     end   
-
-
     function [mu_s,J_s] = GetExcessChemPotential(x,mu)
         xR              = (x(1:N,:));        
         rho_s           = exp((xR-Vext)/kBT);
         x(1:N,:)        = rho_s;                
         %rho_s            = exp((x-Vext)/kBT);
-        if(nargout == 2)
-            [mu_HS,~,~,J_HS] = getFex(x,IntMatrFex,kBT,R);           
+        if(nargout >= 2)
+            [mu_HS,~,~,J_HS] = getFex(x,IntMatrFex,kBT,R);
             if(size(J_HS,2) == nSpecies)
                 J_HS = diag(J_HS(:));
-            end        
+            end
         else
             [mu_HS]          = getFex(x,IntMatrFex,kBT,R);
+            J_HS = [];
         end
-        
+
         [mu_attr,J_attr] = Fex_Meanfield(rho_s,Conv,kBT);
                             
-        mu_s               = mu_HS;
-        mu_s(1:N,:)        = mu_HS(1:N,:) + mu_attr + xR + VAdd;        
+        mu_s             = mu_HS;
+        mu_s(1:N,:)      = mu_HS(1:N,:) + mu_attr + xR + VAdd;        
         
         for iSpecies=1:nSpecies
            mu_s(1:N,iSpecies) = mu_s(1:N,iSpecies) - mu(iSpecies);                      
         end        
         
-        if(nargout == 2)
+        J_s                     = J_HS;
+        if(~isempty(J_s))
             markRhos = (1:N*nSpecies);%repmat(markRhos,nSpecies,1);
 
             J_s                     = J_HS;
@@ -199,7 +240,6 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
             end
         end
     end   
-
     function [dx,err] = GetdX_nP1(x)
         x       = GetFullX(x);
         dx      = -GetExcessChemPotential(x,mu);    

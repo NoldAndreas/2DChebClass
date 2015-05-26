@@ -45,6 +45,7 @@
     misc.IntMatrFex = this.IntMatrFex;    
     misc.Int        = this.IDC.Int;
     misc.PtsCart    = this.IDC.GetCartPts;    
+    
     if(strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
         misc.AD.PtsCart = this.IDC.AD.GetCartPts;
     end    
@@ -64,6 +65,13 @@
                   'Iterative'};
 
     if(isfield(opts,'Iterative') && opts.Iterative)
+        
+        %*** Test start ****
+        misc.CL     = this;
+    %    misc.x_ig   = this.x_eq;
+        %misc.x_ig = this.optsPhys.kBT*log(this.optsPhys.rhoLiq_sat)*ones(size(x_ig));
+        %*** Test end ****
+        
         %misc.x_ig            =  [zeros(1,size(this.Vext,2));zeros(size(this.Vext))];
         [sol,recEq,paramsEq] = DataStorage('EquilibriumIterative',...
                             @ComputeEquilibriumCondition_Iter,opts,misc,[],ignoreList);

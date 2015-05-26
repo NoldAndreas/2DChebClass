@@ -6,10 +6,10 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
     % get number of species
     nSpecies = size(x,2);    
     
-    if(size(x,1) > N)
-        fullInput = true;  %this case is only implemented for one species!!
+    if(nargout >= 4)%size(x,1) > N)
+        fullOutput = true;  %this case is only implemented for one species!!
     else
-        fullInput = false;
+        fullOutput = false;
     end
     
     rho     = x(1:N,:);    
@@ -32,7 +32,7 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
         rhoS = rho(:,iSpecies);
         R    = RS(iSpecies);
         
-        if(fullInput)
+        if(fullOutput)
             n2Add      = x((1:N_AD)+N,iSpecies);
             n3Add      = x((1:N_AD)+N+N_AD,iSpecies);
             n2_v_1Add  = x((1:N_AD)+N+2*N_AD,iSpecies);
@@ -110,19 +110,24 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
     % rescale for temperature
     FMT = real(FMT)*kBT;
     
-    if(~fullInput)
+    if(size(x,1) > N)
+        y   = [FMT;...
+               n2-IntMatrFex(iSpecies).AD.n2 * rho;...
+               n3-IntMatrFex(iSpecies).AD.n3 * rho;...
+               n2_v_1-IntMatrFex(iSpecies).AD.n2_v_1 * rho;...
+               n2_v_2-IntMatrFex(iSpecies).AD.n2_v_2 * rho];
+    else
         y = FMT;
+    end
+    
+    if(~fullOutput)        
+        J = [];
         return;
     end
     
     %********************************
     % Compose full vector
-    %********************************
-    y   = [FMT;...
-           IntMatrFex(iSpecies).AD.n2 * rho - n2;...
-           IntMatrFex(iSpecies).AD.n3 * rho - n3;
-           IntMatrFex(iSpecies).AD.n2_v_1 * rho - n2_v_1
-           IntMatrFex(iSpecies).AD.n2_v_2 * rho - n2_v_2];
+    %********************************    
         
     %********************************
     % Compute Jacobian
@@ -147,28 +152,41 @@ function [y,phi,upsilon,J] = Fex_FMTRosenfeld_3DFluid(x,IntMatrFex,kBT,RS)%n_i,n
                         diag( (-n2_v_1.*n3M2/(4*pi*R)-n1_v_1.*n3M2-n2.*n2_v_1.*n3M3/(2*pi))),...
                         diag( (-n2_v_2.*n3M2/(4*pi*R)-n1_v_2.*n3M2-n2.*n2_v_2.*n3M3/(2*pi)))];
                     
+                    
+    J_FMT_Full_AADn1_v_1 = [zeros(N_AD),...
+                            diag(-n2_v_1.*n3M2),...
+                            diag(-n3M1),...
+                            zeros(N_AD)];
+                        
+    J_FMT_Full_AADn1_v_2 = [zeros(N_AD),...
+                            diag(-n2_v_2.*n3M2),...                            
+                            zeros(N_AD),...
+                            diag(-n3M1)];                    
+                    
     J_FMT_Full_AADn2_v_1 = [diag(-n2_v_1.*n3M2/(4*pi)),...
-                            diag(-n2_v_1.*n3M2/(4*pi*R)-n1_v_1.*n3M2-n2.*n2_v_1.*n3M3/(2*pi)),...
-                            diag(-2*n3M1/(4*pi*R)-n2.*n3M2/(4*pi)),...
+                            diag(-n1_v_1.*n3M2-n2.*n2_v_1.*n3M3/(2*pi)),...
+                            diag(-n3M1/(4*pi*R)-n2.*n3M2/(4*pi)),...
                             zeros(N_AD)];
                         
     J_FMT_Full_AADn2_v_2 = [diag(-n2_v_2.*n3M2/(4*pi)),...
-                            diag(-n2_v_2.*n3M2/(4*pi*R)-n1_v_2.*n3M2-n2.*n2_v_2.*n3M3/(2*pi)),...                            
+                            diag(-n1_v_2.*n3M2-n2.*n2_v_2.*n3M3/(2*pi)),...                            
                             zeros(N_AD),...
-                            diag(-2*n3M1/(4*pi*R)-n2.*n3M2/(4*pi))];
+                            diag(-n3M1/(4*pi*R)-n2.*n3M2/(4*pi))];
                     
-    J_FMT_Full =   AAD_IM.n2*(J_FMT_Full_AADn0/(4*pi*R^2)+J_FMT_Full_AADn1/(4*pi*R)+J_FMT_Full_AADn2)  ...
+    J_FMT_Full =   AAD_IM.n2*(J_FMT_Full_AADn0/(4*pi*R^2)+...
+                              J_FMT_Full_AADn1/(4*pi*R)  +...
+                              J_FMT_Full_AADn2)  ...
                  + AAD_IM.n3*J_FMT_Full_AADn3  ...
-                 - AAD_IM.n2_v_1*J_FMT_Full_AADn2_v_1 ...
-                 - AAD_IM.n2_v_2*J_FMT_Full_AADn2_v_2;
+                 - AAD_IM.n2_v_1*(J_FMT_Full_AADn1_v_1/(4*pi*R) + ...
+                                  J_FMT_Full_AADn2_v_1) ...
+                 - AAD_IM.n2_v_2*(J_FMT_Full_AADn1_v_2/(4*pi*R) + ...
+                                  J_FMT_Full_AADn2_v_2);        
     
-    %J_FMT_n2Full = J_FMT_n2 + J_FMT_n1/(4*pi*R) + J_FMT_n0/(4*pi*R^2);
-    
-    J        = [zeros(N),J_FMT_Full;...%J_FMT_n2Full  ,J_FMT_n3   ,J_FMT_n2_v_1,J_FMT_n2_v_1;...
-                [AD_IM.n2;AD_IM.n3;AD_IM.n2_v_1;AD_IM.n2_v_2],-eye(4*N_AD)];
-    
-    
-    
+    J        = [zeros(N),J_FMT_Full;...
+                -[AD_IM.n2;AD_IM.n3;AD_IM.n2_v_1;AD_IM.n2_v_2],eye(4*N_AD)];
+            
+    J = kBT*J;
+        
 end
 
 
