@@ -32,6 +32,15 @@ classdef ContactLineHS < DDFT_2D
              else
                 configuration.optsNum.PhysArea.shape = 'HalfSpace_FMT';                
              end
+             
+             configuration.optsNum.PhysArea.L2_AD  = configuration.optsNum.PhysArea.L2;
+             configuration.optsNum.PhysArea.y2wall = 0;
+             configuration.optsNum.PhysArea.h      = 1;             
+             
+             if(~isfield(configuration.optsNum.PhysArea,'N2bound'))
+                 configuration.optsNum.PhysArea.N2bound = max(10,2*round(configuration.optsNum.PhysArea.N(2)/6));
+             end
+             
              this@DDFT_2D(configuration);
         end                
         

@@ -68,9 +68,9 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
         %Picard-Iteration
         if(isfield(params,'solver') && ...
             (strcmp(params.solver,'PicardBound') || strcmp(params.solver,'Picard')))
-           % markFull = mark;
+            markFull = mark;
             it   = 1; err  = 1;
-            %x_ic = x_ig_n(1:N);
+            x_ig_n = x_ig_n(1:N);
             %x_ic = x_ic(markFull);            
             x_ic = x_ig_n(markFull);
         end
@@ -95,7 +95,7 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
             end
         elseif(isfield(params,'solver') && strcmp(params.solver,'Picard'))        
             no = 0;
-            while((err > 0.1) && (it < 100))
+            while((err > 0.1) && (it < 1000))
                 [dx,err]   = GetdX_nP1(x_ic);
                 x_ic       = x_ic + 0.01*dx;
                 
@@ -105,8 +105,9 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
                 no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
                 it = it+1;
             end
+            fprintf('\n'); no = 0;
 
-            while((err > 1e-10) && (it < 400))
+            while((err > 1e-4) && (it < 1000))
                 [dx,err]   = GetdX_nP1(x_ic);
                 x_ic       = x_ic + 0.1*dx;
                 for ih = 1:no
@@ -115,7 +116,8 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
                 no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
                 it = it+1;
             end
-             while((err > 1e-10) && (it < 20000))
+            fprintf('\n'); no = 0;
+             while((err > 1e-10) && (it < 50000))
                 [dx,err]   = GetdX_nP1(x_ic);
                 x_ic       = x_ic + 0.2*dx;
                 for ih = 1:no
@@ -123,10 +125,11 @@ function [sol] = ComputeEquilibriumCondition_Iter(params,misc)
                 end 
                 no = fprintf(['Iteration ',num2str(it),': ',num2str(err)]);
                 it = it+1;
-             end                                   
+             end                  
+             fprintf('\n'); no = 0;
         elseif(isfield(params,'solver') && strcmp(params.solver,'Newton'))
-            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,0.2,{'returnLastIteration'});
-            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs,1e-10,100,1,{'returnLastIteration'});
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,0.7,{'returnLastIteration'});
+            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs,1e-10,10000,1,{'returnLastIteration'});
             errorHistory            = [errorHistory1 errorHistory2];
         else
             fsolveOpts             = optimset('TolFun',1e-8,'TolX',1e-8);

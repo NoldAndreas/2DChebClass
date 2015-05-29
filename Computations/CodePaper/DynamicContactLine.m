@@ -4,10 +4,8 @@ function DynamicContactLine()
     close all;
     
     PhysArea = struct('N',[20,20],...
-                      'L1',4,'L2',2,'L2_AD',2.,...
-                      'y2wall',0.,...
-                      'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
-                      'alpha_deg',90);
+                      'L1',4,'L2',2,...                      
+                      'alpha_deg',90);%'y2wall',0.,'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
                   
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
@@ -29,7 +27,7 @@ function DynamicContactLine()
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.865,...%0.928,...%0.94,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856,...%0.928,...%0.94,...
                 'tau',5,'epsilon_w_max',1);
 
     optsPhys = struct('V1',V1,'V2',V2,...
@@ -141,12 +139,11 @@ function DynamicContactLine()
         n      = opts.N;
         
         for i = 1:length(n)
-            conf.optsNum.PhysArea.N       = n(i)*[1,1];
-            conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
+            conf.optsNum.PhysArea.N       = n(i)*[1,1];            
 
             CL = ContactLineHS(conf);
             CL.Preprocess(); 
-            CL.ComputeEquilibrium();              
+            CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));              
             CL.ComputeDynamics();            
             CL.PostprocessDynamics();
 

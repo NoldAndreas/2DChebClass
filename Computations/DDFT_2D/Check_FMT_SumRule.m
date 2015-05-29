@@ -14,7 +14,8 @@ function Check_FMT_SumRule()
     
     V2Num   = struct('Fex','SplitAnnulus','N',[50,50]); 
     %V2      = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
-    V2 = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    %V2 = struct('V2DV2','BarkerHendersonHardCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5); 
+    V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
 
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);                   
@@ -38,13 +39,14 @@ function Check_FMT_SumRule()
 
     config = v2struct(optsNum,optsPhys);                            
     
+    config.optsPhys.V1.epsilon_w = 0.855;
     CheckConfig(config);
     
  %   config.optsNum.V2Num  = struct('Fex','SplitAnnulus','N',[80,80]); 
 %    config.optsPhys.V2    = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
 %    CheckConfig(config);
-
-   config.optsNum.V2Num  = struct('Fex','SplitAnnulus','N',[80,80]); 
+    
+    config.optsNum.V2Num  = struct('Fex','SplitAnnulus','N',[80,80]); 
     %config.optsPhys.V2    = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
     config.optsPhys.V2    = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5.0); 
     CheckConfig(config);

@@ -58,6 +58,7 @@
         
     CL = ContactLineHS(config);
     CL.Preprocess(); 
+    CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));
     CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));
     %CL.ComputeEquilibrium();              
     

@@ -3,10 +3,11 @@ function Check2DSumRule()
     AddPaths('CodePaper');
 
     PhysArea = struct('N',[20,20],...
-                      'L1',4,'L2',2,'L2_AD',2.,...
-                      'y2wall',0.,...
-                      'N2bound',14,'h',1,...
+                      'L1',4,'L2',2,...
                       'alpha_deg',90);
+                      %'L2_AD',2.,...                      
+                      %'y2wall',0.,...
+                      %'N2bound',14,'h',1,...
                       
     V2Num    = struct('Fex','SplitDisk','N',[80,80]);
     V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
@@ -46,7 +47,7 @@ function Check2DSumRule()
 	config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
     config.optsPhys.V2.V2DV2     = 'BarkerHenderson_2D';     
     config.optsPhys.V1.V1DV1     = 'Vext_BarkerHenderson_HardWall';    
-    config.optsPhys.V1.epsilon_w = 0.865;%0.928; %1.0;                
+    config.optsPhys.V1.epsilon_w = 0.856;%0.928; %1.0;                
     res{1} = DataStorage(dirRes,@ComputeError,v2struct(N,config,Interval_SumRule),[],comp,ignoreList);
     
     %     config.optsNum.V2Num.Fex     = 'SplitDisk'; 
@@ -196,8 +197,7 @@ function Check2DSumRule()
                 
         for i = 1:length(n)
             
-            conf.optsNum.PhysArea.N       = [n(i),n(i)];
-            conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
+            conf.optsNum.PhysArea.N       = [n(i),n(i)];            
                 
             CL            = ContactLineHS(conf);
             preErr        = CL.Preprocess(); 
@@ -213,7 +213,7 @@ function Check2DSumRule()
 %             [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
 %             res(i).error_wg = params.contactDensity_relError;
             
-            CL.ComputeEquilibrium();      
+            CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));      
             [res(i).sumRuleII_relError,...
              res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError(in.Interval_SumRule);   
             %CLT.PostProcess(opts);
