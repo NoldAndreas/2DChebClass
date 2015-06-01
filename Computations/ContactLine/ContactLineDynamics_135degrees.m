@@ -1,11 +1,11 @@
-%function ContactLineDynamics_45degrees()
+function ContactLineDynamics_135degrees()
 
     AddPaths('CodePaper');            
     close all;
     
     PhysArea = struct('N',[40,40],...
                       'L1',4,'L2',2,...                        
-                      'alpha_deg',45);
+                      'alpha_deg',135);
                   
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
@@ -126,4 +126,4 @@
 %     CL.PostprocessDynamics();    
 %     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
                 
-%end
+end

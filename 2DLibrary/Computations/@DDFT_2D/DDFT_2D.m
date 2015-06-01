@@ -367,7 +367,8 @@ classdef DDFT_2D < Computation
                     maxVal = max(max(max(abs(val))));
                     if(size(val,1) == 2*this.IDC.M)                   
                         PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
-                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal,1.5,'k'); 
+                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal,1.2,'k'); 
+                        %this.IDC.plot(val(:,iSpecies,i),{'flux'});%,[],maxVal,1.5,'k'); 
                     else
                         %this.IDC.plot(val(:,iSpecies,i),'SC');                    
                         this.IDC.plot(val(:,iSpecies,i),'contour');

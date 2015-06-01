@@ -85,10 +85,9 @@ function ComputeDynamicsInertia(this)
 
     ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
     
-    if(nargin < 2)
-        x_ic = GetInitialCondition(this);
-        mu   = this.mu;
-    end
+    
+	x_ic = GetInitialCondition(this);
+	mu   = this.mu;    
     
     fprintf(1,'Computing dynamics ...'); 
 
@@ -97,9 +96,11 @@ function ComputeDynamicsInertia(this)
     else
         optsNumT = optsNum;
     end
+    ignoreList = 'PlotAreaCart';
     
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
-                            @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]); %true      
+                                    @ComputeDDFTDynamics,...
+                                    v2struct(optsNumT,optsPhys),[],[],ignoreList); %true      
                         
     this.dynamicsResult.t = plotTimes;            
     this.FilenameDyn      = paramsEq.Filename;            

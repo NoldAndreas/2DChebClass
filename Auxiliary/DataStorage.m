@@ -106,6 +106,8 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 [FileName,DataFolder] = uigetfile('*.mat',['Select Data File for ',func2str(func)]);            
                 load([DataFolder,FileName]);  
                 disp(['Stored data from ',[DataFolder,FileName],' will be used..']);                        
+                
+                Parameters.Filename =  [DataFolder,FileName];
 
                 recompute = false;
             else

@@ -6,6 +6,7 @@ classdef (Abstract) Shape < handle
         Int
         Ind
         Interp
+        InterpFlux = []
         Conv
         Origin = [0,0]
         
@@ -92,12 +93,12 @@ classdef (Abstract) Shape < handle
         function [Pts,Diff,Int,Ind,Interp,Conv] = ComputeAll(this,PlotArea,f,shapeParam)
             Ind  = ComputeIndices(this);
             Diff = ComputeDifferentiationMatrix(this);
-            Int  = ComputeIntegrationVector(this);
+            Int  = ComputeIntegrationVector(this);            
                         
             Pts    = this.Pts;            
             
             if(nargin >= 2)
-                Interp = InterpolationPlot(this,PlotArea,true);  
+                Interp = InterpolationPlot(this,PlotArea,true);                  
             end                        
             if(nargin >= 3)
                 if(nargin ==4)
@@ -117,6 +118,10 @@ classdef (Abstract) Shape < handle
             this.Pts.N2 = this.N2;
             this.M      = length(this.Pts.y1_kv);
         end    
+        
+        %*************************************************************
+        %******** Compute Interpolation Matrices *********************
+        %*************************************************************
         function IP   = InterpolationMatrix_Pointwise(this,y1P,y2P)            
             IP = zeros(length(y1P),this.N1*this.N2);            
             for i =1:length(y1P)
@@ -141,7 +146,7 @@ classdef (Abstract) Shape < handle
             y1C_kv = kronecker(y1C,ones(PlotArea.N2,1));
             y2C_kv = kronecker(ones(PlotArea.N1,1),y2C);
             
-            pts = GetInvCartPts(this,y1C_kv,y2C_kv);
+            pts         = GetInvCartPts(this,y1C_kv,y2C_kv);
             
             IP.InterPol = InterpolationMatrix_Pointwise(this,pts.y1_kv,pts.y2_kv);
             IP.pts1     = pts.y1_kv;
@@ -172,7 +177,26 @@ classdef (Abstract) Shape < handle
             else
                 IP = ComputeInterpolationMatrix(this,y1Plot,y2Plot,true,false);           
             end
-        end                   
+        end       
+        function InterpolationPlotFlux(this,PlotArea)   
+            %if(isfield(PlotArea,'NFluxVectors'))
+                N = PlotArea.NFlux;
+            %end
+            
+            dy1     = (PlotArea.y1Max-PlotArea.y1Min);
+            dy2     = (PlotArea.y2Max-PlotArea.y2Min);
+                        
+            deltaY  = (max(dy1,dy2)/N);            
+            
+            PlotArea.N1 = round(dy1/deltaY);            
+            PlotArea.N2 = round(dy2/deltaY);
+            
+            this.InterpFlux = InterpolationPlotCart(this,PlotArea);
+        end
+
+        %********************************************************
+        %****************** Plotting functions*******************
+        %********************************************************
         function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = plotStreamlines(this,flux,startMask1,startMask2,opts)
             mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
                                (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
@@ -229,22 +253,34 @@ classdef (Abstract) Shape < handle
             else
                 nCol = 2;
             end
-            %ma3 = (~Ind.bound  & (Pts.y1_kv >=  min(y1Plot)) & (Pts.y1_kv <=  max(y1Plot)) & (Pts.y2_kv <=  max(y2Plot)) & (Pts.y2_kv >=  min(y2Plot)));
-            mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
-                               (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
-                               (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
-                               (this.Pts.y2_kv >= min(this.Interp.pts2)));                                                           
-            if(exist('maskAdd','var') && ~isempty(maskAdd))                           
-                mask   = (maskAdd & mask);                
+            %ma3 = (~Ind.bound  & (Pts.y1_kv >=  min(y1Plot)) & (Pts.y1_kv <=  max(y1Plot)) & (Pts.y2_kv <=  max(y2Plot)) & (Pts.y2_kv >=  min(y2Plot)));  
+            
+            nRows  = ceil(nSpecies/nCol);
+            %yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);
+            if(isempty(this.InterpFlux))
+                pts = this.Pts;         
+                IP  = diag(length(this.Pts.y1_kv));
+                mask    = ((this.Pts.y1_kv <= max(this.Interp.pts1)) & ...
+                           (this.Pts.y1_kv >= min(this.Interp.pts1)) & ...
+                           (this.Pts.y2_kv <= max(this.Interp.pts2)) & ...
+                           (this.Pts.y2_kv >= min(this.Interp.pts2)));                                                           
+                if(exist('maskAdd','var') && ~isempty(maskAdd))                           
+                    mask   = (maskAdd & mask);                
+                end
+            else
+                pts.y1_kv = this.InterpFlux.pts1;
+                pts.y2_kv = this.InterpFlux.pts2;
+                IP        = this.InterpFlux.InterPol;
+                mask      = true(size(this.InterpFlux.pts1));
             end
+            
             if(sum(mask)==0)
                 return;
-            end           
+            end                     
             
-            nRows  = ceil(nSpecies/nCol);                
-            %yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);
-            yCart  = GetCartPts(this,this.Pts.y1_kv,this.Pts.y2_kv);
-            y1_s   = yCart.y1_kv(mask);     y2_s  = yCart.y2_kv(mask);
+            yCart  = GetCartPts(this,pts.y1_kv,pts.y2_kv);
+            y1_s   = yCart.y1_kv(mask);     
+            y2_s   = yCart.y2_kv(mask);
             
             if(exist('fl_norm','var') && ~isempty(fl_norm))                
                 y1_s  = [min(y1_s);y1_s];
@@ -256,8 +292,8 @@ classdef (Abstract) Shape < handle
                                     
             for iSpecies=1:nSpecies
                 
-                fl_y1     = flux(1:this.N1*this.N2,iSpecies);
-                fl_y2     = flux(this.N1*this.N2+1:end,iSpecies);
+                fl_y1     = IP*flux(1:this.N1*this.N2,iSpecies);
+                fl_y2     = IP*flux(this.N1*this.N2+1:end,iSpecies);
                 
 %                 if(strcmp(this.polar,'polar'))
 %                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);
@@ -309,6 +345,8 @@ classdef (Abstract) Shape < handle
             
             if((nargin >= 3) && ~(iscell(options)))
                 options = {options};
+            else
+                options = {};
             end
                         
             %options: 'SC' , 'contour'
@@ -325,8 +363,14 @@ classdef (Abstract) Shape < handle
                 nCol = 2;
             end
             
+            if(IsOption(options,'flux'))
+                Interp = this.InterpFlux;
+            else
+                Interp = this.Interp;
+            end
+            
             nRows  = ceil(nSpecies/nCol);                
-            yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);            
+            yCart  = GetCartPts(this,Interp.pts1,Interp.pts2);            
             if((nargin >= 4) && isfield(optDetails,'y2CartShift'))
                 yCart.y2_kv = yCart.y2_kv + optDetails.y2CartShift;
             end
@@ -335,12 +379,12 @@ classdef (Abstract) Shape < handle
             yl     = [min(yCart.y2_kv) max(yCart.y2_kv)];            
 
             if((nargin >= 3) && IsOption(options,'comp')) 
-                [x1,x2]  = CompSpace(this,this.Interp.pts1,this.Interp.pts2);
-                y1M    = reshape(x1,this.Interp.Nplot2,this.Interp.Nplot1);
-                y2M    = reshape(x2,this.Interp.Nplot2,this.Interp.Nplot1);       
+                [x1,x2]  = CompSpace(this,Interp.pts1,Interp.pts2);
+                y1M    = reshape(x1,Interp.Nplot2,Interp.Nplot1);
+                y2M    = reshape(x2,Interp.Nplot2,Interp.Nplot1);       
             else
-                y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
-                y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);       
+                y1M    = reshape(yCart.y1_kv,Interp.Nplot2,Interp.Nplot1);
+                y2M    = reshape(yCart.y2_kv,Interp.Nplot2,Interp.Nplot1);       
             end
             
             if((nargin >= 4) && isfield(optDetails,'linewidth'))
@@ -355,16 +399,16 @@ classdef (Abstract) Shape < handle
                 end
 
                 if((nargin >= 3) && IsOption(options,'flux')) %if its a flux
-                    VI = blkdiag(this.Interp.InterPol,this.Interp.InterPol)*V(:,iSpecies);
-                elseif( (size(V,1) == length(this.Interp.pts1)) && (length(this.Interp.pts1) ~= length(this.Pts.y1_kv)) )
+                    VI = blkdiag(Interp.InterPol,Interp.InterPol)*V(:,iSpecies);
+                elseif( (size(V,1) == length(Interp.pts1)) && (length(Interp.pts1) ~= length(this.Pts.y1_kv)) )
                     VI = V(:,iSpecies);                
                 else
-                    VI = this.Interp.InterPol*V(:,iSpecies);
+                    VI = Interp.InterPol*V(:,iSpecies);
                 end
                 
                 if((nargin >= 3) && IsOption(options,'contour'))
                     if(nargin >= 4)         
-                        VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        VIM   = reshape(VI,Interp.Nplot2,Interp.Nplot1);
                         if(isfield(optDetails,'nContours'))                            
                             [C,h] = contour(y1M,y2M,VIM,...
                                   optDetails.nContours,...
@@ -381,13 +425,13 @@ classdef (Abstract) Shape < handle
                         end
                            
                     else
-                        VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                        VIM   = reshape(VI,Interp.Nplot2,Interp.Nplot1);
                         [C,h] = contour(y1M,y2M,VIM,8,...
                                   'linewidth',lw);  
                     end
                     % hh = clabel(C,h,'fontsize',20);
                 elseif((nargin >= 3) && IsOption(options,'color'))
-                    VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                    VIM   = reshape(VI,Interp.Nplot2,Interp.Nplot1);
                     pcolor(y1M,y2M,VIM);
                     shading flat;
                     %colorbar;
@@ -409,7 +453,7 @@ classdef (Abstract) Shape < handle
                     y2M = yCart.y2_kv;
                     quiver(y1M,y2M,VIM.fl_y1,VIM.fl_y2,'LineWidth',lw,'Color',c);
                 else
-                    VIM   = reshape(VI,this.Interp.Nplot2,this.Interp.Nplot1);
+                    VIM   = reshape(VI,Interp.Nplot2,Interp.Nplot1);
                     h = surf(y1M,y2M,VIM); %mesh
                     if(nargin>3)
                         if(isfield(optDetails,'linecolor'))

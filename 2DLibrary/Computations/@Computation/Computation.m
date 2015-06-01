@@ -45,6 +45,7 @@ classdef Computation < handle
             elseif(isfield(optsNum,'PlotAreaCart'))
                 this.IDC.ComputeAll();
                 this.IDC.InterpolationPlotCart(optsNum.PlotAreaCart,true);
+                this.IDC.InterpolationPlotFlux(optsNum.PlotAreaCart);
             else
                 this.IDC.ComputeAll();
             end

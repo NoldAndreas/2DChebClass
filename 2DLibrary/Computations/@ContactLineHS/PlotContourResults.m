@@ -38,7 +38,7 @@ function [fContour] =  PlotContourResults(this,options) %plain
         y1MaxP = max(this.IDC.Interp.pts1);
         y2MaxP = max(this.IDC.Interp.pts2);
 
-        theta_CS  = this.optsNum.PhysArea.alpha_deg*pi/180;
+        theta_CS     = this.optsNum.PhysArea.alpha_deg*pi/180;
         alphaYoungIn = this.alpha_YCA;
 
         pt2.y1_kv = min(y1MaxP,y2MaxP/tan(theta_CS));
@@ -47,10 +47,10 @@ function [fContour] =  PlotContourResults(this,options) %plain
         dx1       = pt2.y1_kv - pt2.y2_kv/tan(alphaYoungIn);
         x1M       = min(y1MaxP - dx1,y2MaxP/tan(alphaYoungIn));
         %x1M = min(PlotArea.y1Max,PlotArea.y2Max/tan(alphaYoungIn));
-        plot([dx1;x1M+dx1],[0;x1M*tan(alphaYoungIn)],'--m','linewidth',2);            
+        plot([dx1;x1M+dx1],[0;x1M*tan(alphaYoungIn)],'--m','linewidth',2); hold on;
 
         x1M = min(y1MaxP,y2MaxP/tan(alphaYoungIn));
-        plot([0,x1M],[0,x1M*tan(theta_CS)],'--g','linewidth',2);
+        plot([0,x1M],[0,x1M*tan(theta_CS)],'--g','linewidth',2); hold on;
     end
     
     if(IsOption(options,'5contours'))
