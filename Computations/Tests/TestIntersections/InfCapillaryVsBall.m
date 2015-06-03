@@ -1,10 +1,12 @@
 clear all; close all;
 
 R      = 1;
+R_in   = 1;
+R_out  = 2.5;
 bottom = 0;
 top    = 5;
 
-IntersectShape = 'Disc';
+IntersectShape = 'Annulus';
 
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[6,6],'L1',1,'L2',2);
@@ -28,6 +30,8 @@ while(y20 > bottom - R)
     
     if(strcmp(IntersectShape,'Disc'))
         DC     = Disc(v2struct(Origin,R,N,sphere));       
+    elseif(strcmp(IntersectShape,'Sphere'))
+        DC     = Sphere(v2struct(Origin,R,N,sphere));       
     elseif(strcmp(IntersectShape,'Ball'))    
         theta1 = 0;  theta2 = pi;    
         DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));   
@@ -35,7 +39,9 @@ while(y20 > bottom - R)
         L            = 1;
         shapeDC      = v2struct(Origin,N,sphere,L);
         shapeDC.RMin = R;
-        DC           = InfAnnulus(shapeDC);  
+        DC           = InfAnnulus(shapeDC);      
+    elseif(strcmp(IntersectShape,'Annulus'))         
+        DC           = Annulus(v2struct(Origin,R_in,R_out,N));               
     end
         
     hold on

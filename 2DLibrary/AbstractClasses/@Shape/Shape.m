@@ -500,7 +500,10 @@ classdef (Abstract) Shape < handle
                     set(gca,'linewidth',1.5);                        
                     hold off;
                 end
-            end            
+            end  
+            if(nargout == 0)
+                y1M = [];
+            end
         end            
         function PlotGrid(this,InitFig)    
             global PersonalUserOutput

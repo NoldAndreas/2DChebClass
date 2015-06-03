@@ -1,17 +1,17 @@
-function ContactLineDynamics_135degrees()
+%function AttractiveWall_1D()
 
     AddPaths('CodePaper');            
     close all;
     
-    PhysArea = struct('N',[40,40],...
-                      'L1',4,'L2',2,...                        
-                      'alpha_deg',135);
+    PhysArea = struct('N',[1,60],...
+                      'L1',5,'L2',2,...                        
+                      'alpha_deg',90);
                   
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
                           'N',[40,40]);
                           
-    PlotAreaCart =     struct('y1Min',-20,'y1Max',5,...
+    PlotAreaCart =     struct('y1Min',-5,'y1Max',20,...
                               'y2Min',0.5,'y2Max',15.5,...
                               'N1',100,'N2',100,'NFlux',40);
                       
@@ -19,7 +19,7 @@ function ContactLineDynamics_135degrees()
     V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);
+                       'Ncircle',1,'N1disc',80,'N2disc',80);
                    
 	plotTimes = struct('t_int',[0,200],'t_n',100);
 
@@ -54,22 +54,18 @@ function ContactLineDynamics_135degrees()
 %     %**********************************************
 %     % Equilibration from off-equilibrium IC
 %     %**********************************************
-    rhoGas = CL.optsPhys.rhoGas_sat;
-    rhoLiq = CL.optsPhys.rhoLiq_sat;
-
     [om,rho1D_wl,params] = CL.Compute1D('WL');            
-	[om,rho1D_wg,params] = CL.Compute1D('WG');
-    [om,rho1D_lg,params] = CL.Compute1D('LG');
+    CL.x_eq = CL.optsPhys.kBT*log(rho1D_wl) + CL.Vext;            
+   % CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));    
     
-    rho1D_wl = repmat(rho1D_wl,CL.IDC.N1,1);
-    rho1D_wg = repmat(rho1D_wg,CL.IDC.N1,1);
-    rho1D_lg = kronecker(rho1D_lg,ones(CL.IDC.N2,1));
-    
-    rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
-    CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
+	CL.optsPhys.V1.tau            = 5;    
+    CL.optsPhys.V1.epsilon_w_end  = 1.5;%epsilon_w_end
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
-    CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
+    CL.PlotDynamicValueLine([0 0],[0.5 10],'rho_t');
+    
+    
+%    CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
     %CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));    
     %CL.ComputeEquilibrium();              
     
@@ -126,4 +122,4 @@ function ContactLineDynamics_135degrees()
 %     CL.PostprocessDynamics();    
 %     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
                 
-end
+%end

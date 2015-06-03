@@ -71,8 +71,14 @@ classdef DDFT_2D < Computation
                     this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
                 GetCriticalPoint(this.optsPhys);
                 % BulkPhaseDiagram(this.optsPhys);
-                this.do2Phase = true;
+                this.do2Phase = true;                                
             end
+            if(isfield(this.optsPhys,'mu_sat') && isfield(this.optsPhys,'Dmu'))
+                this.mu =  this.optsPhys.mu_sat + this.optsPhys.Dmu;       
+            end
+            if(isfield(this.optsPhys,'mu'))
+                this.mu =  this.optsPhys.mu;
+            end            
 
             res_conv = Preprocess_MeanfieldContribution(this);
             res_fex  = Preprocess_HardSphereContribution(this);
@@ -285,8 +291,7 @@ classdef DDFT_2D < Computation
                 this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);                
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
-        end        
-        
+        end                
 
         ComputeEquilibrium(this,rho_ig,optsIn,miscIn)                
         function ComputeDynamics(this)
@@ -403,7 +408,98 @@ classdef DDFT_2D < Computation
                 disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
                 system(['del ',fileNames]);           
             end
-        end                
+        end 
+        function PlotDynamicValueLine(this,y1P,y2P,varName,opts)
+            if(nargin < 5)
+                opts = {};
+            end
+            
+            plotTimes = this.dynamicsResult.t;
+            rho_t     = this.dynamicsResult.rho_t;  
+            
+            
+            if(~iscell(varName))
+                varName = {varName};
+            end
+            name = [];
+            for i = 1:length(varName)
+                if(strcmp(varName{i},'U_t'))
+                    val{i}    = this.dynamicsResult.UV_t(1:end/2,:,:);
+                elseif(strcmp(varName{i},'V_t'))
+                    val{i}    = this.dynamicsResult.UV_t(1+end/2:end,:,:);   
+                else
+                    val{i}    = this.dynamicsResult.(varName{i});                
+                end
+                name      = [name,'_',varName{1}];
+            end                                       
+            
+            figure('Color','white','Position', [0 0 800 800]);
+            
+            T_n_Max = length(plotTimes);            
+            fileNames = [];            
+            
+            for i=1:T_n_Max
+            
+                t       = plotTimes(i);
+                hold off;
+                
+
+                
+                 for iSpecies=1:size(val,2)   
+                     
+                    for k = 1:length(val)
+                        this.IDC.plotLine(y1P,y2P,val{k}(:,iSpecies,i));
+                    end
+%                     if(~isempty(val2))                        
+%                         this.IDC.plot(val2(:,iSpecies,i),'color'); hold on;
+%                         colormap(b2r(0,max(max(val2(:,iSpecies,i)))));
+%                         colorbar;
+%                         %set(gca, 'CLim', [min(min(min(val2))) max(max(max(val2)))]);
+%                     end
+%                     
+%                     maxVal = max(max(max(abs(val))));
+%                     if(size(val,1) == 2*this.IDC.M)                   
+%                         PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
+%                         this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal,1.2,'k'); 
+%                         %this.IDC.plot(val(:,iSpecies,i),{'flux'});%,[],maxVal,1.5,'k'); 
+%                     else
+%                         %this.IDC.plot(val(:,iSpecies,i),'SC');                    
+%                         this.IDC.plot(val(:,iSpecies,i),'contour');
+%                     end
+%                     
+                 end 
+                
+                title(['t = ', num2str((t))]);               
+                set(gca,'fontsize',20);
+                set(gca,'linewidth',1.5);
+                %xlabel('$y_1$','Interpreter','Latex','fontsize',25);
+                %ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                %view([2,5,2]);
+
+                h = get(gca,'xlabel'); set(h,'fontsize',35);
+                h = get(gca,'ylabel'); set(h,'fontsize',35);
+                h = get(gca,'title');  set(h,'fontsize',35);
+                pause(0.2);
+                
+                
+                if(IsOption(opts,'save'))
+                    fileName = getPDFMovieFile('Movie1',i);
+                    save2pdf(fileName,gcf);
+                    fileNames = [fileNames,' ',fileName];
+                end                
+                
+            end
+            
+            if(IsOption(opts,'save'))                
+                allPdfFiles = [this.FilenameDyn,'_',name,'.pdf'];                
+    
+                system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
+                disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
+                system(['del ',fileNames]);           
+            end
+        end 
+        
+        
         function fig_h = PlotDynamics(this,rec)
             if(nargin == 1)
                 rec = false;
