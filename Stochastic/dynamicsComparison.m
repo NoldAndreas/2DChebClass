@@ -13,8 +13,11 @@ AddPaths();
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
 
+%inputFile = 'ThreeSpeciesTest';
+%inputFile = 'ThreeSpeciesTestEq';
+
 %inputFile = 'HIWallTestTowards';
-inputFile = 'HIWallTestAway';
+%inputFile = 'HIWallTestAway';
 
 %inputFile = 'InertiaTest';
 %inputFile = 'InertiaTestInfDisc';
@@ -26,6 +29,15 @@ inputFile = 'HIWallTestAway';
 %inputFile = 'GaussianTest_2Species';
 
 %inputFile = 'GaussianBoxTest';
+%inputFile = 'GaussianBoxTest2';
+%inputFile = 'GaussianBoxTest3';
+
+%inputFile = 'BoxTest3';
+%inputFile = 'BoxTest3N';
+
+%inputFile = 'FMTTest_2Species'; % higher density, less accurate
+%inputFile = 'FMTTest_2Species2';
+inputFile = 'FMTTest_2Species2N';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

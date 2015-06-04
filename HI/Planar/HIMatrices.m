@@ -20,6 +20,13 @@ function HIStruct = HIMatrices(opts,IDC)
     f11      = str2func(optsNum.HI11);
     f12      = str2func(optsNum.HI12);
 
+    if(isfield(optsNum,'HIg'))
+        g = str2func(optsNum.HIg);
+    else
+        g = str2func(g_id);
+    end
+    
+    
     if(isfield(optsNum,'N'))
         params.N = optsNum.N;
     else
@@ -52,11 +59,11 @@ function HIStruct = HIMatrices(opts,IDC)
 
     %--------------------------------------------------------------------------
     function z = F11(r)         
-        z = f11(r,paramsIJ);                    
+        z = f11(r,paramsIJ).*g(r,paramsIJ);                    
     end
 
     function z = F12(r)         
-        z = f12(r,paramsIJ);                    
+        z = f12(r,paramsIJ).*g(r,paramsIJ);                    
     end
 
     function paramsIJ = getIJParams(iS,jS)

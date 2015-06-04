@@ -1,4 +1,4 @@
-function [VBack_S,VAdd_S]=V1_Test_Box(y1S,y2S,t,optsPhys)
+function [VBack_S,VAdd_S,VGeom_S]=V1_Test_Box_Eq(y1S,y2S,t,optsPhys)
 
 V0=optsPhys.V0;
 y10=optsPhys.y10;
@@ -21,14 +21,14 @@ VBack_S = struct('V',VBack,...
         
 t = t/tau;
 
-tSwitch = (1 -exp(-t^2));
+tSwitch = exp(-t^2);
 
-VAdd        = tSwitch*V0.*((y1S-y10).^2 + (y2S-y20).^2);
+VAdd        = V0.*((y1S-y10*tSwitch).^2 + (y2S-y20*tSwitch).^2);
 
 VAdd(abs(y1S)==inf | abs(y2S)==inf) = 0;
 
-DVAddDy1    = 2*V0.*(y1S-y10);
-DVAddDy2    = 2*V0.*(y2S-y20);
+DVAddDy1    = 2*V0.*(y1S-y10*tSwitch);
+DVAddDy2    = 2*V0.*(y2S-y20*tSwitch);
 
 DVAddDy1(abs(y1S)==inf | abs(y2S)==inf) = 0;
 DVAddDy2(abs(y1S)==inf | abs(y2S)==inf) = 0;

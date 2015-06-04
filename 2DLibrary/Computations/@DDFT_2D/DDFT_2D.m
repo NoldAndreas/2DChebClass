@@ -85,8 +85,21 @@ classdef DDFT_2D < Computation
             Preprocess_HIContribution(this);
             Preprocess_ExternalPotential(this);
             Preprocess_SubArea(this);
+<<<<<<< HEAD
             
              res = mergeStruct(res_conv,res_fex);
+=======
+                        
+            if(isempty(fieldnames(res_conv)) && isempty(fieldnames(res_fex)))
+                res.empty = true;
+            elseif(isempty(fieldnames(res_conv)) && ~isempty(fieldnames(res_fex)))
+                res = res_fex;
+            elseif(~isempty(fieldnames(res_conv)) && isempty(fieldnames(res_fex)))
+                res = res_conv;
+            else
+                res = mergeStruct(res_conv,res_fex);
+            end
+>>>>>>> StocTest
         end                
         function y0  = getInitialGuess(this,rho_ig)
             
@@ -217,7 +230,7 @@ classdef DDFT_2D < Computation
                 error('Define V2Num structure in optsNum')
             else
                 res = struct();
-                this.IntMatrV2 = 0;
+                this.IntMatrV2 = [];
             end
         end
         function Preprocess_HIContribution(this)

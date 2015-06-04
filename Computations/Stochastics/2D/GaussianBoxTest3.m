@@ -10,12 +10,12 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-nParticlesS=10;
+nParticlesS=[5;5;5];
 
 kBT=1;          % temperature
-mS=1;
+mS=[1;1;1];
 
-gammaS=1;
+gammaS=[1;1;1];
 D0S=kBT./mS./gammaS;
 
 %--------------------------------------------------------------------------
@@ -48,18 +48,24 @@ potParamsNames = {'L1','L2', ...
 
 V2DV2='Gaussian';
 
-epsilonS = 1;
-alphaS   = 1;
+ epsilonS=[ 1 1 1 ;
+                 1 1 1 ;
+                 1 1 1 ] ;
+
+alpha1 = 0.5;
+alpha2 = 1;
+alpha3 = 1.5;
+
+alpha12=(alpha1+alpha2)/2;
+alpha13=(alpha1+alpha3)/2;
+alpha23=(alpha2+alpha3)/2;
+
+alphaS=[alpha1  alpha12 alpha13 ; 
+        alpha12 alpha2  alpha23 ;
+        alpha13 alpha23 alpha3  ];
+
 
 potParams2Names={'epsilon','alpha'};
-
-%--------------------------------------------------------------------------
-% HI parameters
-%--------------------------------------------------------------------------
-
-sigmaHS = 0.5;
-
-HIParamsNames={'sigmaH'};
 
 %--------------------------------------------------------------------------
 % Save time setup
@@ -77,13 +83,15 @@ tMax = 5;
 % only relevant if fixedInitial=false or sampleFinal=true
 %nSamples=100000;  
 
-nSamples=50000;  
+nSamples=100000;  
 
-initialGuess='makeGridPos';
+sampleFinal = false;
+
+initialGuess='makeGridPosScale';
 
 % number of runs of stochastic dynamics to do, and average over
 %nRuns=500000;
-nRuns=200;
+nRuns=100;
 
 % number of cores to use in parallel processing
 %poolsize=12;
@@ -108,12 +116,12 @@ doStoc={true,false,false,false};
 loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={10^3,10^3,2*10^4,10^3};
+tSteps={10^4,10^3,2*10^4,10^3};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
-stocColour = {{'r'},{'g'},{'b'},{'m'}};
+stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -135,7 +143,7 @@ V2Num  =  {V2_Num, V2_Num};
 DDFTCode = {'DDFTDynamics', ...
             'DDFTDynamics'};
         
-doPlots = true;
+doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','PlotArea','V2Num','doPlots'}, ...
                    {'PhysArea','PlotArea','V2Num','doPlots'}};
@@ -157,7 +165,7 @@ doDDFT={true,false};
 % do we load and save the DDFT data
 loadDDFT={true,true};
 
-DDFTColour = {{'g'},{'m'}};
+DDFTColour = {{'g','m','c'},{'m'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -183,8 +191,8 @@ PMin=[-1;-1];
 PMax=[1;1];
 
 % y axis for mean position and velocity plots
-RMMin=[0;max(L1S,L2S)];
-RMMax=[0;max(L1S,L2S)];
+RMMin=[0;0];
+RMMax=[max(L1S,L2S);max(L1S,L2S)];
 PMMin=[-1;-1];
 PMMax=[1;1];
 

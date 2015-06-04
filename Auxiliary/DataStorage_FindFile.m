@@ -16,7 +16,7 @@ function ind = DataStorage_FindFile(index,Parameters,ignoreList)
         [h1s,par_i.Function]      = fileparts(par_i.Function);
 
         par_i_comp = RemoveIgnoreFromStruct(par_i,ignoreList);
-
+        
         if(isequaln(Parameters_comp,par_i_comp))%index{i}.Parameters))
             ind = i;
             break;

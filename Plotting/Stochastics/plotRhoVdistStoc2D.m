@@ -66,6 +66,7 @@ end
 
 % plotting options
 faceColour=optsPlot.faceColour;
+lineStyle = optsPlot.lineStyle;
 
 % handles of lines
 hr=zeros(nSpecies,1);
@@ -83,7 +84,8 @@ for iSpecies=1:nSpecies
             % surface plot
             %hr(iSpecies)=surf(hRa(iSpecies),xRS(:,:,1),xRS(:,:,2),nRS);
             hr(iSpecies)=surf(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
-            set(hr(iSpecies),'FaceColor',faceColour{iSpecies});
+            set(hr(iSpecies),'FaceColor',faceColour{iSpecies}) %, ...
+                %'EdgeColor','none','LineStyle','none','FaceLighting','phong');
 %           set(hr(iSpecies),'EdgeColor',faceColour{iSpecies});
             alpha(hr(iSpecies),0.5);
             
@@ -97,8 +99,12 @@ for iSpecies=1:nSpecies
 
     hold(hRa(iSpecies),'on')
     
+    if(strcmp(lineStyle{iSpecies},'none'))
+        lineStyle{iSpecies} = ':';
+    end
+    
     [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth);
+    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');
 

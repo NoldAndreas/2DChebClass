@@ -110,6 +110,8 @@ switch optsPlot.plotType
         end          
 end
 
+
+
 %----------------------------------------------------------------------
 % Set up legend
 %----------------------------------------------------------------------
@@ -129,13 +131,13 @@ plotTime=plotTimes(1);
 
 % surface colours and types
 if(nStoc>0)
-     optsPlot.faceColour=optsPlot.eqColour;
+     optsPlot.faceColour=optsPlot.eqColour{1};
      % get type info -- used to decide whether to plot the velocity
      stocType=optsPlot.stocType;
 end
 
 if(nDDFT>0)
-    optsPlot.faceColour=optsPlot.eqColour;
+    optsPlot.faceColour=optsPlot.eqColour{1};
     % get type info -- used to decide whether to plot the velocity
     DDFTType=optsPlot.DDFTType;
 end
@@ -150,37 +152,35 @@ outputFile = optsPlot.eqFile;
 
 if(nDDFT>0)
 
-    for iDDFT = 1:nDDFT
+    % get rho, v and r values
+    rho = ddft(1).dynamicsResult.rho_t;
+    flux = ddft(1).dynamicsResult.flux_t;
+   
+    optsPlot.type=DDFTType(1,:);
+    optsPlot.lineStyle = optsPlot.lineStyleDDFT{1};
+
+    % get values at appropriate time
+    rhot  = rho(:,:,1);
+    fluxt = flux(:,:,:,1);
+
+    %optsPlot.faceColour=optsPlot.lineColourDDFT{1};
+    optsPlot.fluxNorm = 1;
     
-        % get rho, v and r values
-        rho = ddft(iDDFT).dynamicsResult.rho_t;
-        flux = ddft(iDDFT).dynamicsResult.flux_t;
+    colours = optsPlot.lineColourDDFT{1};
+    
+    if(~separateSpecies)
+        optsPlot.faceColour = colours;
+        % plot the distributions
+        plotRhoVdistDDFT2D(rhot,fluxt,ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP);
 
-        optsPlot.type=DDFTType(iDDFT);
-        optsPlot.lineStyle = optsPlot.lineStyleDDFT{iDDFT};
-
-        % get values at appropriate time
-        rhot  = rho(:,:,1);
-        fluxt = flux(:,:,:,1);
-
-        optsPlot.fluxNorm = 1;
-
-        colours = optsPlot.lineColourDDFT{iDDFT};
-
-        if(~separateSpecies)
-            optsPlot.faceColour = colours;
-            % plot the distributions
-            plotRhoVdistDDFT2D(rhot,fluxt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP);
-
-            hold(hRa,'on');
-            hold(hPa,'on');
-        else
-            for iSpecies = 1:nSpecies
-                optsPlot.faceColour = colours(iSpecies);
-                plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iSpecies));
-                hold(hRa(iSpecies),'on');
-                hold(hPa(iSpecies),'on');
-            end
+        hold(hRa,'on');
+        hold(hPa,'on');
+    else
+        for iSpecies = 1:nSpecies
+            optsPlot.faceColour = colours(iSpecies);
+            plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(1).IDC.Interp,ddft(1).IDC.Pts,optsPlot,handlesRP(iSpecies));
+            hold(hRa(iSpecies),'on');
+            hold(hPa(iSpecies),'on');
         end
     end
 
@@ -192,33 +192,29 @@ end
 
 if(nStoc>0)
 
-    for iStoc = 1:nStoc
+    rho   = equilibria(1).data.REq;
+    v     = equilibria(1).data.vEq;
+    boxes = equilibria(1).data.xEq;
     
-        rho   = equilibria(iStoc).data.REq;
-        v     = equilibria(iStoc).data.vEq;
-        boxes = equilibria(iStoc).data.xEq;
+    optsPlot.type=stocType(1,:);
+    optsPlot.lineStyle = optsPlot.lineStyleStoc{1};
 
-        optsPlot.type=stocType(iStoc);
-        optsPlot.lineStyle = optsPlot.lineStyleStoc{iStoc};
+    colours = optsPlot.lineColourStoc{1};
+    nParticlesS = optsPlot.nParticlesS;
 
-        colours = optsPlot.lineColourStoc{iStoc};
-        nParticlesS = optsPlot.nParticlesS;
-
-        if(~separateSpecies)
-            optsPlot.faceColour = colours;
-            plotRhoVdistStoc2D(rho,v,boxes,optsPlot,handlesRP);
-            hold(hRa,'on');
-            hold(hPa,'on');
-        else
-            for iSpecies = 1:nSpecies
-                optsPlot.faceColour = colours(iSpecies);
-                optsPlot.nParticlesS = nParticlesS(iSpecies);
-                plotRhoVdistStoc2D(rho(:,:,iSpecies),v,boxes,optsPlot,handlesRP(iSpecies));
-                hold(hRa(iSpecies),'on');
-                hold(hPa(iSpecies),'on');
-            end
+    if(~separateSpecies)
+        optsPlot.faceColour = colours;
+        plotRhoVdistStoc2D(rho,v,boxes,optsPlot,handlesRP);
+        hold(hRa,'on');
+        hold(hPa,'on');
+    else
+        for iSpecies = 1:nSpecies
+            optsPlot.faceColour = colours(iSpecies);
+            optsPlot.nParticlesS = nParticlesS(iSpecies);
+            plotRhoVdistStoc2D(rho(:,:,iSpecies),v,boxes,optsPlot,handlesRP(iSpecies));
+            hold(hRa(iSpecies),'on');
+            hold(hPa(iSpecies),'on');
         end
-        
     end
 
 end

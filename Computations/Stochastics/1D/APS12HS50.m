@@ -78,20 +78,18 @@ tMax=2.5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=50000;  
-
-nSamples=500;  
+nSamples=50000;  
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=2;
+%nRuns=2;
 
-%nRuns = 1000;
+nRuns = 10;
 
 % number of cores to use in parallel processing
 %poolsize=12;
-poolsize=1;
+poolsize=4;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r','rv','r','rv'};
@@ -107,13 +105,14 @@ stocName={'r0','rv0','r1','rv1'};
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
 %doStoc={true,true,false,false};
-doStoc={false,false,false,false};
+doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
+%loadStoc={false,false,false,false};
 
 % number of time steps
-tSteps={10^4,10^4,2*10^4,2*10^4};
+tSteps={2*10^4,2*10^4,2*10^4,2*10^4};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
@@ -125,12 +124,12 @@ saveStoc={true,true,true,true};
 
 
 Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
-Plot_Area = struct('N',200,'yMin',0,'yMax',8);
+Plot_Area = struct('N',200,'yMin',0,'yMax',12);
 Fex_Num   = struct('Fex','FMT','N',100);
 
-PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area};
-PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
-FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num};
+PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area, Phys_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area, Plot_Area};
+FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num, Fex_Num};
 HINum    = {[], ...
             [], ...
             struct('N',100,'L',4, ...
@@ -140,11 +139,17 @@ HINum    = {[], ...
             struct('N',100,'L',4, ...
                        'HI11','JeffreyOnishi11Spherical',...
                        'HI12','JeffreyOnishi12Spherical', ...
-                       'HIPreprocess', 'JeffreyOnishiPreprocessSpherical')};
+                       'HIPreprocess', 'JeffreyOnishiPreprocessSpherical'), ...
+            struct('N',100,'L',4, ...
+                       'HI11','JeffreyOnishi11Spherical',...
+                       'HI12','JeffreyOnishi12Spherical', ...
+                       'HIPreprocess', 'JeffreyOnishiPreprocessSpherical', ...
+                       'HIg','g_0_Spherical')};
 
 DDFTCode = {'DDFT_Diffusion_1D_Spherical', ...
             'DDFT_Inertia_1D_Spherical', ...
             'DDFT_Diffusion_1D_Spherical', ...
+            'DDFT_Inertia_1D_Spherical', ...
             'DDFT_Inertia_1D_Spherical'};
        
 doPlots = false;
@@ -152,27 +157,26 @@ doPlots = false;
 DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
                    {'PhysArea','PlotArea','FexNum','doPlots'},...
                    {'PhysArea','PlotArea','FexNum','HINum','doPlots'},...
+                   {'PhysArea','PlotArea','FexNum','HINum','doPlots'}, ...
                    {'PhysArea','PlotArea','FexNum','HINum','doPlots'}};
 
 HIParamsNamesDDFT={'sigmaH','sigma'};               
                
-DDFTName={'r0','rv0','r1','rv1'};
+DDFTName={'r0','rv0','r1','rv1','rv1gTest'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','rv','r','rv'};
+DDFTType={'r','rv','r','rv','rv'};
 
 % whether to do DDFT calculations
-%doDDFT={true,true,true,true};
-doDDFT={true,true,true,true};
-%doDDFT={false,false,true,true};
-%doDDFT={false,false,false,false};
+%doDDFT={true,true,true,true,true};
+doDDFT={true,false,false,false,false};
+%doDDFT={false,false,false,false,false};
 
 % do we load and save the DDFT data
-%loadDDFT={true,true,true,true};
-loadDDFT={true,true,true,true};
-%loadDDFT={false,false,false,false};
+loadDDFT={true,true,true,true,true};
+%loadDDFT={false,false,false,false,false};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -239,6 +243,7 @@ doPdfs=false;              % .pdfs to make .swf
 doMovieSwf=false;          % .swf movie
 doInitialFinal=false;
 doMeans=false;
+doEquilibria = true;
 
 % particle movies/plots
 doInitialFinalP=false;

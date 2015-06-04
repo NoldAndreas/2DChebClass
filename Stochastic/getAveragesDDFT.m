@@ -3,20 +3,24 @@ function averagesStruct=getAveragesDDFT(opts,DDFTStruct)
     % check what happens with the 2D case
     %[rMean,vMean]=getRVmeansDDFT(DDFTStruct);
 
-    if(isprop(DDFTStruct.shape,'N1'))
-        dim = 2;
-    else
+    
+    if(isfield(DDFTStruct,'shape'))
         dim = 1;
+    else
+        dim = 2;
     end
     
     if(dim==1)
         [rMean,fluxMean]=getRFluxMeansDDFT(DDFTStruct);
     else
-        [rMean,fluxMean]=getRFluxMeansDDFT2D(DDFTStruct);
+       % [rMean,fluxMean]=getRFluxMeansDDFT2D(DDFTStruct);
+        rMean = 0;
+        fluxMean = 0;
+        averagesStruct.error = 'Not implemented in 2D';
     end
     
     averagesStruct.rMean    = rMean;
     averagesStruct.fluxMean = fluxMean;
-
+    
 end
 

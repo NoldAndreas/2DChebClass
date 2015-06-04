@@ -101,7 +101,7 @@ ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
 ICFilename = [dirData filesep ICDir filesep Parameters.Filename];
 
-fprintf(1,'Finished\n');
+fprintf(1,'Finished\n\n');
 
 %--------------------------------------------------------------------------
 % Final distribution
@@ -122,7 +122,7 @@ if(sampleFinal)
 
     FCFilename = [dirData filesep FCDir filesep Parameters.Filename];
     
-    fprintf(1,'Finished\n');
+    fprintf(1,'Finished\n\n');
     
 else
     % return empty data and don't save
@@ -162,7 +162,7 @@ if(MBp && doP)
 
     pFilename = [dirData filesep pDir filesep Parameters.Filename];
     
-    fprintf(1,'Finished\n');
+    fprintf(1,'Finished\n\n');
     
 else
     
@@ -171,7 +171,7 @@ else
     pIF=zeros(optsStoc.nSamples,optsPhys(1).nParticles*optsPhys(1).dim);
     pFilename = [];
     
-    fprintf(1,'Finished\n');
+    fprintf(1,'Finished\n\n');
 end    
 
 
@@ -224,7 +224,7 @@ for iStoc=1:nStoc
     stocStruct(iStoc).FCFilename = FCFilename;
     stocStruct(iStoc).pFilename = pFilename;
     
-    fprintf(1,'Finished\n');
+    fprintf(1,'Finished\n\n');
 end
 
 

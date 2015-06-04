@@ -2,66 +2,62 @@
 % compulsory physical constants
 %--------------------------------------------------------------------------
 
-geom='spherical';
+geom='planar2D';
 
 % dimension in which to do the stochastic calculations
-stocDim=3;
+stocDim=2;
 % dimension in which to do the DDFT calculations (=1), but we need to know
 % it's one in certain places
-DDFTDim=1;
+DDFTDim=2;
 
-nParticlesS=[25;25];
-%nParticlesS=[10;10];
+nParticlesS=[10;10];
 
 kBT=1;          % temperature
 mS=[1;1];
 
-gammaS=[2;2];
+gammaS=[1;1];
 D0S=kBT./mS./gammaS;
 
 %--------------------------------------------------------------------------
 % V1 parameters
 %--------------------------------------------------------------------------
 
-V1DV1='APSG';
+V1DV1='V1_Triangle';
 
-% appropriate physical parameters for potentials in V1DV1   
-VmS= [0.01;0.01];  
-tSwitchS= [12;12];
+% appropriate physical parameters for potentials in V1DV1
+V0S        = 0.01;
+V0addS     = [3;3];
+tauS       = 0.1;
+sigma1AddS = 0.5;
+sigma2AddS = 0.5;
 
+y10S       = [-1;-0.75];
+y20S       = [0;-0.5];
+y11S       = [0.75;1];
+y21S       = [0;-0.25];
+y12S       = 0;
+y22S       = [0.5;0.75];
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
-potParamsNames = {'Vm','tSwitch'};
+potParamsNames = {'V0','V0add','tau','sigma1Add','sigma2Add',...
+                  'y10','y20','y11','y21','y12','y22'};
 
 %--------------------------------------------------------------------------
 % V2 parameters
 %--------------------------------------------------------------------------
 
-V2DV2='Gaussian';
+V2DV2='hardSphere';
 
-epsilonS = [0.5,0.5;0.5,0.5];
-%epsilonS = [0,0 ; 0,0];
-alpha1=0.2;
-alpha2=1;
-alpha12=(alpha1+alpha2)/2;
+sigmaS = [1 1;1 1];
 
-alphaS = [alpha1, alpha12; alpha12, alpha2];
-
-potParams2Names={'epsilon','alpha'};
-
-%--------------------------------------------------------------------------
-% HI parameters
-%--------------------------------------------------------------------------
-% 
-% HIParamsNames={};
-% HIParamsNamesDDFT={};
+potParams2Names={'sigma'};
 
 %--------------------------------------------------------------------------
 % Save time setup
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=12;
+tMax=0.25;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -70,155 +66,140 @@ tMax=12;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-%nSamples=50000;  
 
-nSamples=50000;  
+nSamples=2000000;  
+ 
+%nSamples=2000000;
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-nRuns=1000;
+
+%nRuns=10000;
+
+nRuns=50;
 
 % number of cores to use in parallel processing
 poolsize=12;
 %poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
-stocType={'r','rv'};
+stocType={'r','rv','r','rv'};
 
 % whether to include hydrodynamic interactions
-stocHI={false,false};
+stocHI={false,false,true,true};
 % HI interaction matrices
-stocHIType={[],[]};
+stocHIType={[],[],'RP','RPInv'};
 
 % names for stochastic calculations -- used as legend text
-stocName={'r0','rv0'};
+stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true};
-%doStoc={false,false};
+%doStoc={true,true,true,true};
+%doStoc={true,false,true,false};
+doStoc={true,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={true,true};
-%loadStoc={false,false};
+loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={10^3,10^3};
+tSteps={10^4,10^3,10^4,10^3};
 
 % whether to save output data (you probably should)
-saveStoc={true,true};
+saveStoc={true,true,true,true};
 
+stocColour = {{'g','m'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
-Plot_Area = struct('N',200,'yMin',0,'yMax',10);
-Fex_Num   = struct('Fex','Meanfield','N',100,'L',2);
+boxL =2;
 
-PhysArea = {Phys_Area,Phys_Area};
-PlotArea = {Plot_Area,Plot_Area};
-FexNum   = {Fex_Num,Fex_Num};
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[50,50],'L1',4,...
+                   'y2Min',-inf,'y2Max',inf,'L2',4);
 
-DDFTCode = {'DDFT_Diffusion_1D_Spherical', ...
-            'DDFT_Inertia_1D_Spherical'};
+Plot_Area = struct('y1Min',-boxL,'y1Max',boxL,'N1',100,...
+                   'y2Min',-boxL,'y2Max',boxL,'N2',100);
+                   
+Fex_Num1   = struct('Fex','FMTRosenfeld',...
+                       'Ncircle',10,'N1disc',10,'N2disc',10);
+
+Fex_Num2   = struct('Fex','FMTRoth',...
+                       'Ncircle',10,'N1disc',10,'N2disc',10);
+                   
+PhysArea = {Phys_Area, Phys_Area};
+
+PlotArea = {Plot_Area, Plot_Area};
+
+FexNum   = {Fex_Num1, Fex_Num2};
+
+V2Num    = {[],[]};
+
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics'};
         
-doPlots = true;
+doPlots = false;
 
-DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','doPlots'}, ...
-                   {'PhysArea','PlotArea','FexNum','doPlots'}};
-                           
-DDFTName={'r0','rv0'};
+DDFTParamsNames = {{'PhysArea','PlotArea','FexNum','V2Num','doPlots'}, ...
+                    {'PhysArea','PlotArea','FexNum','V2Num','doPlots'}};
+
+               
+DDFTName={'Rosenfeld','Roth'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','rv'};
+DDFTType={'r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true};
+doDDFT={false,true};
+%doDDFT={true,false};
+%doDDFT={true,true};
 
 % do we load and save the DDFT data
 loadDDFT={true,true};
+%loadDDFT={false,false};
 
+DDFTColour = {{'g','m'},{'r','b'}};
+DDFTLineStyle = {{'-','-'},{'-','-'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
 
+plotType = 'surf';
 
-% whether to plot the distribution (false) or the density (true) in
-% spherical coordinates.
-plotDensity=false;
-
-plotCurrent=false;
+viewPoint = [-56;7];
 
 % x axis for position and velocity plots
-rMin=0;
-rMax=12;
+rMin=[-boxL;-boxL];
+rMax=[boxL;boxL];
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=15;
+RMax=0.8;
 
-PMin=-0.5;
-PMax=0.4;
-
+PMin=[-1;-1];
+PMax=[1;1];
 
 % y axis for mean position and velocity plots
-RMMin=1;
-RMMax=4;
-PMMin=-0.5;
-PMMax=0.25;
-
-% position of the legend -- set to 'off' to turn off individual legends
-%legPos='SouthEast';
-%legPos='NorthWest';
-legPos='off';
-% to create a single legend for all plots
-oneLeg='top';
-%oneLeg='off';
-perRow=4;
+RMMin=[-3;5];
+RMMax=[3;7];
+PMMin=[-1;-1];
+PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=50;
-%nBins=100;
+nBins=[50;50];
 
-% don't plot v for regions where rho<vCutoff*max(rho) as these are just
-% noise either due to DDFT calculation or very small number of particles
-%vCutoff=5*10^(-2);
-vCutoff=5*10^(-2);
-
-% animation options:
-% resolution
-dpi=300;
-% framerate
-fps=5;
-% whether to flatten pdfs in swf
-bitmap=false;
-% whether to suppress output of pdf2swf
-quiet=true;
+separateSpecies = false;
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif=false;          % .gif movie
-doPdfs=false;              % .pdfs to make .swf
-doMovieSwf=false;          % .swf movie
-doInitialFinal=true;
-doMeans=true;
+doMovieGif     = false;          % .gif movie
+doInitialFinal = false;
+doMeans        = false;
+doEquilibria   = true;
 
-% particle movies/plots
-doInitialFinalP=false;
-doMovieGifP=false;
-doPdfsP=false;
-doMovieSwfP=false;
-
-% strip out any where the time step was too large
-doStrip=false;
-
-doCustom=false;
-%custom='makeMovieWithSnapshotsV';
-custom='MSHISnapshots';
+%sendEmail = true;

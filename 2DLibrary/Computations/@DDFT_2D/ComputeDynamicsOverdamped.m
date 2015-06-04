@@ -58,6 +58,11 @@ function ComputeDynamicsOverdamped(this)
 
     ythS    = repmat(this.IDC.Pts.y2_kv,1,nSpecies);
     
+    if(length(D0)>1)
+        D0 = D0(:);
+        D0 = repmat(D0',M,1);
+    end
+    
     if(nargin < 2)
         x_ic = this.x_eq;
         mu   = this.mu;
@@ -142,7 +147,7 @@ function ComputeDynamicsOverdamped(this)
         dxdt(Ind.finite,:)     = Ind.normalFinite*gradMu;                
         dxdt(markVinf)         = x(markVinf) - x_ic(markVinf);
 
-        dxdt = D0*dxdt;
+        dxdt = D0.*dxdt;
         
         flux_dir               = GetFlux(x,t);
         if(~isempty(this.subArea) && strcmp(this.subArea.polar,'polar'))

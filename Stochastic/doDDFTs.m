@@ -91,7 +91,7 @@ for iDDFT=1:nDDFT
         DDFTStructFull(iDDFT) = DDFTStruct;  %#ok
     end
     
-    fprintf(1,'Finished\n');
+    fprintf(1,'Finished\n\n');
 end
 
     function output = DDFTwrapper(opts,optsPlot)

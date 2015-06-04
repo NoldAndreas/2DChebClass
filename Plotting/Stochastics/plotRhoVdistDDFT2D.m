@@ -63,11 +63,15 @@ else
     hPa=plotHandles.hPa;
     
     if(length(hRa)<nSpecies)
-        hRa = hRa(1)*ones(1,nSpecies);
+        for iSpecies=1:nSpecies
+            hRa(iSpecies) = hRa(1);
+        end
     end
 
     if(length(hPa)<nSpecies)
-        hPa = hPa(1)*ones(1,nSpecies);
+        for iSpecies=1:nSpecies
+            hPa(iSpecies) = hPa(1);
+        end
     end
     
 end
@@ -80,6 +84,7 @@ y1Max=optsPlot.rMax(1);
 y2Max=optsPlot.rMax(2);
 
 faceColour=optsPlot.faceColour;
+lineStyle = optsPlot.lineStyle;
 
 x1=Interp.pts1;
 x2=Interp.pts2;
@@ -185,7 +190,13 @@ for iSpecies=1:nSpecies
     rhoS(rhoS<cutoff)=0;
     
     [C,h]=contour(hCa,y1,y2,rhoS);     
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth);
+    
+    if(strcmp(lineStyle{iSpecies},'none'))
+        lineStyle{iSpecies} = '-';
+    end
+    
+    
+    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
     clabel(C,h,'Color',faceColour{iSpecies});
     hold(hCa,'on');
     

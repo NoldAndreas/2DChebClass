@@ -1,8 +1,5 @@
 function [VBack_S,VAdd_S,VGeom_S] = quad_Box(y1S,y2S,t,optsPhys)
 
-% ensure a column vector (e.g. slicesample uses row vectors)
-y1S=y1S(:);
-
 tau = optsPhys.tau;
 y10 = optsPhys.y10;
 y20 = optsPhys.y20;
@@ -17,10 +14,10 @@ t = t/tau;
 
 V0Add = V0Add * exp(-t);
 
-VAdd        = - V0Add.*exp(-(y1S-y10).^2/B10).*exp(-(y2S-y20).^2/B20);
+VAdd        = - V0Add.*exp(-(y1S-y10).^2./B10).*exp(-(y2S-y20).^2./B20);
 
-DVAddDy1    = - 2*VAdd.*(y1S-y10)/B10;
-DVAddDy2    = - 2*VAdd.*(y2S-y20)/B20;
+DVAddDy1    = - 2*VAdd.*(y1S-y10)./B10;
+DVAddDy2    = - 2*VAdd.*(y2S-y20)./B20;
  
 DVAddDy1(abs(y1S)==inf)=0;
 DVAddDy2(abs(y2S)==inf)=0;

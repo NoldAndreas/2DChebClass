@@ -2,7 +2,11 @@ function FMTMatricesFull = FexMatrices_FMTRoth(Parameters,IDC)
     
     v2struct(Parameters); 
     v2struct(FexNum);    
-    Rs  = diag(V2.sigmaS)/2;    
+    if(exist('sigmaS','var'))
+        Rs  = diag(sigmaS)/2;    
+    else
+        Rs  = diag(V2.sigmaS)/2;    
+    end    
     
     %****************************
     %******* Test ********
