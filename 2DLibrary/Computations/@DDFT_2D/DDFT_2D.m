@@ -85,21 +85,11 @@ classdef DDFT_2D < Computation
             Preprocess_HIContribution(this);
             Preprocess_ExternalPotential(this);
             Preprocess_SubArea(this);
-<<<<<<< HEAD
             
-             res = mergeStruct(res_conv,res_fex);
-=======
-                        
-            if(isempty(fieldnames(res_conv)) && isempty(fieldnames(res_fex)))
+            res = mergeStruct(res_conv,res_fex);
+            if(isempty(res))
                 res.empty = true;
-            elseif(isempty(fieldnames(res_conv)) && ~isempty(fieldnames(res_fex)))
-                res = res_fex;
-            elseif(~isempty(fieldnames(res_conv)) && isempty(fieldnames(res_fex)))
-                res = res_conv;
-            else
-                res = mergeStruct(res_conv,res_fex);
             end
->>>>>>> StocTest
         end                
         function y0  = getInitialGuess(this,rho_ig)
             

@@ -36,7 +36,7 @@
     if(isfield(opts.optsPhys,'nParticles'))
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
-<<<<<<< HEAD
+
     opts.FexNum     = this.optsNum.FexNum;
     
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
@@ -45,10 +45,7 @@
             
     %misc = v2struct(mark,Vext,VAdd,Conv,IntMatrFex,x_ig);
     %misc.mark = mark;           
-=======
-   
-                   
->>>>>>> StocTest
+
     misc.Vext       = this.Vext; 
     misc.VAdd       = this.VAdd;    
     misc.x_ig       = x_ig;%   0.01*this.Vext];%x_ig;

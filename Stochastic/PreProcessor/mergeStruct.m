@@ -12,12 +12,14 @@ nStruct=nargin;
 fNames = [];
 cells = [];
 for iStruct = 1:nStruct
-    
-    fieldnamesi=fieldnames(structs{iStruct});
-    
-    if(~isempty(fieldnamesi))
-        fNames = [fNames ; fieldnamesi]; %#ok        
-        cells = [cells ; struct2cell(structs{iStruct})]; %#ok
+        
+    if(~isempty(structs{iStruct}))
+        fieldnamesi=fieldnames(structs{iStruct});
+
+        if(~isempty(fieldnamesi))
+            fNames = [fNames ; fieldnamesi]; %#ok        
+            cells = [cells ; struct2cell(structs{iStruct})]; %#ok
+        end
     end
     
 end
