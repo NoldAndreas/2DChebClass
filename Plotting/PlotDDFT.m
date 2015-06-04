@@ -131,51 +131,36 @@ function fig_h = PlotDDFT(input,Bool_Record)
             hold off;
             %shape.plot(rho,'contour');  hold on;
             %shape.plotFlux(flux_t(:,1,i),~shape.Ind.bound,fl_norm,0.5,'k'); hold on;            
-<<<<<<< HEAD
-            for iSpecies=1:nSpecies    
-                rho     = rho_t(:,iSpecies,i);
+            
+            if((nSpecies == 1) && isfield(optsPhys,'rhoLiq_sat'))
+                iSpecies = 1;
+                rho      = rho_t(:,iSpecies,i);
                 
                 shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+                
+                drho = optsPhys.rhoLiq_sat - optsPhys.rhoGas_sat;
 
-                if(nSpecies > 1)
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.1*drho;
+                optsPlot.linecolor = 'b';
+                optsPlot.linestyle = '--';
+                shape.plot(rho,'contour',optsPlot);  hold on;  
+
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.5*drho;
+                optsPlot.linecolor = [0 0.75 0];
+                shape.plot(rho,'contour',optsPlot);  hold on;  
+
+                optsPlot.nContours = optsPhys.rhoGas_sat + 0.9*drho;
+                optsPlot.linecolor = 'r';
+                shape.plot(rho,'contour',optsPlot);  hold on;  
+            else
+                for iSpecies=1:nSpecies    
+                    rho     = rho_t(:,iSpecies,i);
+                    
+                    shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;            
                     optsPlot.linecolor = lineColour{iSpecies}; 
                     optsPlot.nContours = 5;
                     shape.plot(rho,'contour',optsPlot); hold on;
-                else
-                    %optsPlot.nContours = 5;
-%                    shape.PlotDensityContours(rho);
-=======
-            
-            if(isfield(optsPhys,'rhoLiq_sat'))
-                    shape.plotFlux(flux_t(:,1,i),~shape.Ind.bound,fl_norm,0.5,lineColour{1}); hold on;           
->>>>>>> StocTest
-                    drho = optsPhys.rhoLiq_sat - optsPhys.rhoGas_sat;
-
-                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.1*drho;
-                    optsPlot.linecolor = 'b';
-                    optsPlot.linestyle = '--';
-                    shape.plot(rho,'contour',optsPlot);  hold on;  
-
-                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.5*drho;
-                    optsPlot.linecolor = [0 0.75 0];
-                    shape.plot(rho,'contour',optsPlot);  hold on;  
-
-                    optsPlot.nContours = optsPhys.rhoGas_sat + 0.9*drho;
-                    optsPlot.linecolor = 'r';
-                    shape.plot(rho,'contour',optsPlot);  hold on;  
-            
-            else
-            
-                for iSpecies=1:nSpecies    
-                    rho     = rho_t(:,iSpecies,i);
-                
-                    shape.plotFlux(flux_t(:,iSpecies,i),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
-
-                    optsPlot.linecolor = lineColour{iSpecies};
-                    
-                    shape.plot(rho,'contour',optsPlot);  hold on;  
-                end
-
+                end                             
                 
             end
             %plot([0;0],[i;i]);
