@@ -1,4 +1,4 @@
-function [sol] = ComputeEquilibriumCondition(params,misc)
+function [sol] = ComputeEquilibriumCondition_fsolve(params,misc)
 
     x_ig       = misc.x_ig;    
     Vext       = misc.Vext;
@@ -15,7 +15,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     
     kBT    = params.optsPhys.kBT;    
     
-	getFex    = str2func(['Fex_',misc.FexNum.Fex]);    
+	getFex    = str2func(['Fex_',params.FexNum.Fex]);    
     if(isfield(params.optsPhys,'sigmaS'))        
         R      = params.optsPhys.sigmaS/2;
     else
@@ -77,7 +77,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     function mu_s = GetExcessChemPotential(x,mu)
         rho_s    = exp((x-Vext)/kBT);
         mu_s     = getFex(rho_s,IntMatrFex,kBT,R) + ...
-                                Fex_Meanfield(rho_s,Conv,kBT);
+                                Fex_Meanfield(rho_s,Conv,kBT);                            
         
         for iSpecies=1:nSpecies
            mu_s(:,iSpecies) = mu_s(:,iSpecies) - mu(iSpecies);

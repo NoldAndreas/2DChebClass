@@ -36,8 +36,7 @@ function Check2DSumRule()
                   'config_optsNum_PhysArea_N2bound'};
     comp = [];
     dirRes = 'SumRuleError2D';
-    
-    AddPaths('CodePaper');    
+        
 %     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
 %     config.optsPhys.V2.V2DV2     = 'BarkerHendersonCutoff_2D';                
 %     config.optsPhys.V1.epsilon_w = 0.94;%0.94;                
@@ -213,7 +212,7 @@ function Check2DSumRule()
 %             [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
 %             res(i).error_wg = params.contactDensity_relError;
             
-            CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));      
+            CL.ComputeEquilibrium(struct('solver','Picard'));      
             [res(i).sumRuleII_relError,...
              res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError(in.Interval_SumRule);   
             %CLT.PostProcess(opts);

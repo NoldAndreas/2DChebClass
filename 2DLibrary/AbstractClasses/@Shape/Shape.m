@@ -179,9 +179,12 @@ classdef (Abstract) Shape < handle
             end
         end       
         function InterpolationPlotFlux(this,PlotArea)   
-            %if(isfield(PlotArea,'NFluxVectors'))
+            if(isfield(PlotArea,'NFluxVectors'))
                 N = PlotArea.NFlux;
-            %end
+            else
+                N = 30;
+                cprintf('m','!!PlotArea.NFlux is not set!!\n 30 is used as default in function "InterpolationPlotFlux" of "Shape" class.\n');
+            end
             
             dy1     = (PlotArea.y1Max-PlotArea.y1Min);
             dy2     = (PlotArea.y2Max-PlotArea.y2Min);

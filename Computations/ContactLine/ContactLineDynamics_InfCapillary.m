@@ -48,7 +48,7 @@ function [EX,res] = ContactLineDynamics_InfCapillary(doHI)
     AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
-    CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));    
+    CL.ComputeEquilibrium(struct('solver','Newton'));    
 %    EX.ComputeEquilibrium();%EX.optsPhys.rhoGas_sat);
     
     EX.IDC.plot(EX.GetRhoEq,'SC');

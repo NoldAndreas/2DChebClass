@@ -70,14 +70,14 @@ function ContactLineDynamics_135degrees()
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
-    %CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));    
+    %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     
 
 %     %*************************************************************
 %     % Increasing/Decreasing attraction of wall - Spontaneous spreading
 %     %*************************************************************
-%     CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));
+%     CL.ComputeEquilibrium(struct('solver','Picard'));
 % 
 %      CL.optsPhys.V1.tau            = 5;    
 %      CL.optsPhys.V1.epsilon_w_end  = 0.856;%epsilon_w_end

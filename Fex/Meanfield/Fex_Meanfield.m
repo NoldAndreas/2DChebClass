@@ -6,7 +6,7 @@ function [MeanField,J] = Fex_Meanfield(rho,IntMatrFex,kBT)
     MeanField = zeros(size(rho));
     J         = zeros(N*nSpecies);
     
-    if(~isempty(IntMatrFex)) % default value for no mean field part
+    if(isempty(IntMatrFex)) % default value for no mean field part
                              % (see DDFT_2D/Preprocess_MeanfieldContribution)        
         return;
     end

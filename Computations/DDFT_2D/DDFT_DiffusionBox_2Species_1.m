@@ -47,7 +47,7 @@ function [config,res] = DDFT_DiffusionBox_2Species_1()
     AddPaths();
     EX     = DDFT_2D(config);
     EX.Preprocess();
-    EX.ComputeEquilibrium([],struct('Iterative',true));
+    EX.ComputeEquilibrium([],struct('solver','Newton'));
     %EX.ComputeEquilibrium(0.5);%EX.optsPhys.rhoLiq_sat);
     EX.ComputeDynamics();           
     res.fig_handles = EX.PlotDynamics();    

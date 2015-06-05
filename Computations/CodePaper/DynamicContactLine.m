@@ -143,7 +143,7 @@ function DynamicContactLine()
 
             CL = ContactLineHS(conf);
             CL.Preprocess(); 
-            CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));              
+            CL.ComputeEquilibrium(struct('solver','Picard'));              
             CL.ComputeDynamics();            
             CL.PostprocessDynamics();
 

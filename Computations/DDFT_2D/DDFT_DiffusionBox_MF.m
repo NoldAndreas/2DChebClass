@@ -47,7 +47,7 @@
 	AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
-    EX.ComputeEquilibrium([],struct('Iterative',true));
+    EX.ComputeEquilibrium([],struct('solver','Newton'));
    % EX.ComputeEquilibrium(); 
     EX.ComputeDynamics();
    

@@ -69,24 +69,15 @@
                   'optsPhys_V1_epsilon_w_max',...
                   'optsPhys_V1_tau',...
                   'optsPhys_viscosity',...
-                  'optsPhys_BCWall_U',...                  
-                  'Iterative'};
+                  'optsPhys_BCWall_U'}; %Iterative
 
-    if(isfield(opts,'Iterative') && opts.Iterative)
-        
-        %*** Test start ****
-        misc.CL     = this;
-    %    misc.x_ig   = this.x_eq;
-        %misc.x_ig = this.optsPhys.kBT*log(this.optsPhys.rhoLiq_sat)*ones(size(x_ig));
-        %*** Test end ****
-        
-        %misc.x_ig            =  [zeros(1,size(this.Vext,2));zeros(size(this.Vext))];
-        [sol,recEq,paramsEq] = DataStorage('EquilibriumIterative',...
-                            @ComputeEquilibriumCondition_Iter,opts,misc,[],ignoreList);
-    else        
-        [sol,recEq,paramsEq] = DataStorage('Equilibrium',...
-                            @ComputeEquilibriumCondition,opts,misc,[],ignoreList);
-    end
+    misc.CL     = this;
+	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
+                            @ComputeEquilibriumCondition,opts,misc,[],ignoreList);              
+              
+	%[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
+     %                       @ComputeEquilibriumCondition_fsolve,opts,misc,[],ignoreList);                  
+    
 
     this.x_eq   = sol.x;
     this.mu     = sol.mu;

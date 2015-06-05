@@ -4,7 +4,7 @@
     close all;
     
     PhysArea = struct('N',[40,40],...
-                      'L1',4,'L2',2,'L2_AD',2.,...                                            
+                      'L1',4,'L2',2,...                                            
                       'y2wall',0.,...
                       'N2bound',14,'h',1,... %max(10,2*round(n(i)/6));
                       'alpha_deg',90);
@@ -22,7 +22,7 @@
                               'N1',100,'N2',100);                             
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
+    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
@@ -37,7 +37,7 @@
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.94);%,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856);%,...
                 %'tau',5,'epsilon_w_end',1.0);
             
     %optsViscosity = struct('etaC',1,'zetaC',0);    
@@ -58,8 +58,8 @@
         
     CL = ContactLineHS(config);
     CL.Preprocess(); 
-    CL.ComputeEquilibrium(struct('Iterative',true,'solver','Newton'));
-    CL.ComputeEquilibrium(struct('Iterative',true,'solver','Picard'));
+    CL.ComputeEquilibrium(struct('solver','Newton'));
+    CL.ComputeEquilibrium(struct('solver','Picard'));
     %CL.ComputeEquilibrium();              
     
     %**********************************************
