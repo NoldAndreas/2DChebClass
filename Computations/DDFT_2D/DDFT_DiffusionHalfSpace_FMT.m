@@ -49,7 +49,8 @@ function [EX,res] = DDFT_DiffusionHalfSpace_FMT(doHI)
     EX.Preprocess();        
     EX.ComputeEquilibrium([],struct('solver','Newton')); 
     %EX.ComputeEquilibrium(); 
- %   EX.ComputeDynamics();
+ 
+    EX.ComputeDynamics();
    
     if( (nargin < 3) || ...
         (isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots) || ...

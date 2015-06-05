@@ -43,7 +43,16 @@ function [EX,res] = DDFT_DiffusionInfSpace_MF()
     lineColourDDFT={{'r','b','g'}};            
     optsPlot = struct('lineColourDDFT',lineColourDDFT);
     optsPlot.doDDFTPlots=true;
-      
-    [EX,res] = DDFTDynamics(optsPhys,optsNum,optsPlot);
+    
+    
+    AddPaths();
+    EX   = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    EX.ComputeEquilibrium([],struct('solver','Newton')); 
+    EX.ComputeDynamics();
+   
+
+	res.fig_handles = EX.PlotDynamics();
+    
 end                 
 

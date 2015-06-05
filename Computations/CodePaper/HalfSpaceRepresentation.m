@@ -1,7 +1,7 @@
 
 
     %Initialize half space
-    Phys_Area = struct('L1',3,'L2',2,'N',[20;20]);
+    Phys_Area = struct('L1',4,'L2',2,'N',[20;20]);
 
     PlotArea       = struct('y1Min',-5,'y1Max',5,...
                             'N2',100,'N1',100,'y2Min',0,'y2Max',4);        

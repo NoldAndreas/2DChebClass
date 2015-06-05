@@ -69,34 +69,14 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         x_ig_n                 = x_ig;%(2:end);
         mu                     = params.optsPhys.mu;
         
-        %Picard-Iteration
-        if((strcmp(params.solver,'PicardBound') || strcmp(params.solver,'Picard')))
+        %Picard-Iteration        
+        if(strcmp(params.solver,'Picard'))        
             markFull = mark;
             it   = 1; err  = 1;
             x_ig_n = x_ig_n(1:N);
             %x_ic = x_ic(markFull);            
             x_ic = x_ig_n(markFull);
-        end
-        
-        %
-        if(strcmp(params.solver,'PicardBound'))
-            xmin = kBT*log(params.optsPhys.rhoGas_sat);
-            xmax = kBT*log(5*params.optsPhys.rhoLiq_sat);
-            while((err > 1e-10) && (it < 500))
-                [dx,err]   = GetdX_nP1(x_ic);
-                x_ic       = x_ic + 0.05*dx;
-                x_ic       = max(min(x_ic,xmax),xmin);
-                disp(['Iteration ',num2str(it),': ',num2str(err)]);
-                it = it+1;
-            end
-            while((err > 1e-10) && (it < 1000))
-                [dx,err]   = GetdX_nP1(x_ic);
-                x_ic       = x_ic + 0.1*dx;
-                x_ic       = max(min(x_ic,xmax),xmin);
-                disp(['Iteration ',num2str(it),': ',num2str(err)]);
-                it = it+1;
-            end
-        elseif(strcmp(params.solver,'Picard'))        
+            
             no = 0;
             while((err > 0.1) && (it < 1000))
                 [dx,err]   = GetdX_nP1(x_ic);
@@ -157,13 +137,13 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
             disp('error');
         else
             mu    = (x_ic(1:nSpecies))';
-            x_ic  = x_ic(nSpecies+1:end);
-            x_ic  = reshape(x_ic,NFull,nSpecies);
+            x_ic  = x_ic(nSpecies+1:end);            
         end
     end
     
+    x_ic      = reshape(x_ic,NFull,nSpecies);    
     x_ic_full = GetFullX(x_ic);%
-    rho = exp((x_ic_full(1:N)-Vext)/kBT);
+    rho       = exp((x_ic_full(1:N,:)-Vext)/kBT);
     
     %x_ic_full(mark,:)  = x_ic;
     %x_ic_full(~mark,:) = x_ig(~mark,:);
@@ -171,7 +151,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
 %    rho = exp((x_ic_full-Vext)/kBT);   
 %    
     sol   = v2struct(rho,mu);    
-    sol.x = x_ic_full(1:N);
+    sol.x = x_ic_full(1:N,:);
     
     function [mu_sRel,J] = fs(xm)      
         if(nargout >= 2)
@@ -188,7 +168,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         x            = reshape(x,NFull,nSpecies);
         
         if(nargout >= 2)
-            [y,J]        = GetExcessChemPotentialPart(x,mu_s);%./exp((x-Vext(mark,:))/kBT);
+            [y,J]    = GetExcessChemPotentialPart(x,mu_s);%./exp((x-Vext(mark,:))/kBT);
         else
             y        = GetExcessChemPotentialPart(x,mu_s);%./exp((x-Vext(mark,:))/kBT);
         end

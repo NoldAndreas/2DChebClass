@@ -146,7 +146,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 disp(['Data recomputed: ',sec2hms(t),' (hrs:min:sec)']);
            end
            Parameters.Results.comments  = comments; 
-           Parameters.Filename          = filename;          
+           Parameters.Filename          = [DataFolder filesep filename];          
             
            Struct2File([DataFolder filesep fileParamTxtname],Parameters,...
                 ['Computed at: ',datestr(now),...

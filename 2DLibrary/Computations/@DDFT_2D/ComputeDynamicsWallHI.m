@@ -68,6 +68,8 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
     end
     [this.dynamicsResult,recEq,paramsEq] = DataStorage('Dynamics',...
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]);
+                        
+	this.dynamicsResult.t = plotTimes;   
                      
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        

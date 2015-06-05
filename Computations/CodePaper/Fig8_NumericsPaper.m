@@ -1,7 +1,7 @@
-function Check2DSumRule()
+function Fig8_NumericsPaper()
     
     AddPaths('CodePaper');
-
+    global recomputeAll
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,...
                       'alpha_deg',90);
@@ -34,7 +34,7 @@ function Check2DSumRule()
     
     ignoreList = {'config_optsNum_PhysArea_N',...
                   'config_optsNum_PhysArea_N2bound'};
-    comp = [];
+    comp = true;
     dirRes = 'SumRuleError2D';
         
 %     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
@@ -211,10 +211,12 @@ function Check2DSumRule()
 % 
 %             [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
 %             res(i).error_wg = params.contactDensity_relError;
-            
+            recomputeAll = true;
             CL.ComputeEquilibrium(struct('solver','Picard'));      
             [res(i).sumRuleII_relError,...
              res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError(in.Interval_SumRule);   
+         
+            recomputeAll = false;
             %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       

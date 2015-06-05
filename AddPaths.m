@@ -44,16 +44,16 @@
         recomputeAll = false;
     end
     
-    no = fprintf('Do you want to be asked if data should be recomputed? (press any key)\n');            
-	if(getkeywait(2) == -1)        
-        loadAll = true;
-    else
-        cprintf('*g','Thanks. You will be asked if data should be recomputed.\n');
-        loadAll = false;
+    if(isempty(loadAll))
+        no = fprintf('Do you want to be asked if data should be recomputed? (press any key)\n');            
+        if(getkeywait(2) == -1)
+            loadAll = true;
+        else
+            cprintf('*g','Thanks. You will be asked if data should be recomputed.\n');
+            loadAll = false;
+        end
     end
-                  
-    
-    	
+
     if(isempty(QuickOutput))
         QuickOutput = false;
     end

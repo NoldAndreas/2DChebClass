@@ -4,7 +4,7 @@ function [EX,res] = DDFT_DiffusionInfCapillary_FMT_Case1(doHI)
         doHI = false;
     end
 
-    Phys_Area = struct('shape','InfCapillary_FMT','N',[60;40],... %
+    Phys_Area = struct('shape','InfCapillary_FMT','N',[30;30],... %
                        'L1',3,'y2Min',0,'y2Max',4,'N2bound',10);
     
     Plot_Area = struct('y1Min',-5,'y1Max',5,'N1',80,...
