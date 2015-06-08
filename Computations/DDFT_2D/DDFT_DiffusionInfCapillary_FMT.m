@@ -57,9 +57,9 @@ function [EX,res] = DDFT_DiffusionInfCapillary_FMT(doHI)
     AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
-    EX.ComputeEquilibrium();%EX.optsPhys.rhoGas_sat);
+    %EX.ComputeEquilibrium();%EX.optsPhys.rhoGas_sat);
     
-    EX.IDC.plot(EX.GetRhoEq,'SC');
-    EX.ComputeDynamics();
+    %EX.IDC.plot(EX.GetRhoEq,'SC');
+    %EX.ComputeDynamics();
     res.fig_handles = EX.PlotDynamics();
 end                 

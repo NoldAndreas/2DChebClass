@@ -21,7 +21,19 @@ function [EX,res] = DDFT_DiffusionPolarInfinity_Case1()
     optsPhys = struct('V2',V2,'V1',V1,...
                      'kBT',0.7,...
                      'nParticlesS',50);                                          
+                 
+    AddPaths();
+    EX   = DDFT_2D(v2struct(optsPhys,optsNum));
+    EX.Preprocess();
+    EX.ComputeEquilibrium([],struct('solver','Newton')); 
+    EX.ComputeDynamics();
+   
+    if( (nargin < 3) || ...
+        (isfield(optsPlot,'doDDFTPlots') && optsPlot.doDDFTPlots) || ...
+        (isfield(optsNum,'doPlots') && optsNum.doPlots) )
+        res.fig_handles = EX.PlotDynamics();
+    end
 
-	[EX,res] = DDFTDynamics(optsPhys,optsNum);
+	%[EX,res] = DDFTDynamics(optsPhys,optsNum);
 end
     

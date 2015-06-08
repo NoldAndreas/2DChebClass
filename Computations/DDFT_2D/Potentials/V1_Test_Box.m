@@ -37,6 +37,6 @@ VAdd_S  = struct('V',VAdd, ...
             'dy1',DVAddDy1,'dy2',DVAddDy2,...
             'grad',[DVAddDy1;DVAddDy2]);
 
-VGeom_S = V1_Box(y1S,y2S,t,optsPhys);
+%VGeom_S = V1_Box(y1S,y2S,t,optsPhys);
 
 end

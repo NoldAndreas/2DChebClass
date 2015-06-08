@@ -60,7 +60,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         end
     else
         markFull = mark;
-        NFull  = N;
+        NFull    = N;
     end            
     
     if(isfield(params.optsPhys,'mu'))
@@ -129,6 +129,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         else
             x_ig_n                  = x_ig([true;mark],:);
             fsolveOpts              = optimset('TolFun',1e-8,'TolX',1e-8);
+   
             [x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig_n(:),fsolveOpts);
             %[x_ic,~,flag_fsolve]    = fsolve(@fs_canonical,x_ig([true;mark],:),fsolveOpts);
         end        
@@ -141,9 +142,9 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         end
     end
     
-    x_ic      = reshape(x_ic,NFull,nSpecies);    
-    x_ic_full = GetFullX(x_ic);%
-    rho       = exp((x_ic_full(1:N,:)-Vext)/kBT);
+    x_ic      = reshape(x_ic,[],nSpecies);        
+    x_ic      = GetFullX(x_ic);%    
+    rho       = exp((x_ic(1:N,:)-Vext)/kBT);
     
     %x_ic_full(mark,:)  = x_ic;
     %x_ic_full(~mark,:) = x_ig(~mark,:);
@@ -151,7 +152,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
 %    rho = exp((x_ic_full-Vext)/kBT);   
 %    
     sol   = v2struct(rho,mu);    
-    sol.x = x_ic_full(1:N,:);
+    sol.x = x_ic(1:N,:);
     
     function [mu_sRel,J] = fs(xm)      
         if(nargout >= 2)

@@ -58,7 +58,9 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
         i = DataStorage_FindFile(index,Parameters,ignoreList);
         
         if(~isempty(i))
-            filename            = index{i}.Filename;
+            [~,filename,ext]    = fileparts(index{i}.Filename);
+            filename            = [filename,ext];
+           % filename            = index{i}.Filename;
             Parameters.Filename = [DataFolder filesep filename(1:end-4)];
 
             fileParamTxtname    = [filename(1:end-4),'.txt'];
@@ -146,14 +148,14 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 disp(['Data recomputed: ',sec2hms(t),' (hrs:min:sec)']);
            end
            Parameters.Results.comments  = comments; 
-           Parameters.Filename          = [DataFolder filesep filename];          
+           Parameters.Filename          = filename;          
             
            Struct2File([DataFolder filesep fileParamTxtname],Parameters,...
                 ['Computed at: ',datestr(now),...
                 ' Computation time: ',sec2hms(t), ' (hrs:min:sec) ',comments]);
             
             %disp(['Index file saved in ',[DataFolder filesep fileParamTxtname],'..']);            
-            Parameters.Filename = Parameters.Filename(1:end-4);
+            Parameters.Filename = [DataFolder filesep Parameters.Filename(1:end-4)];
          end       
     end
     ChangeDirData(old_dirData);
