@@ -1,4 +1,4 @@
-function CheckConvolutionHalfSpace_BH_Conv1()
+function Fig5_NumericsPaper_ConvolutionConvergence()
     
     AddPaths('CodePaper');
 

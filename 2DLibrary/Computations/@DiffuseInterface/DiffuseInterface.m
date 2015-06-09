@@ -451,21 +451,42 @@ classdef DiffuseInterface < Computation
             PlotU(this); hold on;             
             SaveCurrentFigure(this,'ChemPot');            
         end
-        function PlotResultsPhi(this)
-            figure('Position',[0 0 800 600],'color','white');
+        function PlotResultsPhi(this,opts)
+            if(nargin < 2)
+                opts = {};
+            end
+            if(IsOption(opts,'newFigure'))
+                figure('Position',[0 0 800 600],'color','white');
+            end
             
        %     PlotU(this); hold on;             
-            this.IDC.plot(this.phi,'contour');     
+            %this.IDC.plot(this.phi,'contour');                 
+                    
+            optsPlot.nContours = -0.9;
+            optsPlot.linecolor = 'b';
+            optsPlot.linestyle = '--';
+            this.IDC.plot(this.phi,'contour',optsPlot);  hold on;  
+
+            optsPlot.nContours = 1e-10;
+            optsPlot.linecolor = [0 0.75 0];
+            this.IDC.plot(this.phi,'contour',optsPlot);  hold on;  
+
+            optsPlot.nContours = 0.9;
+            optsPlot.linecolor = 'r';
+            this.IDC.plot(this.phi,'contour',optsPlot);  hold on;  
                         
             hold on;
-            if(~isempty(this.IsoInterface.h))
-                plot(this.IsoInterface.h,this.IDC.Pts.y2,...
-                                                    'k','linewidth',3);
-            end
+            
+            %if(~isempty(this.IsoInterface.h))
+%                plot(this.IsoInterface.h,this.IDC.Pts.y2,...
+               %                                     'k','linewidth',3);
+%            end
       %      if(IsSeppecher(this))
 %                PlotSeppecherSolution(this);
 %            end
-            SaveCurrentFigure(this,'Density');            
+            if(IsOption(opts,'save'))
+                SaveCurrentFigure(this,'Density');            
+            end
         end        
         function PlotSeppecherSolution(this)                                                                 
            % PlotU(this);            hold on;                               
@@ -491,7 +512,8 @@ classdef DiffuseInterface < Computation
         end
         function [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU(this,uv,y1Pts,y2Pts,opts) 
             
-            n = 20;
+            n2 = 20;
+            n1 = 20;
             if((nargin<2) || isempty(uv))
                 if(isempty(this.uv))
                     return;
@@ -505,12 +527,12 @@ classdef DiffuseInterface < Computation
             y1Min = this.optsNum.PlotArea.y1Min;
             y1Max = this.optsNum.PlotArea.y1Max;
                         
-            y2L = y2Min + (y2Max-y2Min)*(0:n-1)'/(n-1);            
-            y1L = y1Min + (y1Max-y1Min)*(0:n-1)'/(n-1);            
+            y2L = y2Min + (y2Max-y2Min)*(0:n2-2)'/(n2-1);            
+            y1L = y1Min + (y1Max-y1Min)*(0:n1-1)'/(n1-1);            
             
             startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
-                         y1Min*ones(size(y2L))+0.1;...
-                         y1L];
+                             y1Min*ones(size(y2L))+0.1;...
+                             y1L];
             startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
             
             if(nargin >= 4)
@@ -522,17 +544,17 @@ classdef DiffuseInterface < Computation
                 [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2,opts); %IDC.plotFlux(u_flow)(mu);
             else
                 [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = this.IDC.plotStreamlines(uv,startPtsy1,startPtsy2); %IDC.plotFlux(u_flow)(mu);
-            end
-            hold on;
-            this.IDC.plotFlux(uv);
-            
+            end            
+                                   
+        end      
+        function PlotStagnationPoint(this)
             sp = this.StagnationPoint;
             if(~isempty(sp))          
                 hold on;
                 plot(sp.y1_kv,sp.y2_kv,'or','MarkerFaceColor','r','MarkerSize',10); 
                 hold on;
             end
-        end           
+        end
         function PlotInterfaceAnalysis(this)            
             thetaEq = this.optsPhys.thetaEq;
             Ca      = 3/4*this.optsPhys.Cak;            

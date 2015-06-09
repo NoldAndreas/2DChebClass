@@ -1,4 +1,4 @@
-  function [EX,res] = CheckFMTComputation()
+  function [EX,res] = Fig3_NumericsPaper_DFT_vs_MD()
 
     disp('** CheckFMTComputationSkewed **');
     

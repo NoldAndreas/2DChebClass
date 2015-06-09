@@ -1,4 +1,4 @@
-function Fig8_NumericsPaper()
+function Fig8_NumericsPaper_2DSumRuleConvergence()
     
     AddPaths('CodePaper');
     global recomputeAll
@@ -34,7 +34,7 @@ function Fig8_NumericsPaper()
     
     ignoreList = {'config_optsNum_PhysArea_N',...
                   'config_optsNum_PhysArea_N2bound'};
-    comp = true;
+    comp = [];
     dirRes = 'SumRuleError2D';
         
 %     config.optsNum.V2Num.Fex     = 'SplitAnnulus'; 
@@ -70,6 +70,15 @@ function Fig8_NumericsPaper()
     %**********************    
     PlotDisjoiningPressureProfiles(res);
     
+    f0 = figure('color','white','Position',[0 0 800 800]); 
+    PlotErrorGraph(res,'compTimeEq','k','k');
+    set(gca,'yscale','log'); 
+    ylim([50 10^4]);
+    set(gca,'fontsize',15); set(gca,'linewidth',1.5);
+    xlabel('$N$','Interpreter','Latex','fontsize',20);%/{\sigma}
+	ylabel('t (sec.)','Interpreter','Latex','fontsize',20); %/{\sigma}    
+    SaveFigure('CompTime');
+    
     %fullname = PlotDensityProfile(res{1}(3));
     %open([fullname,'.fig']);    
     open('D:\2DChebData\CodePaper\deg90\2015_5_9_17_1_53_EquilibriumContour.fig');
@@ -99,6 +108,7 @@ function Fig8_NumericsPaper()
     xlim([(N(1)-2),(N(end)+2)]);    
 	
     inset2(f2,f1,0.35,[0.6,0.6]);   close(f1);
+    inset2(f2,f0,0.3,[0.25,0.2]); close(f0);
     SaveFigure('SumRuleError2D',v2struct(N,config));
     
     figure('color','white','Position',[0 0 800 800]);  %subplot(1,2,2);
@@ -211,12 +221,13 @@ function Fig8_NumericsPaper()
 % 
 %             [~,res(i).rho_1D_WG,params] = CL.Compute1D('WG');
 %             res(i).error_wg = params.contactDensity_relError;
-            recomputeAll = true;
-            CL.ComputeEquilibrium(struct('solver','Picard'));      
+         %   recomputeAll = true;
+            r = CL.ComputeEquilibrium(struct('solver','Picard'));      
+            res(i).compTimeEq = r.compTime;
             [res(i).sumRuleII_relError,...
              res(i).sumRuleII_eps,res(i).piII]  = CL.SumRuleIIError(in.Interval_SumRule);   
          
-            recomputeAll = false;
+          %  recomputeAll = false;
             %CLT.PostProcess(opts);
             %CLT.PlotDensitySlices();
             %CLT.PlotDisjoiningPressures();       
@@ -256,6 +267,10 @@ function Fig8_NumericsPaper()
             for i1 = 1:length(res{i0})
                 DP = res{i0}(i1).piII.DP;
                 res{i0}(i1).sumRuleII_epsMax = max(abs(DP(1)),abs(DP(end)))/max(abs(DP));
+                
+                if(ischar(res{i0}(i1).compTimeEq))
+                    res{i0}(i1).compTimeEq = str2double(res{i0}(i1).compTimeEq);
+                end
             end
         end
     end

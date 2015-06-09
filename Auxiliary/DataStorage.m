@@ -55,7 +55,8 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
             recompute = false;
     else
         %(2) Second Option: Search file                                
-        i = DataStorage_FindFile(index,Parameters,ignoreList);
+        i          = DataStorage_FindFile(index,Parameters,ignoreList);
+        Parameters = index{i};
         
         if(~isempty(i))
             [~,filename,ext]    = fileparts(index{i}.Filename);

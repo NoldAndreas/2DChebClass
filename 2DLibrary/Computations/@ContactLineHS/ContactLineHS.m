@@ -342,12 +342,12 @@ classdef ContactLineHS < DDFT_2D
         end
         
         %Compute functions 
-        function ComputeEquilibrium(this,optsIn)
+        function res = ComputeEquilibrium(this,optsIn)
             %if(isfield(this.optsNum,'maxComp_y2'))
                 optsIn.maxComp_y2 = this.optsNum.maxComp_y2;
                 miscIn.mark       = (this.IDC.GetCartPts.y2_kv <= ...
                                         this.optsNum.maxComp_y2);
-                ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
+                res = ComputeEquilibrium@DDFT_2D(this,[],optsIn,miscIn);
             %else
 %                ComputeEquilibrium@DDFT_2D(this,this.optsPhys.rhoLiq_sat,optsIn,[]);
 %            end

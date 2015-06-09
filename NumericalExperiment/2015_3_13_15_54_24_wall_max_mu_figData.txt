@@ -1,0 +1,37 @@
+# ************************************************************ 
+# Figure NumericalExperiment\2015_3_13_15_54_24_wall_max_mu.fig/eps saved at: 09-Jun-2015 12:21:39 with git branch AndreasTemp 
+# ************************************************************ 
+config_optsPhys_thetaEq : 1.57079632679
+config_optsPhys_theta : 1.57079632679
+config_optsPhys_Cak : 0.01
+config_optsPhys_Cn : 1
+config_optsPhys_UWall : 1
+config_optsPhys_l_diff : 0.5
+config_optsPhys_nParticles : 0
+config_optsNum_PhysArea_y2Min : 0
+config_optsNum_PhysArea_y2Max : 20
+config_optsNum_PhysArea_L1 : 7
+config_optsNum_PhysArea_N_1 : 50
+config_optsNum_PhysArea_N_2 : 40
+config_optsNum_PhysArea_IntInterval_1 : -10
+config_optsNum_PhysArea_IntInterval_2 : 10
+config_optsNum_PlotArea_y1Min : -15
+config_optsNum_PlotArea_y1Max : 15
+config_optsNum_PlotArea_N1 : 80
+config_optsNum_PlotArea_N2 : 80
+comment : run by ContactLineBinaryFluid.m
+Cak_1 : 0.005
+Cak_2 : 0.01
+y2Max_1 : 18
+y2Max_2 : 20
+y2Max_3 : 22
+y2Max_4 : 24
+l_d_1 : 1
+l_d_2 : 1.25
+l_d_3 : 1.5
+l_d_4 : 1.75
+l_d_5 : 2
+l_d_6 : 2.25
+l_d_7 : 2.5
+l_d_8 : 2.75
+l_d_9 : 3

@@ -389,8 +389,8 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            
             if(nargin < 3)
                 %opts = [];
-                opts.linewidth = 1.5;
-                opts.color = 'm';
+                opts.linewidth = 1.4;
+                opts.color = 'k';
             end
            
             if(nargin == 1)
@@ -401,12 +401,10 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                FindStagnationPoint(this,[-2,2],[-2,this.IDC.y2Max-2]); 
             end            
             
-            y1Pts = [0;...
-                     this.optsNum.PlotArea.y1Min+0.1;...
-                     this.optsNum.PlotArea.y1Max-0.1];
-            y2Pts = [this.optsNum.PlotArea.y2Max/2;...
-                     0.5;...
-                     this.optsNum.PlotArea.y2Max-0.5];
+            y1Pts = [this.optsNum.PlotArea.y1Min+0.1;...
+                     this.optsNum.PlotArea.y1Max-0.1];%0;...
+            y2Pts = [0.5;...
+                     this.optsNum.PlotArea.y2Max-0.5]; %this.optsNum.PlotArea.y2Max/2;...
             
             [y1M,y2M,fl_y1,fl_y2,startMask1,startMask2] = PlotU@DiffuseInterface(this,uv,y1Pts,y2Pts,opts);
        end       

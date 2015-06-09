@@ -296,7 +296,7 @@ classdef DDFT_2D < Computation
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
         end                
 
-        ComputeEquilibrium(this,rho_ig,optsIn,miscIn)                
+        res = ComputeEquilibrium(this,rho_ig,optsIn,miscIn)                
         function ComputeDynamics(this)
             if(this.doHIWall)
                 ComputeDynamicsWallHI(this);

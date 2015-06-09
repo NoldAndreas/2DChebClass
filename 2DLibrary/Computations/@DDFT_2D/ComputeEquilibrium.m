@@ -1,4 +1,4 @@
- function ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
+ function res = ComputeEquilibrium(this,rho_ig,optsIn,miscIn)
     
     fprintf('Solving for equilibrium condition...\n');    
     
@@ -78,9 +78,9 @@
 	%[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
      %                       @ComputeEquilibriumCondition_fsolve,opts,misc,[],ignoreList);                  
     
-
-    this.x_eq   = sol.x;
-    this.mu     = sol.mu;
+    res.compTime = paramsEq.Results_comptime_sec;
+    this.x_eq    = sol.x;
+    this.mu      = sol.mu;
     if(isfield(paramsEq,'Filename'))
         this.FilenameEq  = paramsEq.Filename;
     end
