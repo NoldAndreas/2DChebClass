@@ -46,7 +46,8 @@
             if((this.Origin(2)-this.y2Wall-this.R) > 3*this.L1)
                 L1_r = this.L1*ones(size(rd));
             else
-                L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);L1_r(rd==inf) = this.L1;
+                L1_r          = this.L1*(rd-this.R)./(this.L1*3+rd-this.R);
+                L1_r(rd==inf) = this.L1;
             end
             %L1_r          = this.L1*(rd-this.R)./(1+rd-this.R);L1_r(rd==inf) = this.L1;
             %*ones(size(rd));%

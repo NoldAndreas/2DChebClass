@@ -56,6 +56,8 @@ function [data,res] = SimulationBall(N1,N2,vext)
     	
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    xlim([-3.1 3.1]);
+    ylim([-2.5 2.5]);
     res.fig_handles{1} = gcf;
     
     %***************************************************************

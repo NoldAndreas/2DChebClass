@@ -53,7 +53,8 @@ function [AS,res] = SimulationInfAnnulus()
 
     function [V,VInt] = VTest(y1,y2)       
             r     = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);  
-            V     = ExponentialDouble(r);
+            V2.epsilon = 1;
+            V     = ExponentialDouble(r,V2);
             VInt  = pi/RMin^2;
    end
 

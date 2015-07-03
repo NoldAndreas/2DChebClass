@@ -14,7 +14,7 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
         N1      = 20;
         N2      = 10;
         N       = [N1;N2];
-        Origin  = [3,-2];
+        Origin  = [0,0];
     else
         R = L1;
     end

@@ -367,7 +367,12 @@ classdef DDFT_2D < Computation
                 for iSpecies=1:size(val,2)   
                     if(~isempty(val2))                        
                         this.IDC.plot(val2(:,iSpecies,i),'color'); hold on;
-                        colormap(b2r(0,max(max(val2(:,iSpecies,i)))));
+                        m = max(max(val2(:,iSpecies,i)));
+                        if(m==0)
+                            colormap(b2r(0,1));
+                        else
+                            colormap(b2r(0,m));
+                        end
                         colorbar;
                         %set(gca, 'CLim', [min(min(min(val2))) max(max(max(val2)))]);
                     end
@@ -383,7 +388,7 @@ classdef DDFT_2D < Computation
                     end
                     
                 end                
-                title(['t = ', num2str((t))]);               
+                title(['t = ', num2str(t,'%10.1f')]);               
                 set(gca,'fontsize',20);
                 set(gca,'linewidth',1.5);
                 %xlabel('$y_1$','Interpreter','Latex','fontsize',25);
@@ -393,12 +398,13 @@ classdef DDFT_2D < Computation
                 h = get(gca,'xlabel'); set(h,'fontsize',35);
                 h = get(gca,'ylabel'); set(h,'fontsize',35);
                 h = get(gca,'title');  set(h,'fontsize',35);
-                pause(0.2);
-                
+                pause(0.2);                
                 
                 if(IsOption(opts,'save'))
                     fileName = getPDFMovieFile('Movie1',i);
+                    disp(fileName);                    
                     save2pdf(fileName,gcf);
+                    SaveFigure(fileName(1:end-4));
                     fileNames = [fileNames,' ',fileName];
                 end                
                 

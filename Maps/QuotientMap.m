@@ -20,8 +20,8 @@ function [z,dz,dx,ddx,dddx,ddddx,ddz] = QuotientMap(x,L0,a,b)
 %
 % and obtain (for L = b -a): 
 %
-% h0  = 2*L*L0/(L-2*L0)    (if L == inf)  h0  = 2*L0
-% eps = 2*L0/(L-2*L0)      (if L == inf)  eps = 0
+% h0  = 2*L*L0/(L-2*L0)    (if L == inf):  h0  = 2*L0
+% eps = 2*L0/(L-2*L0)      (if L == inf):  eps = 0
 %
 % The derivatives are:
 % dz/dx = h0/2*(2+eps)/(1-x+eps)^2

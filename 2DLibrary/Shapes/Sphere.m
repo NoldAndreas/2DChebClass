@@ -85,8 +85,7 @@ classdef Sphere < SpectralSpectral%SpectralEvenFourier%
             
             this.Int = int;
             
-        end               
-    
+        end                  
         function ComputeConvolutionMatrix(this)
             exc = MException('Segment2:ComputeConvolutionMatrix','case not implemented');
             throw(exc);           

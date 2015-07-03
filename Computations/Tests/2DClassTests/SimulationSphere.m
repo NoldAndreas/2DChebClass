@@ -6,12 +6,12 @@ function [data,res] = SimulationSphere()
     close all;
     
     %Initialization
-    N1 = 40;
-    N2 = 40;
+    N1 = 20;
+    N2 = 20;
     vext  = @VTestt;
     R      = 1;
-    theta1 = 0;%pi/5;%pi/2;
-    theta2 = pi;%pi*3/4;
+    theta1 = pi/5;%pi/2;
+    theta2 = pi*3/4;
     Origin = [0;0];
     N      = [N1;N2];    
     volume = false;
@@ -109,11 +109,13 @@ function [data,res] = SimulationSphere()
     function [V,VDiff,VInt] = VTestt(pts)
         y1 = pts.y1_kv;
         y2 = pts.y2_kv;
-        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);        
-        global r_cutoff
-        r_cutoff = 5;
-        rc       = r_cutoff;
-        V  = BarkerHendersonCutoff_2D(d);        
+        d  = ((y1-Origin(1)).^2+(y2-Origin(2)).^2).^(1/2);                
+        rc = 5;
+        
+        V2.r_cutoff = rc;
+        V2.epsilon  = 1;
+        
+        V  = BarkerHendersonCutoff_2D(d,V2);
         %V  = BarkerHenderson_2D(d);        
         VDiff = 0;
         if(rc == inf)

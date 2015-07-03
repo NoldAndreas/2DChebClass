@@ -18,7 +18,7 @@ function [SMD,res] = SimulationHalfStripMinusDisk()
     [Pts,Diff,Int,Ind] = SMD.ComputeAll();    
     Interp             = SMD.ComputeInterpolationMatrix((-1:0.02:0.6)',(-1:0.02:1)',true,true);
     
-    figure;
+    figure;%('color','white','Position',[0 0 600 600]);
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
     SMD.PlotIsoline(0,'y1');

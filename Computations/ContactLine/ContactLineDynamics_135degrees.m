@@ -1,4 +1,4 @@
-function ContactLineDynamics_135degrees()
+%function ContactLineDynamics_135degrees()
 
     AddPaths('CodePaper');            
     close all;
@@ -11,9 +11,13 @@ function ContactLineDynamics_135degrees()
                           'y2Min',0.5,'y2Max',2.5,...
                           'N',[40,40]);
                           
-    PlotAreaCart =     struct('y1Min',-20,'y1Max',5,...
-                              'y2Min',0.5,'y2Max',15.5,...
-                              'N1',100,'N2',100,'NFlux',40);
+    %PlotAreaCart =     struct('y1Min',-20,'y1Max',5,...
+%                              'y2Min',0.5,'y2Max',15.5,...
+%                              'N1',100,'N2',100,'NFlux',40);
+                          
+     PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
+                               'y2Min',0.5,'y2Max',8.5,...
+                               'N1',100,'N2',100,'NFlux',20);                          
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
     V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
@@ -126,4 +130,4 @@ function ContactLineDynamics_135degrees()
 %     CL.PostprocessDynamics();    
 %     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
                 
-end
+%end

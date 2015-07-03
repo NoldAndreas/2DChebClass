@@ -1,6 +1,6 @@
 function TestAll(dirTest)
     global recomputeAll QuickOutput dirData dirDataOrg
-    dbclear all;
+  %  dbclear all;
     
     no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 3 seconds.');
     if(getkeywait(3) == -1)
@@ -87,16 +87,26 @@ function TestAll(dirTest)
                 if(nargout(f)>=2)
                     [~,res] = f();
                     
-                    for k = 1:length(res.fig_handles)
-                        fh = res.fig_handles{k};
-                        %ax = get(fh,'children');
-                        %xlim = get(ax,'xlim');
-                        %ylim = get(ax,'ylim');
-                        %pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+                    for k = 1:length(res.fig_handles)                        
+                        fh = res.fig_handles{k};                        
+                        set(0, 'currentfigure', fh);
+                        
+                        ax = get(fh,'children');
+                        xlim = get(ax,'xlim');
+                        ylim = get(ax,'ylim');
+                        r    = (ylim(2)-ylim(1))/(xlim(2)-xlim(1));
+                        set(fh,'Position',[0 0 600 600*r],'color','white');                        
+                        pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+                        set(ax,'fontsize',25);
+                        
+                        hand = get(ax,'xlabel'); set(hand,'str','');                        
+                        hand = get(ax,'ylabel'); set(hand,'str','');
+                        %hand = get(gca,'xlabel'); set(hand,'fontsize',35);                        
+                        %hand = get(gca,'ylabel'); set(hand,'fontsize',35);
 
                         str_fig = [strf,num2str(k)];
-                        print2eps([dirDDFT_2D_LatexReport filesep str_fig],fh);
-                        saveas(fh,[dirDDFT_2D_LatexReport filesep str_fig '.fig']);                                
+                        set(0, 'currentfigure', fh);
+                        SaveFigure([dirDDFT_2D_LatexReport filesep str_fig]);                        
                     end
                 else
                     f();

@@ -20,7 +20,8 @@ function [WDG,res] = SimulationWedgeCut
     figure;
     WDG.PlotGridLines();  hold on;
     WDG.PlotGrid();
-   % xlim([-5 5]);
+    xlim([-1.5 1.5]);
+    ylim([-1.6 -0.7]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
     res.fig_handles{1} = gcf;    
