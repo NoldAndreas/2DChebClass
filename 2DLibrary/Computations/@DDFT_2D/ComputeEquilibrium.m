@@ -20,7 +20,8 @@
     opts.PhysArea    = this.optsNum.PhysArea;
     opts.optsPhys    = this.optsPhys; 
     if(isfield(this.optsNum,'FexNum'));
-        opts.optsNum.FexNum = this.optsNum.FexNum;
+        %opts.optsNum.FexNum = this.optsNum.FexNum;
+        opts.FexNum     = this.optsNum.FexNum;
     end
     if(isfield(this.optsNum,'V2Num'));
         opts.optsNum.V2Num = this.optsNum.V2Num;
@@ -37,7 +38,6 @@
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
 
-    opts.FexNum     = this.optsNum.FexNum;
     
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
 %    opts.Comments    = this.configName;    
@@ -69,7 +69,9 @@
                   'optsPhys_V1_epsilon_w_max',...
                   'optsPhys_V1_tau',...
                   'optsPhys_viscosity',...
-                  'optsPhys_BCWall_U'}; %Iterative
+                  'optsPhys_BCWall_U',...
+                  %'optsNum_FexNum'
+                  }; %Iterative
 
     misc.CL     = this;
 	[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
