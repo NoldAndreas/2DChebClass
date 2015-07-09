@@ -20,8 +20,8 @@
     opts.PhysArea    = this.optsNum.PhysArea;
     opts.optsPhys    = this.optsPhys; 
     if(isfield(this.optsNum,'FexNum'));
-        %opts.optsNum.FexNum = this.optsNum.FexNum;
-        opts.FexNum     = this.optsNum.FexNum;
+        opts.optsNum.FexNum = this.optsNum.FexNum;
+        %opts.FexNum     = this.optsNum.FexNum;
     end
     if(isfield(this.optsNum,'V2Num'));
         opts.optsNum.V2Num = this.optsNum.V2Num;
@@ -38,7 +38,6 @@
         opts.optsPhys    = rmfield(opts.optsPhys,'nParticles');
     end
 
-    
     %opts.maxComp_y2  = this.optsNum.maxComp_y2;
 %    opts.Comments    = this.configName;    
     %mark             = (PtsCart.y2_kv <= this.optsNum.maxComp_y2);     
@@ -70,6 +69,7 @@
                   'optsPhys_V1_tau',...
                   'optsPhys_viscosity',...
                   'optsPhys_BCWall_U',...
+                  'PlotAreaCart',...
                   %'optsNum_FexNum'
                   }; %Iterative
 
@@ -79,8 +79,12 @@
               
 	%[sol,recEq,paramsEq] = DataStorage('Equilibrium',...
      %                       @ComputeEquilibriumCondition_fsolve,opts,misc,[],ignoreList);                  
-    
-    res.compTime = paramsEq.Results_comptime_sec;
+
+    if(isfield(paramsEq,'Results_comptime_sec'))
+        res.compTime = paramsEq.Results_comptime_sec;
+    else
+        res.compTime = [];
+    end
     this.x_eq    = sol.x;
     this.mu      = sol.mu;
     if(isfield(paramsEq,'Filename'))

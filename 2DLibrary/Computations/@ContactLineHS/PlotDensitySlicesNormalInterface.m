@@ -1,7 +1,6 @@
-function PlotDensitySlicesNormalInterface(this)
+function PlotDensitySlicesNormalInterface(this,y1P)
 
-% Initialization         
-    n      = 5;
+% Initialization             
     deltaZ = 5;
     [~,rho1D_LV] = Compute1D(this,'LG');
     if(this.optsNum.PhysArea.alpha_deg > 90)
@@ -13,13 +12,17 @@ function PlotDensitySlicesNormalInterface(this)
     rho1D_WL_full = kron(ones(this.IDC.Pts.N1,1),rho1D_WL);
     
     
-    y2Max = this.optsNum.PlotAreaCart.y2Max;
-    y1Min = this.optsNum.PlotAreaCart.y1Min;
-    y1Max = this.optsNum.PlotAreaCart.y1Max;
+    %y2Max = this.optsNum.PlotAreaCart.y2Max;
+    if(nargin < 2)
+        n      = 5;
+        y1Min = this.optsNum.PlotAreaCart.y1Min;
+        y1Max = this.optsNum.PlotAreaCart.y1Max;
+        y1P = y1Min + (y1Max-y1Min)*(0.5:1:(n-0.5))/n;    
+    end
     
     rhoLiq_sat = this.optsPhys.rhoLiq_sat;
         
-    y1P = y1Min + (y1Max-y1Min)*(0.5:1:(n-0.5))/n;
+    
     col = distinguishable_colors_NoRedBlueGreen();
     
     h_full  = this.hIII;
@@ -27,7 +30,7 @@ function PlotDensitySlicesNormalInterface(this)
     %str = {'','','m','','c'};
                 
     L2_AdIso = 4;%input('Parameter L_2 used for computation of adsorption isotherm: ');
-    for i = 1:n
+    for i = 1:length(y1P)
         y1              = y1P(i);
         IP              = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i));
         h               = IP*h_full;        
@@ -45,15 +48,17 @@ function PlotDensitySlicesNormalInterface(this)
         %plot(pts{i}.z-deltaZ,rho_Ana{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
         
         %rho_Ana2 = rho_dp(y_2)
-        th       = atan(dhdx);
-        ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII/cos(th);        
-        [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
-        y2_AdIso = this.AdsorptionIsotherm.Pts.y2;
-        x2_AdIso = this.AdsorptionIsotherm.Pts.x2;
-        
-        x2       = InvQuotientMap((pts{i}.y2_kv-0.5)/cos(th)+0.5,L2_AdIso,0.5,inf);
-        IP_AdIso = barychebevalMatrix(x2_AdIso,x2);
-        rho_Ana2{i} = IP_AdIso*rho';
+        if(~isempty(this.AdsorptionIsotherm))
+            th       = atan(dhdx);
+            ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII/cos(th);        
+            [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
+            y2_AdIso = this.AdsorptionIsotherm.Pts.y2;
+            x2_AdIso = this.AdsorptionIsotherm.Pts.x2;
+
+            x2       = InvQuotientMap((pts{i}.y2_kv-0.5)/cos(th)+0.5,L2_AdIso,0.5,inf);
+            IP_AdIso = barychebevalMatrix(x2_AdIso,x2);
+            rho_Ana2{i} = IP_AdIso*rho';
+        end
         %plot(y2_AdIso,rho); hold on;
         %plot(this.IDC.Pts.y1*sin(this.IDC.alpha)+ell+0.5,flipud(rho1D_LV),'m')
         %plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
@@ -63,10 +68,12 @@ function PlotDensitySlicesNormalInterface(this)
     
     figure('color','white','Position',[0 0 1700 600]);
     subplot(1,2,1);
-    for i = 1:n
+    for i = 1:length(y1P)
         plot(pts{i}.z-deltaZ,f_p{i},'color',col(i,:),'linewidth',1.5); hold on;
-        %plot(pts{i}.z-deltaZ,rho_Ana1{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
-        plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        if(~isempty(this.AdsorptionIsotherm))
+            %plot(pts{i}.z-deltaZ,rho_Ana1{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+            plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+        end
     end    
     dz = (-deltaZ:0.05:deltaZ)';
     IP_LV      = barychebevalMatrix(this.IDC.Pts.x1,this.IDC.CompSpace1(dz/sin(this.IDC.alpha)));
@@ -92,7 +99,7 @@ function PlotDensitySlicesNormalInterface(this)
     else
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
-    for i = 1:n
+    for i = 1:length(y1P)
         plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.5);
     end        
     

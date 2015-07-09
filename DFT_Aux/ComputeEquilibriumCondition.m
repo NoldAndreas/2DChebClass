@@ -21,7 +21,13 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     
     kBT    = params.optsPhys.kBT;    
     
-	getFex    = str2func(['Fex_',params.FexNum.Fex]);    
+    if(isfield(params,'optsNum'))
+        FexNum = params.optsNum.FexNum;
+    else
+        FexNum = params.FexNum;
+    end
+    
+	getFex    = str2func(['Fex_',FexNum.Fex]);    
     if(isfield(params.optsPhys,'sigmaS'))        
         R      = params.optsPhys.sigmaS/2;
     else
@@ -32,7 +38,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
        params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.Dmu;       
     end
     
-    if(strcmp(params.FexNum.Fex,'FMTRosenfeld_3DFluid') && strcmp(params.solver,'Newton'))
+    if(strcmp(FexNum.Fex,'FMTRosenfeld_3DFluid') && strcmp(params.solver,'Newton'))
         fullInput = true; %case only implemented for 1 species
     else
         fullInput = false;

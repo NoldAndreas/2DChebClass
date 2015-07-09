@@ -4,9 +4,11 @@
    ChangeDirData([dirData filesep 'MMNP'],'ORG');    
    close all;
                   
-   bounds    = [-10,10]; %[0,20]
-   %alpha_deg = 120; epw      = 0.7; %40 %1.375     
-   alpha_deg = 135; epw      = 0.55; 
+  
+   %alpha_deg = 120; epw      = 0.7;  bounds    = [-10,10];
+   alpha_deg =  60; epw      = 1.25;  bounds    = [-10,10];
+   %alpha_deg = 40;  epw = 1.375; bounds    = [0,20];
+   %alpha_deg = 135; epw      = 0.55;  bounds    = [-10,10];
                
     PhysArea = struct('N',[50 80],'L1',4,'L2',2,'L2_AD',2.,...
                       'y2wall',0.,...
@@ -44,7 +46,7 @@
 
     CLT = ContactLineHS(config);     
     CLT.Preprocess();        
-    CLT.ComputeEquilibrium();      
+    CLT.ComputeEquilibrium(struct('solver','Picard'));
     
     CLT.y1_SpectralLine = SpectralLine(shapeSL);
     CLT.y1_SpectralLine.ComputeAll();
