@@ -1,4 +1,3 @@
-
 function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)    
 %%
 %

@@ -34,6 +34,8 @@ classdef InfCapillary < InfCapillaryGeneral & ConvolutionFiniteSupport
         end
         function xf = CompSpace1(this,y1)            
             xf  = InvSqrtMap(y1 - this.y10,this.L1,inf);
-        end    
+        end
+        
+        AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)                 
     end
 end

@@ -202,7 +202,7 @@
         function [x1] = CompSpace1(this,y1)
              x1 = this.Main_Strip.CompSpace1(y1);
         end 
- 	   function [x2] = CompSpace2(this,y2)
+ 	    function [x2] = CompSpace2(this,y2)
             
             mark_id = GetArea_ID(this,1,y2);
            
@@ -216,7 +216,7 @@
 %            %I2 - linear Operator on second dimension           
 %            I12 = [kronecker(I1,I2(:,this.mark_id_2{1})),kronecker(I1,I2(:,this.mark_id_2{2}))];
 %        end
-        function id = GetArea_ID(this,y1,y2)
+       function id = GetArea_ID(this,y1,y2)
             id = ones(size(y2));
             
             id(y2 < this.Bottom_Strip.y2Max)    = 1;

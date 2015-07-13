@@ -7,15 +7,16 @@
        end
        
        if(isa(this,'InfCapillary'))
-           topB = true;
-           y2M  = this.y2Max;
+           topB = true;                   
        else
            topB = false;
        end
        
-       if((nargin > 2) && strcmp(opts,'checkTop'))
+       if(isa(this,'InfCapillary_FMT')) %(nargin > 2) &&  strcmp(opts,'checkTop')
+           y2Min    = this.y2Min;
            checkTop = true;
        else
+           y2Min    = 0.5;
            checkTop = false;
        end
          
@@ -23,8 +24,8 @@
         R = this.R(1);
                 
         if(topB)
-            subPts.y2_kv          = (0.:0.01:this.y2Max+R)';
-            subPtsAAD.y2_kv       = (this.y2Min:0.01:this.y2Max)';
+            subPts.y2_kv          = (y2Min-R:0.01:this.y2Max+R)';
+            subPtsAAD.y2_kv       = (y2Min:0.01:this.y2Max)';
         else
             subPts.y2_kv          = (0.:0.01:3.5)';
             subPtsAAD.y2_kv       = (this.y2Min:0.01:3.5)';        
@@ -83,7 +84,7 @@
         x       = CartPts.y2_kv(markInf);                
         
         if(checkTop)            
-            xC_Cart = (y2M-5):0.01:(y2M+R); 
+            xC_Cart = (this.y2Max-5):0.01:(this.y2Max+R); 
             x  = this.y2Max + R - x;    
             xC = this.y2Max + R - xC_Cart;                
         else
@@ -96,7 +97,7 @@
             mark = (xADInt < 3);
         elseif(topB && checkTop)
             mark = (abs(this.y2Max + R - xADInt)  < 3);
-            xADInt = y2M + R - xADInt;
+            xADInt = this.y2Max + R - xADInt;
         else
             mark = true(size(xADInt));
         end
@@ -146,22 +147,25 @@
        % z     = this.AD.Pts.y2_kv(this.AD.Pts.y1_kv == inf);    
         z     = ADCartPts.y2_kv(this.AD.Pts.y1_kv == inf);    
         if(checkTop)     
-            z = y2M + R - z;
+            z = this.y2Max + R - z;
         end
         rhoAD = ones(size(z));
-        rhoAD(this.AD.mark_id_2(:,1)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
+        rhoAD(this.AD.mark_id_2(:,1)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;        
+        if(checkTop)     
+            rhoAD(this.AD.mark_id_2(:,3)) = 0;%f2z_h2(z,z+R) - f2z_h2(z,max(R,z-R)); rhoAD(end) = 0;
+        end
         row   = 4;
         %xADInt =  this.Pts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
-        xADInt =  CartPts.y2_kv(this.Pts.y1_kv == inf) - 0.5;
+        xADInt =  CartPts.y2_kv(this.Pts.y1_kv == inf);
         if(VisualOutput)
             PlotRosenfeldFMT_AADInf(IntMatrFex(1),rhoAD,rows,10);
-            subplot(rows,3,9+1); plot(xADInt+0.5,check1n2(xADInt),'m','linewidth',1.5);
-            subplot(rows,3,9+2); plot(xADInt+0.5,check1n3(xADInt),'m','linewidth',1.5);
-            subplot(rows,3,9+3); plot(xADInt+0.5,check1n2z(xADInt),'m','linewidth',1.5);            
+            subplot(rows,3,9+1); plot(xADInt,check1n2_AD(xADInt),'m','linewidth',1.5);
+            subplot(rows,3,9+2); plot(xADInt,check1n3_AD(xADInt),'m','linewidth',1.5);
+            subplot(rows,3,9+3); plot(xADInt,check1n2z_AD(xADInt),'m','linewidth',1.5);            
         end        
-        res.error_n2AD_ones   = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-check1n2(xADInt),'FMT, AD n2 for ones',xADInt);
-        res.error_n3AD_ones   = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-check1n3(xADInt),'FMT, AD n3 for ones',xADInt);
-        res.error_n2v2AD_ones = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-check1n2z(xADInt),'FMT, AD n2_v_2 for ones',xADInt);        
+        res.error_n2AD_ones   = PrintErrorPos(IntMatrFex.AAD.n2*rhoAD-check1n2_AD(xADInt),'FMT, AD n2 for ones',xADInt);
+        res.error_n3AD_ones   = PrintErrorPos(IntMatrFex.AAD.n3*rhoAD-check1n3_AD(xADInt),'FMT, AD n3 for ones',xADInt);
+        res.error_n2v2AD_ones = PrintErrorPos(IntMatrFex.AAD.n2_v_2*rhoAD-check1n2z_AD(xADInt),'FMT, AD n2_v_2 for ones',xADInt);        
         
         %*********************************************
         
@@ -193,7 +197,6 @@
     function y = f3_h2(x,xt)
         y = pi*((xt.^3.*erf(xt))/3 + xt.*(2*R^2 - 2*x.^2) + 2*x.*xt.^2 + (x.*erf(xt))/2 - (2*xt.^3)/3 + (xt.^2.*exp(-xt.^2))/(3*pi^(1/2)) - x.*xt.^2.*erf(xt) + (exp(-xt.^2).*(- R^2 + x.^2 + 1/3))/pi^(1/2) - xt.*erf(xt).*(R^2 - x.^2) - (x.*xt.*exp(-xt.^2))/pi^(1/2));
     end
- 
     function y = f2_h2Diff(x)
         y          = f2_h2(x+R) - f2_h2(max(R,x-R));
         y(x==Inf)  = 2*pi*R;
@@ -201,7 +204,6 @@
     function y = f2_h2(xt)
         y = pi*(2*xt - exp(-xt.^2)/pi^(1/2) - xt.*erf(xt));
     end
-
     function y = f2z_h2Diff(x)
         y          = f2z_h2(x,x+R) - f2z_h2(x,max(R,x-R));    
         y(x>20)  = 0;                
@@ -213,35 +215,91 @@
         end
     end
 
-    function y  = check1n2(x)
+    function y  = check1n2_AD(x)
         y        = ones(size(x));
-        y(x < 1) = x(x<1);        
+        
+        markB    = (x < (y2Min + 2*R));
+        y(markB) =  x(markB) - (y2Min);
         
         if(topB)
-            markT    = ((y2M+R -x) < 1);
-            y(markT) = y2M + R - x(markT);
+            markT    = ((this.y2Max -x) < 1);
+            y(markT) = this.y2Max - x(markT);
         end
         y = y*2*pi*R;
     end
-    function y  = check1n3(x)
-        y        = 4*(R^3)*ones(size(x));
-        y(x < 1) = (x(x<1)).^2.*(3*R-x(x<1));
+    function y  = check1n2(x)
+        y        = ones(size(x));
+        
+        markB    = (x < (y2Min+R));
+        y(markB) =  x(markB) - (y2Min - R);                
         
         if(topB)
-            markT    = ((y2M+R -x) < 1);
-            xR       = y2M + R - x(markT);            
+            markT    = ((this.y2Max+R -x) < 1);
+            y(markT) = this.y2Max + R - x(markT);
+        end
+        y = y*2*pi*R;
+    end
+
+    function y  = check1n3_AD(x)
+        y        = 4*(R^3)*ones(size(x));
+               
+        markB    = (x < (y2Min+2*R));
+        xR       = x(markB) - (y2Min);
+        y(markB) = xR.^2.*(3*R-xR);            
+        %y(x < 1) = (x(x<1)).^2.*(3*R-x(x<1));
+        
+        if(topB)
+            markT    = ((this.y2Max -x) < 1);                        
+            xR       = this.y2Max - x(markT);            
             y(markT) = xR.^2.*(3*R-xR);                        
         end
         
         y        = y*pi/3;
     end
-    function y  = check1n2z(x)
-        y        = zeros(size(x));
-        y(x < 1) = pi*(x(x<1)).*(x(x<1)-2*R);        
+    function y  = check1n3(x)
+        y        = 4*(R^3)*ones(size(x));
+               
+        markB    = (x < (y2Min+R));
+        xR       = x(markB) - (y2Min - R);
+        y(markB) = xR.^2.*(3*R-xR);            
+        %y(x < 1) = (x(x<1)).^2.*(3*R-x(x<1));
         
         if(topB)
-            markT    = ((y2M+R -x) < 1);
-            xR       = y2M + R - x(markT);           
+            markT    = ((this.y2Max+R -x) < 1);
+            xR       = this.y2Max + R - x(markT);            
+            y(markT) = xR.^2.*(3*R-xR);                        
+        end
+        
+        y        = y*pi/3;
+    end
+
+    function y  = check1n2z_AD(x)
+        y        = zeros(size(x));
+        
+        markB    = (x < (y2Min+2*R));
+        xR       = x(markB) - (y2Min);
+                
+        y(markB) = pi*xR.*(xR-2*R);                    
+        %y(x < 1) = pi*(x(x<1)).*(x(x<1)-2*R);        
+        
+        if(topB)
+            markT    = ((this.y2Max -x) < 1);
+            xR       = this.y2Max - x(markT);           
+            y(markT) = -pi*xR.*(xR-2*R);                    
+        end
+        
+    end
+    function y  = check1n2z(x)
+        y        = zeros(size(x));
+        
+        markB    = (x < (y2Min+R));
+        xR       = x(markB) - (y2Min - R);
+        y(markB) = pi*xR.*(xR-2*R);                    
+        %y(x < 1) = pi*(x(x<1)).*(x(x<1)-2*R);        
+        
+        if(topB)
+            markT    = ((this.y2Max+R -x) < 1);
+            xR       = this.y2Max + R - x(markT);           
             y(markT) = -pi*xR.*(xR-2*R);                    
         end
         

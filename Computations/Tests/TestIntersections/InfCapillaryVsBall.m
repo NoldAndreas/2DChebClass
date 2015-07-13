@@ -6,7 +6,7 @@ R_out  = 2.5;
 bottom = 0;
 top    = 5;
 
-IntersectShape = 'Annulus';
+IntersectShape = 'InfAnnulus';%'Annulus';
 
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[6,6],'L1',1,'L2',2);

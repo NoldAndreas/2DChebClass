@@ -508,7 +508,6 @@ classdef DDFT_2D < Computation
             end
         end 
         
-        
         function fig_h = PlotDynamics(this,rec)
             if(nargin == 1)
                 rec = false;
