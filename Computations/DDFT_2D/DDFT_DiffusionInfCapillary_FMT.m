@@ -57,6 +57,7 @@ function [EX,res] = DDFT_DiffusionInfCapillary_FMT(doHI)
     AddPaths();
     EX   = DDFT_2D(v2struct(optsPhys,optsNum));
     EX.Preprocess();
+    EX.ComputeEquilibrium([],struct('solver','Picard'));
     %EX.ComputeEquilibrium();%EX.optsPhys.rhoGas_sat);
     
     %EX.IDC.plot(EX.GetRhoEq,'SC');

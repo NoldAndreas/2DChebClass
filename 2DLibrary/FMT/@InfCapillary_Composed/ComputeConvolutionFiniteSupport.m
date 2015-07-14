@@ -19,13 +19,13 @@ function [AAD] = ComputeConvolutionFiniteSupport(this,area,weights,pts)
     ptsBottom.y2     = pts.y2(pts.y2 < this.Bottom_Strip.y2Max + 0.5/sin(alpha));    
     
     
-    markTop       = (pts.y2_kv < this.Top_Strip.y2Max + 0.5/sin(alpha));
+    markTop       = (pts.y2_kv > this.Top_Strip.y2Min - 0.5/sin(alpha));
     ptsTop        = pts;
     ptsTop.y1_kv  = pts.y1_kv(markTop);
     ptsTop.y2_kv  = pts.y2_kv(markTop);
     ptsTop.x1_kv  = pts.x1_kv(markTop);
     ptsTop.x2_kv  = pts.x2_kv(markTop);
-    ptsTop.y2     = pts.y2(pts.y2 > this.Top_Strip.y2Max - 0.5/sin(alpha));    
+    ptsTop.y2     = pts.y2(pts.y2 > this.Top_Strip.y2Min - 0.5/sin(alpha));
     
     AAD_BottomStrip                = zeros(length(pts.y1_kv),this.Bottom_Strip.M,length(weights)+1);
     AAD_TopStrip                   = zeros(length(pts.y1_kv),this.Top_Strip.M,length(weights)+1);
