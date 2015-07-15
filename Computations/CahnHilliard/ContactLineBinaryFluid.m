@@ -24,7 +24,9 @@ function ContactLineBinaryFluid
     parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
     parameters.y2Max = 18:2:24;%(16:2:24);            
     parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
-	%parameters.l_d   = 2.25:0.25:3.0;%0.25:0.25:2.5;                    
+	
+    parameters.y2Max = 30:5:50;%(16:2:24);      
+    parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
 
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
     dataN = Rescale(dataM);clear('dataM');

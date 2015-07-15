@@ -1,20 +1,20 @@
-function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
+function data = SimulationInfCapillary_M1(N1,N2,L1,L2,vext)
 
-    disp('** Simulation Inf Box M1 **');
+    disp('** Simulation Inf Capillary M1 **');
     AddPaths();
     
     close all;
     
     %Initialization
     if(nargin == 0)
-        N1 =  30;   N2 = 30; N = [N1;N2];
+        N1 =  50;   N2 = 50; N = [N1;N2];
         L1 =  1;  y2Min = 0; y2Max = 2;
         vext  = @Vext_IN;
     end            
     
     IC     = InfCapillary_Interface(v2struct(L1,y2Min,y2Max,N));
     [Pts,Diff,Int,Ind] = IC.ComputeAll();
-    Interp             = IC.ComputeInterpolationMatrix((-0.99:0.03:0.99)',...
+    Interp             = IC.ComputeInterpolationMatrix((-0.9:0.03:0.9)',...
                                 (-1:0.02:1)',true,true);    
     
      %Check Spectral/Spectral map in 2D:         
@@ -76,8 +76,6 @@ function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
         %dh2  = c*ones(size(y));
         %ddh2 = zeros(size(y));
     end    
- 
-
     function [V,VDiff] = Vext_IN(y1,y2)
         c2 = 0.1;
         
@@ -88,6 +86,9 @@ function data = SimulationInfBox_M1(N1,N2,L1,L2,vext)
         dVdy1       = (1-(tanh(z)).^2)/c2;
         dVdy2       = -(1-(tanh(z)).^2).*dh2/c2;
         dVddy1      = -2*tanh(z).*(1-(tanh(z).^2))/c2^2;
+        
+        %dVddy2      = -2*V.*(1-V.^2).*(dh2).^2/c2^2 - (1-V.^2).*ddh2/c2;
+        
         dVddy2      = -(1-(tanh(z)).^2).*(...
                                2*tanh(z).*(dh2.^2)/c2^2+(ddh2)/c2);
         dVdy1dy2    = 2*tanh(z).*(1-(tanh(z)).^2).*dh2/c2^2;

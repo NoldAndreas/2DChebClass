@@ -42,7 +42,9 @@ classdef DiffuseInterface < Computation
         end       
         function Preprocess(this)          
             
-            this.optsNum.PhysArea.shape = 'InfCapillaryQuad';
+            if(~isfield(this.optsNum.PhysArea,'shape'))
+                this.optsNum.PhysArea.shape = 'InfCapillaryQuad';
+            end
             Preprocess@Computation(this);                        
             
             Sel = {'Dy1' ;'DDy1' ; 'Dy2'; 'DDy2';...
