@@ -44,12 +44,17 @@ classdef (Abstract) M1SpectralSpectral < Shape
             Int        = kron(wInt1,wInt2).*(det');
             this.Int = Int;
         end        
-        function Diff   = ComputeDifferentiationMatrix(this)
+        function Diff   = ComputeDifferentiationMatrix(this,Sel)
             
             Diff1 = barychebdiff(this.Pts.x1,2);
             Diff2 = barychebdiff(this.Pts.x2,2);    
             [h1,h2,J,dH1,dH2] = PhysSpace(this,this.Pts.x1_kv,this.Pts.x2_kv);                        
             Diff      = PhysicalDerivativeJH(this.Pts,Diff1,Diff2,J,dH1,dH2);
+                        
+            if((nargin >= 2))% && isfield(Sel,'LapDiv'))
+                Diff.LapDiv = Diff.Lap*Diff.div;
+            end
+            
             this.Diff = Diff;
         end              
         function [Interp,Interp1,Interp2] = ComputeInterpolationMatrix(this,interp1,interp2,fullInterpGrid,saveBool)            

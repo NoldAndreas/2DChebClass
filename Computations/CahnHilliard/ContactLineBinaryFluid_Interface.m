@@ -25,6 +25,5 @@
     DI = DiffuseInterfaceBinaryFluid(config);
     DI.Preprocess();
 
-
 	DI.IterationStepFullProblem();                    
 	DI.PostProcess(); 

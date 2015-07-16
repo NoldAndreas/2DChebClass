@@ -19,7 +19,7 @@ classdef InfCapillary_Interface < M1SpectralSpectral
 
             InitializationPts(this);            
             
-            this.dy1 = 2*(this.Pts.x2*(this.y2Min - this.y2Max)/2).^2;
+            %this.dy1 = 2*(this.Pts.x2*(this.y2Min - this.y2Max)/2).^2;
             InitializationPts(this);            
         end
     end
@@ -65,10 +65,14 @@ classdef InfCapillary_Interface < M1SpectralSpectral
             %[z,dz,dx,ddx,dddx,ddddx] = QuadMapAB(xR,L1,-L1,L1);
         end
         function [x1,x2] = CompSpace(this,y1,y2)
+            x2  = InvLinearMap(y2,this.y2Min,this.y2Max);
+            h2  =  h(this,x2);
+            x1  = InvQuadMap(y1-h2,this.L1,inf);
+            
              %xf  = InvQuadMapAB(z,L1,-L1,L1);
-             error = MException('InfCapillary_Interface',...
-                                'inverse function not yet implemented');
-             throw(error);
+            %error = MException('InfCapillary_Interface',...
+%                                'inverse function not yet implemented');
+%             throw(error);
         end     
         function [h2,dh2,ddh2] = h(this,x2)%,y)
 
