@@ -302,15 +302,15 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            v_cont         = Diff.div*uv;
            
            % (BC0) [uv;phi;G;p]
-           indBC0 = Ind.top;
-           A_cont(indBC0,[T;T;F;F;F]) = Diff.LapDiv(indBC0,:);
-           A_cont(indBC0,[F;F;T;F;F]) = Diff.div(indBC0,:)*(diag(repmat(G,2,1))*Diff.grad)/Cak;
-           A_cont(indBC0,[F;F;F;T;F]) = Diff.div(indBC0,:)*([diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)])/Cak;
-           A_cont(indBC0,[F;F;F;F;T]) = - Diff.Lap(indBC0,:);
-           
-           v_cont(indBC0) = - Diff.Lap(indBC0,:)*p...
-                                          + Diff.LapDiv(indBC0,:)*uv ...
-                                          + Diff.div(indBC0,:)*(repmat(G,2,1).*(Diff.grad*phi))/Cak;
+%            indBC0 = Ind.top;
+%            A_cont(indBC0,[T;T;F;F;F]) = Diff.LapDiv(indBC0,:);
+%            A_cont(indBC0,[F;F;T;F;F]) = Diff.div(indBC0,:)*(diag(repmat(G,2,1))*Diff.grad)/Cak;
+%            A_cont(indBC0,[F;F;F;T;F]) = Diff.div(indBC0,:)*([diag(Diff.Dy1*phi);diag(Diff.Dy2*phi)])/Cak;
+%            A_cont(indBC0,[F;F;F;F;T]) = - Diff.Lap(indBC0,:);
+%            
+%            v_cont(indBC0) = - Diff.Lap(indBC0,:)*p...
+%                                           + Diff.LapDiv(indBC0,:)*uv ...
+%                                           + Diff.div(indBC0,:)*(repmat(G,2,1).*(Diff.grad*phi))/Cak;
             
            % (BC1) p = 0  at y1 = +/- infinity
            A_cont(Ind.left,:)           = 0;

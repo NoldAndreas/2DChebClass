@@ -36,7 +36,7 @@ function [data,res] = SimulationSphere()
     display([' Error in Interpolation: ', num2str(data.InterPol)]);    
     
     %Check Integration
-    data.Int = abs(Int*V-VInt);
+    data.Int      = abs(Int*V-VInt);
     data.IntValue = Int*V;
     display([' Error in Integration: ', num2str(data.Int)]);                                
     

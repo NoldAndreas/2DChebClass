@@ -21,12 +21,13 @@ function ContactLineBinaryFluid
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
-    parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
-    parameters.y2Max = 18:2:24;%(16:2:24);            
-    parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
+    parameters.Cak   = [0.005];%;0.01];%(0.005:0.0025:0.01)';
+    parameters.y2Max = 18:2:24;%(18:2:24);            
+  %  parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
 	
-    parameters.y2Max = 30:5:50;%(16:2:24);      
-    parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
+    %parameters.y2Max = 30:5:50;%(16:2:24);      
+    %parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
+    parameters.l_d   = [0.2:0.1:1.0,1.25:0.25:3.0];%0.25:0.25:2.5;                    
 
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
     dataN = Rescale(dataM);clear('dataM');
@@ -788,9 +789,9 @@ function ContactLineBinaryFluid
             config.optsPhys.l_diff = l_diff;    
             
             for j = 1:length(pars.y2Max)            
-
-                config.optsNum.PhysArea.y2Max = pars.y2Max(j)*l_diff;
-
+                
+                config.optsNum.PhysArea.y2Max = pars.y2Max(j)*max(l_diff,1);
+                
                 DI = DiffuseInterfaceBinaryFluid(config);
                 DI.Preprocess();
                 for i = 1:length(pars.Cak)
