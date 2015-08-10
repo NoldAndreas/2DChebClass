@@ -13,6 +13,7 @@ classdef ContactLineHS < DDFT_2D
         y2=[],Int_y2=[],DiffY2=[]
         
         IsolineInterfaceY2=[]        
+        FittedInterfaceY2=[]
                
         %structure with information of the adsorption isotherm        
         AdsorptionIsotherm 
@@ -455,7 +456,57 @@ classdef ContactLineHS < DDFT_2D
             end
             fullName = SaveCurrentFigure@Computation(this,filename);            
         end
-        
+        function PostprocessDynamics(this)                        
+            PostprocessDynamics@DDFT_2D(this);
+                        
+            %Compute Position Of Contact Line
+            rho_t       = this.dynamicsResult.rho_t;
+            nSpecies    = size(rho_t,2);
+            times       = this.dynamicsResult.t;
+            no_t        = size(rho_t,3);
+                        
+            if((nSpecies > 1))
+                return;
+            end            
+            rho0        = 0.5*(this.optsPhys.rhoGas_sat + this.optsPhys.rhoLiq_sat);
+                
+            pt.y2_kv    = min(this.IDC.GetCartPts.y2_kv);
+            y1_0_Cart   = zeros(no_t,1);
+            vel_0_Cart  = zeros(no_t,1);
+            ca_deg      = zeros(no_t,1);
+            y2_Interface= (this.optsNum.PlotAreaCart.y2Min:0.1:this.optsNum.PlotAreaCart.y2Max)';
+            %fsolveOpts  = optimset('Display','off');
+            
+            this.dynamicsResult.fittedInterface.y1 = zeros(length(y2_Interface),nSpecies,no_t);
+            this.dynamicsResult.fittedInterface.y2 = zeros(length(y2_Interface),nSpecies,no_t);
+            
+            for nt = 1:no_t
+                rho_eq        = rho_t(:,1,nt);
+                %y1_0_Cart(nt) = fsolve(@rhoX1,0,fsolveOpts);
+                
+                [y1_0_Cart(nt),ca_deg(nt),y1_Interface{nt}]= ExtrapolateInterface(this,rho_eq,y2_Interface);
+                this.dynamicsResult.fittedInterface.y1(:,1,nt) = y1_Interface{nt};
+                this.dynamicsResult.fittedInterface.y2(:,1,nt) = y2_Interface;
+            end         
+            
+            vel_0_Cart(1) = (y1_0_Cart(2)-y1_0_Cart(1))/(times(2)-times(1));
+            for nt = 2:(size(rho_t,3)-1)      
+                vel_0_Cart(nt) = (y1_0_Cart(nt+1)-y1_0_Cart(nt-1))/(times(nt+1)-times(nt-1));
+            end
+            vel_0_Cart(end) = (y1_0_Cart(end)-y1_0_Cart(end-1))/(times(end)-times(end-1));
+            
+            this.dynamicsResult.contactlinePos_y1_0 = (y1_0_Cart-y1_0_Cart(1));
+            this.dynamicsResult.contactangle_0 = ca_deg;
+            this.dynamicsResult.contactlineVel_y1_0 = vel_0_Cart;            
+            
+            function z = rhoX1(y1)
+                pt.y1_kv = y1;
+                IP       = this.IDC.SubShapePtsCart(pt);
+                z        = IP*rho_eq-rho0;
+            end 
+        end
+         [contactlinePos,contactAngle_deg,y2Interface] = ExtrapolateInterface(this,rho,y2)
+            
         %to delete
         [f,y1]  = PostProcess(this,y1Int)
         I       = doIntNormalLine(this,y2Max,y1,f_loc,f_hs)

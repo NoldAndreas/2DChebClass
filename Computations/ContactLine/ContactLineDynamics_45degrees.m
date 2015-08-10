@@ -16,7 +16,7 @@
 %                               'N1',100,'N2',100,'NFlux',40);
 
      PlotAreaCart =     struct('y1Min',-5,'y1Max',10,...
-                               'y2Min',0.5,'y2Max',8.5,...
+                               'y2Min',0.5,'y2Max',15.5,...
                                'N1',100,'N2',100,'NFlux',20);
                       
     V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
@@ -25,7 +25,7 @@
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
                    
-	plotTimes = struct('t_int',[0,200],'t_n',100);
+	plotTimes = struct('t_int',[0,300],'t_n',150);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -73,7 +73,8 @@
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
-    CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
+    CL.PlotDynamicValue({'rho_t','fittedInterface','UV_t'},{'save','MovingFrameOfReference'});
+    CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     

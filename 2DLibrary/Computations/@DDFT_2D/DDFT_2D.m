@@ -41,7 +41,6 @@ classdef DDFT_2D < Computation
         function res = Preprocess(this)
 
             Preprocess@Computation(this);
-                        
             optsPhys = this.optsPhys;
            
             % Determine hard-sphere contribution to bulk free energy
@@ -344,49 +343,80 @@ classdef DDFT_2D < Computation
             rho_t     = this.dynamicsResult.rho_t;  
             
             if(iscell(varName))
-                val       = this.dynamicsResult.(varName{1});
-                val2      = this.dynamicsResult.(varName{2});
-                name      = [varName{1},'_',varName{2}];
+                name  = [];
+                valC{1}    = this.dynamicsResult.(varName{1});
+                for k = 2:length(varName)             
+                    valC{k}   = this.dynamicsResult.(varName{k});
+                    name      = [name,'_',varName{k}];                    
+                end
             else
-                val       = this.dynamicsResult.(varName);
-                val2      = [];
+                valC{1}    = this.dynamicsResult.(varName);                
                 name      = varName;
             end
                         
             
             figure('Color','white','Position', [0 0 800 800]);
             
+            PlotAreaCartOrg       = this.optsNum.PlotAreaCart;
             T_n_Max = length(plotTimes);            
             fileNames = [];
-            maxV2     = max(max(max(val2)));
+            %maxV2     = max(max(max(val2)));
             
-            for i=1:T_n_Max
+            for i=1:T_n_Max                
+                if(IsOption(opts,'MovingFrameOfReference'))                    
+                    PlotAreaCart       = PlotAreaCartOrg;
+                    PlotAreaCart.y1Min = PlotAreaCart.y1Min + this.dynamicsResult.contactlinePos_y1_0(i);
+                    PlotAreaCart.y1Max = PlotAreaCart.y1Max + this.dynamicsResult.contactlinePos_y1_0(i);
+                    this.optsNum.PlotAreaCart  = PlotAreaCart;
+                    this.IDC.InterpolationPlotCart(PlotAreaCart,true);
+                    this.IDC.InterpolationPlotFlux(PlotAreaCart);  
+                    
+                    v1_ref = this.dynamicsResult.contactlineVel_y1_0(i);
+                else
+                    v1_ref = 0;
+                end
+                
             
                 t       = plotTimes(i);
                 hold off;
-                for iSpecies=1:size(val,2)   
-                    if(~isempty(val2))                        
-                        this.IDC.plot(val2(:,iSpecies,i),'color'); hold on;
-                        m = max(max(val2(:,iSpecies,i)));
-                        if(m==0)
-                            colormap(b2r(0,1));
-                        else
-                            colormap(b2r(0,m));
+                for iSpecies=1:size(valC{1},2)   
+                    
+                    cont = true;
+                    
+                    for k = 1:length(valC)
+                        val = valC{k};
+                        
+                        if(isstruct(val) && isfield(val,'y1'))
+                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'linewidth',3); hold on;
+                        elseif(size(val,1) == this.IDC.M)                            
+                            if(~cont)
+                                this.IDC.plot(val(:,iSpecies,i),'color'); hold on;
+                                m = max(max(val(:,iSpecies,i)));
+                                if(m==0)
+                                    colormap(b2r(0,1));
+                                else
+                                    colormap(b2r(0,m));
+                                end
+                                colorbar;
+                            else
+                                if(strcmp(varName{k},'rho_t'))
+                                    PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                               
+                                else
+                                    this.IDC.plot(val(:,iSpecies,i),'contour');
+                                end
+                            end
+                            
+                        elseif(size(val,1) == 2*this.IDC.M)                            
+                            maxVal = max(max(max(abs(val))));
+                            fl     = val(:,iSpecies,i);
+                            fl(1:end/2) = fl(1:end/2) - v1_ref;
+                            this.IDC.plotFlux(fl,[],maxVal,1.2,'k');                         
+                        elseif(size(val,1) == 2)
+                            
                         end
-                        colorbar;
-                        %set(gca, 'CLim', [min(min(min(val2))) max(max(max(val2)))]);
+                        
                     end
-                    
-                    maxVal = max(max(max(abs(val))));
-                    if(size(val,1) == 2*this.IDC.M)                   
-                        PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                        
-                        this.IDC.plotFlux(val(:,iSpecies,i),[],maxVal,1.2,'k'); 
-                        %this.IDC.plot(val(:,iSpecies,i),{'flux'});%,[],maxVal,1.5,'k'); 
-                    else
-                        %this.IDC.plot(val(:,iSpecies,i),'SC');                    
-                        this.IDC.plot(val(:,iSpecies,i),'contour');
-                    end
-                    
+                                                                                                   
                 end                
                 title(['t = ', num2str(t,'%10.1f')]);               
                 set(gca,'fontsize',20);
@@ -417,6 +447,7 @@ classdef DDFT_2D < Computation
                 disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
                 system(['del ',fileNames]);           
             end
+            this.optsNum.PlotAreaCart = PlotAreaCartOrg;
         end 
         function PlotDynamicValueLine(this,y1P,y2P,varName,opts)
             if(nargin < 5)
