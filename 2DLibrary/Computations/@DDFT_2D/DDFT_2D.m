@@ -344,7 +344,8 @@ classdef DDFT_2D < Computation
             
             if(iscell(varName))
                 name  = [];
-                valC{1}    = this.dynamicsResult.(varName{1});
+                valC{1}   = this.dynamicsResult.(varName{1});
+                name      = [name,'_',varName{1}];                    
                 for k = 2:length(varName)             
                     valC{k}   = this.dynamicsResult.(varName{k});
                     name      = [name,'_',varName{k}];                    
@@ -380,6 +381,7 @@ classdef DDFT_2D < Computation
                     
                     v1_ref = this.dynamicsResult.contactlineVel_y1_0(i);
                 else
+                    PlotAreaCart       = PlotAreaCartOrg;
                     v1_ref = 0;
                 end
                             
@@ -389,7 +391,7 @@ classdef DDFT_2D < Computation
                 hold off;
                 for iSpecies=1:size(valC{1},2)   
                     
-                    cont = true;
+                    cont = false;
                     
                     for k = 1:length(valC)
                         val = valC{k};
@@ -408,13 +410,13 @@ classdef DDFT_2D < Computation
                                     colormap(b2r(0,m));
                                 end
                                 colorbar;                                
+                                cont = true;
                             else
                                 if(strcmp(varName{k},'rho_t'))
                                     PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                               
                                 else
                                     this.IDC.plot(val(:,iSpecies,i),'contour'); hold on;
-                                end
-                                cont = false;
+                                end                                
                             end
                             
                         elseif(size(val,1) == 2*this.IDC.M)                            

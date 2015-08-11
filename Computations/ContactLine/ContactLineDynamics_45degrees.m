@@ -73,8 +73,10 @@
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
+    
+       
     CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
-  %  CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
+    %CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     

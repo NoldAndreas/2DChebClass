@@ -19,13 +19,13 @@
                                'y2Min',0.5,'y2Max',8.5,...
                                'N1',100,'N2',100,'NFlux',20);                          
                       
-    V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
+    V2Num    = struct('Fex','SplitAnnulus','N',[60,60]);
     V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);
+                       'Ncircle',1,'N1disc',40,'N2disc',40);
                    
-	plotTimes = struct('t_int',[0,200],'t_n',100);
+	plotTimes = struct('t_int',[0,400],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -73,7 +73,9 @@
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
-    CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
+    
+    CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+    %CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     
