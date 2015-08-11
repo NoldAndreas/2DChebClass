@@ -360,9 +360,16 @@ classdef DDFT_2D < Computation
             PlotAreaCartOrg       = this.optsNum.PlotAreaCart;
             T_n_Max = length(plotTimes);            
             fileNames = [];
-            %maxV2     = max(max(max(val2)));
+            %maxV2     = max(max(max(val2)));            
             
-            for i=1:T_n_Max                
+%             if(IsOption(opts,'save'))
+%                 deltaT = (floor(T_n_Max/50));
+%             else
+%                 deltaT = 1;
+%             end
+                 deltaT = 1;
+            
+            for i=1:deltaT:T_n_Max                
                 if(IsOption(opts,'MovingFrameOfReference'))                    
                     PlotAreaCart       = PlotAreaCartOrg;
                     PlotAreaCart.y1Min = PlotAreaCart.y1Min + this.dynamicsResult.contactlinePos_y1_0(i);
@@ -375,9 +382,10 @@ classdef DDFT_2D < Computation
                 else
                     v1_ref = 0;
                 end
+                            
+                t        = plotTimes(i);
+                titlestr = ['t = ', num2str(t,'%10.1f')];
                 
-            
-                t       = plotTimes(i);
                 hold off;
                 for iSpecies=1:size(valC{1},2)   
                     
@@ -386,8 +394,10 @@ classdef DDFT_2D < Computation
                     for k = 1:length(valC)
                         val = valC{k};
                         
-                        if(isstruct(val) && isfield(val,'y1'))
-                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'linewidth',3); hold on;
+                        if(isstruct(val) && isfield(val,'y1'))                            
+                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'linewidth',3,'color','m'); hold on;
+                        elseif(isstruct(val) && isfield(val,'str'))
+                            titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),2)];
                         elseif(size(val,1) == this.IDC.M)                            
                             if(~cont)
                                 this.IDC.plot(val(:,iSpecies,i),'color'); hold on;
@@ -397,30 +407,30 @@ classdef DDFT_2D < Computation
                                 else
                                     colormap(b2r(0,m));
                                 end
-                                colorbar;
+                                colorbar;                                
                             else
                                 if(strcmp(varName{k},'rho_t'))
                                     PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                               
                                 else
-                                    this.IDC.plot(val(:,iSpecies,i),'contour');
+                                    this.IDC.plot(val(:,iSpecies,i),'contour'); hold on;
                                 end
+                                cont = false;
                             end
                             
                         elseif(size(val,1) == 2*this.IDC.M)                            
                             maxVal = max(max(max(abs(val))));
                             fl     = val(:,iSpecies,i);
                             fl(1:end/2) = fl(1:end/2) - v1_ref;
-                            this.IDC.plotFlux(fl,[],maxVal,1.2,'k');                         
-                        elseif(size(val,1) == 2)
-                            
+                            this.IDC.plotFlux(fl,[],maxVal,1.2,'k');   hold on;                      
+                        elseif(size(val,1) == 2)                            
                         end
                         
                     end
                                                                                                    
                 end                
-                title(['t = ', num2str(t,'%10.1f')]);               
+                title(titlestr);               
                 set(gca,'fontsize',20);
-                set(gca,'linewidth',1.5);
+                set(gca,'linewidth',1.5);                
                 %xlabel('$y_1$','Interpreter','Latex','fontsize',25);
                 %ylabel('$y_2$','Interpreter','Latex','fontsize',25);
                 %view([2,5,2]);
@@ -428,6 +438,10 @@ classdef DDFT_2D < Computation
                 h = get(gca,'xlabel'); set(h,'fontsize',35);
                 h = get(gca,'ylabel'); set(h,'fontsize',35);
                 h = get(gca,'title');  set(h,'fontsize',35);
+                xlim([PlotAreaCart.y1Min,PlotAreaCart.y1Max]);
+                ylim([PlotAreaCart.y2Min,PlotAreaCart.y2Max]);
+                pbaspect([(PlotAreaCart.y1Max-PlotAreaCart.y1Min),...
+                          (PlotAreaCart.y2Max-PlotAreaCart.y2Min),1]);
                 pause(0.2);                
                 
                 if(IsOption(opts,'save'))
@@ -445,7 +459,7 @@ classdef DDFT_2D < Computation
     
                 system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
                 disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
-                system(['del ',fileNames]);           
+                %system(['del ',fileNames]);           
             end
             this.optsNum.PlotAreaCart = PlotAreaCartOrg;
         end 

@@ -179,7 +179,7 @@ classdef (Abstract) Shape < handle
             end
         end       
         function InterpolationPlotFlux(this,PlotArea)   
-            if(isfield(PlotArea,'NFluxVectors'))
+            if(isfield(PlotArea,'NFlux'))
                 N = PlotArea.NFlux;
             else
                 N = 30;

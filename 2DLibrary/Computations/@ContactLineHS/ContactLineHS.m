@@ -494,10 +494,11 @@ classdef ContactLineHS < DDFT_2D
                 vel_0_Cart(nt) = (y1_0_Cart(nt+1)-y1_0_Cart(nt-1))/(times(nt+1)-times(nt-1));
             end
             vel_0_Cart(end) = (y1_0_Cart(end)-y1_0_Cart(end-1))/(times(end)-times(end-1));
-            
+
             this.dynamicsResult.contactlinePos_y1_0 = (y1_0_Cart-y1_0_Cart(1));
-            this.dynamicsResult.contactangle_0 = ca_deg;
-            this.dynamicsResult.contactlineVel_y1_0 = vel_0_Cart;            
+            this.dynamicsResult.contactangle_0.val = ca_deg;
+            this.dynamicsResult.contactangle_0.str = '\theta';
+            this.dynamicsResult.contactlineVel_y1_0 = vel_0_Cart;
             
             function z = rhoX1(y1)
                 pt.y1_kv = y1;

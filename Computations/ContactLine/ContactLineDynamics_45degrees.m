@@ -25,7 +25,7 @@
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',50,'N2disc',50);
                    
-	plotTimes = struct('t_int',[0,300],'t_n',150);
+	plotTimes = struct('t_int',[0,400],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -73,8 +73,8 @@
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
-    CL.PlotDynamicValue({'rho_t','fittedInterface','UV_t'},{'save','MovingFrameOfReference'});
-    CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
+    CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+  %  CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     
