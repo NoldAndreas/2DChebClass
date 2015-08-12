@@ -32,9 +32,9 @@ function theta = IntermediateStokesSlope(z,lambda)
     
     if(boolPlot)
         
-        plotOpts = struct('plain',true,'linecolor','b','linewidth',2,'linestyle','-');
-        f1 =  figure('color','white','Position',[0 0 800 800]);
-        plot(y,GHR_lambdaEta0(y),'b','linewidth',2); hold on;
+        plotOpts = struct('plain',true,'linecolor','b','linewidth',1,'linestyle','-');
+        f1 =  figure('color','white','Position',[0 0 400 400]);
+        plot(y,GHR_lambdaEta0(y),'b','linewidth',1); hold on;
         plotOpts.linecolor = 'r';        
         SL.plot(GHR_lambdaEta(y,1),plotOpts); hold on; 
         
@@ -46,13 +46,14 @@ function theta = IntermediateStokesSlope(z,lambda)
         ylim([0 max(GHR_lambdaEta0(y))]);
         set(gca,'xtick',[0,pi/2,pi],...
                 'xticklabel',{'0','90','180'});        
-        xlabel('$\theta [deg]$','Interpreter','Latex','fontsize',20);
-        ylabel('$G(\theta)$','Interpreter','Latex','fontsize',20);
+        xlabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',20); %
+        ylabel('$G(\theta)$','Interpreter','Latex','fontsize',20); 
         set(gca,'fontsize',15);                
+        ylim([0 16]);
         
-        plotOpts = struct('plain',true,'linecolor','b','linewidth',2,'linestyle','-');        
+        plotOpts = struct('plain',true,'linecolor','b','linewidth',1,'linestyle','-');        
         f2 =  figure('color','white','Position',[0 0 800 800]);
-        plot(y,GHR_lambdaEta0(y),'b','linewidth',2); hold on;
+        plot(y,GHR_lambdaEta0(y),'b','linewidth',1); hold on;
         plotOpts.linecolor = 'r';
         SL.plot(GHR_lambdaEta(y,1),plotOpts); hold on; 
         plotOpts.linecolor = 'm';
@@ -64,24 +65,25 @@ function theta = IntermediateStokesSlope(z,lambda)
         ylim([0 max(GHR_lambdaEta0(y))]);        
         set(gca,'xtick',[0,pi/2,pi],...
                 'xticklabel',{'0','90','180'});        
-        xlabel('$\theta [deg]$','Interpreter','Latex','fontsize',20);
-        ylabel('$G(\theta)$','Interpreter','Latex','fontsize',20);
+        xlabel('$\theta [^\circ]$','Interpreter','Latex','fontsize',20); 
+        ylabel('$G(\theta)$','Interpreter','Latex','fontsize',20); 
         set(gca,'fontsize',15);
         ylim([0 0.5]);
 
                 
-        inset2(f1,f2,0.6,[0.25,0.35]);        
+        inset2(f1,f2,0.6,[0.35,0.35]);        
         close(f2);          
         
-        print2eps([fulldir,'theta_G'],gcf);  
-        saveas(gcf,[fulldir,'theta_G.fig']);    
+        SaveFigure([fulldir,'theta_G']);
+        %print2eps([fulldir,'theta_G'],gcf);  
+        %saveas(gcf,[fulldir,'theta_G.fig']);    
         
         figure('color','white','Position',[0 0 800 800]);
         plot(exp(GHR_lambdaEta0(y)/Ca),y*180/pi,'b','linewidth',2); hold on;
         plot(exp(y.^3/9/Ca),y*180/pi,'b:','linewidth',2);
         xlim([1 max(exp(GHR_lambdaEta0(y)/Ca))])        
         xlabel('$r/\hat L$','Interpreter','Latex','fontsize',20);
-        ylabel('$\theta(r)[^\circ]$','Interpreter','Latex','fontsize',20);
+        ylabel('$\theta(r)[^\circ]$','fontsize',20);%'Interpreter','Latex',
         set(gca,'fontsize',15);
         
         print2eps([fulldir,'r_theta'],gcf);

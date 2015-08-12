@@ -22,14 +22,14 @@ function [contactlinePos,contactAngle_deg,y1Interface]= ExtrapolateInterface(thi
     end    
     
     %2nd step: solve (EQ) for a_k
-    ig     = ones(size(y2k));
-    ig = [1;0.5];
-    ak     = fsolve(@f_error,ig);
-    if(length(ak) == 1)
-        disp(['Fitting coefficient ak = ',num2str(ak)]);
+    if(c > 1)
+        ig = [1;0.5];
     else
-        ak
+        ig = [-1;0.5];
     end
+    ak     = fsolve(@f_error,ig,fsolveOpts);    
+	disp(['Fitting coefficient ak = ',num2str(ak')]);
+    
 
     %3rd step: set interface, contact line position    
     y2Min = min(this.IDC.GetCartPts.y2_kv);

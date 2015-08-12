@@ -20,10 +20,11 @@ function fullName = SaveFigure(filename,opts)
 	if(~exist(DataFolder,'dir'))            
         disp('Folder not found. Creating new path..');            
         mkdir(DataFolder);
-	end
-    
+    end
+        
     print2eps(fullName,gcf);
 	saveas(gcf,[fullName '.fig']);        
+    matlab2tikz([fullName '.tex']);
     
     disp(['Figures saved in ',fullName '.fig/eps']);
         
