@@ -1,6 +1,7 @@
  function AddPaths(dirOrg)
    
     global dirData
+    global dirDDFT
     global dirDataOrg    
     
     global PersonalUserOutput

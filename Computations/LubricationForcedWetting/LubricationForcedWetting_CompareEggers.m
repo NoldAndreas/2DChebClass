@@ -1,4 +1,4 @@
-function LubricationForcedWetting_old()
+function LubricationForcedWetting_CompareEggers()
 %% Reproduce computation in Fig. 1 of Eggers PoF,17,082106 (2005)
 
 %% ODE to solve
@@ -111,7 +111,8 @@ function LubricationForcedWetting_old()
         
     h = figure('color','white');
 	shift = struct('xmin',0,'xmax',4,'ymin',0,'ymax',2.5,'yref',0,'xref',0);
-	PlotBackgroundImage(['Computations' filesep 'PDEs' filesep 'EggersPoF2005_Fig3_cut.gif'],shift);    
+    global dirDDFT
+	PlotBackgroundImage([dirDDFT filesep 'Computations' filesep 'LubricationForcedWetting' filesep 'EggersPoF2005_Fig3_cut.gif'],shift);    
     HIS.plot(hP);   
     %Outer solution:
     plot(y,thetaAP+(delta/thetaAP^2)*(log(y*c)),'r','linewidth',1.5); %C/thetaAP^2+
@@ -126,7 +127,7 @@ function LubricationForcedWetting_old()
     xlim([0 4]);
     
     %copyobj(gcf,0);
-    set(gca,'XScale','log');
+    %set(gca,'XScale','log');
 
     %% Right hand side of ODE
     function y = ODE(hP)

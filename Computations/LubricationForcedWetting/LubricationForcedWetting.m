@@ -111,8 +111,18 @@ function LubricationForcedWetting()
     close all;
     
     lw = 2.5;
+         
+    PlotThesisFigure_ForcedLubrication(y,hP,lambda,delta,thetaAP,h0P,h1P,h2P,...
+                                               hIP_0,hIP_1,hIP_2,...
+                                               HIS,yInner,ySInner);
+	PlotJFMPaperFigure();
+    PlotInnerRegion();
+    PlotFullResults();
+    Ploth3Results();  
     
-      %**** Print for Paper **********
+    
+    function PlotJFMPaperFigure()
+         %**** Print for Paper **********
         fig1 = figure('color','white','Position',[0 0 1300 600]);
         
         subplot(1,2,1);            
@@ -198,10 +208,7 @@ function LubricationForcedWetting()
         
         print2eps([dirData filesep 'LubrAsym'],fig1);
         saveas(fig1,[dirData filesep 'LubrAsym.fig']);
-       
-    PlotInnerRegion();
-    PlotFullResults();
-    Ploth3Results();  
+    end
     
     function Ploth3Results()
         %% Plot h^3 - graph
