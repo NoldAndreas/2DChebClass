@@ -3,9 +3,18 @@
     AddPaths('CodePaper');            
     close all;
     
+    advancing = false;
+    if(advancing)
+        alpha_deg = 135;
+        epw       = 0.856; %= 90 degree contact angle
+    else
+        alpha_deg = 120;
+        epw       = 0.453; %= 135 degree contact angle
+    end
+    
     PhysArea = struct('N',[40,40],...
                       'L1',4,'L2',2,...                        
-                      'alpha_deg',135);
+                      'alpha_deg',alpha_deg);
                   
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
@@ -15,7 +24,7 @@
 %                              'y2Min',0.5,'y2Max',15.5,...
 %                              'N1',100,'N2',100,'NFlux',40);
                           
-     PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
+    PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
                                'y2Min',0.5,'y2Max',15.5,...
                                'N1',100,'N2',100,'NFlux',20);                          
                       
@@ -34,7 +43,7 @@
                      'maxComp_y2',10,...%'y1Shift',0,...
                      'plotTimes',plotTimes);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856);%,...%1.154 = 45 degrees
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);%,...%1.154 = 45 degrees
                 %'tau',5,'epsilon_w_end',1.0);
             
     %optsViscosity = struct('etaC',1,'zetaC',0);    
