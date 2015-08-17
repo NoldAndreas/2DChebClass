@@ -1,4 +1,4 @@
-function [contactlinePos,contactAngle_deg,y1Interface]= ExtrapolateInterface(this,rho,y2)
+function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(this,rho,y2,ak_ig)
             
 	%Based on values of the interface away from the wall at (y_1^k,y_2^k)
     %Interpolate to 
@@ -7,7 +7,7 @@ function [contactlinePos,contactAngle_deg,y1Interface]= ExtrapolateInterface(thi
     y2k     = [4;5];
     lambdak = [0.5;0.6]; %Doesnt have to be equal y1k, I think.
     y2B     = 4;
-    c       = tan(this.optsNum.PhysArea.alpha_deg*pi/180);
+    c       = 1/tan(this.optsNum.PhysArea.alpha_deg*pi/180);
     CartPts = this.IDC.GetCartPts;
         
     %1st step: get y1k    
@@ -22,19 +22,22 @@ function [contactlinePos,contactAngle_deg,y1Interface]= ExtrapolateInterface(thi
     end    
     
     %2nd step: solve (EQ) for a_k
-    if(c > 1)
-        ig = [1;0.5];
-    else
-        ig = [-1;0.5];
+    if((nargin < 4) || isempty(ak_ig))
+         ak_ig = [0;0.5];
+%         if(c > 1)
+%             ig = [1;0.5];
+%         else
+%             ig = [-1;0.5];
+%         end
     end
-    ak     = fsolve(@f_error,ig,fsolveOpts);    
+    ak     = fsolve(@f_error,ak_ig,fsolveOpts);    
 	disp(['Fitting coefficient ak = ',num2str(ak')]);
     
 
     %3rd step: set interface, contact line position    
     y2Min = min(this.IDC.GetCartPts.y2_kv);
     [contactlinePos,dz] = f_LinearExtrapolation(y2Min,ak);
-    contactAngle_deg    = atan(1/dz)*180/pi;
+    contactAngle_deg    = mod(atan(1/dz)*180/pi,180);
     if(nargin > 2)
         %y1Interface = f(y2,ak);
         y1Interface = f_LinearExtrapolation(y2,ak);         
@@ -42,7 +45,13 @@ function [contactlinePos,contactAngle_deg,y1Interface]= ExtrapolateInterface(thi
 
     PlotDensityContours(this,rho);  hold on;      
     plot(y1Interface,y2,'linewidth',3)
-     
+    
+%     y2kAna = [4:0.2:15];
+%     for k = 1:length(y2kAna)
+%         pt.y2_kv    = y2kAna(k);        
+%         y1kAna(k)   = fsolve(@rhoX1,0,fsolveOpts);                                
+%     end   
+    
     function z = rhoX1(y1)
         pt.y1_kv = y1;
         IP       = this.IDC.SubShapePtsCart(pt);

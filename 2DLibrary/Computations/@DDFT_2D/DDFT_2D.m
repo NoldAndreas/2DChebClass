@@ -399,7 +399,7 @@ classdef DDFT_2D < Computation
                         if(isstruct(val) && isfield(val,'y1'))                            
                             plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'linewidth',3,'color','m'); hold on;
                         elseif(isstruct(val) && isfield(val,'str'))
-                            titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),2)];
+                            titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),3)];
                         elseif(size(val,1) == this.IDC.M)                            
                             if(~cont)
                                 this.IDC.plot(val(:,iSpecies,i),'color'); hold on;

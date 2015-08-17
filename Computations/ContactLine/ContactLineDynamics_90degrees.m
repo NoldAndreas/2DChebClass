@@ -1,17 +1,14 @@
-%function ContactLineDynamics_45degrees()
+function ContactLineDynamics_90degrees(advancing)
 
     AddPaths('CodePaper');            
     close all;
     
-    advancing = true;
-    if(~advancing)
-        alpha_deg = 45;
-        epw       = 0.856; %= 90 degree contact angle
-        maxT      = 400;
-    else
-        alpha_deg = 60;
-        epw       = 1.154; %= 45 degree contact angle
-        maxT      = 600;
+    %advancing = false;
+    alpha_deg = 90;
+    if(advancing)        
+        epw       = 1.154; %= 90 degree contact angle
+    else        
+        epw       = 0.453; %= 135 degree contact angle
     end
     
     PhysArea = struct('N',[40,40],...
@@ -22,21 +19,21 @@
                           'y2Min',0.5,'y2Max',2.5,...
                           'N',[40,40]);
                           
-%     PlotAreaCart =     struct('y1Min',-5,'y1Max',20,...
-%                               'y2Min',0.5,'y2Max',15.5,...
-%                               'N1',100,'N2',100,'NFlux',40);
-
-     PlotAreaCart =     struct('y1Min',-5,'y1Max',10,...
+    %PlotAreaCart =     struct('y1Min',-20,'y1Max',5,...
+%                              'y2Min',0.5,'y2Max',15.5,...
+%                              'N1',100,'N2',100,'NFlux',40);
+                          
+    PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
                                'y2Min',0.5,'y2Max',15.5,...
-                               'N1',100,'N2',100,'NFlux',20);
+                               'N1',100,'N2',100,'NFlux',20);                          
                       
-    V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
+    V2Num    = struct('Fex','SplitAnnulus','N',[60,60]);
     V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
 
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);
+                       'Ncircle',1,'N1disc',40,'N2disc',40);
                    
-	plotTimes = struct('t_int',[0,maxT],'t_n',100);
+	plotTimes = struct('t_int',[0,400],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
@@ -52,7 +49,7 @@
     %optsViscosity = struct('etaL1',2,'zetaC',1);
     optsViscosity = struct('etaLiq',5,'etaVap',1,...
                            'zetaLiq',5,'zetaVap',1);
-                            %'zetaC',1);
+                        %'zetaC',1);
     %BCwall        = struct('bc','sinHalf','tau',1);
 	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
 
@@ -87,9 +84,8 @@
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
     
-       
     CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
-    %CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
+    %CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
     
