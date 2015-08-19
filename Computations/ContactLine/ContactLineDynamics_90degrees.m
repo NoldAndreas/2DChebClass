@@ -1,14 +1,20 @@
-function ContactLineDynamics_90degrees(advancing)
+function ContactLineDynamics_90degrees(opts)
 
     AddPaths('CodePaper');            
     close all;
     
     %advancing = false;
     alpha_deg = 90;
-    if(advancing)        
-        epw       = 1.154; %= 90 degree contact angle
-    else        
+   
+    if(IsOption('dragging'))
+    else
+        if(IsOption(opts,'advancing'))        
+             maxT     = 600;
+            epw       = 1.154; %= 45 degree contact angle
+    elseif(IsOption(opts,'receding'))    
         epw       = 0.453; %= 135 degree contact angle
+        maxT      = 600;
+    elseif(I
     end
     
     PhysArea = struct('N',[40,40],...
@@ -23,7 +29,7 @@ function ContactLineDynamics_90degrees(advancing)
 %                              'y2Min',0.5,'y2Max',15.5,...
 %                              'N1',100,'N2',100,'NFlux',40);
                           
-    PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
+    PlotAreaCart =     struct('y1Min',-7.5,'y1Max',7.5,...
                                'y2Min',0.5,'y2Max',15.5,...
                                'N1',100,'N2',100,'NFlux',20);                          
                       
@@ -33,7 +39,7 @@ function ContactLineDynamics_90degrees(advancing)
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',40,'N2disc',40);
                    
-	plotTimes = struct('t_int',[0,400],'t_n',100);
+	plotTimes = struct('t_int',[0,maxT],'t_n',100);
 
     optsNum = struct('PhysArea',PhysArea,...
                      'PlotAreaCart',PlotAreaCart,...
