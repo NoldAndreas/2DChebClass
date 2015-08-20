@@ -6,15 +6,23 @@ function ContactLineDynamics_90degrees(opts)
     %advancing = false;
     alpha_deg = 90;
    
-    if(IsOption('dragging'))
-    else
+    if(IsOption('dragging'))        
+            epw      = 0.856; %= 90 degree contact angle
+            maxT     = 20;            
         if(IsOption(opts,'advancing'))        
-             maxT     = 600;
+            BCwall   = struct('bc','exp','tau',1,'u_max',-0.2);            
+        elseif(IsOption(opts,'receding'))                
+            BCwall   = struct('bc','exp','tau',1,'u_max',0.2);            
+        end
+    elseif(IsOption(opts,'chemical'))
+        BCwall = [];
+        if(IsOption(opts,'advancing'))        
+            maxT     = 600;
             epw       = 1.154; %= 45 degree contact angle
-    elseif(IsOption(opts,'receding'))    
-        epw       = 0.453; %= 135 degree contact angle
-        maxT      = 600;
-    elseif(I
+        elseif(IsOption(opts,'receding'))    
+            epw       = 0.453; %= 135 degree contact angle
+            maxT      = 600;
+        end
     end
     
     PhysArea = struct('N',[40,40],...
@@ -57,13 +65,14 @@ function ContactLineDynamics_90degrees(opts)
                            'zetaLiq',5,'zetaVap',1);
                         %'zetaC',1);
     %BCwall        = struct('bc','sinHalf','tau',1);
-	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
+	%BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
 
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
                       'Dmu',0.0,'nSpecies',1,...
                       'sigmaS',1,...
-                      'Inertial',true,'gammaS',0,...%4% 'Fext',[-1,0],...%);%,...% 'BCWall_U',BCwall,...%);                     
+                      'Inertial',true,'gammaS',0,...%4% 'Fext',[-1,0],...%);%,...% 
+                      'BCWall_U',BCwall,...%);                     
                       'viscosity',optsViscosity);	
 
     config = v2struct(optsNum,optsPhys);                                    
