@@ -6,7 +6,7 @@ function ContactLineDynamics_90degrees(opts)
     %advancing = false;
     alpha_deg = 90;
    
-    if(IsOption('dragging'))        
+    if(IsOption(opts,'dragging'))        
             epw      = 0.856; %= 90 degree contact angle
             maxT     = 20;            
         if(IsOption(opts,'advancing'))        
@@ -80,22 +80,27 @@ function ContactLineDynamics_90degrees(opts)
     CL = ContactLineHS(config);
     CL.Preprocess(); 
     
-%     %**********************************************
-%     % Equilibration from off-equilibrium IC
-%     %**********************************************
-    rhoGas = CL.optsPhys.rhoGas_sat;
-    rhoLiq = CL.optsPhys.rhoLiq_sat;
+    if(IsOption(opts,'chemical'))
+    
+    %     %**********************************************
+    %     % Equilibration from off-equilibrium IC
+    %     %**********************************************
+        rhoGas = CL.optsPhys.rhoGas_sat;
+        rhoLiq = CL.optsPhys.rhoLiq_sat;
 
-    [om,rho1D_wl,params] = CL.Compute1D('WL');            
-	[om,rho1D_wg,params] = CL.Compute1D('WG');
-    [om,rho1D_lg,params] = CL.Compute1D('LG');
+        [om,rho1D_wl,params] = CL.Compute1D('WL');            
+    	[om,rho1D_wg,params] = CL.Compute1D('WG');
+        [om,rho1D_lg,params] = CL.Compute1D('LG');
     
-    rho1D_wl = repmat(rho1D_wl,CL.IDC.N1,1);
-    rho1D_wg = repmat(rho1D_wg,CL.IDC.N1,1);
-    rho1D_lg = kronecker(rho1D_lg,ones(CL.IDC.N2,1));
+        rho1D_wl = repmat(rho1D_wl,CL.IDC.N1,1);
+        rho1D_wg = repmat(rho1D_wg,CL.IDC.N1,1);
+        rho1D_lg = kronecker(rho1D_lg,ones(CL.IDC.N2,1));
     
-    rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
-    CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
+        rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
+        CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;    
+    elseif(IsOption(opts,'dragging'))
+        CL.ComputeEquilibrium(struct('solver','Picard'));
+    end
     CL.ComputeDynamics();
     CL.PostprocessDynamics();
     
