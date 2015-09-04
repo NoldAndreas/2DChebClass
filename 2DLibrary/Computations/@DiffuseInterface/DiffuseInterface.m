@@ -206,7 +206,7 @@ classdef DiffuseInterface < Computation
             M              = this.IDC.M;
             PtsCart        = this.IDC.GetCartPts();
             y2Max          = this.IDC.y2Max;
-            ITT            = repmat(Ind.top,2,1);  
+            ITT            = repmat(Ind.top,2,1);
             IBB            = repmat(Ind.bound,2,1); 
         	Dy12           = blkdiag(Diff.Dy1,Diff.Dy1);
             d_theta        = 0.01;
@@ -214,23 +214,36 @@ classdef DiffuseInterface < Computation
             F              = false(M,1);   
             T              = true(M,1);   
             EYM            = eye(M);
+            Cak            = this.optsPhys.Cak;
             
-            u_flow         = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...%_Blurred
-                                                PtsCart.y2_kv],1,0,0,theta);                  
+            %Get beta from 
+            % theta = beta + Ca*f(beta)
+            Ca          = 3/4*Cak;
+            beta        = fsolve(@func,theta);
+            [~,fb]      = f_stokes(beta);
+            dthetadbeta = 1 + Ca*fb;
+            
+            %Get Delta Z
+            deltaZ         = deltaX + y2Max*(1/tan(theta) - 1/tan(beta));
+            
+            u_flow         = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaZ,PtsCart.y2_kv],1,0,0,beta);                  
+            
+            %u_flow         = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,...%_Blurred
+%                                                PtsCart.y2_kv],1,0,0,theta);                  
                                             
-            y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
-            a_corr        = (1 + a./(1+y1_Interface.^2));
-            a_corr_a      = 1./(1+y1_Interface.^2);        
-            a_corr_deltaX = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
+            y1_Interface                        = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
+            a_corr                              = (1 + a./(1+y1_Interface.^2));
+            a_corr_a                            = 1./(1+y1_Interface.^2);        
+            a_corr_deltaX                       = 2*a*y1_Interface./(1+y1_Interface.^2).^2;
             a_corr_deltaX(Ind.left | Ind.right) = 0;
-            a_corr_theta  = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
+            a_corr_theta                        = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
     
             uvBound        = u_flow .*repmat(a_corr,2,1);                                        
 
             uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
             uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
 
-            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
+            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaZ,PtsCart.y2_kv],1,0,0,beta+d_theta/dthetadbeta);
             u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
             uvBound_theta    = u_flow_d.*repmat(a_corr,2,1) + u_flow.*repmat(a_corr_theta,2,1);
 
@@ -256,6 +269,11 @@ classdef DiffuseInterface < Computation
             
             A_mom_IBB = A_mom(IBB,:);
             v_mom_IBB = v_mom(IBB);
+            
+            function t = func(b)
+                t = b + Ca*f_stokes(b);
+            end
+                
         end
         function [v_mu,A_mu] = ChemicalPotential(this,phi,G)
             %[uv;phi;G]     

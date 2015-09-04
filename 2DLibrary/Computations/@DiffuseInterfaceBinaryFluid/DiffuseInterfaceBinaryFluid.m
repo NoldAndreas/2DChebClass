@@ -95,15 +95,14 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
 
             %(BC8) [uv;phi;G;p]                    
             A_G(Ind.left & Ind.bottom,:)           = 0;
-            A_G(Ind.left & Ind.bottom,[F;T;F;F;F]) = this.IDC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
+            %A_G(Ind.left & Ind.bottom,[F;T;F;F;F]) = this.IDC.borderBottom.IntSc*(diag(phi)*Diff.Dy2);
             A_G(Ind.left & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) ...
-                                                      - EYM(Ind.left & Ind.bottom,:) ...                                              
-                                                      + this.IDC.borderBottom.IntSc*(diag(Diff.Dy2*(uv(1+end/2:end))));
+                                                     - EYM(Ind.left & Ind.bottom,:) ;%...
+                                                     %+ this.IDC.borderBottom.IntSc*(diag(Diff.Dy2*(uv(1+end/2:end))));
             A_G(Ind.left & Ind.bottom,[F;F;F;T;F]) = - m*this.IDC.borderBottom.IntSc*Diff.DDy2;
             v_G(Ind.left & Ind.bottom)             =    phi(Ind.right & Ind.bottom) ...
-                                                      - phi(Ind.left & Ind.bottom) ...
-                                                      + this.IDC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
-                                                      - m*this.IDC.borderBottom.IntSc*Diff.DDy2*G;
+                                                      - phi(Ind.left & Ind.bottom) ...                                                     
+                                                      - m*this.IDC.borderBottom.IntSc*Diff.DDy2*G;%+ this.IDC.borderBottom.IntSc*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
                               
             % ****************
             IP                      = this.IDC.SubShapePtsCart(this.RightCapillary.GetCartPts);           
@@ -111,14 +110,13 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             IntPath_Half_Low        = this.RightCapillary.borderBottom.IntSc*IP;            
             
             A_G(Ind.right & Ind.bottom,:)           = 0;
-            A_G(Ind.right & Ind.bottom,[F;T;F;F;F]) = IntPath_Half_Low*(diag(phi)*Diff.Dy2);
-            A_G(Ind.right & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) - IP0 ...                                              
-                                                      + IntPath_Half_Low*(Diff.Dy2*(uv(1+end/2:end)));
+            %A_G(Ind.right & Ind.bottom,[F;T;F;F;F]) = IntPath_Half_Low*(diag(phi)*Diff.Dy2);
+            A_G(Ind.right & Ind.bottom,[F;F;T;F;F]) = + EYM(Ind.right & Ind.bottom,:) - IP0 ;%...
+                                                      %+ IntPath_Half_Low*(Diff.Dy2*(uv(1+end/2:end)));
             A_G(Ind.right & Ind.bottom,[F;F;F;T;F]) = - m*IntPath_Half_Low*Diff.DDy2;
             
-            v_G(Ind.right & Ind.bottom) = phi(Ind.right & Ind.bottom) - IP0*phi ...
-                                          + IntPath_Half_Low*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
-                                          - m*IntPath_Half_Low*Diff.DDy2*G;
+            v_G(Ind.right & Ind.bottom) = phi(Ind.right & Ind.bottom) - IP0*phi ...                                          
+                                          - m*IntPath_Half_Low*Diff.DDy2*G;%+ IntPath_Half_Low*(phi.*(Diff.Dy2*(uv(1+end/2:end))))...
                                       
             if(IsSeppecher(this))
                 A_G  = [A_G_four,A_G];
@@ -322,7 +320,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            A_cont(Ind.right,[F;F;F;F;T]) = Diff.Dy2(Ind.right,:);
            v_cont(Ind.right,:)           = Diff.Dy2(Ind.right,:)*p;
 
-           indBC2 = Ind.right & Ind.top;
+           indBC2 = Ind.right & Ind.bottom;
 
            A_m11 = zeros(M,5*M);
            A_m11(:,[F;F;T;F;F]) = diag(fWP);
