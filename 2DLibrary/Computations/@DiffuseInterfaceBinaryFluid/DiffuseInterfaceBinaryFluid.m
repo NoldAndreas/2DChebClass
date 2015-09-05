@@ -39,7 +39,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             end           
            vec      = [vec;this.p];
        end        
-       function [v_mom,A_mom] = GetVelBC(this,uv,a,deltaX,theta)
+       function [v_mom,A_mom]         = GetVelBC(this,uv,a,deltaX,theta)
            M = this.IDC.M;           
            if(nargin == 2)
                 [v_mom,A_mom] = GetVelBC@DiffuseInterface(this,uv);
@@ -48,7 +48,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
            end
            A_mom         = [A_mom,zeros(size(A_mom,1),M)]; 
        end
-       function [v_mu_T,A_mu_T] = GetPhiBC(this,phi,theta)
+       function [v_mu_T,A_mu_T]       = GetPhiBC(this,phi,theta)
            M = this.IDC.M;           
            [v_mu_T,A_mu_T] = GetPhiBC@DiffuseInterface(this,phi,theta);                      
            A_mu_T          = [A_mu_T,zeros(size(A_mu_T,1),M)];
@@ -56,7 +56,7 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
                A_mu_T = [zeros(size(A_mu_T,1),1),A_mu_T];
            end
        end       
-       function [v_G_IBB,A_G_IBB] = GetChemPotBC(this,uv,phi,G,theta)
+       function [v_G_IBB,A_G_IBB]     = GetChemPotBC(this,uv,phi,G,theta)
            
             m              = this.optsPhys.mobility;
             Ind            = this.IDC.Ind;
@@ -210,9 +210,17 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             T              = true(M,1);   
             Z              = zeros(M,1);
             
+            %*****************************************
+            %Get beta from
+            % theta = beta + Ca*f(beta)           
+            [beta,dthetadbeta] = GetBeta(this,theta);            
             
-            u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,...
-                                                PtsCart.y2_kv],1,0,0,theta);                  
+            %Get Delta Z
+            deltaZ         = deltaX + y2Max*(1/tan(theta) - 1/tan(beta));
+            
+            u_flow         = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaZ,PtsCart.y2_kv],1,0,0,beta);                  
+            %u_flow         = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta);                  
+            %*****************************************
                                             
             y1_Interface  = PtsCart.y1_kv - (deltaX + y2Max/tan(theta));
             
@@ -251,7 +259,12 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             uvBound_deltaX = -(Dy12*u_flow)+...%.*repmat(corr,2,1)+...
                                [Z;a1_corr_deltaX+a2_corr_deltaX]; %u_flow .*
 
-            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
+            %u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaX,PtsCart.y2_kv],1,0,0,theta+d_theta);
+            dbeta            = d_theta/dthetadbeta;
+            %deltaZ          = deltaX + y2Max*(1/tan(theta) - 1/tan(beta));
+            ddeltaZ          = deltaX + y2Max*(1/tan(theta+d_theta) - 1/tan(beta+dbeta));
+
+            u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - ddeltaZ,PtsCart.y2_kv],1,0,0,beta+dbeta);
             u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;
             uvBound_theta    = u_flow_d +... %repmat(corr,2,1)
                                [Z;a1_corr_theta + a2_corr_theta];  %u_flow.*
@@ -274,6 +287,23 @@ classdef DiffuseInterfaceBinaryFluid < DiffuseInterface
             
             A_mom_IBB = A_mom(IBB,:);
             v_mom_IBB = v_mom(IBB);
+            
+       end
+       function [beta,dthetadbeta] = GetBeta(this,theta)
+           if(nargin < 2)
+               theta = this.theta;
+           end
+
+           Ca          = 3/4*this.optsPhys.Cak;
+           
+           fsolveOpts  = optimset('Display','off');
+           beta        = fsolve(@func,theta,fsolveOpts);
+           [~,dfdbeta] = f_stokes(beta,1);
+           dthetadbeta = 1 + Ca*dfdbeta;
+           
+           function y = func(b)
+                y = b + Ca*f_stokes(b,1) - theta;
+            end
        end
 
        vec_a  = FindAB(this,phi,mu,deltaX,a_ig)              

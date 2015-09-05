@@ -238,10 +238,10 @@ classdef DiffuseInterface < Computation
             a_corr_deltaX(Ind.left | Ind.right) = 0;
             a_corr_theta                        = -a_corr_deltaX*y2Max/(sin(theta)).^2;            
     
-            uvBound        = u_flow .*repmat(a_corr,2,1);                                        
+            uvBound          = u_flow .*repmat(a_corr,2,1);                                        
 
-            uvBound_a      = u_flow.*repmat(a_corr_a,2,1);               
-            uvBound_deltaX = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
+            uvBound_a        = u_flow.*repmat(a_corr_a,2,1);               
+            uvBound_deltaX   = -(Dy12*u_flow).*repmat(a_corr,2,1)+u_flow .*repmat(a_corr_deltaX,2,1);        
 
             u_flow_PTheta    = GetSeppecherSolutionCart([PtsCart.y1_kv - deltaZ,PtsCart.y2_kv],1,0,0,beta+d_theta/dthetadbeta);
             u_flow_d         = (u_flow_PTheta - u_flow)/d_theta;

@@ -803,7 +803,7 @@ function ContactLineBinaryFluid
                     dataM{k0}(i,j).config.optsNum    = DI.optsNum;
                     dataM{k0}(i,j).config.optsPhys   = DI.optsPhys;
                     
-                    dataM{k0}(i,j).Pts = DI.IDC.Pts;
+                    dataM{k0}(i,j).Pts       = DI.IDC.Pts;
                     dataM{k0}(i,j).Diff.Dy1  = DI.IDC.Diff.Dy1;
                     dataM{k0}(i,j).Diff.Dy2  = DI.IDC.Diff.Dy2;
                     dataM{k0}(i,j).Diff.DDy2 = DI.IDC.Diff.DDy2;
@@ -821,6 +821,7 @@ function ContactLineBinaryFluid
                     dataM{k0}(i,j).pMin              = min((DI.p));                              
                     dataM{k0}(i,j).IsoInterface      = DI.IsoInterface;                                
                     dataM{k0}(i,j).stagnationPointY2 = DI.StagnationPoint.y2_kv(1);                    
+                    dataM{k0}(i,j).beta              = DI.GetBeta(); 
 
                     y2 = 0:0.5:3;
                     for kk = 1:length(y2)
