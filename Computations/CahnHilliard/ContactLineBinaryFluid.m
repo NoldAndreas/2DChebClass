@@ -21,18 +21,21 @@ function ContactLineBinaryFluid
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
-    parameters.Cak   = [0.005];%;0.01];%(0.005:0.0025:0.01)';
+    parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
     parameters.y2Max = 18:2:24;%(18:2:24);            
   %  parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
 	
     %parameters.y2Max = 30:5:50;%(16:2:24);      
     %parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
-    parameters.l_d   = [0.2:0.1:1.0,1.25:0.25:3.0];%0.25:0.25:2.5;                    
+    %parameters.l_d   = [0.2:0.1:1.0];%,1.25:0.25:3.0];%0.25:0.25:2.5;
+    parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
+    
 
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
-    dataN = Rescale(dataM);clear('dataM');
+    dataN = Rescale(dataM);clear('dataM');    
     
-    
+    PlotExample(dataN,1,4,7,parameters);
+    AddPaths(['DIBinaryPaper' filesep 'NumericalExperiment']);   
     cols = {}; %{'g','b','c','k','r'};  
     nocols = 9;%length(cols);
     for iC = 1:nocols
@@ -44,8 +47,7 @@ function ContactLineBinaryFluid
     
     fileExampleVelocoties = 'D:\2DChebData\DIBinaryPaper\StagnationPoint_Velocity.fig';
 
-    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});    
-   % PlotExample(dataN,1,4,7,parameters);
+    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});       
                 
     PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend'}); xlim([0 1]); ylim([0.42 0.48]); SaveFigure('hatL_Asymptotics');
     
@@ -72,13 +74,13 @@ function ContactLineBinaryFluid
     SaveFigures(dataN,res,parameters);
      
   %  PlotAsymptoticInterfaceResults(dataN,1,'theta',{'IsoInterface'},'\theta');        
-    PlotAsymptoticInterfaceResults(dataN,[],[],'kappa',{'IsoInterface'},'\kappa');    
-    PlotAsymptoticInterfaceResults(dataN,1,[],'mu',{'IsoInterface'},'\mu');
-    PlotAsymptoticInterfaceResults(dataN,1,[],'mu_ddy2',{'IsoInterface'},'\frac{\partial^2\mu}{\partial y_2^2}');
-    PlotAsymptoticInterfaceResults(dataN,1,[],'p',{'IsoInterface'},'p');
-    PlotAsymptoticInterfaceResults(dataN,1,[],'kappa_Cakmu',{'IsoInterface'},'\kappa/(Ca_k\mu)');        
-	PlotAsymptoticInterfaceResults(dataN,1,[],'mu',{'mu_y2'},'\mu');        
-    PlotAsymptoticInterfaceResults(dataN,1,[],'mu_ddy2',{'mu_y2'},'\frac{\partial^2\mu}{\partial y_2^2}');                                           
+    PlotAsymptoticInterfaceResults(dataN,[],[],'kappa',{'IsoInterface'});    %'\kappa'
+    PlotAsymptoticInterfaceResults(dataN,1,[],'mu',{'IsoInterface'});%'\mu'
+    PlotAsymptoticInterfaceResults(dataN,1,[],'mu_ddy2',{'IsoInterface'});%'\frac{\partial^2\mu}{\partial y_2^2}'
+    PlotAsymptoticInterfaceResults(dataN,1,[],'p',{'IsoInterface'}); %'p'
+    PlotAsymptoticInterfaceResults(dataN,1,[],'kappa_Cakmu',{'IsoInterface'}); %'\kappa/(Ca_k\mu)'
+	PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','mu'),{'mu_y2'});        %,'\mu'
+    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','mu_ddy2'),{'mu_y2'}); %,'\frac{\partial^2\mu}{\partial y_2^2}'
         
     function PlotExample(dataN,i_Cak,i_y2Max,i_Cn,parameters)
         data = dataN{i_Cn}(i_Cak,i_y2Max);
@@ -134,7 +136,7 @@ function ContactLineBinaryFluid
         DI.PlotStagnationPoint();
        % DI.IDC.plotFlux(DI.uv,[],[],1,'k');%[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = 
        % DI.IDC.plotFlux(DI.flux); %[y1_s,y2_s,fl_y1_q,fl_y2_q] =         
-        SetTicksLabels(Cn);                 
+        SetTicksLabels(Cn,[-5,0,5],[0,5,10]);                 
         SaveFigure('StagnationPoint_Velocity',config);
         
         %Plot flux j_1-j_2 next to stagnation point
@@ -143,7 +145,7 @@ function ContactLineBinaryFluid
         DI.PlotU(DI.flux); %[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = 
         DI.PlotStagnationPoint();
         %DI.IDC.plotFlux(DI.flux); %[y1_s,y2_s,fl_y1_q,fl_y2_q] =         
-        SetTicksLabels(Cn);                 
+        SetTicksLabels(Cn,[-5,0,5],[0,5,10]);                                 
         SaveFigure('StagnationPoint_Flux',config);
                 
         %******* Plot 3D chemical potential, pressure and phi
@@ -158,8 +160,8 @@ function ContactLineBinaryFluid
             else
                  DI.IDC.plot(DI.(vals{k}));                 
             end                        
-            DI.PlotU([],struct('color','b','linewidth',1.4));%close all;[y1M,y2M,VIM] =   %close all;[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] =
-            SetTicksLabels(Cn);
+            DI.PlotU([],struct('color','b','linewidth',1.4));%close all;[y1M,y2M,VIM] =   %close all;[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] =            
+            SetTicksLabels(Cn,[-5,0,5],[0,5,10]);
            % surf(y1M*Cn,y2M*Cn,VIM);  hold on;
            % h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   
            % xlim(xL); ylim(yL);
@@ -328,7 +330,7 @@ function ContactLineBinaryFluid
     function SaveFigures(dataN,res,params) 
         params.comment = 'run by ContactLineBinaryFluid.m';
         [~,fn]   = fileparts(res.Filename);        
-        filename = ['NumericalExperiment' filesep fn '_'];
+        filename = [fn '_'];%'NumericalExperiment' filesep
         
         PlotAsymptoticResults(dataN,'mu_max_y20',{'mu_y2','noLegend'});    
         SaveFigure([filename, 'wall_max_mu'],params);      
@@ -338,17 +340,16 @@ function ContactLineBinaryFluid
         
         PlotAsymptoticResults(dataN,'mu_ddy2_max_y20_sqrtCn',{'mu_y2','noLegend'});
         SaveFigure([filename, 'wall_max_muddy2_sqrtCn'],params);        
-                
-        PlotAsymptoticInterfaceResults(dataN,[],[],'mu',{'mu_y2','noLegend'},'\mu');                
+                      
+        PlotAsymptoticInterfaceResults(dataN,[],[],struct('i',1,'val','mu'),{'mu_y2','noLegend'}); %'\mu'
         SaveFigure([filename, 'wall_mu'],params);
         
-        PlotAsymptoticInterfaceResults(dataN,[],[],'mu_dy1',{'mu_y2','noLegend'},'\frac{\partial\mu}{\partial y_1}');                        
+        PlotAsymptoticInterfaceResults(dataN,[],[],struct('i',1,'val','mu_dy1'),{'mu_y2','noLegend'});%'\frac{\partial\mu}{\partial y_1}'
         SaveFigure([filename, 'wall_mu_dy1'],params);
         
-        PlotAsymptoticInterfaceResults(dataN,[],[],'mu_ddy2',{'mu_y2','noLegend'},'\frac{\partial^2\mu}{\partial y_2^2}');                        
+        PlotAsymptoticInterfaceResults(dataN,[],[],struct('i',1,'val','mu_ddy2'),{'mu_y2','noLegend'});
         SaveFigure([filename, 'wall_mu_ddy2'],params);
-        
-	    
+
         PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend'}); 
         SaveFigure([filename, 'hatL'],params);
                        
@@ -746,6 +747,8 @@ function ContactLineBinaryFluid
             str = '$\frac{\partial \mu}{\partial y_1}$';
         elseif(strcmp(VarName,'mu_dy2'))
             str = '$\frac{\partial \mu}{\partial y_2}$';
+        elseif(strcmp(VarName,'mu_ddy2'))
+            str = '$\frac{\partial^2\mu}{\partial y_2^2}$';
         elseif(strcmp(VarName,'muMinusInf'))
             str = '$\mu_{y_1 = -\infty}$';
         elseif(strcmp(VarName,'muPlusInf'))
@@ -865,20 +868,42 @@ function ContactLineBinaryFluid
             end
         end        
     end  
-
-    function SetTicksLabels(Cn)
+    function SetTicksLabels(Cn,xlRed,ylRed)
+        
+        xl    = xlim;
+        if(nargin < 2)
+            xlRed = xl(1)  + [0.1,0.5,0.9]*(xl(2)-xl(1));
+            xlRed = xlRed*Cn;
+        end
+        for i = 1:length(xlRed)
+            xlRed(i) = round(xlRed(i))/Cn;
+        end
+        set(gca,'XTick',xlRed);                               
+        
         T = get(gca,'Xtick');                
         c = {};
+        R = 100;
+        
         for i = 1:length(T)
-            c{end+1} = num2str(T(i)*Cn);
+            c{end+1} = num2str(round(R*T(i)*Cn)/R);
         end
         set(gca,'XTickLabel',c);
         
         
+        yl    = ylim;
+        if(nargin < 3)
+            ylRed = yl(1)  + [0,0.5,0.9]*(yl(2)-yl(1));
+            ylRed    = ylRed*Cn;
+        end        
+        for i = 1:length(ylRed)
+            ylRed(i) = round(ylRed(i))/Cn;
+        end
+        set(gca,'YTick',ylRed);        
+        
         T = get(gca,'Ytick');                
         c = {};
         for i = 1:length(T)
-            c{end+1} = num2str(T(i)*Cn);
+            c{end+1} = num2str(round(R*T(i)*Cn)/R);
         end
         set(gca,'YTickLabel',c);                          
         

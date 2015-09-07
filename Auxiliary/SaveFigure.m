@@ -24,7 +24,7 @@ function fullName = SaveFigure(filename,opts)
         
     print2eps(fullName,gcf);
 	saveas(gcf,[fullName '.fig']);        
-    matlab2tikz([fullName '.tex']);
+    matlab2tikz([fullName '.tex'],'showInfo',false);
     
     disp(['Figures saved in ',fullName '.fig/eps']);
         
