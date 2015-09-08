@@ -1,5 +1,6 @@
 function ContactLineBinaryFluid
-    close all;    
+
+    close all;
     AddPaths('DIBinaryPaper');            
 
     PhysArea = struct('N',[50,40],'y2Min',0,'y2Max',20,...
@@ -16,25 +17,27 @@ function ContactLineBinaryFluid
     optsPhys = struct('thetaEq',pi/2,...       
                        'theta',90*pi/180,...
                        'Cak',0.01,'Cn',1,...
-                       'UWall',1,...                       
+                       'UWall',1,...
                        'l_diff',0.5,...%'mobility',10,...
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
     parameters.y2Max = 18:2:24;%(18:2:24);            
+    parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
+    
   %  parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
 	
-    %parameters.y2Max = 30:5:50;%(16:2:24);      
+  %  parameters.y2Max = 30:5:50;%(16:2:24);          
+  %  parameters.l_d   = [0.2:0.1:1.0];%,1.25:0.25:3.0];%0.25:0.25:2.5;
+    
     %parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
-    %parameters.l_d   = [0.2:0.1:1.0];%,1.25:0.25:3.0];%0.25:0.25:2.5;
-    parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
+    %parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
     
 
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
     dataN = Rescale(dataM);clear('dataM');    
-    
-    PlotExample(dataN,1,4,7,parameters);
+        
     AddPaths(['DIBinaryPaper' filesep 'NumericalExperiment']);   
     cols = {}; %{'g','b','c','k','r'};  
     nocols = 9;%length(cols);
@@ -46,6 +49,15 @@ function ContactLineBinaryFluid
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
     
     fileExampleVelocoties = 'D:\2DChebData\DIBinaryPaper\StagnationPoint_Velocity.fig';
+    
+    
+    %PlotFigure1_Thesis();
+    PlotFigure2_Thesis();    
+    %***************************************
+    %***************************************
+    %***************************************
+    %***************************************
+    
 
     PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});       
                 
@@ -82,154 +94,89 @@ function ContactLineBinaryFluid
 	PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','mu'),{'mu_y2'});        %,'\mu'
     PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','mu_ddy2'),{'mu_y2'}); %,'\frac{\partial^2\mu}{\partial y_2^2}'
         
-    function PlotExample(dataN,i_Cak,i_y2Max,i_Cn,parameters)
-        data = dataN{i_Cn}(i_Cak,i_y2Max);
-        
-        config                        = parameters.config;
-        Cn                            = data.Cn;  
-        Cak                           = data.Cak;
-        config.optsPhys.l_diff        = 1/Cn;
-        config.optsPhys.Cak           = Cak;
-        config.optsNum.PhysArea.y2Max = data.y2Max/Cn;   
-        
-        xL = [-7 7]; yL = [0 14];
-        config.optsNum.PlotArea = struct('y1Min',xL(1)/Cn,'y1Max',xL(2)/Cn,...
-                                         'y2Min',yL(1)/Cn,'y2Max',yL(2)/Cn,'N1',80,'N2',80);   
+         
+    function PlotFigure1_Thesis()
+        %***************************************
+        %%% Thesis - Figure 1
+        %***************************************
+        %***************************************
+        %%% Thesis - Figure 1 - a
+        %***************************************
+        figure('Position',[0 0 250 200],'color','white');        
+        i_y2Max = 1:4;                   
+        PlotAsymptoticInterfaceResults(dataN,1:2,i_y2Max,'mu',{'IsoInterface','noLegend','noNewFigure'});
+        xlim([0 dataN{1}(1,i_y2Max(end)).y2Max]);    
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_y2Max_mu',num2str(dataN{1}(1,1).Cak)],parameters);              
 
-        DI = DiffuseInterfaceBinaryFluid(config);
-        DI.Preprocess();
-        DI.IterationStepFullProblem();                    
-        DI.PostProcess();        
-        
-        PtsCart = DI.IDC.GetCartPts;
-        
-        %Plot Values at stagnation point
-        y2_SP = DI.StagnationPoint.y2_kv(1);
-        y1    = [-10,10]/Cn+DI.StagnationPoint.y1_kv(1);
-        [mu,pts] = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.mu); close all; mu = mu/(Cn*Cak);
-        [u,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.uv(1:end/2)); close all;
-        [v,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.uv(1+end/2:end)); close all;
-        [p,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.p); close all; p = p/Cn;
-        [j1,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.flux(1:end/2)); close all;
-        [j2,pts]  = DI.IDC.plotLine(y1,y2_SP*[1 1],DI.flux(1+end/2:end)); close all;
-        
-        lw  = 1.5;
-        y   = (pts.y1_kv - DI.StagnationPoint.y1_kv(1))*Cn;
-        figure('Position',[0 0 800 800],'color','white');
-        plot(y,mu,'-k','linewidth',lw); hold on;
-        plot(y,p,'--k','linewidth',lw);
-        plot(y,u,'-b','linewidth',lw);
-        plot(y,v,':b','linewidth',lw);
-        plot(y,j1,'-m','linewidth',lw);
-        plot(y,j2,':m','linewidth',lw);
-        
-        set(gca,'linewidth',1.5); set(gca,'fontsize',20);
-        xlabel('$y_1$','fontsize',20,'Interpreter','Latex');       
-        pbaspect([1 1 1]);        
-        config.stagnationPoint = DI.StagnationPoint;
-        SaveFigure('ValuesThroughStagnationPoint',config);               
-                        
-        %Plot velocities
-        figure('Position',[0 0 800 800],'color','white');       
-        DI.PlotResultsPhi();
-        DI.PlotU();
-        DI.PlotStagnationPoint();
-       % DI.IDC.plotFlux(DI.uv,[],[],1,'k');%[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = 
-       % DI.IDC.plotFlux(DI.flux); %[y1_s,y2_s,fl_y1_q,fl_y2_q] =         
-        SetTicksLabels(Cn,[-5,0,5],[0,5,10]);                 
-        SaveFigure('StagnationPoint_Velocity',config);
-        
-        %Plot flux j_1-j_2 next to stagnation point
-        figure('Position',[0 0 800 800],'color','white');       
-        DI.PlotResultsPhi();
-        DI.PlotU(DI.flux); %[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = 
-        DI.PlotStagnationPoint();
-        %DI.IDC.plotFlux(DI.flux); %[y1_s,y2_s,fl_y1_q,fl_y2_q] =         
-        SetTicksLabels(Cn,[-5,0,5],[0,5,10]);                                 
-        SaveFigure('StagnationPoint_Flux',config);
-                
-        %******* Plot 3D chemical potential, pressure and phi
-        vals = {'mu','p','phi'};
-        labs = {'$\mu$','p','$\phi$'};
-        for k = 1:3            
-            figure('Position',[0 0 800 800],'color','white');        
-            if(strcmp(vals{k},'mu'))
-                 DI.IDC.plot(DI.(vals{k})/(Cn*Cak)  );
-            elseif(strcmp(vals{k},'p'))
-                 DI.IDC.plot(DI.(vals{k})/Cn  );
-            else
-                 DI.IDC.plot(DI.(vals{k}));                 
-            end                        
-            DI.PlotU([],struct('color','b','linewidth',1.4));%close all;[y1M,y2M,VIM] =   %close all;[y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] =            
-            SetTicksLabels(Cn,[-5,0,5],[0,5,10]);
-           % surf(y1M*Cn,y2M*Cn,VIM);  hold on;
-           % h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   
-           % xlim(xL); ylim(yL);
-           % pbaspect([(xL(2)-xL(1))/(yL(2)-yL(1)) 1 1]);
-           % set(h,'linewidth',1.5);  %set(h,'color','k');
-            %set(gca,'linewidth',1.5); set(gca,'fontsize',20);
-            %xlabel('$y_1$','fontsize',20,'Interpreter','Latex');
-            %ylabel('$y_2$','fontsize',20,'Interpreter','Latex');
-            zlabel(labs{k},'fontsize',25,'Interpreter','Latex');  
-            SaveFigure([vals{k},'_3DPlot'],config);
-        end  
-        %         %Plot velocities next to stagnation point
-%         [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
-%         [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;                
-%         [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.uv); close all;
-%         
-% 
-%         figure('Position',[0 0 800 800],'color','white');
-%         [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
-%         h = streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
-%         quiver(y1_s*Cn,y2_s*Cn,fl_y1_q,fl_y2_q);        
-%         %quiver(y1_s_Sepp,y2_s_Sepp,fl_y1_q__Sepp,fl_y2_q__Sepp,'color','m');        
-%         plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
-%         plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
-%         
-%         set(gca,'linewidth',1.5); set(gca,'fontsize',20);
-%         xlabel('$y_1$','fontsize',20,'Interpreter','Latex');
-%         ylabel('$y_2$','fontsize',20,'Interpreter','Latex');
-%         pbaspect([1 1 1]);
-%         SaveFigure('StagnationPoint',config);
+        %***************************************
+        %%% Thesis - Figure 1 - b
+        %***************************************
+        figure('Position',[0 0 250 200],'color','white');        
+        defaultOpts = {'noLegend','noNewFigure'};    
+        PlotAsymptoticResults_Y2Max(dataN,'muMinusInf',defaultOpts); hold on;        
+        xlim([18 24]); ylim([-0.3 -0.2]);
+        set(gca,'YTick',[-0.3,-0.25,-0.2]);
+        set(gca,'XTick',[18 20 22 24]);
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_y2Max_muMinusInf',num2str(dataN{1}(1,1).Cak)],parameters);              
+        %PlotAsymptoticResults_Y2Max(dataN,'muPlusInf',defaultOpts);
 
-        %************************************
-        %************************************
-        %************************************
-        %Plot wider area
-        DI.optsNum.PlotArea = struct('y1Min',-10/Cn,'y1Max',10/Cn,...
-                                     'y2Min',0/Cn,'y2Max',20/Cn,'N1',80,'N2',80);   
-        DI.IDC.InterpolationPlotCart(DI.optsNum.PlotArea,true);
-        
-         %Plot flux j_1-j_2 next to stagnation point
-         %Plot velocities next to stagnation point         
-         uSepp = GetSeppecherSolutionCart_Blurred([PtsCart.y1_kv - DI.deltaX,...
-                                                PtsCart.y2_kv],1,0,0,DI.theta);
-        [y1_s_Sepp,y2_s_Sepp,fl_y1_q__Sepp,fl_y2_q__Sepp] = DI.IDC.plotFlux(uSepp); close all;                                                             
-        [y1MU_Sepp,y2MU_Sepp,fl_y1_Sepp,fl_y2_Sepp,startMask1_Sepp,startMask2_Sepp] = DI.PlotU(uSepp); close all;                
-        
-        [y1M,y2M,VIM] = DI.IDC.plot(DI.phi,'contour'); close all;
-        [y1MU,y2MU,fl_y1,fl_y2,startMask1,startMask2] = DI.PlotU(); close all;                
-        [y1_s,y2_s,fl_y1_q,fl_y2_q] = DI.IDC.plotFlux(DI.uv); close all;
-        
+        %***************************************
+        %%% Thesis - Figure 1 - c
+        %***************************************
+        figure('Position',[0 0 250 200],'color','white');        
+        PlotAsymptoticResults_Y2Max(dataN,'stagnationPointY2',defaultOpts)
+        xlim([18 24]); ylim([2.44 2.5]);        
+        set(gca,'YTick',[2.44,2.46,2.48,2.5]);
+        set(gca,'XTick',[18 20 22 24]);
 
-        figure('Position',[0 0 800 800],'color','white');
-        [C,h] = contour(y1M*Cn,y2M*Cn,VIM,'linewidth',2.5);  hold on;        
-        streamline(y1MU*Cn,y2MU*Cn,fl_y1,fl_y2,startMask1*Cn,startMask2*Cn);   hold on;
-        h = streamline(y1MU_Sepp*Cn,y2MU_Sepp*Cn,fl_y1_Sepp,fl_y2_Sepp,startMask1_Sepp*Cn,startMask2_Sepp*Cn);   hold on;
-        set(h,'color','m');
-        quiver(y1_s*Cn,y2_s*Cn,fl_y1_q,fl_y2_q);        
-        quiver(y1_s_Sepp*Cn,y2_s_Sepp*Cn,fl_y1_q__Sepp,fl_y2_q__Sepp,'color','m');        
-        plot(DI.IsoInterface.h*Cn,DI.IDC.Pts.y2*Cn,'k','linewidth',3);
-        plot(DI.StagnationPoint.y1_kv(1)*Cn,DI.StagnationPoint.y2_kv(1)*Cn,'o','MarkerFaceColor','m','MarkerSize',12)
-        
-        set(gca,'linewidth',1.5); set(gca,'fontsize',20);
-        xlabel('$y_1$','fontsize',20,'Interpreter','Latex');
-        ylabel('$y_2$','fontsize',20,'Interpreter','Latex');
-        pbaspect([1 1 1]);
-        SaveFigure('CoxComparison',config);                  
-        
-    end    
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_y2Max_y2S',num2str(dataN{1}(1,1).Cak)],parameters);              
+        %***************************************
+        %***************************************
+        %***************************************    
+    end
+
+    function PlotFigure2_Thesis()
+        %***************************************
+        %%% Thesis - Figure 2
+        %***************************************
+        %***************************************
+        %%% Thesis - Figure 2 - a
+        %***************************************
+        defaultOpts = {'noLegend','noNewFigure'};  
+        figure('Position',[0 0 250 200],'color','white');        	
+        PlotAsymptoticResults(dataN,'muMaxAbs',defaultOpts);
+        xlim([0 1]);   set(gca,'XTick',[0 0.5 1]);
+        set(gca,'YTick',[1.6 1.7 1.8]);
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_Cn_mu',num2str(dataN{1}(1,1).Cak)],parameters);              
+
+        %***************************************
+        %%% Thesis - Figure 2 - b
+        %***************************************
+        figure('Position',[0 0 250 200],'color','white');              
+        PlotAsymptoticResults(dataN,'muMinusInf',defaultOpts); hold on;        
+        xlim([0 1]); ylim([-0.3 -0.2]);
+        set(gca,'YTick',[-0.3,-0.25,-0.2]);
+        set(gca,'XTick',[0 0.5 1]);
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_Cn_muMinusInf',num2str(dataN{1}(1,1).Cak)],parameters);              
+        %PlotAsymptoticResults_Y2Max(dataN,'muPlusInf',defaultOpts);
+
+        %***************************************
+        %%% Thesis - Figure 2 - c
+        %***************************************
+        figure('Position',[0 0 250 200],'color','white');        
+        PlotAsymptoticResults(dataN,'stagnationPointY2',defaultOpts)
+        xlim([0 1]); ylim([2.44 2.5]);        
+        set(gca,'YTick',[2.44,2.46,2.48,2.5]);
+        set(gca,'XTick',[0 0.5 1]);
+
+        ylabel([]); pbaspect([1 1 1]);
+        SaveFigure(['Interface_Cn_y2S',num2str(dataN{1}(1,1).Cak)],parameters);              
+    end
     function Plot3D(dataN,i_Cak,i_y2Max)        
         
         Ca = dataN{1}(i_Cak,i_y2Max).Ca;            
@@ -466,7 +413,7 @@ function ContactLineBinaryFluid
                                 
                 plot(Cn,par,...
                     [lin,sym,'k'],'linewidth',1.5,...
-                    'MarkerSize',8,'MarkerFaceColor','k'); hold on;                
+                    'MarkerSize',4,'MarkerFaceColor','k'); hold on;                
                 
                 legendstr(end+1) = {['Ca = ',num2str(Ca),' y_{2,Max} = ',num2str(dataM{1}(i_Cak,j2).y2Max)]};
              end  
@@ -868,51 +815,7 @@ function ContactLineBinaryFluid
             end
         end        
     end  
-    function SetTicksLabels(Cn,xlRed,ylRed)
-        
-        xl    = xlim;
-        if(nargin < 2)
-            xlRed = xl(1)  + [0.1,0.5,0.9]*(xl(2)-xl(1));
-            xlRed = xlRed*Cn;
-        end
-        for i = 1:length(xlRed)
-            xlRed(i) = round(xlRed(i))/Cn;
-        end
-        set(gca,'XTick',xlRed);                               
-        
-        T = get(gca,'Xtick');                
-        c = {};
-        R = 100;
-        
-        for i = 1:length(T)
-            c{end+1} = num2str(round(R*T(i)*Cn)/R);
-        end
-        set(gca,'XTickLabel',c);
-        
-        
-        yl    = ylim;
-        if(nargin < 3)
-            ylRed = yl(1)  + [0,0.5,0.9]*(yl(2)-yl(1));
-            ylRed    = ylRed*Cn;
-        end        
-        for i = 1:length(ylRed)
-            ylRed(i) = round(ylRed(i))/Cn;
-        end
-        set(gca,'YTick',ylRed);        
-        
-        T = get(gca,'Ytick');                
-        c = {};
-        for i = 1:length(T)
-            c{end+1} = num2str(round(R*T(i)*Cn)/R);
-        end
-        set(gca,'YTickLabel',c);                          
-        
-        set(gca,'linewidth',1.5); set(gca,'fontsize',25);
-        xlabel('$y_1$','fontsize',25,'Interpreter','Latex');
-        ylabel('$y_2$','fontsize',25,'Interpreter','Latex');        
-        pbaspect([1 1 1]);
-     
-    end
+    
 end
 
 
