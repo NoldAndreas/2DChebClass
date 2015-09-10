@@ -319,9 +319,9 @@ classdef DiffuseInterface < Computation
             %Compute values on Interface 
             pts.y1_kv = this.IsoInterface.h;
             pts.y2_kv = y2;            
-            IP        = this.IDC.SubShapePtsCart(pts);
+            IP        = this.IDC.SubShapePtsCart(pts);                                    
             u1        = this.uv(1:end/2);
-            u2        = this.uv(1+end/2:end);
+            u2        = this.uv(1+end/2:end);            
             
             this.IsoInterface.IP      = IP;
             this.IsoInterface.y2      = y2;
@@ -335,7 +335,24 @@ classdef DiffuseInterface < Computation
             
             this.IsoInterface.kappa = (Diff.DDx*interface)./((1+(Diff.Dx*interface).^2).^(3/2));   
             this.IsoInterface.u_n   = sin(th).*(IP*u1)  - cos(th).*(IP*u2);
-            this.IsoInterface.u_t   = cos(th).*(IP*u1) + sin(th).*(IP*u2);                                    
+            this.IsoInterface.u_t   = cos(th).*(IP*u1) + sin(th).*(IP*u2);                         
+            
+            %Compute jump across interface
+            Cn     = this.optsPhys.Cn;
+            DeltaZ = 2*Cn;
+            pts_right.y1_kv = pts.y1_kv + DeltaZ*cos(th-pi/2);
+            pts_right.y2_kv = pts.y2_kv + DeltaZ*sin(th-pi/2);
+            
+            pts_left.y1_kv  = pts.y1_kv - DeltaZ*cos(th-pi/2);
+            pts_left.y2_kv  = pts.y2_kv - DeltaZ*sin(th-pi/2);
+            
+            IP_Jump = this.IDC.SubShapePtsCart(pts_left) - this.IDC.SubShapePtsCart(pts_right);
+            
+            this.IsoInterface.Jump_uv     = blkdiag(IP_Jump,IP_Jump)*this.uv;
+            this.IsoInterface.Jump_Gradmu = blkdiag(IP_Jump,IP_Jump)*(this.IDC.Diff.grad*this.mu);
+            this.IsoInterface.Jump_mu = IP_Jump*this.mu;
+            this.IsoInterface.Jump_p  = IP_Jump*this.p;
+            %dont forget tau!!
             
             function z = phiX1(y1)
                 pt.y1_kv = y1;

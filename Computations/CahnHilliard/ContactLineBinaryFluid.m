@@ -56,7 +56,8 @@ function ContactLineBinaryFluid
     %PlotFigure2_Thesis();    
     %PlotFigure3_Thesis();	
     %PlotFigure4_Thesis();	
-    PlotFigure5_Thesis();
+    %PlotFigure5_Thesis();
+    PlotFigure6_Thesis();    
     %***************************************
     %***************************************
     %***************************************
@@ -253,6 +254,25 @@ function ContactLineBinaryFluid
         %title('$\left.\mu\right|_{y_1 = y_{1,\mathcal{I}}}$','Interpreter','Latex');        
         SaveFigure(['Interface_y2Max_mudy1',num2str(dataN{1}(1,1).Cak)],parameters);              
     end
+    function PlotFigure6_Thesis()
+        iy2Max = 3;
+        iCak   = 1;        
+        Ca     = dataN{1}(iCak,1).Ca;
+        xl     = [-15,15];
+        
+        figure('Position',[0 0 300 250],'color','white');
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,struct('i',1,'val','mu_ddy2'),{'mu_y2','noLegend','noNewFigure'},xl); %,'\frac{\partial^2\mu}{\partial y_2^2}'
+        xlim(xl);
+        ylim([0 1.5]);    
+        %ylabel([]);
+        SaveFigure(['Wall_FluxFromBulk_muddy2',num2str(Ca)],parameters);
+        
+        figure('Position',[0 0 300 250],'color','white');
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,struct('i',1,'val','mu_dy1'),{'mu_y2','noLegend','noNewFigure',},xl); %,'\frac{\partial^2\mu}{\partial y_2^2}'
+        xlim(xl);
+        %ylabel([]);
+        SaveFigure(['Wall_FluxAlongWall_mudy1',num2str(Ca)],parameters);
+    end
     %********************************************************
     %********************************************************
     function Plot3D(dataN,i_Cak,i_y2Max)        
@@ -383,7 +403,7 @@ function ContactLineBinaryFluid
               
         SaveFigure([filename, 'Interface_KappaCak_Mu'],params);
     end
-    function PlotAsymptoticInterfaceResults(dataM,i_Cak,i_y2Max,value,opts)
+    function PlotAsymptoticInterfaceResults(dataM,i_Cak,i_y2Max,value,opts,xl)
         if(nargin < 4)
             opts = {};                        
         end        
@@ -426,13 +446,18 @@ function ContactLineBinaryFluid
                         val = dataM{j0}(j1,j2).mu_y1{value.i}.(value.val);
                         y  = dataM{j0}(j1,j2).mu_y1{value.i}.pts.y2_kv;   
                     end
-
+                    
+                    if(nargin >= 6 )
+                        mark = ((y < xl(2)) & (y > xl(1)));
+                    else
+                        mark = true(size(y));
+                    end
                     if(IsOption(opts,'SC'))
-                        plot(y,val,[lin,sym],...
+                        plot(y(mark),val(mark),[lin,sym],...
                             'color',col,...
                             'MarkerSize',2,'MarkerFaceColor',col);
                     else
-                        plot(y,val,[lin],'color',col,'linewidth',1.); 
+                        plot(y(mark),val(mark),[lin],'color',col,'linewidth',1.); 
                     end
                     hold on;                                
                     if(size(dataM{1},2)>1)
