@@ -339,7 +339,7 @@ classdef DiffuseInterface < Computation
             
             %Compute jump across interface
             Cn     = this.optsPhys.Cn;
-            DeltaZ = 2*Cn;
+            DeltaZ = 1.5*Cn;
             pts_right.y1_kv = pts.y1_kv + DeltaZ*cos(th-pi/2);
             pts_right.y2_kv = pts.y2_kv + DeltaZ*sin(th-pi/2);
             
@@ -352,6 +352,17 @@ classdef DiffuseInterface < Computation
             this.IsoInterface.Jump_Gradmu = blkdiag(IP_Jump,IP_Jump)*(this.IDC.Diff.grad*this.mu);
             this.IsoInterface.Jump_mu = IP_Jump*this.mu;
             this.IsoInterface.Jump_p  = IP_Jump*this.p;
+            
+            [A11,b11] = FullStressTensorIJ(this,this.phi,1,1);
+            tau11 = A11*[this.p;this.uv] + b11;
+            [A12,b12] = FullStressTensorIJ(this,this.phi,1,2);
+            tau12 = A12*[this.p;this.uv] + b12;
+            [A22,b22] = FullStressTensorIJ(this,this.phi,2,2);
+            tau22 = A22*[this.p;this.uv] + b22;
+            
+            this.IsoInterface.Jump_tau11 = IP_Jump*tau11;
+            this.IsoInterface.Jump_tau12 = IP_Jump*tau12;
+            this.IsoInterface.Jump_tau22 = IP_Jump*tau22;
             %dont forget tau!!
             
             function z = phiX1(y1)
