@@ -11,7 +11,7 @@
     global loadAll
      
     if(exist('D:\','dir'))
-        dirData    = 'D:\2DChebData';    
+        dirData    = 'E:\2DChebData';    
         dirDDFT    = pwd;
     elseif(exist('/Users/NoldAndreas/','dir'))
         dirData    = '/Users/NoldAndreas/Documents/2DChebData';

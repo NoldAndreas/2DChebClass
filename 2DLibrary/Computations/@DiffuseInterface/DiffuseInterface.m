@@ -325,6 +325,8 @@ classdef DiffuseInterface < Computation
             
             this.IsoInterface.IP      = IP;
             this.IsoInterface.y2      = y2;
+            y10                       = this.IsoInterface.h(1);
+            this.IsoInterface.r       = sqrt(y2.^2 + (pts.y1_kv-y10));
             this.IsoInterface.mu      = IP*this.mu;                        
             this.IsoInterface.mu_ddy2 = IP*(this.IDC.Diff.DDy2*this.mu);     
                         
@@ -340,30 +342,56 @@ classdef DiffuseInterface < Computation
             %Compute jump across interface
             Cn     = this.optsPhys.Cn;
             DeltaZ = 1.5*Cn;
-            pts_right.y1_kv = pts.y1_kv + DeltaZ*cos(th-pi/2);
-            pts_right.y2_kv = pts.y2_kv + DeltaZ*sin(th-pi/2);
+            alpha  = th-pi/2;
+            pts_right.y1_kv = pts.y1_kv + DeltaZ*cos(alpha);
+            pts_right.y2_kv = pts.y2_kv + DeltaZ*sin(alpha);
             
-            pts_left.y1_kv  = pts.y1_kv - DeltaZ*cos(th-pi/2);
-            pts_left.y2_kv  = pts.y2_kv - DeltaZ*sin(th-pi/2);
+            pts_left.y1_kv  = pts.y1_kv - DeltaZ*cos(alpha);
+            pts_left.y2_kv  = pts.y2_kv - DeltaZ*sin(alpha);
             
             IP_Jump = this.IDC.SubShapePtsCart(pts_left) - this.IDC.SubShapePtsCart(pts_right);
             
-            this.IsoInterface.Jump_uv     = blkdiag(IP_Jump,IP_Jump)*this.uv;
-            this.IsoInterface.Jump_Gradmu = blkdiag(IP_Jump,IP_Jump)*(this.IDC.Diff.grad*this.mu);
+            
+            J_u1 = IP_Jump*this.uv(1:end/2);
+            J_u2 = IP_Jump*this.uv(1+end/2:end);
+            this.IsoInterface.Jump_u_1  = J_u1;
+            this.IsoInterface.Jump_u_2  = J_u2;
+            this.IsoInterface.Jump_u_n  = sin(th).*J_u1 - cos(th).*J_u2;
+            this.IsoInterface.Jump_u_t  = cos(th).*J_u1 + sin(th).*J_u2;
+                        
+            J_dmudy1                           = IP_Jump*(this.IDC.Diff.Dy1*this.mu);
+            J_dmudy2                           = IP_Jump*(this.IDC.Diff.Dy2*this.mu);
+            this.IsoInterface.Jump_DmuDy1      = J_dmudy1;
+            this.IsoInterface.Jump_DmuDy2      = J_dmudy2;
+            this.IsoInterface.Jump_Gradmu_dnu  = sin(th).*J_dmudy1 - cos(th).*J_dmudy2;
+            this.IsoInterface.Jump_Gradmu_dt   = cos(th).*J_dmudy1 + sin(th).*J_dmudy2;                         
+            
             this.IsoInterface.Jump_mu = IP_Jump*this.mu;
             this.IsoInterface.Jump_p  = IP_Jump*this.p;
             
-            [A11,b11] = FullStressTensorIJ(this,this.phi,1,1);
-            tau11 = A11*[this.p;this.uv] + b11;
-            [A12,b12] = FullStressTensorIJ(this,this.phi,1,2);
-            tau12 = A12*[this.p;this.uv] + b12;
-            [A22,b22] = FullStressTensorIJ(this,this.phi,2,2);
-            tau22 = A22*[this.p;this.uv] + b22;
+            %[A11,b11] = FullStressTensorIJ(this,this.phi,1,1);
+            %tau11 = A11*[this.p;this.uv] + b11;
+            %[A12,b12] = FullStressTensorIJ(this,this.phi,1,2);
+            %tau12 = A12*[this.p;this.uv] + b12;
+            %[A22,b22] = FullStressTensorIJ(this,this.phi,2,2);
+            %tau22 = A22*[this.p;this.uv] + b22;
             
-            this.IsoInterface.Jump_tau11 = IP_Jump*tau11;
-            this.IsoInterface.Jump_tau12 = IP_Jump*tau12;
-            this.IsoInterface.Jump_tau22 = IP_Jump*tau22;
-            %dont forget tau!!
+            tau11 = this.IDC.Diff.Dy1*u1;
+            tau12 = 1/2*(this.IDC.Diff.Dy1*u2+this.IDC.Diff.Dy2*u1);
+            tau22 = this.IDC.Diff.Dy2*u2;
+            
+            Jump_tau11 = IP_Jump*tau11;
+            Jump_tau12 = IP_Jump*tau12;
+            Jump_tau22 = IP_Jump*tau22;
+                        
+            this.IsoInterface.Jump_tau11 = Jump_tau11;
+            this.IsoInterface.Jump_tau12 = Jump_tau12;
+            this.IsoInterface.Jump_tau22 = Jump_tau22;
+            
+            S = sin(alpha); C = cos(alpha);
+            this.IsoInterface.Jump_tau_nn = (C.^2).*Jump_tau11 + 2*C.*S.*Jump_tau12 + (S.^2).*Jump_tau22;
+            this.IsoInterface.Jump_tau_nt = -C.*S.*Jump_tau11 + (C.^2 - S.^2).*Jump_tau12 + S.*C.*Jump_tau22;
+            this.IsoInterface.Jump_tau_tt = (S.^2).*Jump_tau11 - 2*C.*S.*Jump_tau12 + (C.^2).*Jump_tau22;            
             
             function z = phiX1(y1)
                 pt.y1_kv = y1;

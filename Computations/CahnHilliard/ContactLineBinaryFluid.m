@@ -51,13 +51,15 @@ function ContactLineBinaryFluid
     
     fileExampleVelocoties = 'D:\2DChebData\DIBinaryPaper\StagnationPoint_Velocity.fig';
     
+        
     
     %PlotFigure1_Thesis();
     %PlotFigure2_Thesis();    
     %PlotFigure3_Thesis();	
     %PlotFigure4_Thesis();	
     %PlotFigure5_Thesis();
-    PlotFigure6_Thesis();    
+    %PlotFigure6_Thesis();    
+    PlotFigure7_Thesis();
     %***************************************
     %***************************************
     %***************************************
@@ -273,6 +275,29 @@ function ContactLineBinaryFluid
         %ylabel([]);
         SaveFigure(['Wall_FluxAlongWall_mudy1',num2str(Ca)],parameters);
     end
+    function PlotFigure7_Thesis()
+        iCak   = 1;
+        iy2Max = 3;
+        Ca     = dataN{1}(iCak,1).Ca;
+        
+        %dataM{l_d}[Cak,y2Max]
+        xl = [0 max(dataN{1}(iCak,iy2Max).IsoInterface.r)];
+        
+        figure('Position',[0 0 500 700],'color','white');
+        subplot(3,2,1);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCa',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        subplot(3,2,2);        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCb',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        subplot(3,2,3);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        subplot(3,2,4);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        subplot(3,2,5);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCe',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        subplot(3,2,6);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        SaveFigure(['BCs_along_Interface',num2str(Ca)],parameters);
+    end
     %********************************************************
     %********************************************************
     function Plot3D(dataN,i_Cak,i_y2Max)        
@@ -426,7 +451,7 @@ function ContactLineBinaryFluid
         end
         if(length(i_Cak) == 1)
             title(['Ca = ',num2str(dataM{1}(i_Cak,1).Ca)]);
-        end
+        end        
         
         for j1 = i_Cak
             lin   = lines{mod(j1-1,nolines)+1};
@@ -438,7 +463,7 @@ function ContactLineBinaryFluid
 
                     if(IsOption(opts,'IsoInterface'))
                         val = dataM{j0}(j1,j2).IsoInterface.(value); 
-                        y  = dataM{j0}(j1,j2).IsoInterface.y2;
+                        y  = dataM{j0}(j1,j2).IsoInterface.r;%y2;
                     elseif(IsOption(opts,'mu_y2'))                        
                         val = dataM{j0}(j1,j2).mu_y2{value.i}.(value.val);                        
                         y  = dataM{j0}(j1,j2).mu_y2{value.i}.pts.y1_kv - dataN{j0}(j1,j2).mu_y2{value.i}.y1_contactLine;   
@@ -450,7 +475,7 @@ function ContactLineBinaryFluid
                     if(nargin >= 6 )
                         mark = ((y < xl(2)) & (y > xl(1)));
                     else
-                        mark = true(size(y));
+                        mark = true(size(val));
                     end
                     if(IsOption(opts,'SC'))
                         plot(y(mark),val(mark),[lin,sym],...
@@ -464,7 +489,8 @@ function ContactLineBinaryFluid
                         legendstr(end+1) = {['Cn = ',num2str(Cn),' y_{2,Max} = ',num2str(dataM{j0}(j1,j2).y2Max)]};
                     else
                         legendstr(end+1) = {['Cn = ',num2str(Cn)]};
-                    end
+                    end                                        
+                    
                 end
             end  
         end
@@ -476,8 +502,10 @@ function ContactLineBinaryFluid
         
         if(IsOption(opts,'mu_y2'))
             xlabel('$y_1 - y_{1,CL}$','Interpreter','Latex','fontsize',20);
-        else
+        elseif(IsOption(opts,'mu_y1'))
             xlabel('$y_2$','Interpreter','Latex','fontsize',20);
+        elseif(IsOption(opts,'IsoInterface'))
+            xlabel('$r$','Interpreter','Latex','fontsize',20);            
         end
         ylabel(ylabelStr,'Interpreter','Latex','fontsize',20);  
                 
@@ -766,19 +794,51 @@ function ContactLineBinaryFluid
                     
                     
                     dataN{k0}(k1,k2).IsoInterface.y2       = dataM{k0}(k1,k2).IsoInterface.y2*Cn;
+                    dataN{k0}(k1,k2).IsoInterface.h        = dataM{k0}(k1,k2).IsoInterface.h*Cn;                    
+                    dataN{k0}(k1,k2).IsoInterface.r        = dataM{k0}(k1,k2).IsoInterface.r*Cn;                    
+                    
                     dataN{k0}(k1,k2).IsoInterface.theta    = dataM{k0}(k1,k2).IsoInterface.theta;
                     dataN{k0}(k1,k2).IsoInterface.hatL     = dataM{k0}(k1,k2).IsoInterface.hatL*Cn;
                     dataN{k0}(k1,k2).IsoInterface.mu_ddy2  = dataM{k0}(k1,k2).IsoInterface.mu_ddy2/(Cn^3*Cak);
-                    dataN{k0}(k1,k2).IsoInterface.u_n  = dataM{k0}(k1,k2).IsoInterface.u_n;
-                    dataN{k0}(k1,k2).IsoInterface.u_t  = dataM{k0}(k1,k2).IsoInterface.u_t;
+                    dataN{k0}(k1,k2).IsoInterface.u_n      = dataM{k0}(k1,k2).IsoInterface.u_n;
+                    dataN{k0}(k1,k2).IsoInterface.u_t      = dataM{k0}(k1,k2).IsoInterface.u_t;
                     dataN{k0}(k1,k2).IsoInterface.flux_n  = dataM{k0}(k1,k2).IsoInterface.flux_n;
                     dataN{k0}(k1,k2).IsoInterface.flux_t  = dataM{k0}(k1,k2).IsoInterface.flux_t;
-                    
                     
                     dataN{k0}(k1,k2).IsoInterface.kappa = dataM{k0}(k1,k2).IsoInterface.kappa/Cn;
                     dataN{k0}(k1,k2).IsoInterface.p     = dataM{k0}(k1,k2).IsoInterface.p/Cn;
                     dataN{k0}(k1,k2).IsoInterface.mu    = dataM{k0}(k1,k2).IsoInterface.mu/(Cak*Cn);
                     dataN{k0}(k1,k2).IsoInterface.kappa_Cakmu       = dataM{k0}(k1,k2).IsoInterface.kappa./dataM{k0}(k1,k2).IsoInterface.mu;
+                    
+                    
+                    dataN{k0}(k1,k2).IsoInterface.Jump_u_1     = dataM{k0}(k1,k2).IsoInterface.Jump_u_1;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_u_2     = dataM{k0}(k1,k2).IsoInterface.Jump_u_2;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_u_n     = dataM{k0}(k1,k2).IsoInterface.Jump_u_n;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_u_t     = dataM{k0}(k1,k2).IsoInterface.Jump_u_t;
+                    
+                    dataN{k0}(k1,k2).IsoInterface.Jump_DmuDy1     = dataM{k0}(k1,k2).IsoInterface.Jump_DmuDy1/(Cak*Cn.^2);
+                    dataN{k0}(k1,k2).IsoInterface.Jump_DmuDy2     = dataM{k0}(k1,k2).IsoInterface.Jump_DmuDy2/(Cak*Cn.^2);
+                    dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu = dataM{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu/(Cak*Cn.^2);
+                    dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dt  = dataM{k0}(k1,k2).IsoInterface.Jump_Gradmu_dt/(Cak*Cn.^2);                    
+                    
+                    dataN{k0}(k1,k2).IsoInterface.Jump_mu     = dataM{k0}(k1,k2).IsoInterface.Jump_mu/(Cak*Cn);
+                    dataN{k0}(k1,k2).IsoInterface.Jump_p      = dataM{k0}(k1,k2).IsoInterface.Jump_p/Cn;
+    
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau11  = dataM{k0}(k1,k2).IsoInterface.Jump_tau11/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau12  = dataM{k0}(k1,k2).IsoInterface.Jump_tau12/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau22  = dataM{k0}(k1,k2).IsoInterface.Jump_tau22/Cn;
+                    
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn  = dataM{k0}(k1,k2).IsoInterface.Jump_tau_nn/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau_nt  = dataM{k0}(k1,k2).IsoInterface.Jump_tau_nt/Cn;
+                    dataN{k0}(k1,k2).IsoInterface.Jump_tau_tt  = dataM{k0}(k1,k2).IsoInterface.Jump_tau_tt/Cn;
+                    
+                    dataN{k0}(k1,k2).IsoInterface.BCa = dataN{k0}(k1,k2).IsoInterface.Jump_u_n;
+                    dataN{k0}(k1,k2).IsoInterface.BCb = dataN{k0}(k1,k2).IsoInterface.Jump_mu;
+                    dataN{k0}(k1,k2).IsoInterface.BCc = -dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu-(2*dataN{k0}(k1,k2).IsoInterface.u_n);
+                    dataN{k0}(k1,k2).IsoInterface.BCd = 2/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./dataN{k0}(k1,k2).IsoInterface.mu;
+                    dataN{k0}(k1,k2).IsoInterface.BCe = dataN{k0}(k1,k2).IsoInterface.Jump_tau_nt;
+                    dataN{k0}(k1,k2).IsoInterface.BCf = 4/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./(-dataN{k0}(k1,k2).IsoInterface.Jump_p+dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn);
+                                             
                 end
             end
         end
