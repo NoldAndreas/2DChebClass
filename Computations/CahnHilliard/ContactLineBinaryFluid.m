@@ -60,7 +60,7 @@ function ContactLineBinaryFluid
     %PlotFigure5_Thesis();
     %PlotFigure6_Thesis();    
     PlotFigure7_Thesis();
-    PlotFigure8_Thesis();
+    %PlotFigure8_Thesis();
     %***************************************
     %***************************************
     %***************************************
@@ -284,12 +284,40 @@ function ContactLineBinaryFluid
         
         %dataM{l_d}[Cak,y2Max]
         xl = [0 max(dataN{1}(iCak,iy2Max).IsoInterface.r)];
-        blue = [0 0 1];                
+        blue  = [0 0 1];     
+        %green = [0 1 0];
+        red   = [1 0 0];        
+        defaultOpts = {'noLegend','noNewFigure','IsoInterface'};
         
-        figure('Position',[0 0 650 800],'color','white');        
+        fsub_c = figure('Position',[0 0 300 250],'color','white');     
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_left',defaultOpts,[],red);   xlim(xl);        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_right',defaultOpts,[],blue);   xlim(xl);                        
+        ylim([-0.5 2.5]);set(gca,'YTick',[0 2]);
+        pbaspect([1 1 1]);
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);                
+        
+        fsub_d = figure('Position',[0 0 300 250],'color','white');                
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_left',defaultOpts,[],red);   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_right',defaultOpts,[],blue);   xlim(xl);
+        ylim([-2 0]);    set(gca,'YTick',[-2 0]);    
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);
+        
+        fsub_f = figure('Position',[0 0 300 250],'color','white');        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_left',defaultOpts,[],red);   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_right',defaultOpts,[],blue);   xlim(xl);
+        ylim([0 4]);        set(gca,'YTick',[0 4]);
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);
+        
+        fMain = figure('Position',[0 0 600 750],'color','white');        
         
         subplot(3,2,1); %figure('Position',[0 0 300 250],'color','white');        
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCa',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCa',defaultOpts);   xlim(xl);
         title('(a)');
         ylabel('$\llbracket {\normalVec \cdot \vel} \rrbracket$','Interpreter','Latex');                
         pbaspect([1 1 1]);
@@ -298,36 +326,40 @@ function ContactLineBinaryFluid
         %SaveFigure(['BC_a_along_Interface',num2str(Ca)],parameters);
         
         subplot(3,2,2); %figure('Position',[0 0 300 250],'color','white');               
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCb',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCb',defaultOpts);   xlim(xl);
         ylabel('$\llbracket \mu^{\pm} \rrbracket$','Interpreter','Latex');
         title('(b)'); ylim([-0.005 0.005]); pbaspect([1 1 1]); 
         %SaveFigure(['BC_b_along_Interface',num2str(Ca)],parameters);
         
         subplot(3,2,3); %figure('Position',[0 0 300 250],'color','white');               
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_left',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);        
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_right',{'noLegend','noNewFigure','IsoInterface','SC'},[],blue);   xlim(xl);                        
-        ylabel('$\left\{ \llbracket \normalVec \cdot \Grad \mu^{\pm} \rrbracket,{\color{blue} 2 (\normalVec \cdot \vel)}\right\}$','Interpreter','Latex');
-        title('(c)'); ylim([-0.5 2.5]); pbaspect([1 1 1]);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc',defaultOpts);   xlim(xl);        
+        ylim([-1.5 0.2]); %set(gca,'YTick',[-1.5 -1 -0.5 0]);
+        ylabel('${\color{red} \llbracket \normalVec \cdot \Grad \mu^{\pm} \rrbracket}-{\color{blue} 2 (\normalVec \cdot \vel)}$','Interpreter','Latex');        
+        title('(c)'); pbaspect([1 1 1]);
+        inset2(fMain,fsub_c,0.15,[0.25,0.45]);  
         %SaveFigure(['BC_c_along_Interface',num2str(Ca)],parameters);
                 
         subplot(3,2,4); %figure('Position',[0 0 300 250],'color','white');               
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_left',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_right',{'noLegend','noNewFigure','IsoInterface','SC'},[],blue);   xlim(xl);
-        ylabel('$\left\{\llbracket \frac{2}{3}\frac{\kappa}{Ca_k} \rrbracket,{\color{blue} \mu^{\pm}}\right\}$','Interpreter','Latex');
-        title('(d)'); ylim([-2 0]); pbaspect([1 1 1]);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd',defaultOpts);   xlim(xl);        
+        ylim([-0.02 0.15]); set(gca,'YTick',[0 0.05 0.1 0.15]); set(gca,'XTickLabel',{'0','0.05','0.1','0.15'});
+        
+        ylabel('${\color{red}\llbracket \frac{2}{3}\frac{\kappa}{Ca_k} \rrbracket} - {\color{blue} \mu^{\pm}}$','Interpreter','Latex');
+        title('(d)'); pbaspect([1 1 1]);
+        inset2(fMain,fsub_d,0.15,[0.71,0.47]);  
         %SaveFigure(['BC_d_along_Interface',num2str(Ca)],parameters);
         
         subplot(3,2,5); %figure('Position',[0 0 300 250],'color','white');               
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCe',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCe',defaultOpts);   xlim(xl);
         ylabel('$\llbracket  \IrrevStressTensor^{12} \rrbracket$','Interpreter','Latex');
         title('(e)'); ylim([-0.01 0.002]); pbaspect([1 1 1]);
         %SaveFigure(['BC_e_along_Interface',num2str(Ca)],parameters);        
         
-        subplot(3,2,6); %figure('Position',[0 0 300 250],'color','white');               
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_left',{'noLegend','noNewFigure','IsoInterface','SC'});   xlim(xl);
-        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_right',{'noLegend','noNewFigure','IsoInterface','SC'},[],blue);   xlim(xl);
-        ylabel('$\left\{\llbracket - p + \IrrevStressTensor^{22} \rrbracket,{\color{blue}- 2\mu^{\pm}}\right\}$','Interpreter','Latex');
-        title('(f)'); ylim([0 4]); pbaspect([1 1 1]);
+        subplot(3,2,6); %figure('Position',[0 0 300 250],'color','white');                       
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf',defaultOpts);   xlim(xl);        
+        ylim([-2 0]);%set(gca,'YTick',[-2 -1 0]);
+        ylabel('${\color{red}\llbracket - p + \IrrevStressTensor^{22} \rrbracket}-({\color{blue}- 2\mu^{\pm}})$','Interpreter','Latex');
+        title('(f)');  pbaspect([1 1 1]);
+        inset2(fMain,fsub_f,0.15,[0.71,0.16]);  
         %SaveFigure(['BC_f_along_Interface',num2str(Ca)],parameters);
         SaveFigure(['BCs_along_Interface',num2str(Ca)],parameters);
 
@@ -688,7 +720,7 @@ function ContactLineBinaryFluid
                 hatL_M(j1,j2) = dataM{j0}(j1,j2).IsoInterface.hatL;         
                 Sy2_M(j1,j2)  = dataM{j0}(j1,j2).stagnationPointY2; 
                 
-                col  = shades{mod(j0-1,nocols)+1}*[1 1 1];
+                col  = shades{mod(j0-1,noshades)+1}*[1 1 1];
                 %lin = lines{mod(i_Cak-1,nolines)+1};                
                 sym = syms{mod(j2-1,nosyms)+1};
                 
@@ -697,13 +729,13 @@ function ContactLineBinaryFluid
         end       
                         
         hatL      = dataM{end}(j1,j2).IsoInterface.hatL;
-        y2P       = (hatL:0.1:max(dataM{end}(j1,j2).IsoInterface.y2))';%-4
-        theta_Ana = GHR_Inv(Ca*log(y2P/hatL)+GHR_lambdaEta(thetaEq,1),1);
-        plot(y2P,180/pi*theta_Ana,'m','linewidth',2); hold on;        
+        r         = (hatL:0.1:max(dataM{end}(j1,j2).IsoInterface.r))';%-4
+        theta_Ana = GHR_Inv(Ca*log(r/hatL)+GHR_lambdaEta(thetaEq,1),1);
+        plot(r,180/pi*theta_Ana,'m','linewidth',2); hold on;        
 
         set(gca,'linewidth',1.);
         set(gca,'fontsize',20);
-        xlabel('$y_2$','Interpreter','Latex');
+        xlabel('$r$','Interpreter','Latex');
         %ylabel('$\theta[^\circ]$','Interpreter','Latex');        
         xlim([0 25]);
         yl = ylim; ylim([90,yl(2)]);
@@ -740,7 +772,7 @@ function ContactLineBinaryFluid
 
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
-        xlabel('$y$','Interpreter','Latex','fontsize',20);
+        xlabel('$r$','Interpreter','Latex','fontsize',20);
         ylabel('$\theta[^\circ]$','Interpreter','Latex','fontsize',20);        
         ylim([90,100]);
         
@@ -764,9 +796,9 @@ function ContactLineBinaryFluid
         disp(['stagnation point y2/l_diff = ',num2str(av/l_diff),' +/- ',num2str(max(Lb,Ub)/l_diff)]);
     end        
     function PlotInterfaceSlope(dataM,i1,i2,col,sym)                    
-        y2     = dataM(i1,i2).IsoInterface.y2;                                          
-        mark   = (y2 < (max(y2)));%-4
-        plot(y2(mark),180/pi*dataM(i1,i2).IsoInterface.theta(mark),['-',sym],...
+        r      = dataM(i1,i2).IsoInterface.r;                                          
+        mark   = (r < (max(r)));%-4
+        plot(r(mark),180/pi*dataM(i1,i2).IsoInterface.theta(mark),['-',sym],...
             'color',col,'MarkerSize',2,'MarkerFaceColor',col); hold on;                                              
     end
     function dataN = Rescale(dataM)
@@ -886,20 +918,20 @@ function ContactLineBinaryFluid
                     
                     dataN{k0}(k1,k2).IsoInterface.BCa = dataN{k0}(k1,k2).IsoInterface.Jump_u_n;
                     dataN{k0}(k1,k2).IsoInterface.BCb = dataN{k0}(k1,k2).IsoInterface.Jump_mu;
-
-                    dataN{k0}(k1,k2).IsoInterface.BCc       = -dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu-(2*dataN{k0}(k1,k2).IsoInterface.u_n);
+                    
                     dataN{k0}(k1,k2).IsoInterface.BCc_left  = -dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu;
                     dataN{k0}(k1,k2).IsoInterface.BCc_right = (2*dataN{k0}(k1,k2).IsoInterface.u_n);
-                    
-                    dataN{k0}(k1,k2).IsoInterface.BCd       = 2/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./dataN{k0}(k1,k2).IsoInterface.mu;
+                    dataN{k0}(k1,k2).IsoInterface.BCc       = dataN{k0}(k1,k2).IsoInterface.BCc_left - dataN{k0}(k1,k2).IsoInterface.BCc_right;% -dataN{k0}(k1,k2).IsoInterface.Jump_Gradmu_dnu-(2*dataN{k0}(k1,k2).IsoInterface.u_n);
+                                        
                     dataN{k0}(k1,k2).IsoInterface.BCd_left  = 2/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa;
                     dataN{k0}(k1,k2).IsoInterface.BCd_right = dataN{k0}(k1,k2).IsoInterface.mu;
+                    dataN{k0}(k1,k2).IsoInterface.BCd       = dataN{k0}(k1,k2).IsoInterface.BCd_left - dataN{k0}(k1,k2).IsoInterface.BCd_right; %2/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa - dataN{k0}(k1,k2).IsoInterface.mu;
                     
                     dataN{k0}(k1,k2).IsoInterface.BCe = dataN{k0}(k1,k2).IsoInterface.Jump_tau_nt;
-                    
-                    dataN{k0}(k1,k2).IsoInterface.BCf       = 4/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./(-dataN{k0}(k1,k2).IsoInterface.Jump_p+dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn);
+                                        
                     dataN{k0}(k1,k2).IsoInterface.BCf_left  = -(-dataN{k0}(k1,k2).IsoInterface.Jump_p+dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn);
                     dataN{k0}(k1,k2).IsoInterface.BCf_right = -2*dataN{k0}(k1,k2).IsoInterface.mu;%4/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./(-dataN{k0}(k1,k2).IsoInterface.Jump_p+dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn);
+                    dataN{k0}(k1,k2).IsoInterface.BCf       = dataN{k0}(k1,k2).IsoInterface.BCf_left - dataN{k0}(k1,k2).IsoInterface.BCf_right;%4/(3*Cak)*dataN{k0}(k1,k2).IsoInterface.kappa./(-dataN{k0}(k1,k2).IsoInterface.Jump_p+dataN{k0}(k1,k2).IsoInterface.Jump_tau_nn);
                                              
                 end
             end
