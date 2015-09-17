@@ -1,30 +1,10 @@
 function ThesisNanoscale_Fig1_YoungContactAngles()
     
-    AddPaths('ThesisNanoscale');            
-
-    PhysArea = struct('N',[50,80],'alpha_deg',90,...
-                      'L1',4,'L2',2);
-     
-    V2Num     = struct('Fex','SplitAnnulus','N',[80,80]);    
+    AddPaths('ThesisNanoscale');       
     
-    Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);                   
- 
-    optsNum = struct('PhysArea',PhysArea,...
-                     'FexNum',Fex_Num,...
-                     'maxComp_y2',25,...
-                     'V2Num',V2Num);
-
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',1.49);
-    V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
-
-    optsPhys = struct('V1',V1,'V2',V2,...                   
-                      'kBT',0.75,'Dmu',0.0,...
-                      'nSpecies',1,...
-                      'sigmaS',1);      
-
-    config = v2struct(optsNum,optsPhys);                 
-    
+    config = ThesisNanoscale_GetStandardConfig(90);    
+	
+   
     %***************************************************
     % Get table of epw for certain contact angles
     thY_V = [0.0,30,45,60,90,120,135,150,180];

@@ -3,6 +3,7 @@ function [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,initialG
  %Load Data & Initializing    
     HS_f          = str2func(optsPhys.HSBulk);    	
     [h1,h2,alpha] = getV2(0,optsPhys.V2);    
+    alpha
     
     if((nargin == 1) || isempty(initialGuess))
         initialGuess = [1;0.4;-3.4]; 

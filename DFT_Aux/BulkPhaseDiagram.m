@@ -1,5 +1,8 @@
-function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhaseDiagram(optsPhys,filename)
-    
+function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhaseDiagram(optsPhys,opts)
+    if(nargin < 2)
+        opts = {};
+    end
+
     [kBT_crit,rho_crit,mu_crit,p_crit] = GetCriticalPoint(optsPhys,[],false);
         
     intitialGuess = [0.01;0.6;-2];
@@ -34,99 +37,72 @@ function [rhoGas_satP,rhoLiq_satP,mu_satP,kBT_crit,rho_crit,mu_crit] = BulkPhase
     
     %*******************************************************************
     %Plot Density Profiles
-    figure('color','white','Position', [0 0 1500 500]);	
-    fontS = 20;    
-    
-    subplot(1,3,1); PlotRho_T();    
-    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
-        str = ['$T_{crit}$ = ',num2str(kBT_crit,3),', $\rho_{crit}$ = ',num2str(rho_crit,3)];
-        title(str,'Interpreter','Latex','fontsize',fontS);
-    end
-	%h = text(rho_crit-0.05,kBT_crit+0.02,['$T_{crit}$ = ',num2str(kBT_crit,3),', $\rho_{crit}$ = ',num2str(rho_crit,3)]);  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);
-	    
-    subplot(1,3,2); Plot_T_ChemPot(); 
-    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
-        str = ['$\mu_{crit}$ = ',num2str(mu_crit,3)];    
-        title(str,'Interpreter','Latex','fontsize',fontS);
-    end
-	%h = text(kBT_crit-0.1,mu_crit,str,'HorizontalAlignment','right');  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);    
-    
-    subplot(1,3,3); Plot_T_P();
-    if(~isfield(optsPhys,'criticalValues') || optsPhys.criticalValues) 
-        str = ['$p_{crit}$ = ',num2str(p_crit,3)];
-        title(str,'Interpreter','Latex','fontsize',fontS);
-    end
-	%h = text(kBT_crit-0.1,mu_crit,str,'HorizontalAlignment','right');  set(h,'Interpreter','Latex'); set(h,'fontsize',fontS);
-    
-    %Save Data     
-    
-    if((nargin >= 2) && ~isempty(filename))        
-        h = figure('color','white','Position', [0 0 800 800]);	
-        PlotRho_T();    
-        print2eps([filename '_Bulk_Rho_T'],gcf);        
-        saveas(gcf,[filename '_Bulk_Rho_T.fig']);   
-        close(h);
+    figure('color','white','Position', [0 0 250 200]);	                
+    PlotRho_T();    
+    if(IsOption(opts,'PlotExperimentalData'))
+        PlotData('D://Data/MichelsNGasNLiq.txt','d'); hold on;
+        PlotData('D://Data/Trokhymchuk_cutoff_5.txt','s');
+        ylim([0.5 1.4]);
+    end   
+    SaveFigure('BulkPhaseDiagram_Bulk_Rho_T');
+   
+    figure('color','white','Position', [0 0 250 200]);	                
+	Plot_T_ChemPot();           
+    SaveFigure('BulkPhaseDiagram_Bulk_T_mu');        
         
-        h = figure('color','white','Position', [0 0 800 800]);	
-        Plot_T_ChemPot();           
-        print2eps([filename '_Bulk_T_Mu'],gcf);        
-        saveas(gcf,[filename '_Bulk_T_Mu.fig']);
-        close(h);
+    figure('color','white','Position', [0 0 250 200]);
+	Plot_T_P();        
+    SaveFigure('BulkPhaseDiagram_Bulk_T_p');
         
-        h = figure('color','white','Position', [0 0 800 800]);	
-        Plot_T_P();        
-        print2eps([filename '_Bulk_T_P'],gcf);        
-        saveas(gcf,[filename '_Bulk_T_P.fig']);
-        close(h);
-    end    
-    
     function PlotRho_T()
         plot(rhoGas_sat,kBT,'k','linewidth',1.5);hold on;
         plot(rhoLiq_sat,kBT,'k','linewidth',1.5);
-        plot(rho_crit,kBT_crit,'ok','MarkerFace','k','MarkerSize',10);   
+        plot(rho_crit,kBT_crit,'or','MarkerFace','r');   
         if(isfield(optsPhys,'kBT'))
-            plot(rhoGas_satP,optsPhys.kBT,'ok','MarkerFace','k','MarkerSize',10);
-            plot(rhoLiq_satP,optsPhys.kBT,'ok','MarkerFace','k','MarkerSize',10);
+            plot(rhoGas_satP,optsPhys.kBT,'ob','MarkerFace','b');
+            plot(rhoLiq_satP,optsPhys.kBT,'ob','MarkerFace','b');
         end
-        xlabel('$\rho_{sat,\{gas,liq\}}$','Interpreter','Latex','fontsize',fontS+5); %\{\text{liq},\text{gas}\},\text{sat} 
-        ylabel('$k_BT$','Interpreter','Latex','fontsize',fontS+5);
-        ylim([min(kBT),max(kBT)+0.06])
+        xlabel('$\nDensityV/\nDensityL$','Interpreter','Latex'); %\{\text{liq},\text{gas}\},\text{sat} 
+        ylabel('$T$','Interpreter','Latex');
+       % ylim([min(kBT),max(kBT)+0.06])
         pbaspect([1 1 1]);   
-        set(gca,'ytick',0.5:0.1:1);
-        set(gca,'fontsize',fontS);                        
-        set(gca,'linewidth',1.5);  
+        %set(gca,'ytick',0.5:0.1:1);        
     end
-
     function Plot_T_ChemPot()
         %Plot Chemical Potential    
         plot(kBT,mu_sat,'k','linewidth',1.5); hold on;
         if(isfield(optsPhys,'kBT'))
-            plot(optsPhys.kBT,mu_satP,'ok','MarkerFace','k','MarkerSize',10);
+            plot(optsPhys.kBT,mu_satP,'ob','MarkerFace','b');
         end
-        plot(kBT_crit,mu_crit,'ok','MarkerFace','k','MarkerSize',10);
-        xlabel('$k_BT$','Interpreter','Latex','fontsize',fontS);
-        ylabel('$\mu_{sat}$','Interpreter','Latex','fontsize',fontS);
+        plot(kBT_crit,mu_crit,'or','MarkerFace','r');
+        xlabel('$T$','Interpreter','Latex');
+        ylabel('$\chemPot_{\text{sat}}$','Interpreter','Latex');
         pbaspect([1 1 1]);   
         xlim([min(kBT),max(kBT)+0.06])
         %set(gca,'ytick',-2.8:0.1:-2.5);
         %ylim([-2.85 -2.45]);
-        set(gca,'fontsize',fontS);                        
-        set(gca,'linewidth',1.5);       
     end
-
     function Plot_T_P()
         plot(kBT,p,'k','linewidth',1.5); hold on;
         if(isfield(optsPhys,'kBT'))
-            plot(optsPhys.kBT,pP,'ok','MarkerFace','k','MarkerSize',10);
+            plot(optsPhys.kBT,pP,'ob','MarkerFace','b');
         end
-        plot(kBT_crit,p_crit,'ok','MarkerFace','k','MarkerSize',10);
-        xlabel('$k_BT$','Interpreter','Latex','fontsize',fontS);
-        ylabel('$p_{sat}$','Interpreter','Latex','fontsize',fontS);
+        plot(kBT_crit,p_crit,'or','MarkerFace','r');
+        xlabel('$T$','Interpreter','Latex');
+        ylabel('$p_{\text{sat}}$','Interpreter','Latex');
         pbaspect([1 1 1]);   
         xlim([min(kBT),max(kBT)+0.06])
         %set(gca,'ytick',-2.8:0.1:-2.5);
-        %ylim([-2.85 -2.45]);
-        set(gca,'fontsize',fontS);                        
-        set(gca,'linewidth',1.5);            
+        %ylim([-2.85 -2.45]);        
     end
+
+    function PlotData(filename,sym)
+        fid = fopen(filename);
+        x = textscan(fid,'%f %f %f','headerlines',3); %[T, rhoG, rhoL]
+        fclose(fid); 
+        plot(x{2},x{1},['k',sym],'MarkerFaceColor','k'); hold on;	
+        plot(x{3},x{1},['k',sym],'MarkerFaceColor','k'); hold on;	       
+    end
+    
+
 end

@@ -16,7 +16,7 @@ function PlotDisjoiningPressureAnalysis(this)
     wAna   = -A./(12*pi*(fTAna).^2);       
     dPAna  = A./(6*pi*(fTAna).^3);
     
-    BulkPhaseDiagram(this.optsPhys,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq]);    
+    BulkPhaseDiagram(this.optsPhys);%,[dirData filesep 'EquilibriumSolutions' filesep this.FilenameEq]);    
  
     %********************************************************************
     %Adsorption Isotherm based on 1D computations

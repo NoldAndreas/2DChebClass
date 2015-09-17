@@ -1,6 +1,5 @@
 function ThesisNanoscale_Fig3_ComputeContactAngles()
 
-   global dirData
    AddPaths('ThesisNanoscale');            
             
    opts.bounds1   = [0,20];
@@ -47,67 +46,24 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
         CLT.PlotDensitySlices();
         CLT.PlotDisjoiningPressures();                
     end
-    function config = GetStandardConfig(opts)
+    function config = GetStandardConfig(opts)                             
         
-        alpha_deg  = opts.alpha_deg;
-        epw        = opts.epw;
-        
-        bounds1    = opts.bounds1;
-        bounds2    = [0.5,15.5];
-        maxComp_y2 = 35;        
-        N          = [50,80];           
-
-        PhysArea = struct('N',N,'L1',4,'L2',2,...
-                          'alpha_deg',alpha_deg);
-
-        PlotArea = struct('y1Min',bounds1(1),'y1Max',bounds1(2),...
-                          'y2Min',bounds2(1),'y2Max',bounds2(2),...
-                          'zMax',4,...
-                          'N1',100,'N2',100);
-
-        V2Num     = struct('Fex','SplitAnnulus','N',[80,80]);          
-        Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid','Ncircle',1,'N1disc',50,'N2disc',50); 
-
-        optsNum = struct('PhysArea',PhysArea,...
-                         'PlotAreaCart',PlotArea,...
-                         'FexNum',Fex_Num,...
-                         'V2Num',V2Num,...
-                         'maxComp_y2',maxComp_y2);
-
-        V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);
-        V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
-
-        optsPhys = struct('V1',V1,'V2',V2,...                   
-                          'kBT',0.75,'Dmu',0.0,'nSpecies',1,'sigmaS',1);      
-
-        config = v2struct(optsNum,optsPhys);                        
-
+        config = ThesisNanoscale_GetStandardConfig(opts.alpha_deg,opts.epw);
+                
+        config.optsNum.PlotAreaCart       = struct('y1Min',opts.bounds1(1),'y1Max',opts.bounds1(2),...
+                                                   'y2Min',0.5,'y2Max',15.5,...
+                                                   'zMax',4,...
+                                                    'N1',100,'N2',100);
     end
     function filename = ComputeExactAdsorptionIsotherm(opts)
-       
-        PhysArea = struct('N',[1,250],...
-                          'L1',4,'L2',2,...                          
-                          'alpha_deg',90);
-
-        V2Num     = struct('Fex','SplitAnnulus','N',[80,80]);                  
-        Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid','Ncircle',1,'N1disc',50,'N2disc',50);        
-
-        optsNum = struct('PhysArea',PhysArea,...
-                         'FexNum',Fex_Num,...
-                         'V2Num',V2Num,...
-                         'maxComp_y2',-1,...
-                         'y1Shift',0);
-
-        V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',opts.epw);
-        V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
-
-        optsPhys = struct('V1',V1,'V2',V2,...                   
-                          'kBT',0.75,...                                                    
-                          'Dmu',0.0,'nSpecies',1,...
-                          'sigmaS',1);      
-
-        config = v2struct(optsNum,optsPhys);                        
-
+        
+        config = ThesisNanoscale_GetStandardConfig(90,opts.epw);
+        
+        config.optsNum.PhysArea.N         = [1,250];        
+        config.optsNum.maxComp_y2         = -1;
+        %config.optsNum.y1Shift            = 0;
+        
+        
         CL = ContactLineHS(config);
         CL.Preprocess();    close all;
         CL.ComputeAdsorptionIsotherm(1000,opts.dryingWetting);    
