@@ -50,6 +50,9 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     y = (abs(this.AdsorptionIsotherm.mu - this.optsPhys.mu_sat));
     
     markk = (absFT < LogPlotInt(2)) & (absFT > LogPlotInt(1)); 
+    if(sum(markk)==0)
+        return;
+    end
     loglog((absFT(markk)),y(markk),'ko');  hold on;
         
     loglog(absFT(markk),...

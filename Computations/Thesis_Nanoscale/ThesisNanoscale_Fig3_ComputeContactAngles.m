@@ -1,6 +1,13 @@
 function ThesisNanoscale_Fig3_ComputeContactAngles()
 
-   AddPaths('ThesisNanoscale');            
+   AddPaths('ThesisNanoscale');   
+   
+   opts.bounds1   = [-10,10];
+   opts.alpha_deg = 90;  
+   opts.epw       = 0.856;     
+   opts.dryingWetting = 'wetting';
+   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
+   Job_ComputeContactAngle(opts); 
             
    opts.bounds1   = [0,20];
    opts.alpha_deg = 45;  
@@ -14,13 +21,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
    opts.epw       = 1.071;
    opts.dryingWetting = 'wetting';
    opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);   
-   Job_ComputeContactAngle(opts);                
-   
-   opts.alpha_deg = 90;  
-   opts.epw       = 0.856;     
-   opts.dryingWetting = 'wetting';
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-   Job_ComputeContactAngle(opts);       
+   Job_ComputeContactAngle(opts);                      
    
    opts.alpha_deg = 120;  
    opts.epw       = 0.594;
@@ -41,7 +42,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
 
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
-        CLT.ComputeEquilibrium();      
+        CLT.ComputeEquilibrium(struct('solver','Picard'));      
         CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
         CLT.PlotDisjoiningPressures();                
@@ -66,10 +67,10 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
         
         CL = ContactLineHS(config);
         CL.Preprocess();    close all;
-        CL.ComputeAdsorptionIsotherm(1000,opts.dryingWetting);    
+        CL.ComputeAdsorptionIsotherm(100,opts.dryingWetting);    
         
         CL.FittingAdsorptionIsotherm([10 14],1)
-        if(optsPhys.kBT == 0.75)
+        if(config.optsPhys.kBT == 0.75)
             CL.SumRule_AdsorptionIsotherm(0.3463);
         end
         
