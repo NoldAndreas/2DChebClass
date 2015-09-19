@@ -2,38 +2,59 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
 
    AddPaths('ThesisNanoscale');   
    
-   opts.bounds1   = [-10,10];
-   opts.alpha_deg = 90;  
-   opts.epw       = 0.856;     
-   opts.dryingWetting = 'wetting';
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-   Job_ComputeContactAngle(opts); 
-            
-   opts.bounds1   = [0,20];
-   opts.alpha_deg = 45;  
-   opts.epw       = 1.155;   
-   opts.dryingWetting = 'wetting';   
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-   Job_ComputeContactAngle(opts);    
-    
-   opts.bounds1   = [-10,10];
-   opts.alpha_deg = 60;  
-   opts.epw       = 1.071;
-   opts.dryingWetting = 'wetting';
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);   
-   Job_ComputeContactAngle(opts);                      
+
+    try 
+        opts.bounds1   = [-10,10];
+       opts.alpha_deg = 90;  
+       opts.epw       = 0.856;     
+       opts.dryingWetting = 'wetting';
+       opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
+       Job_ComputeContactAngle(opts); 
+    catch err
+        disp('ERROR')
+    end
+
+    try            
+       opts.bounds1   = [0,20];
+       opts.alpha_deg = 45;  
+       opts.epw       = 1.155;   
+       opts.dryingWetting = 'wetting';   
+       opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
+       Job_ComputeContactAngle(opts);    
+    catch err
+        disp('ERROR')
+    end       
+       
+    try
+       opts.bounds1   = [-10,10];
+       opts.alpha_deg = 60;  
+       opts.epw       = 1.071;
+       opts.dryingWetting = 'wetting';
+       opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);   
+       Job_ComputeContactAngle(opts);                      
+    catch err
+        disp('ERROR')
+    end       
    
-   opts.alpha_deg = 120;  
-   opts.epw       = 0.594;
-   opts.dryingWetting = 'drying';
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-   Job_ComputeContactAngle(opts); 
+    try
+       opts.alpha_deg = 120;  
+       opts.epw       = 0.594;
+       opts.dryingWetting = 'drying';
+       opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
+       Job_ComputeContactAngle(opts); 
+	catch err
+        disp('ERROR')
+    end
    
-   opts.alpha_deg = 135;  
-   opts.epw       = 0.453;
-   opts.dryingWetting = 'drying';
-   opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-   Job_ComputeContactAngle(opts);
+    try
+       opts.alpha_deg = 135;  
+       opts.epw       = 0.453;
+       opts.dryingWetting = 'drying';
+       opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
+       Job_ComputeContactAngle(opts);
+	catch err
+        disp('ERROR')
+    end
 
     function Job_ComputeContactAngle(opts)
 
@@ -67,7 +88,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
         
         CL = ContactLineHS(config);
         CL.Preprocess();    close all;
-        CL.ComputeAdsorptionIsotherm(100,opts.dryingWetting);    
+        CL.ComputeAdsorptionIsotherm(500,opts.dryingWetting);    
         
         CL.FittingAdsorptionIsotherm([10 14],1)
         if(config.optsPhys.kBT == 0.75)

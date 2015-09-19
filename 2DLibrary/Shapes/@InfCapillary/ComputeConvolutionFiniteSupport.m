@@ -47,15 +47,15 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     % ptsStrip.
     %
     
-    alpha = pi/2;%this.alpha;
+    alpha = this.alpha; %pi/2;%
 
     fprintf('Computing interpolation for matrices for averaged densities..\n');
 
     AD          = zeros(length(pts.y1_kv),this.M,numel(weights)+1);%always include unity weight
     areaPtsCart = area.GetCartPts();
 
-    y2SepMin    = this.y2Min + abs(min(areaPtsCart.y2_kv))/sin(alpha);
-    y2SepMax    = this.y2Max - abs(max(areaPtsCart.y2_kv))/sin(alpha);
+    y2SepMin    = min(this.Pts.y2) + abs(min(areaPtsCart.y2_kv))/sin(alpha);
+    y2SepMax    = max(this.Pts.y2) - abs(max(areaPtsCart.y2_kv))/sin(alpha);
                        
                        
     % Note: division through sin(this.alpha) takes into account that
@@ -99,7 +99,7 @@ function AD = ComputeConvolutionFiniteSupport(this,area,weights,pts,params)
     ptsStripCart = GetCartPts(this,0,ptsStrip{3}.y2);
     ptsy2        = ptsStripCart.y2_kv;        
     for iPts = 1:length(ptsy2)
-        area.Origin(2) = ptsy2(iPts);
+        area.Origin(2)  = ptsy2(iPts);
         dataAD3(iPts)   = Intersect(this,area);
     end    
     area.Origin(2) = 0;
