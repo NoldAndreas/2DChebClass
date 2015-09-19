@@ -32,11 +32,11 @@ while(y20 > bottom - R)
     N      = [10,10];
     sphere = false;
     
-    DC     = Annulus(v2struct(Origin,R_in,R_out,N));       
+    %DC     = Annulus(v2struct(Origin,R_in,R_out,N));       
     %DC     = Disc(v2struct(Origin,R,N,sphere));       
     %DC     = Sphere(v2struct(Origin,R,N,sphere));       
-    %theta1 = 0;  theta2 = pi;    
-    %DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));       
+    theta1 = 0;  theta2 = pi;    
+    DC           = Ball(v2struct(Origin,N,sphere,theta1,theta2,R));       
 
     hold on
     area = Intersect(HS,DC);

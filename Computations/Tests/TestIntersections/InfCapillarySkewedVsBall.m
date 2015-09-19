@@ -4,7 +4,7 @@ R      = 1;
 bottom = 1;
 top    = 5;
 
-IntersectShape = 'Ball'; %Disc
+IntersectShape = 'Annulus';%'Ball'; %Disc
 
 figure('color','white','Position',[0 0 800 500]);
 shape = struct('y2Min',bottom,'y2Max',top,'N',[6,6],'L1',1,'L2',2,...
@@ -39,6 +39,10 @@ while(y20 > bottom - R)
         shapeDC      = v2struct(Origin,N,sphere,L);
         shapeDC.RMin = R;
         DC           = InfAnnulus(shapeDC);  
+	elseif(strcmp(IntersectShape,'Annulus')) 
+        R_in  = R; 
+        R_out = 2*R;
+        DC           = Annulus(v2struct(Origin,R_in,R_out,N));       
     end
         
     hold on
