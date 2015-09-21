@@ -38,12 +38,13 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
                     absFT,'k:','linewidth',1.5); hold on;    
 	plot([0 0],[0 max(absFT)],'k--','linewidth',1.5);
     set(gca,'fontsize',20);
-    xlabel('$\Delta \mu/\varepsilon$','Interpreter','Latex','fontsize',25);
-    ylabel('$\ell/\sigma$','Interpreter','Latex','fontsize',25);    
+    xlabel('$\Delta \mu$','Interpreter','Latex','fontsize',25);
+    ylabel('$\ell$','Interpreter','Latex','fontsize',25);    
     ylim([0 max(absFT)]);    
     ylim([0 15]);
     xlim([min(this.AdsorptionIsotherm.dmuCheck)-0.02,max(this.AdsorptionIsotherm.dmuCheck)]);
     %xlim([-0.02 0.1]);
+    SaveCurrentFigure(this,'AdsorptionIsotherm');
     
     f2 = figure('Color','white','Position',[0 0 800 800]); 
     set(gca,'YTickMode','manual')
@@ -64,14 +65,15 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     xlim(LogPlotInt);
     ylim([min(y(markk)),max(y(markk))]);
     ylim([min(y(markk)),0.1]);
-    ylabel('$|\Delta \mu|/\varepsilon$','Interpreter','Latex','fontsize',25);
-    xlabel('$\ell/\sigma$','Interpreter','Latex','fontsize',25);
+    ylabel('$|\Delta \mu|$','Interpreter','Latex','fontsize',25);
+    xlabel('$\ell$','Interpreter','Latex','fontsize',25);
     
     set(gca,'XTick',[2 5 10 15]); %LogPlotInt(1):5:LogPlotInt(2)
     set(gca,'YTick',[0.001 0.01 0.1]);%LogPlotInt(1):5:LogPlotInt(2));
     set(gca, 'XTickLabel', num2str(get(gca, 'XTick').'));
     set(gca, 'YTickLabel', num2str(get(gca, 'YTick').'));
     set(gca,'fontsize',20);
+    SaveCurrentFigure(this,'FittingAdsorptionIsotherm');
     
     if(min(this.AdsorptionIsotherm.FT)<0)
         inset2(f1,f2,0.45,[0.35,0.5]);
@@ -84,10 +86,8 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     if(~exist(folder,'dir'))
                 disp('Folder not found. Creating new path..');            
                 mkdir(folder);
-	end
+    end
     
-    print2eps([folder filesep this.FilenameEq 'AdsorptionIsotherm'],f1);
-    saveas(f1,[folder filesep this.FilenameEq 'AdsorptionIsotherm.fig']);
-  
+    SaveCurrentFigure(this,'AdsorptionIsotherm_Inset');      
     
 end

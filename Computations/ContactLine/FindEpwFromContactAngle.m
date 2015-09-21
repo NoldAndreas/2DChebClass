@@ -2,11 +2,12 @@ function epw = FindEpwFromContactAngle(config,thY)
     
     
     %Get liquid-vapour surface tension
-    config.optsNum.maxComp_y2 = -1;        
+    config.optsPhys.V1.epsilon_w = 0;
+    config.optsNum.maxComp_y2    = -1;        
     
     confP = config;
     confP.optsNum.PhysArea.N2bound = 3;
-    confP.optsNum.PhysArea.N = [60;3];
+    confP.optsNum.PhysArea.N = [60;3];    
     
     CLP = ContactLineHS(confP);
     CLP.Preprocess();     close all;

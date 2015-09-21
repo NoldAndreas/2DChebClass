@@ -66,13 +66,13 @@ function PlotDensitySlicesNormalInterface(this,y1P)
     
     close all
     
-    figure('color','white','Position',[0 0 1700 600]);
-    subplot(1,2,1);
+    figure('color','white','Position',[0 0 600 600]);
+    
     for i = 1:length(y1P)
         plot(pts{i}.z-deltaZ,f_p{i},'color',col(i,:),'linewidth',1.5); hold on;
         if(~isempty(this.AdsorptionIsotherm))
             %plot(pts{i}.z-deltaZ,rho_Ana1{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
-            plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
+            %plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
         end
     end    
     dz = (-deltaZ:0.05:deltaZ)';
@@ -80,8 +80,6 @@ function PlotDensitySlicesNormalInterface(this,y1P)
 	rho1D_lv_i = IP_LV*rho1D_LV;
 	plot(dz,rho1D_lv_i,'k--','linewidth',1.5); hold on;        
     %plot(this.IDC.Pts.y1*sin(this.IDC.alpha),rho1D_LV,'k--','linewidth',1.5);
-    
-    
     
     
     xlim([-1 1]*deltaZ);
@@ -92,8 +90,10 @@ function PlotDensitySlicesNormalInterface(this,y1P)
     ylabel('$n \sigma^3$','Interpreter','Latex','fontsize',25);
     pbaspect([(this.optsNum.PlotAreaCart.y1Max-this.optsNum.PlotAreaCart.y1Min) ....
               (this.optsNum.PlotAreaCart.y2Max-this.optsNum.PlotAreaCart.y2Min) 1]);
+          
+    SaveCurrentFigure(this,'DensityNormalInterface');          
         
-    subplot(1,2,2);
+    figure('color','white','Position',[0 0 600 600]);
     if(this.optsNum.PhysArea.alpha_deg ~= 90)
         PlotContourResults(this,{'hI','hII','hIII'}); hold on;        
     else
@@ -103,7 +103,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.5);
     end        
     
-    SaveCurrentFigure(this,'DensityNormalInterface');
+    SaveCurrentFigure(this,'DensitySlicesNormal_Contour');
     
     function [pts_y1,pts_y2] = GetStartEndNormalPts(y1,h,dhdx,deltaZ)
         alpha  = atan(dhdx);

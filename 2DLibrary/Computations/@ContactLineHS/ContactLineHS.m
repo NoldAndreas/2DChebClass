@@ -285,6 +285,7 @@ classdef ContactLineHS < DDFT_2D
             %set(gca,'YTick',-0.1:0.01:0);    
              
             SaveCurrentFigure(this,'DisjoiningPressures');
+            %SaveFigure(this,'DisjoiningPressures');
 
         end
         PlotDensitySlicesNormalInterface(this,y1Lim)
@@ -443,7 +444,7 @@ classdef ContactLineHS < DDFT_2D
                 foldername = 'Equilibrium';
             end
             
-            if(strcmp(foldername,'Equilibrium'))
+            if(strcmp(foldername,'Equilibrium') && ~isempty(this.FilenameEq))
                 [~,fn]   = fileparts(this.FilenameEq);
                 if(~isempty(filename))
                     filename = [fn,'_',filename];            

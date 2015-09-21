@@ -51,7 +51,8 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
         
         CL = ContactLineHS(config);
         CL.Preprocess();
-        CL.ComputeEquilibrium();                                
+        CLT.ComputeEquilibrium(struct('solver','Picard'));     
+        %CLT.ComputeEquilibrium();                                
         CL.PlotContourResults();
         
         close all;
@@ -81,7 +82,8 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
             %ChangeDirData();
             CL.SetV1(epw(i));
             CL.ComputeST();
-            CL.ComputeEquilibrium();                        
+            CLT.ComputeEquilibrium(struct('solver','Picard'));     
+            %CL.ComputeEquilibrium();                        
             
           %  CL.PostProcess_FilmThickness([-10 0]);
             theta_YCA(i)    = CL.alpha_YCA*180/pi;

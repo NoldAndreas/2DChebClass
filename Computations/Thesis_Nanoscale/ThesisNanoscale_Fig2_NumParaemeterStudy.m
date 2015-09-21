@@ -16,7 +16,7 @@ function ThesisNanoscale_Fig2_NumParaemeterStudy()
 
         %Setup result file for this Job        
         filename   = ['ThesisNanoscale_Fig2_NumParaemeterStudy',getTimeStr(),'.txt'];
-        Struct2File(filename,v2struct(epw,aplha_deg),['Computed at ',datestr(now)]);    
+        Struct2File(filename,v2struct(epw,alpha_deg),['Computed at ',datestr(now)]);    
 
         close all;    
         for i = 1:length(alpha_deg)
@@ -68,7 +68,8 @@ function ThesisNanoscale_Fig2_NumParaemeterStudy()
           
 	function [y2,theta] = GetY2Theta(y2Max)
         CLT.optsNum.maxComp_y2 = y2Max;
-        CLT.ComputeEquilibrium();  
+        CLT.ComputeEquilibrium(struct('solver','Picard'));     
+        %CLT.ComputeEquilibrium();  
         [y2,theta] = CLT.PlotInterfaceAnalysisY2([5 (y2Max+3)]);        
     end
 end

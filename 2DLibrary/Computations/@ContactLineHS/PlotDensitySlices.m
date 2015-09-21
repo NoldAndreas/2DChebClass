@@ -36,7 +36,8 @@ function PlotDensitySlices(this)
     set(gca,'linewidth',1.5);          
     %pbaspect([(y1Max-y1Min) (y2Max) 1]);
     
-    SaveFigure('DensitySlices');
+    %SaveFigure('DensitySlices');
+    SaveCurrentFigure(this,'DensitySlices');
     
     f2 = figure('color','white','Position',[0 0 600 500]);    
     if(this.optsNum.PhysArea.alpha_deg ~= 90)
@@ -48,7 +49,8 @@ function PlotDensitySlices(this)
         plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.5);
     end
 
-    SaveFigure('DensitySlices_contour');    
+    %SaveFigure('DensitySlices_contour');    
+    SaveCurrentFigure(this,'DensitySlices_contour');    
     
     inset2(f1,f2,0.43,[0.55,0.62]);
     set(gca,'fontsize',10);
@@ -57,7 +59,8 @@ function PlotDensitySlices(this)
     close(f2);      
         
     % Save plot
-    SaveFigure('DensitySlices_Inset');	
+    SaveCurrentFigure(this,'DensitySlices_Inset');	
+    %SaveCurrentFigure('DensitySlices_Inset');	
     
     function str = distinguishable_colors_NoRedBlueGreen()
         str = [0 1 1;... %cyan
