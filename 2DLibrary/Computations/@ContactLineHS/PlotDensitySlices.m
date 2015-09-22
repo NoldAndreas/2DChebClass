@@ -23,7 +23,8 @@ function PlotDensitySlices(this)
         for i = 1:n
             ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII;        
             [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
-            plot(this.AdsorptionIsotherm.Pts.y2-0.5,rho,'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
+            mark     = (this.AdsorptionIsotherm.Pts.y2 < (y2Max + 0.5));
+            plot(this.AdsorptionIsotherm.Pts.y2(mark)-0.5,rho(mark),'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
         end
     end
     
