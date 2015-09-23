@@ -1,37 +1,43 @@
 function ThesisNanoscale_Fig3_ComputeContactAngles()
 
+    
     AddPaths('ThesisNanoscale');   
-    global dirData 
+    global dirData             
+    
+    %ComputeData(45,1.155,-2.5);
+    %ComputeData(60,1.071,-5);
+    %ComputeData(90,0.856,-7.5);
+    %ComputeData(120,0.594,-7.5);
+    %ComputeData(135,0.453,-10);
         
-    optsDefault = {};%{'onlyPlot'};
-    
-    ComputeAndPlot(45,1.155,-2.5,optsDefault,'2015_9_19_19_55_33_');
-    ComputeAndPlot(60,1.071,-7.5,optsDefault);
-    ComputeAndPlot(90,0.856,-7.5,optsDefault);
-    ComputeAndPlot(120,0.594,-7.5,optsDefault);
-    ComputeAndPlot(135,0.453,-7.5,optsDefault);
+    PlotData(45,-2.5,'2015_9_19_19_55_33',[-0.1 0],[-0.15 0.05],0.6);
+    PlotData(60,-5,'2015_9_20_0_2_34',[-0.2 -0.1 0],[-0.2 0.05],0.6);
+    PlotData(90,-7.5,'2015_9_18_11_25_36',[-0.2 -0.1 0],[-0.2 0.05],0.55);
+    PlotData(120,-7.5,'2015_9_20_4_1_22',[-0.1 0],[-0.1,0.05],0.48);
+    PlotData(135,-10,'2015_9_20_7_53_56',[-0.04 -0.02 0],[-0.04 0],0.48);
     
     
-    function ComputeAndPlot(alpha_deg,epw,bounds1,opts,nameEq)
-        if(nargin < 4)
-            opts = {};
-        end
+    function ComputeData(alpha_deg,epw,bounds1)
         bounds1 = bounds1 + [0 15];
-        
-        if(IsOption(opts,'onlyPlot'))
-            AddPaths(['ThesisNanoscale' filesep 'deg' num2str(alpha_deg)]);            
-        else
-            try
-                opts = v2struct(alpha_deg,epw,bounds1);            
-                opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);
-                nameEq = Job_ComputeContactAngle(opts);
-            catch err
-                disp('ERROR')
-                rethrow(err);
-                %msgString = getReport(exception,type,'hyperlinks',hlink);
-                %disp(msgString);
-            end
+        AddPaths('ThesisNanoscale');   
+        try
+            opts = v2struct(alpha_deg,epw,bounds1);            
+            opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);            
+        catch err
+            disp('ERROR')
+            rethrow(err);        
         end
+
+    end
+    
+    
+    function PlotData(alpha_deg,bounds1,nameEq,yTicksDP,yLimsDP,subPlotPosX)        
+        
+        bounds1 = bounds1 + [0 15];
+                
+        AddPaths(['ThesisNanoscale' filesep 'deg' num2str(alpha_deg)]);            
+        nameEq = [nameEq,'_'];
+
         
         try
                 subplots = false;
@@ -42,8 +48,8 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                     figMain = figure('Position',[0 0 500 600],'color','white');
                 else
                     figMain = []; sP = [];
-                    posSubPlotsGCA = [0.7 0.6 1.55 1.55];%250 200];
-                    posSubPlots    = [0 0 3.0 3.0];%250 200];
+                    posSubPlotsGCA = [0.7 0.6 1.6 1.6];%250 200];
+                    posSubPlots    = [0 0 2.4 2.5];%250 200];
                     units = 'inches';
                 end
 
@@ -57,6 +63,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 xlabel('$y_1$','Interpreter','Latex');
                 ylabel('$y_2$','Interpreter','Latex');
                 pbaspect([1 1 1]);
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(a)','LineWidth',0,'EdgeColor','none');
                 
                 if(~subplots)                                         
                     set(gcf,'Units',units,'Position',posSubPlots,'color','white');
@@ -73,6 +80,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 xlabel('$y_2$','Interpreter','Latex');
                 ylabel('$\nDensity$','Interpreter','Latex');
                 pbaspect([1 1 1]);
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(b)','LineWidth',0,'EdgeColor','none');
                 if(~subplots)  
                     set(gcf,'Units',units,'Position',posSubPlots,'color','white');
                     set(gca,'Units',units,'Position',posSubPlotsGCA);                    
@@ -88,6 +96,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 xlabel('$y_1$','Interpreter','Latex');
                 ylabel('$y_2$','Interpreter','Latex');
                 pbaspect([1 1 1]);
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(c)','LineWidth',0,'EdgeColor','none');
                 if(~subplots)     
                     set(gcf,'Units',units,'Position',posSubPlots,'color','white');
                     set(gca,'Units',units,'Position',posSubPlotsGCA);
@@ -103,6 +112,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 xlabel('$y_2$','Interpreter','Latex');        
                 ylabel('$\nDensity$','Interpreter','Latex');
                 pbaspect([1 1 1]);
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(d)','LineWidth',0,'EdgeColor','none');
                 if(~subplots)         
                     set(gcf,'Units',units,'Position',posSubPlots,'color','white');
                     set(gca,'Units',units,'Position',posSubPlotsGCA);
@@ -118,6 +128,8 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 xlabel('$y_1$','Interpreter','Latex');
                 ylabel('$\Pi$','Interpreter','Latex');
                 pbaspect([1 1 1]);
+                ylim(yLimsDP); set(gca,'YTick',yTicksDP);                
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(e)','LineWidth',0,'EdgeColor','none');
                 if(~subplots)   
                     set(gcf,'Units',units,'Position',posSubPlots,'color','white');
                     set(gca,'Units',units,'Position',posSubPlotsGCA);
@@ -125,6 +137,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 end
 
                 % Bottom left subplot: Disjoining pressure
+                close all;
                 if(subplots)                
                     sP = subplot(3,2,6);                                    
                 end
@@ -134,14 +147,17 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
                 ylabel('$\ell$','Interpreter','Latex');
                 ylim([0 15]);
                 pbaspect([1 1 1]);                
+                annotation('textbox',[0.02 0.9 0.1 0.05],'String','(f)','LineWidth',0,'EdgeColor','none');
 
                 fsub  = openfig([dirData filesep nameEq,'FittingAdsorptionIsotherm']);
+                xlabel('');  ylabel('');
                 if(subplots)                         
                     inset2(figMain,fsub,0.1,[0.8,0.2]);               
                 else
-                    inset2(figMain,fsub,0.4,[0.55,0.5]);               
+                    %inset2(figMain,fsub,0.5,[subPlotPosX,0.375]);               
+                    inset2(figMain,fsub,0.4,[subPlotPosX,0.5]);               
                 end
-                close(fsub);  
+                close(fsub);                  
                 
                 if(subplots)
                     SaveFigure(['FullFigure_deg',num2str(alpha_deg)]);
@@ -211,7 +227,14 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
         
         CL = ContactLineHS(config);
         CL.Preprocess();    close all;
-        CL.ComputeAdsorptionIsotherm(750);
+        
+        if(opts.alpha_deg > 90)
+            optsDrying = 'drying';
+        else
+            optsDrying = 'wetting';
+        end
+        
+        CL.ComputeAdsorptionIsotherm(750,optsDrying);
         
         CL.FittingAdsorptionIsotherm([10 14],1)
         if(config.optsPhys.kBT == 0.75)

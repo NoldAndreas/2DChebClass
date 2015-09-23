@@ -69,7 +69,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
     figure('color','white','Position',[0 0 600 600]);
     
     for i = 1:length(y1P)
-        plot(pts{i}.z-deltaZ,f_p{i},'color',col(i,:),'linewidth',1.5); hold on;
+        plot(pts{i}.z-deltaZ,f_p{i},'color',col(i,:)); hold on;
         if(~isempty(this.AdsorptionIsotherm))
             %plot(pts{i}.z-deltaZ,rho_Ana1{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
             %plot(pts{i}.z-deltaZ,rho_Ana2{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
@@ -100,7 +100,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
     for i = 1:length(y1P)
-        plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.5);
+        plot(pts_y1{i},pts_y2{i},':','color',col(i,:));
     end        
     
     SaveCurrentFigure(this,'DensitySlicesNormal_Contour');

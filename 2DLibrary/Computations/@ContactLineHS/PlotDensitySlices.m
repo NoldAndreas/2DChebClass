@@ -24,7 +24,7 @@ function PlotDensitySlices(this)
             ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII;        
             [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
             mark     = (this.AdsorptionIsotherm.Pts.y2 < (y2Max + 0.5));
-            plot(this.AdsorptionIsotherm.Pts.y2(mark)-0.5,rho(mark),'--','color',col(i,:),'linewidth',1.5); hold on;%%%%
+            plot(this.AdsorptionIsotherm.Pts.y2(mark)-0.5,rho(mark),'--','color',col(i,:)); hold on;%%%%
         end
     end
     
@@ -47,7 +47,7 @@ function PlotDensitySlices(this)
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
     for i = 1:n
-        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.5);
+        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:));
     end
 
     %SaveFigure('DensitySlices_contour');    

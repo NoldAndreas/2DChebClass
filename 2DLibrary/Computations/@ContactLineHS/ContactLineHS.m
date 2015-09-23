@@ -261,20 +261,20 @@ classdef ContactLineHS < DDFT_2D
 
             plot([-10 35],[0 0],'k'); hold on;
             if(~isempty(this.disjoiningPressure_II))
-                plot(y1,this.disjoiningPressure_II,'r--','linewidth',1.5);     
+                plot(y1,this.disjoiningPressure_II,'r--');
             end
             if(~isempty(this.disjoiningPressure_IV))
-                plot(y1,this.disjoiningPressure_IV,'g--','linewidth',1.5);     
+                plot(y1,this.disjoiningPressure_IV,'g--');
             end    
             
             markFT = (this.hIII < 25);
             hhFT   = GetDisjoiningPressure_III(this);
-            plot(y1(markFT),hhFT(markFT),'k','linewidth',1.5);
+            plot(y1(markFT),hhFT(markFT),'k');
 
             [DeltaY1_II,DeltaY1_III] = this.ComputeDeltaFit();
             dP1D                     = GetDisjoiningPressure_I_ell(this,this.hI);
             %plot(this.y1_I+DeltaY1_II,dP1D,'k-.','linewidth',1.5);
-            plot(this.y1_I+DeltaY1_III,dP1D,'b','linewidth',1.5);
+            plot(this.y1_I+DeltaY1_III,dP1D,'b');
 
 
             xlim([min(y1) max(y1)]);

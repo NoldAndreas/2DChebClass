@@ -32,11 +32,9 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     %Plot result
     f1 = figure('Color','white','Position',[0 0 800 800]);
     
-    plot(this.AdsorptionIsotherm.mu- this.optsPhys.mu_sat,...
-                    absFT,'k','linewidth',1.5); hold on;    
-	plot(this.AdsorptionIsotherm.dmuCheck,...
-                    absFT,'k:','linewidth',1.5); hold on;    
-	plot([0 0],[0 max(absFT)],'k--','linewidth',1.5);
+    plot(this.AdsorptionIsotherm.mu- this.optsPhys.mu_sat,absFT,'k'); hold on;    
+	plot(this.AdsorptionIsotherm.dmuCheck,absFT,'k:'); hold on;    
+	plot([0 0],[0 max(absFT)],'k--');
     set(gca,'fontsize',20);
     xlabel('$\Delta \mu$','Interpreter','Latex','fontsize',25);
     ylabel('$\ell$','Interpreter','Latex','fontsize',25);    
@@ -54,13 +52,11 @@ function FittingAdsorptionIsotherm(this,FT_Int,n)
     if(sum(markk)==0)
         return;
     end
-    loglog((absFT(markk)),y(markk),'ko');  hold on;
-        
-    loglog(absFT(markk),...
-                abs(this.AdsorptionIsotherm.dmuCheck(markk)),'k:','linewidth',1.5); hold on;    	
+    loglog((absFT(markk)),y(markk),'k');  hold on;
+    loglog(absFT(markk),abs(this.AdsorptionIsotherm.dmuCheck(markk)),'k:'); hold on;    	
     
     hold on;
-    loglog((fft),(abs(mufft)),'k--','linewidth',1.5);
+    loglog((fft),(abs(mufft)),'k--');
     
     xlim(LogPlotInt);
     ylim([min(y(markk)),max(y(markk))]);

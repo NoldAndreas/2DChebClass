@@ -4,18 +4,18 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
     
     config = ThesisNanoscale_GetStandardConfig(90);    
 	
-   
-    %***************************************************
-    % Get table of epw for certain contact angles
-    thY_V = [0.0,30,45,60,90,120,135,150,180];
-    epw_V = FindEpwFromContactAngle(config,thY_V);
     
-    %****************************************************
-    [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.0,1.0:0.005:1.24,1.24:0.001:1.29]);
-    %[res,f1] = ComputeYoungContactAngle(config,[0.55:0.05:1.]);
-    
-    SaveFigure('Fig1_SurfaceTension');
-        
+     %***************************************************
+     % Get table of epw for certain contact angles
+     thY_V = [0.0,30,45,60,90,120,135,150,180];
+     epw_V = FindEpwFromContactAngle(config,thY_V);
+     
+     %****************************************************
+     [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.0,1.0:0.005:1.24,1.24:0.001:1.29]);
+     %[res,f1] = ComputeYoungContactAngle(config,[0.55:0.05:1.]);
+     
+     SaveFigure('Fig1_SurfaceTension');
+         
             
     f2 = figure('Color','white','Position',[0 0 800 800]);    	
     thetaYCA = 180/pi*res.theta_CA;    

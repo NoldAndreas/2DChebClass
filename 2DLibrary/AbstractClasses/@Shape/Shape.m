@@ -393,7 +393,7 @@ classdef (Abstract) Shape < handle
             if((nargin >= 4) && isfield(optDetails,'linewidth'))
                 lw = optDetails.linewidth;
             else
-                lw = 2.5;                
+                lw = 1.0;                
             end
             for iSpecies=1:nSpecies
                 
@@ -726,7 +726,7 @@ classdef (Abstract) Shape < handle
             end
             
             f_p = IP*f;
-            plot(offset + dist,f_p,'color',color,'linewidth',1.5); hold on;
+            plot(offset + dist,f_p,'color',color); hold on;
             xlabel(xLab_Txt);
             if(~plain)
                 plot(offset + distG1,IPG1*f,'o','MarkerEdgeColor','k','MarkerFaceColor','g');            
