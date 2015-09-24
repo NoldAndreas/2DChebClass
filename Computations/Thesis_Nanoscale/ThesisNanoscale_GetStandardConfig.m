@@ -4,7 +4,7 @@
         alpha_deg = [];
     end
     if(nargin < 2)
-        epw = [];
+        epw = 0;
     end
             
     PhysArea = struct('N',[45 75],'L1',4,'L2',2,...

@@ -15,12 +15,12 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
     	
     opts.epw_YCA = epw;
     opts.config  = config;
-    res = DataStorage('ContactAngleMeasurements',@MeasureYoungContactAngles,opts,[],[],{'config_optsNum_PhysArea_N'});
+    res = DataStorage('YoungContactAngleMeasurements',@MeasureYoungContactAngles,opts,[],[],{'config_optsNum_PhysArea_N'});
     
   	f1 = figure('Color','white','Position',[0 0 300 250]);
     plot(res.epw,180/pi*res.theta_CA,'k','linewidth',1.0); hold on;        
     xlabel('$\LJWdepth$','Interpreter','Latex');
-    ylabel('$\thY[^\circ]$','Interpreter','Latex'); 
+    ylabel('$\thYoung[^\circ]$','Interpreter','Latex'); 
     set(gca,'fontsize',20); 
     xlim([0.5 1.3]);
     set(gca,'YTick',[0 45 90 135]);

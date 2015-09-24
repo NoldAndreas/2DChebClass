@@ -6,64 +6,87 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
 	
     
      %***************************************************
+     %***************************************************
      % Get table of epw for certain contact angles
-     thY_V = [0.0,30,45,60,90,120,135,150,180];
-     epw_V = FindEpwFromContactAngle(config,thY_V);
+     %thY_V = [0.0,30,45,60,90,120,135,150,180];
+     % epw_V = FindEpwFromContactAngle(config,thY_V);
      
      %****************************************************
-     [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.0,1.0:0.005:1.24,1.24:0.001:1.29]);
-     %[res,f1] = ComputeYoungContactAngle(config,[0.55:0.05:1.]);
+     [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.0,1.0:0.005:1.24,1.24:0.001:1.29]); %[0.55:0.05:1.]     
+     AddPaths('ThesisNanoscale');  
      
-     SaveFigure('Fig1_SurfaceTension');
-         
-            
-    f2 = figure('Color','white','Position',[0 0 800 800]);    	
-    thetaYCA = 180/pi*res.theta_CA;    
-    
-    %ComputeAndPlot(0.55:0.02:1.25,90,15,'o','k');    
-    ComputeAndPlot(0.55:0.05:1.25,90,15,'o','k');    
-    ComputeAndPlot(0.45:0.05:0.8,120,15,'+','k');
-    ComputeAndPlot(1.3:0.05:1.44,40,15,'d','k');    
-  %  ComputeAndPlot(1.2:0.05:1.4,60,15,'s','k'); % N = [45,90]?? 
-    
-    xlim([0.45 1.44]);
-    xlabel('${\alpha_w \sigma^3}/{\varepsilon}$','Interpreter','Latex','fontsize',25);
-    ylabel('$\theta -\theta_{Y}[^\circ]$','Interpreter','Latex','fontsize',25);
-    set(gca,'fontsize',20);    
-           
-    inset2(f1,f2,0.38,[0.3,0.25]);
-    close(f2);  
-    fullName = SaveFigure('temp');
-   
-    config.optsPhys.V1.epsilon_w = 0.55;
+     pbaspect([1 1 1]);
+     fullName = SaveFigure('Fig1_YoungContactAngles');
+                           
+    config.optsPhys.V1.epsilon_w = 1.15;
     f3 = PlotContourLines(config);
 	f1 = hgload([fullName '.fig']);
+    set(gcf,'Color','white','Position',[0 0 300 250]);
     inset2(f1,f3,0.35,[0.55,0.65]);
     close(f3);
     
     ChangeDirData();    
-    SaveFigure(['Figures' filesep 'Fig1']);
+    SaveFigure('Fig1_YoungContactAngles');
+    
+    %****************************************************
+    %****************************************************
+    
+    f2 = figure('Color','white','Position',[0 0 300 250]);    	
+    thetaYCA = 180/pi*res.theta_CA;    
+  
+    %old
+    %ComputeAndPlot(0.55:0.05:1.25,90,15,'o','k');    
+    %ComputeAndPlot(0.45:0.05:0.8,120,15,'+','k');
+    %ComputeAndPlot(1.3:0.05:1.44,40,15,'d','k');    
+    %new
+    ComputeAndPlot(0.55:0.05:1.15,90,15,'o','k');    
+    %ComputeAndPlot(0.5:0.05:1.15,90,15,'o','k');    
+    %ComputeAndPlot(0.5:0.05:0.7,120,15,'+','k');
+    %ComputeAndPlot(1.0:0.05:1.15,40,15,'d','k');    
+  
+    pbaspect([1 1 1]);
+    xlim([0.5 1.2]);
+    xlabel('$\LJWdepth$','Interpreter','Latex');
+    ylabel('$\theta -\thYoung[^\circ]$','Interpreter','Latex');    
+           
+    %inset2(f1,f2,0.38,[0.3,0.25]); close(f2);  
+    SaveFigure('Fig1_YoungContactAngles_Errors');
+    
+    function ComputeAndPlot(epw,alpha,maxY2,symbol,color)
+        opts.config                            = config;                
+        opts.config.optsNum.maxComp_y2         = maxY2; 
+        opts.config.optsNum.PhysArea.alpha_deg = alpha;        
+        opts.epw                               = epw;    
+        
+        resL = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts,[],[],{'config_optsPhys_V1_epsilon_w'});
+        plotErr(resL,symbol,color);
+    end
          
     function f3 = PlotContourLines(config)
-        config.optsNum.PlotAreaCart = struct('y1Min',-4,'y1Max',20,...
+        config.optsNum.PlotAreaCart = struct('y1Min',-15,'y1Max',5,...
                                              'y2Min',0.5,'y2Max',20,...%'zMax',4,...
                                              'N1',100,'N2',100);
-        
+        config.optsNum.maxComp_y2  = 15;                                    
+
         CL = ContactLineHS(config);
         CL.Preprocess();
-        CLT.ComputeEquilibrium(struct('solver','Picard'));     
+        CL.ComputeEquilibrium(struct('solver','Picard'));     
         %CLT.ComputeEquilibrium();                                
         CL.PlotContourResults();
         
+        y1L = [config.optsNum.PlotAreaCart.y1Min config.optsNum.PlotAreaCart.y1Max];
         close all;
         f3 = figure('Color','white','Position',[0 0 500 300]);                        
-        ha = area([-7,20],[20,29],15,'FaceColor',0.8*[1 1 1]); hold on;
+        %ha = area(y1L,[20,29],15,'FaceColor',0.8*[1 1 1]); hold on;
         CL.PlotContourResults({});
-        plot([-5 20],[15 15],'k--','linewidth',2);
-        set(gca,'linewidth',2);        
-        text('String','$y_{max}$','VerticalAlignment', 'top','HorizontalAlignment','center ','Position',[12 17],'Interpreter','Latex','fontsize',20);        
-    end
-    
+        plot(y1L,config.optsNum.maxComp_y2*[1 1],'k--','linewidth',1.5);        
+        
+        xlabel('$y_1$','Interpreter','Latex');
+        ylabel('$y_2$','Interpreter','Latex');
+        set(gca,'XTick',[-10 0]);
+        
+       % text('String','$y_{max}$','VerticalAlignment', 'top','HorizontalAlignment','center ','Position',[(y1L(1)+6) (config.optsNum.maxComp_y2 + 4)],'Interpreter','Latex');
+    end    
     function res = MeasureContactAngles(opts,h)
         
         epw     = opts.epw;
@@ -82,7 +105,7 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
             %ChangeDirData();
             CL.SetV1(epw(i));
             CL.ComputeST();
-            CLT.ComputeEquilibrium(struct('solver','Picard'));     
+            CL.ComputeEquilibrium(struct('solver','Picard'));     
             %CL.ComputeEquilibrium();                        
             
           %  CL.PostProcess_FilmThickness([-10 0]);
@@ -100,10 +123,13 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
         %mark = iseq(res.epw,resIn.epw);
         %h    = thetaYCA(mark);
         for i = 1:length(resIn.epw)
-            mark = iseq(res.epw,resIn.epw(i));
+            mark = iseq(res.epw,resIn.epw(i));            
             epw_h = res.epw(mark);
-            th_h  = thetaYCA(mark);
-            plot(epw_h(1),resIn.thetaM(i) - th_h(1),[str1,'k'],'MarkerFaceColor',str2,'MarkerSize',8); hold on;
+            th_h  = thetaYCA(mark);           
+            if(sum(mark)==0)
+                continue;
+            end
+            plot(epw_h(1),resIn.thetaM(i) - th_h(1),[str1,'k'],'MarkerFaceColor',str2,'MarkerSize',3); hold on;
         end
         %plot(h,(resIn.theta_YCA - h),['k',str2],'linewidth',1.5);  
     end
@@ -114,14 +140,5 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
                 z(i) = true;
             end
         end
-    end
-    function ComputeAndPlot(epw,alpha,maxY2,symbol,color)
-        opts.config = config;                
-        opts.config.optsNum.maxComp_y2         = maxY2; 
-        opts.config.optsNum.PhysArea.alpha_deg = alpha;        
-        opts.epw    = epw;    
-        
-        resL = DataStorage('ContactAngleMeasurements',@MeasureContactAngles,opts,[]);
-        plotErr(resL,symbol,color);
-    end
+    end   
 end

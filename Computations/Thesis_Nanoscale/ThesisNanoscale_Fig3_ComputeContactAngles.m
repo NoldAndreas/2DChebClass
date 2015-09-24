@@ -23,6 +23,7 @@ function ThesisNanoscale_Fig3_ComputeContactAngles()
         try
             opts = v2struct(alpha_deg,epw,bounds1);            
             opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);            
+            Job_ComputeContactAngle(opts);
         catch err
             disp('ERROR')
             rethrow(err);        
