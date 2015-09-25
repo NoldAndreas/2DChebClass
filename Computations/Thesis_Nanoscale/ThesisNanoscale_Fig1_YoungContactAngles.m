@@ -38,11 +38,11 @@ function ThesisNanoscale_Fig1_YoungContactAngles()
     %ComputeAndPlot(0.55:0.05:1.25,90,15,'o','k');    
     %ComputeAndPlot(0.45:0.05:0.8,120,15,'+','k');
     %ComputeAndPlot(1.3:0.05:1.44,40,15,'d','k');    
-    %new
-    ComputeAndPlot(0.55:0.05:1.15,90,15,'o','k');    
-    %ComputeAndPlot(0.5:0.05:1.15,90,15,'o','k');    
-    %ComputeAndPlot(0.5:0.05:0.7,120,15,'+','k');
-    %ComputeAndPlot(1.0:0.05:1.15,40,15,'d','k');    
+    %new    
+    ComputeAndPlot(0.5:0.05:1.15,90,15,'o','k');    
+    ComputeAndPlot(0.5:0.05:0.7,120,15,'+','k');
+    ComputeAndPlot(1.0:0.05:1.15,60,15,'d','k');    
+    %ComputeAndPlot(0.55:0.05:1.15,90,15,'o','k');    
   
     pbaspect([1 1 1]);
     xlim([0.5 1.2]);
