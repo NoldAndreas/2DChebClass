@@ -63,22 +63,7 @@ classdef DDFT_2D < Computation
                 this.optsPhys.nSpecies = optsPhys.nSpecies;
             end
             
-            % Determine saturation point if a 2-Phase system is given
-            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap') && (this.optsPhys.nSpecies == 1))
-                [this.optsPhys.rhoGas_sat,...
-                     this.optsPhys.rhoLiq_sat,...
-                    this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
-                GetCriticalPoint(this.optsPhys);
-                % BulkPhaseDiagram(this.optsPhys);
-                this.do2Phase = true;                                
-            end
-            if(isfield(this.optsPhys,'mu_sat') && isfield(this.optsPhys,'Dmu'))
-                this.mu =  this.optsPhys.mu_sat + this.optsPhys.Dmu;       
-            end
-            if(isfield(this.optsPhys,'mu'))
-                this.mu =  this.optsPhys.mu;
-            end            
-
+            Preprocess_BulkValues(this);
             res_conv = Preprocess_MeanfieldContribution(this);
             res_fex  = Preprocess_HardSphereContribution(this);
             Preprocess_HIContribution(this);
@@ -166,6 +151,23 @@ classdef DDFT_2D < Computation
             end
         end        
         
+        function Preprocess_BulkValues(this)
+            % Determine saturation point if a 2-Phase system is given
+            if(isfield(this.optsPhys,'V2') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap') && (this.optsPhys.nSpecies == 1))
+                [this.optsPhys.rhoGas_sat,...
+                     this.optsPhys.rhoLiq_sat,...
+                    this.optsPhys.mu_sat,this.optsPhys.p] = BulkSatValues(this.optsPhys);
+                GetCriticalPoint(this.optsPhys);
+                % BulkPhaseDiagram(this.optsPhys);
+                this.do2Phase = true;                                
+            end
+            if(isfield(this.optsPhys,'mu_sat') && isfield(this.optsPhys,'Dmu'))
+                this.mu =  this.optsPhys.mu_sat + this.optsPhys.Dmu;       
+            end
+            if(isfield(this.optsPhys,'mu'))
+                this.mu =  this.optsPhys.mu;
+            end            
+        end
         function res = Preprocess_HardSphereContribution(this)      
             res = struct();
             if(isfield(this.optsNum,'FexNum'))

@@ -151,6 +151,11 @@ classdef ContactLineHS < DDFT_2D
             PtsCart                    = this.IDC.GetCartPts();
             this.VAdd                  = getVAdd(PtsCart.y1_kv,PtsCart.y2_kv,0,this.optsPhys.V1);
         end       
+        function SetkBT(this,kBT)
+            this.optsPhys.kBT = kBT;
+            this.Preprocess_BulkValues(); 
+        end
+        
         function y0  = getInitialGuess(this,rho_ig)
                     
         	rhoLiq_sat    = this.optsPhys.rhoLiq_sat;

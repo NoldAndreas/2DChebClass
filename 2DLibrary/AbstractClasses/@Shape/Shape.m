@@ -122,7 +122,7 @@ classdef (Abstract) Shape < handle
         %*************************************************************
         %******** Compute Interpolation Matrices *********************
         %*************************************************************
-        function IP   = InterpolationMatrix_Pointwise(this,y1P,y2P)            
+        function IP = InterpolationMatrix_Pointwise(this,y1P,y2P)            
             IP = zeros(length(y1P),this.N1*this.N2);            
             for i =1:length(y1P)
                 [x1,x2] = CompSpace(this,y1P(i),y2P(i));
