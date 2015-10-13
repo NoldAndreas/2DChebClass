@@ -15,7 +15,7 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
     	
     opts.epw_YCA = epw;
     opts.config  = config;
-    res = DataStorage('YoungContactAngleMeasurements',@MeasureYoungContactAngles,opts,[],[],{'config_optsNum_PhysArea_N'});
+    res          = DataStorage('YoungContactAngleMeasurements',@MeasureYoungContactAngles,opts,[],[],{'config_optsNum_PhysArea_N'});
     
   	f1 = figure('Color','white','Position',[0 0 300 250]);
     plot(res.epw,180/pi*res.theta_CA,'k','linewidth',1.0); hold on;        
@@ -41,7 +41,7 @@ function [res,f1] = ComputeYoungContactAngle(config,epw)
         
         confP = opts.config;
         confP.optsNum.PhysArea.N2bound = 3;
-        confP.optsNum.PhysArea.N = [60;3];
+        confP.optsNum.PhysArea.N       = [60;3];
         CLP = ContactLineHS(confP);
         CLP.Preprocess();     close all;
         omLG = CLP.ST_1D.om_LiqGas;            

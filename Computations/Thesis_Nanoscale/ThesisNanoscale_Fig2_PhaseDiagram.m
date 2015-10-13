@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig0_PhaseDiagram()  
+function ThesisNanoscale_Fig2_PhaseDiagram()  
 
     fontS = 15;
     

@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig3_ComputeContactAngles()
+function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
 
     
     AddPaths('ThesisNanoscale');   

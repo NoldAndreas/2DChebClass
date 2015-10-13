@@ -1,4 +1,4 @@
-function ThesisNanoscale_PercusYevick
+function ThesisNanoscale_Fig1_PercusYevick
 
     AddPaths('ThesisNanoscale');
     filename = 'D:\Data\PercusYevick\PY05.txt';
@@ -13,7 +13,7 @@ function ThesisNanoscale_PercusYevick
     xlim([0 4]);
     xlabel('$r$','Interpreter','Latex');
     ylabel('$\radialDistributionFunction(r)$','Interpreter','Latex');
-    SaveFigure('PercusYevick_RadialDistributionFunciton');
+    SaveFigure('PercusYevick_RadialDistributionFunction');
     
 	%plot(x{3},x{1},['k',sym],'MarkerFaceColor','k'); hold on;	       
 

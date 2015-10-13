@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig4_Isotherm()
+function ThesisNanoscale_FigX_Isotherm()
 
     AddPaths('ThesisNanoscale');
 

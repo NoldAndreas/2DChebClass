@@ -142,7 +142,7 @@ classdef HalfSpaceSkewed < HalfSpace & ConvolutionFiniteSupport
             end
         end
         
-         function do1DPlotParallel(this,V)    
+         function [pts_y1,V_pts] = do1DPlotParallel(this,V)    
              global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -157,7 +157,9 @@ classdef HalfSpaceSkewed < HalfSpace & ConvolutionFiniteSupport
             
             plot(sin(this.alpha)*this.Pts.y1_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
             hold on;
-            plot(sin(this.alpha)*IP.pts1,IP.InterPol*V,'linewidth',1.5);
+            pts_y1 = sin(this.alpha)*IP.pts1;
+            V_pts  = IP.InterPol*V;
+            plot(pts_y1,V_pts,'linewidth',1.5);
             xlim([-y1N y1N]);
             xlabel('$\sin(\alpha) y_{1}$','Interpreter','Latex','fontsize',25);        
             set(gca,'fontsize',20);                        

@@ -108,7 +108,7 @@ classdef ContactLineHS < DDFT_2D
                 
                 this.ST_1D.om_wallGas = params.Fex;
                 this.rho1D_wg         = rho1D;                
-            elseif(strcmp(WLWGLG,'LG'))
+            elseif(strcmp(WLWGLG,'LG') || strcmp(WLWGLG,'LV'))
                 rhoLiq_sat       = this.optsPhys.rhoLiq_sat;
                 rhoGas_sat       = this.optsPhys.rhoGas_sat;
                 Pts              = this.IDC.Pts;

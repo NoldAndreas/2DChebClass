@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig1_YoungContactAngles()
+function ThesisNanoscale_Fig3_YoungContactAngles()
     
     AddPaths('ThesisNanoscale');       
     

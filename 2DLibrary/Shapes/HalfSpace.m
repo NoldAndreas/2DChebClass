@@ -179,7 +179,7 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);       
         end        
-        function do1DPlotParallel(this,V)  
+        function [pts_y1,V_pts] = do1DPlotParallel(this,V)  
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -193,7 +193,9 @@ classdef HalfSpace < SpectralSpectral & ConvolutionPointwise
             
             plot(this.Pts.y1_kv(mark),V,'o','MarkerEdgeColor','k','MarkerFaceColor','g'); 
             hold on;
-            plot(IP.pts1,IP.InterPol*V,'linewidth',1.5);
+            pts_y1 = IP.pts1;
+            V_pts  = IP.InterPol*V;
+            plot(pts_y1,V_pts,'linewidth',1.5);
             xlim([min(IP.pts1) max(IP.pts1)]);
             xlabel('$y_{1}$','Interpreter','Latex','fontsize',25);        
             set(gca,'fontsize',20);                        
