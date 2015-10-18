@@ -110,7 +110,7 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
                 end
                 PutFigInSubplot([nameEq,'DensityNormalInterface'],figMain,sP);
                 xlim([-5 5]);
-                xlabel('$y_2$','Interpreter','Latex');        
+                xlabel('$z$','Interpreter','Latex');        
                 ylabel('$\nDensity$','Interpreter','Latex');
                 pbaspect([1 1 1]);
                 annotation('textbox',[0.02 0.9 0.1 0.05],'String','(d)','LineWidth',0,'EdgeColor','none');

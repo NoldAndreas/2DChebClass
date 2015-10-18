@@ -15,23 +15,15 @@ function ThesisNanoscale_Fig3_YoungContactAngles()
      [res,f1] = ComputeYoungContactAngle(config,[0.45:0.05:1.0,1.0:0.005:1.24,1.24:0.001:1.29]); %[0.55:0.05:1.]     
      AddPaths('ThesisNanoscale');  
      
-     pbaspect([1 1 1]);
-     fullName = SaveFigure('Fig1_YoungContactAngles');
-                           
-    config.optsPhys.V1.epsilon_w = 1.15;
-    f3 = PlotContourLines(config);
-	f1 = hgload([fullName '.fig']);
-    set(gcf,'Color','white','Position',[0 0 300 250]);
-    inset2(f1,f3,0.35,[0.55,0.65]);
-    close(f3);
-    
-    ChangeDirData();    
-    SaveFigure('Fig1_YoungContactAngles');
+     pbaspect([1 1 1]); 
+     ylim([0 135]);
+     set(gcf,'Color','white','Position',[0 0 250 200]);
+     fullName = SaveFigure('Fig1_YoungContactAngles');                             
     
     %****************************************************
     %****************************************************
     
-    f2 = figure('Color','white','Position',[0 0 300 250]);    	
+    f2 = figure('Color','white','Position',[0 0 250 200]);    	
     thetaYCA = 180/pi*res.theta_CA;    
   
     %old
@@ -50,6 +42,17 @@ function ThesisNanoscale_Fig3_YoungContactAngles()
     ylabel('$\theta -\thYoung[^\circ]$','Interpreter','Latex');    
            
     %inset2(f1,f2,0.38,[0.3,0.25]); close(f2);  
+    fullName = SaveFigure('Fig1_YoungContactAngles_Errors');
+    
+    config.optsPhys.V1.epsilon_w = 1.15;
+    f3 = PlotContourLines(config);
+    xlabel(''); ylabel('');
+	f1 = hgload([fullName '.fig']);
+    set(gcf,'Color','white','Position',[0 0 250 200]);    
+    inset2(f1,f3,0.28,[0.32,0.22]);
+    close(f3);
+    
+    ChangeDirData();    
     SaveFigure('Fig1_YoungContactAngles_Errors');
     
     function ComputeAndPlot(epw,alpha,maxY2,symbol,color)
