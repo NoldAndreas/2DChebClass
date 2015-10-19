@@ -100,7 +100,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
     for i = 1:length(y1P)
-        plot(pts_y1{i},pts_y2{i},':','color',col(i,:));
+        plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.5);
     end        
     
     SaveCurrentFigure(this,'DensitySlicesNormal_Contour');

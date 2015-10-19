@@ -31,7 +31,6 @@ function PostProcess(this,opts)
          
     function res = ComputePostProcess(opts,misc)
         
-        
          %ComputeAdsorptionIsotherm(this,'load'); %epw = 0.7: '\2DChebData\POF_FMT_ContactLine\deg90\IterativeContinuationPostProcess\2014_8_13_16_55_32.496'
          if(isfield(opts,'AdsorptionIsotherm_file'))
              ComputeAdsorptionIsotherm(this,opts.AdsorptionIsotherm_file);

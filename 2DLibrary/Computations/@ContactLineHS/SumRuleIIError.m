@@ -39,6 +39,6 @@ function [err,epsRel,pi_II] = SumRuleIIError(this,interval_y1)
      %(4) Compute Sum rule error
      err    = SumRule_DisjoiningPressure(this,'II');                 
 
-     this.y1_SpectralLine = y1_SL_old;
+    % this.y1_SpectralLine = y1_SL_old;
 
 end  

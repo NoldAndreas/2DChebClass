@@ -4,11 +4,11 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
     AddPaths('ThesisNanoscale');   
     global dirData             
     
-    %ComputeData(45,1.155,-2.5);
-    %ComputeData(60,1.071,-5);
-    %ComputeData(90,0.856,-7.5);
-    %ComputeData(120,0.594,-7.5);
-    %ComputeData(135,0.453,-10);
+    ComputeData(45,1.155,-2.5);
+    ComputeData(60,1.071,-5);
+    ComputeData(90,0.856,-7.5);
+    ComputeData(120,0.594,-7.5);
+    ComputeData(135,0.453,-10);
         
     PlotData(45,-2.5,'2015_9_19_19_55_33',[-0.1 0],[-0.15 0.05],0.6);
     PlotData(60,-5,'2015_9_20_0_2_34',[-0.2 -0.1 0],[-0.2 0.05],0.6);
@@ -22,8 +22,10 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
         AddPaths('ThesisNanoscale');   
         try
             opts = v2struct(alpha_deg,epw,bounds1);            
-            opts.AdsorptionIsotherm_file = ComputeExactAdsorptionIsotherm(opts);            
-            Job_ComputeContactAngle(opts);
+            [opts.AdsorptionIsotherm_file] = ComputeExactAdsorptionIsotherm(opts);            
+            [~,res] = Job_ComputeContactAngle(opts);
+                        
+            disp(res);
         catch err
             disp('ERROR')
             rethrow(err);        
@@ -199,28 +201,51 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
                                                    'zMax',4,...
                                                     'N1',100,'N2',100);
     end
-    function nameEq = Job_ComputeContactAngle(opts)
+    function [nameEq,res] = Job_ComputeContactAngle(opts)
+        
+        %output:
+        % - thetaY                  = Young contact angle
+        % - int_DPI                 = -int_h0^\infty DP_I(h) dh
+        % - error_int_DPI           = error of int_DPI
+        % - thetaY_I                = contact angle obtained from integration of adsorption isotherm        
+        % - error\Delta(\thetaY_I)  = error of thetaY_I
+        % - int_DPII                = -int_{-\infty}^\infty DP_I(x) dx
+        % - error_int_DPII          = error of int_DPII
+        % - thetaY_II               = contact angle obtained from integration of DPII 
+        % - error\Delta(\thetaY_II) = error of thetaY_II
+        
 
         config = GetStandardConfig(opts);
         close all;
 
         CLT = ContactLineHS(config);     
         CLT.Preprocess();
-        CLT.ComputeEquilibrium(struct('solver','Picard'));      
+        CLT.ComputeEquilibrium(struct('solver','Picard'));
         CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
         CLT.PlotDensitySlicesNormalInterface();
         CLT.PlotDisjoiningPressures();                
         CLT.FittingAdsorptionIsotherm([10 14],1);
+        
+        CLT.SumRule_DisjoiningPressure('I');
+        [res.theta_sumrule_I,res.errTheta_I,...
+              res.Int_I,res.errI] = CLT.SumRule_AdsorptionIsotherm(0.3463);
+                
+        CLT.SumRuleIIError([-10,20]);               
+        [~,res.theta_sumrule_II,res.errTheta_II,...
+                 res.Int_II,res.errII] = CLT.SumRule_DisjoiningPressure('II');        
+             
+        res.thetaY = CLT.alpha_YCA*180/pi;
                 
         [~,fn] = fileparts(CLT.FilenameEq);
         nameEq = [fn,'_'];            
     end
    
-    function filename = ComputeExactAdsorptionIsotherm(opts)
+    function [filename] = ComputeExactAdsorptionIsotherm(opts)
         
         config = ThesisNanoscale_GetStandardConfig(90,opts.epw);
         
+        config.optsNum.PhysArea.L2        = 4;
         config.optsNum.PhysArea.N         = [1,250];        
         config.optsNum.maxComp_y2         = -1;
         %config.optsNum.y1Shift            = 0;
@@ -235,14 +260,13 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
             optsDrying = 'wetting';
         end
         
-        CL.ComputeAdsorptionIsotherm(750,optsDrying);
+        CL.ComputeAdsorptionIsotherm(650,optsDrying);
         
         CL.FittingAdsorptionIsotherm([10 14],1)
         if(config.optsPhys.kBT == 0.75)
-            CL.SumRule_AdsorptionIsotherm(0.3463);
+             CL.SumRule_AdsorptionIsotherm(0.3463);
         end
         
         filename = CL.AdsorptionIsotherm.Filename;
-
     end
 end

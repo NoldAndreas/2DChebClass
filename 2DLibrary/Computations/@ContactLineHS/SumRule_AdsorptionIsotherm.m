@@ -1,4 +1,4 @@
-function theta_sumrule = SumRule_AdsorptionIsotherm(this,ST_LG) 
+function [theta_sumrule,errTheta,I,errI] = SumRule_AdsorptionIsotherm(this,ST_LG) 
 
     if(nargin < 2)
         ST_LG = this.ST_1D.om_LiqGas;
@@ -13,7 +13,7 @@ function theta_sumrule = SumRule_AdsorptionIsotherm(this,ST_LG)
     rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
     rhoGas_sat     = this.optsPhys.rhoGas_sat;
     
-    ftMax = 20;
+    ftMax = 20; 
     mark  = (this.AdsorptionIsotherm.FT < ftMax);
     
     mu_I = this.AdsorptionIsotherm.mu(mark) - mu_sat;
@@ -29,16 +29,16 @@ function theta_sumrule = SumRule_AdsorptionIsotherm(this,ST_LG)
     
     I = I*(rhoLiq_sat-rhoGas_sat);
     %(2) Compute contact angle from sum rule and compare with Young CA
-    theta_sumrule = acos(1 - I/ST_LG);
+    theta_sumrule = acos(1 - I/ST_LG)*180/pi;
     
     if(min(this.AdsorptionIsotherm.FT) < 0)
-        theta_sumrule = pi - theta_sumrule;
+        theta_sumrule = 180 - theta_sumrule;
     end
     
     %fprintf(['Error for Contact Angle from Sum Rule for Disjoining Potential: ',num2str((theta_sumrule-this.alpha_YCA)*180/pi,2),' [deg]\n']);
-    errI = I-ST_LG*(1-abs(cos(this.alpha_YCA)));
+    errI     = I-ST_LG*(1-abs(cos(this.alpha_YCA)));
+    errTheta = errI/ST_LG/sin(theta_sumrule*pi/180)*180/pi;
     disp(['Integral expression: ',num2str(I),' +/- ',num2str(errI)]);
-    fprintf(['Contact Angle from Sum Rule for Disjoining Potential: ',num2str((theta_sumrule)*180/pi),' [deg] +/_ ',num2str(errI/ST_LG/sin(theta_sumrule)*180/pi),' [deg]\n' ]);
-    
+    fprintf(['Contact Angle from Sum Rule for Disjoining Potential: ',num2str(theta_sumrule),' [deg] +/_ ',num2str(errTheta),' [deg]\n' ]);
     
 end

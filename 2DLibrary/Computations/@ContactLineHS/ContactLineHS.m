@@ -300,7 +300,7 @@ classdef ContactLineHS < DDFT_2D
         %Adsorption Isotherm
         ComputeAdsorptionIsotherm(this,n,drying)
         FittingAdsorptionIsotherm(this,FT_Int,n)
-        SumRule_AdsorptionIsotherm(this,ST_LG)
+        [theta_sumrule,errTheta,I,errI] = SumRule_AdsorptionIsotherm(this,ST_LG)
         function [Pi_I,V_I] = GetDisjoiningPressure_I(this)
             rhoLiq_sat     = this.optsPhys.rhoLiq_sat;
             rhoGas_sat     = this.optsPhys.rhoGas_sat;    
@@ -365,7 +365,7 @@ classdef ContactLineHS < DDFT_2D
         %Compute disjoining pressure
         Compute_DisjoiningPressure_II(this,y1Int)
         Compute_DisjoiningPressure_IV(this)
-        errRel = SumRule_DisjoiningPressure(this,II_or_IV)      
+        [errRel,estTheta,error_estTheta,I,err] = SumRule_DisjoiningPressure(this,II_or_IV)      
         [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
         
         %Compute height profiles
