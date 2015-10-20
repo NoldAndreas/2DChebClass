@@ -410,10 +410,10 @@ classdef ContactLineHS < DDFT_2D
                 return;
             end
 
-            dP1D        = GetDisjoiningPressure_I_ell(this,this.hI);
-            [min_I,i_I] = min(dP1D);
+            dP1D            = GetDisjoiningPressure_I_ell(this,this.hI);
+            [min_I,i_I]     = min(dP1D);
             [min_III,i_III] = min(GetDisjoiningPressure_III(this));
-            DeltaY1_III = this.y1_SpectralLine.Pts.y(i_III) - this.y1_I(i_I);
+            DeltaY1_III     = this.y1_SpectralLine.Pts.y(i_III) - this.y1_I(i_I);
             
             hS           = max(this.hI);
             h0           = min(this.hIII);

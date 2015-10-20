@@ -36,7 +36,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         h               = IP*h_full;        
         dhdx            = IP*dhIIIdx;
         [pts_y1{i},pts_y2{i}] = GetStartEndNormalPts(y1,h,dhdx,deltaZ);
-        [f_p{i},pts{i}] = this.IDC.plotLine(pts_y1{i},0.5+pts_y2{i},this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:))); %'plain',true        
+        [f_p{i},pts{i}]       = this.IDC.plotLine(pts_y1{i},0.5+pts_y2{i},this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:))); %'plain',true        
         
         %rho_Ana = rholv(z)*rho_wl(y_2)/rho_liq
         IP_WL      = this.IDC.SubShapePtsCart(pts{i});                
@@ -100,7 +100,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
     for i = 1:length(y1P)
-        plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.5);
+        plot(pts_y1{i},pts_y2{i},':','color',col(i,:),'linewidth',1.3);
     end        
     
     SaveCurrentFigure(this,'DensitySlicesNormal_Contour');

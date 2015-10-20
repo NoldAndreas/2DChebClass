@@ -16,13 +16,14 @@ function [errRel,estTheta,error_estTheta,I,err] = SumRule_DisjoiningPressure(thi
     %Integrate along y1, and check sum rule
     % - Int(DisjoiningPressure(y),y=-inf..inf) = \gammaLV*sin(theta)            
 
-    Int_y1  = this.y1_SpectralLine.Int;
-    sinGamm = sin(this.alpha_YCA)*ST_LG;
-    err       = (Int_y1*anaDP + sinGamm);
-    errRel    = err/sinGamm;            
-    disp(['Integral expression: ',num2str(Int_y1*anaDP),' +/- ',num2str(err) , ' or relative: ',num2str(errRel*100),' percent']);
+    Int_y1  = this.y1_SpectralLine.Int;    
+   
+    I         = (-Int_y1*anaDP)/ST_LG;    
+    err       = I - sin(this.alpha_YCA);
+    errRel    = err/I;            
+    disp(['Integral expression: ',num2str(I),' +/- ',num2str(err) , ' or relative: ',num2str(errRel*100),' percent']);
 
-    I              = (-Int_y1*anaDP)/ST_LG;
+    
     estTheta       = asin(I)*180/pi;
     if(IsDrying(this))
         estTheta = 180 - estTheta;

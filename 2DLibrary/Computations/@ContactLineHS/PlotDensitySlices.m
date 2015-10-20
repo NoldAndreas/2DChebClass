@@ -47,7 +47,7 @@ function PlotDensitySlices(this)
         PlotContourResults(this,{'hI','hII'}); hold on;        
     end
     for i = 1:n
-        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.5);
+        plot([y1P(i) y1P(i)],[0 (y2Max-0.5)],':','color',col(i,:),'linewidth',1.3);
     end
 
     %SaveFigure('DensitySlices_contour');    
