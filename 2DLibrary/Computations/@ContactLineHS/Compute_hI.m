@@ -13,7 +13,8 @@ function Compute_hI(this)
                 %min(max(this.hII),max(this.hIII)));
        
     if(this.optsNum.PhysArea.alpha_deg == 90)
-        hmax = max(hmax,6);
+        hmax = min(hmax,2.5);
+        L    = 3;
     end
     
     yN = 0; hN = hmax;    

@@ -31,11 +31,17 @@ function PlotDensitySlicesNormalInterface(this,y1P)
                 
     L2_AdIso = 4;%input('Parameter L_2 used for computation of adsorption isotherm: ');
     for i = 1:length(y1P)
-        y1              = y1P(i);
-        IP              = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i));
-        h               = IP*h_full;        
-        dhdx            = IP*dhIIIdx;
-        [pts_y1{i},pts_y2{i}] = GetStartEndNormalPts(y1,h,dhdx,deltaZ);
+        
+        if( abs(90 - this.alpha_YCA*180/pi) > 5)
+            y1              = y1P(i);
+            IP              = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i));
+            h               = IP*h_full;        
+            dhdx            = IP*dhIIIdx;
+            [pts_y1{i},pts_y2{i}] = GetStartEndNormalPts(y1,h,dhdx,deltaZ);
+        else
+            pts_y1{i} = deltaZ*[-1,1];
+            pts_y2{i} = [1,1]*this.optsNum.PlotAreaCart.y2Max*(0.5+(i-1))/n;
+        end
         [f_p{i},pts{i}]       = this.IDC.plotLine(pts_y1{i},0.5+pts_y2{i},this.GetRhoEq,struct('dist0',true,'plain',true,'CART',true,'color',col(i,:))); %'plain',true        
         
         %rho_Ana = rholv(z)*rho_wl(y_2)/rho_liq
@@ -48,7 +54,7 @@ function PlotDensitySlicesNormalInterface(this,y1P)
         %plot(pts{i}.z-deltaZ,rho_Ana{i},'--','color',col(i,:),'linewidth',1.5); hold on;       
         
         %rho_Ana2 = rho_dp(y_2)
-        if(~isempty(this.AdsorptionIsotherm))
+        if(~isempty(this.AdsorptionIsotherm) && ( abs(90 - this.alpha_YCA*180/pi) > 5))            
             th       = atan(dhdx);
             ell      = this.y1_SpectralLine.InterpolationMatrix_Pointwise(y1P(i))*this.hIII/cos(th);        
             [rho,mu] = GetPointAdsorptionIsotherm(this,ell);        
