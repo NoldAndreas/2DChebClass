@@ -258,7 +258,11 @@ classdef ContactLineHS < DDFT_2D
             
             SaveCurrentFigure(this,'Interfaces');
         end
-        function f2 = PlotDisjoiningPressures(this)
+        function f2 = PlotDisjoiningPressures(this,opts)
+            
+            if(nargin == 1)
+                opts = {};
+            end
 
             y1   = this.y1_SpectralLine.Pts.y;    
 
@@ -266,9 +270,9 @@ classdef ContactLineHS < DDFT_2D
 
             plot([-10 35],[0 0],'k'); hold on;
             if(~isempty(this.disjoiningPressure_II))
-                plot(y1,this.disjoiningPressure_II,'r--');
+                plot(y1,this.disjoiningPressure_II,'k--');
             end
-            if(~isempty(this.disjoiningPressure_IV))
+            if(~isempty(this.disjoiningPressure_IV) && ~ IsOption(opts,'noDP_IV'))
                 plot(y1,this.disjoiningPressure_IV,'g--');
             end    
             

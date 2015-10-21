@@ -3,18 +3,20 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
     
     AddPaths('ThesisNanoscale');   
     global dirData             
+    
+    interValFitIsotherm = [9 12];
    
-    res45  = ComputeData(45,1.155,-2.5);
-    res60  = ComputeData(60,1.071,-5);
+   % res45  = ComputeData(45,1.155,-2.5);
+%    res60  = ComputeData(60,1.071,-5);
     res90  = ComputeData(90,0.856,-7.5);
-    res120 = ComputeData(120,0.594,-7.5);
-    res135 = ComputeData(135,0.453,-7.5);
+%    res120 = ComputeData(120,0.594,-7.5);
+%    res135 = ComputeData(135,0.453,-7.5);
         
-    PlotData(45,-2.5,'2015_9_19_19_55_33',[-0.1 0],[-0.15 0.05],0.6);
-    PlotData(60,-5,'2015_9_20_0_2_34',[-0.2 -0.1 0],[-0.2 0.05],0.6);
+   % PlotData(45,-2.5,'2015_9_19_19_55_33',[-0.1 0],[-0.15 0.05],0.6);
+%    PlotData(60,-5,'2015_9_20_0_2_34',[-0.2 -0.1 0],[-0.2 0.05],0.6);
     PlotData(90,-7.5,'2015_9_18_11_25_36',[-0.2 -0.1 0],[-0.2 0.05],0.55);
-    PlotData(120,-7.5,'2015_9_20_4_1_22',[-0.1 0],[-0.1,0.05],0.48);
-    PlotData(135,-7.5,'2015_9_20_7_53_56',[-0.04 -0.02 0],[-0.04 0],0.48);
+    %PlotData(120,-7.5,'2015_9_20_4_1_22',[-0.1 0],[-0.1,0.05],0.48);
+    %PlotData(135,-7.5,'2015_9_20_7_53_56',[-0.04 -0.02 0],[-0.04 0],0.48);
     
     
     function res = ComputeData(alpha_deg,epw,bounds1)
@@ -224,11 +226,11 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
         CLT.PostProcess(opts);
         CLT.PlotDensitySlices();
         CLT.PlotDensitySlicesNormalInterface();
-        CLT.PlotDisjoiningPressures();                
-        CLT.FittingAdsorptionIsotherm([10 14],1);
+        CLT.PlotDisjoiningPressures({'noDP_IV'});                
+        CLT.FittingAdsorptionIsotherm(interValFitIsotherm,1);
         
         CLT.SumRule_DisjoiningPressure('I');
-        CLT.FittingAdsorptionIsotherm([10 14],1);
+        CLT.FittingAdsorptionIsotherm(interValFitIsotherm,1);
         [res.theta_sumrule_I,res.errTheta_I,...
               res.Int_I,res.errI] = CLT.SumRule_AdsorptionIsotherm();
                 
@@ -263,7 +265,7 @@ function ThesisNanoscale_Fig5_6_7_8_9_ComputeContactAngles()
         
         CL.ComputeAdsorptionIsotherm(650,optsDrying);
         
-        CL.FittingAdsorptionIsotherm([10 14],1);        
+        CL.FittingAdsorptionIsotherm(interValFitIsotherm,1);        
         if(config.optsPhys.kBT == 0.75)
              CL.SumRule_AdsorptionIsotherm(0.3463);
         end
