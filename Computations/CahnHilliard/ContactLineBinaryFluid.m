@@ -59,7 +59,8 @@ function ContactLineBinaryFluid
     %PlotFigure4_Thesis();	
     %PlotFigure5_Thesis();
     %PlotFigure6_Thesis();    
-    PlotFigure7_Thesis();
+    %PlotFigure7_Thesis();   
+    PlotFigure7_APSDFD_2015(); 
     %PlotFigure8_Thesis();
     %***************************************
     %***************************************
@@ -276,6 +277,117 @@ function ContactLineBinaryFluid
         %ylabel([]);
         SaveFigure(['Wall_FluxAlongWall_mudy1',num2str(Ca)],parameters);
     end
+
+    function PlotFigure7_APSDFD_2015()
+        iCak   = 1;
+        iy2Max = 3;
+        Ca     = dataN{1}(iCak,1).Ca;
+        
+        %dataM{l_d}[Cak,y2Max]
+        xl = [0 max(dataN{1}(iCak,iy2Max).IsoInterface.r)];
+        blue  = [0 0 1];     
+        %green = [0 1 0];
+        red   = [1 0 0];        
+        defaultOpts = {'noLegend','noNewFigure','IsoInterface'};
+        
+        fsub_c = figure('Position',[0 0 300 250],'color','white');     
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_left',defaultOpts,[],red);   xlim(xl);        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc_right',defaultOpts,[],blue);   xlim(xl);                        
+        ylim([-0.5 2.5]);set(gca,'YTick',[0 2]);
+        pbaspect([1 1 1]);
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);                
+        
+        fsub_d = figure('Position',[0 0 300 250],'color','white');                
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_left',defaultOpts,[],red);   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd_right',defaultOpts,[],blue);   xlim(xl);
+        ylim([-2 0]);    set(gca,'YTick',[-2 0]);    
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);
+        
+        fsub_f = figure('Position',[0 0 300 250],'color','white');        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_left',defaultOpts,[],red);   xlim(xl);
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf_right',defaultOpts,[],blue);   xlim(xl);
+        ylim([0 4]);        set(gca,'YTick',[0 4]);
+        ylabel(''); xlabel(''); title('');
+        set(gca,'XTick',[0 20]);
+        pbaspect([1 1 1]);
+        
+        
+        n1 = 2; n2 = 3; %FOR APS_DFD 2015 conference talk
+        
+        if(n1 == 3)
+            fMain = figure('Position',[0 0 600 750],'color','white');
+        else
+            fMain = figure('Position',[0 0 564 293],'color','white');
+        end
+        
+        subplot(n1,n2,1); %figure('Position',[0 0 300 250],'color','white');        
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCa',defaultOpts);   xlim(xl);        
+        title('$\llbracket {\normalVec \cdot \vel} \rrbracket$','Interpreter','Latex');                
+        ylabel('');
+        pbaspect([1 1 1]);
+        ylim([-0.01 0.01]);
+        
+        %SaveFigure(['BC_a_along_Interface',num2str(Ca)],parameters);
+        
+        subplot(n1,n2,2); %figure('Position',[0 0 300 250],'color','white');               
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCb',defaultOpts);   xlim(xl);
+        title('$\llbracket \mu^{\pm} \rrbracket$','Interpreter','Latex');
+        ylabel('');
+        ylim([-0.005 0.005]); pbaspect([1 1 1]); 
+        %SaveFigure(['BC_b_along_Interface',num2str(Ca)],parameters);
+        
+        subplot(n1,n2,3); %figure('Position',[0 0 300 250],'color','white');               
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc',defaultOpts);   xlim(xl);        
+        ylim([-1.5 0.2]); %set(gca,'YTick',[-1.5 -1 -0.5 0]);
+        title('${\color{red} \llbracket \normalVec \cdot \Grad \mu^{\pm} \rrbracket}-{\color{blue} 2 (\normalVec \cdot \vel)}$','Interpreter','Latex');        
+        ylabel('');
+        pbaspect([1 1 1]);
+        if(n1 == 3)
+            inset2(fMain,fsub_c,0.15,[0.25,0.45]);  
+        elseif(n1 == 2)
+            inset2(fMain,fsub_c,0.15,[0.78,0.70]);
+        end
+        %SaveFigure(['BC_c_along_Interface',num2str(Ca)],parameters);
+                
+        subplot(n1,n2,4); %figure('Position',[0 0 300 250],'color','white');               
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd',defaultOpts);   xlim(xl);        
+        ylim([-0.02 0.15]); set(gca,'YTick',[0 0.05 0.1 0.15]); set(gca,'XTickLabel',{'0','0.05','0.1','0.15'});
+        
+        title('${\color{red}\llbracket \frac{2}{3}\frac{\kappa}{Ca_k} \rrbracket} - {\color{blue} \mu^{\pm}}$','Interpreter','Latex');
+        ylabel('');
+        pbaspect([1 1 1]);
+        if(n1 == 3)
+            inset2(fMain,fsub_d,0.15,[0.71,0.47]);    
+        elseif(n1 == 2)
+            inset2(fMain,fsub_c,0.15,[0.23,0.27]);
+        end
+        %SaveFigure(['BC_d_along_Interface',num2str(Ca)],parameters);
+        
+        subplot(n1,n2,5); %figure('Position',[0 0 300 250],'color','white');               
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCe',defaultOpts);   xlim(xl);
+        title('$\llbracket  \IrrevStressTensor^{12} \rrbracket$','Interpreter','Latex');
+        ylabel('');
+        ylim([-0.01 0.002]); pbaspect([1 1 1]);
+        %SaveFigure(['BC_e_along_Interface',num2str(Ca)],parameters);        
+        
+        subplot(n1,n2,6); %figure('Position',[0 0 300 250],'color','white');                       
+        PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf',defaultOpts);   xlim(xl);        
+        ylim([-2 0]);%set(gca,'YTick',[-2 -1 0]);
+        title('${\color{red}\llbracket - p + \IrrevStressTensor^{22} \rrbracket}-({\color{blue}- 2\mu^{\pm}})$','Interpreter','Latex');
+        ylabel('');
+        pbaspect([1 1 1]);
+        if(n1 == 3)
+            inset2(fMain,fsub_f,0.15,[0.71,0.16]);  
+        elseif(n1 == 2)
+            inset2(fMain,fsub_f,0.15,[0.78,0.22]);
+        end
+        %SaveFigure(['BC_f_along_Interface',num2str(Ca)],parameters);
+        SaveFigure(['BCs_along_Interface',num2str(Ca),'APSDFD2015'],parameters);
+    end
     function PlotFigure7_Thesis()
                 
         iCak   = 1;
@@ -314,9 +426,17 @@ function ContactLineBinaryFluid
         set(gca,'XTick',[0 20]);
         pbaspect([1 1 1]);
         
-        fMain = figure('Position',[0 0 600 750],'color','white');        
         
-        subplot(3,2,1); %figure('Position',[0 0 300 250],'color','white');        
+        n1 = 3; n2 = 2; %FOR THESIS
+        %n1 = 2; n2 = 3; %FOR APS_DFD 2015 conference talk
+        
+        if(n1 == 3)
+            fMain = figure('Position',[0 0 600 750],'color','white');
+        else
+            fMain = figure('Position',[0 0 600 300],'color','white');
+        end
+        
+        subplot(n1,n2,1); %figure('Position',[0 0 300 250],'color','white');        
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCa',defaultOpts);   xlim(xl);
         title('(a)');
         ylabel('$\llbracket {\normalVec \cdot \vel} \rrbracket$','Interpreter','Latex');                
@@ -325,41 +445,53 @@ function ContactLineBinaryFluid
         
         %SaveFigure(['BC_a_along_Interface',num2str(Ca)],parameters);
         
-        subplot(3,2,2); %figure('Position',[0 0 300 250],'color','white');               
+        subplot(n1,n2,2); %figure('Position',[0 0 300 250],'color','white');               
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCb',defaultOpts);   xlim(xl);
         ylabel('$\llbracket \mu^{\pm} \rrbracket$','Interpreter','Latex');
         title('(b)'); ylim([-0.005 0.005]); pbaspect([1 1 1]); 
         %SaveFigure(['BC_b_along_Interface',num2str(Ca)],parameters);
         
-        subplot(3,2,3); %figure('Position',[0 0 300 250],'color','white');               
+        subplot(n1,n2,3); %figure('Position',[0 0 300 250],'color','white');               
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCc',defaultOpts);   xlim(xl);        
         ylim([-1.5 0.2]); %set(gca,'YTick',[-1.5 -1 -0.5 0]);
         ylabel('${\color{red} \llbracket \normalVec \cdot \Grad \mu^{\pm} \rrbracket}-{\color{blue} 2 (\normalVec \cdot \vel)}$','Interpreter','Latex');        
         title('(c)'); pbaspect([1 1 1]);
-        inset2(fMain,fsub_c,0.15,[0.25,0.45]);  
+        if(n1 == 3)
+            inset2(fMain,fsub_c,0.15,[0.25,0.45]);  
+        elseif(n1 == 2)
+            inset2(fMain,fsub_c,0.15,[0.78,0.70]);
+        end
         %SaveFigure(['BC_c_along_Interface',num2str(Ca)],parameters);
                 
-        subplot(3,2,4); %figure('Position',[0 0 300 250],'color','white');               
+        subplot(n1,n2,4); %figure('Position',[0 0 300 250],'color','white');               
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCd',defaultOpts);   xlim(xl);        
         ylim([-0.02 0.15]); set(gca,'YTick',[0 0.05 0.1 0.15]); set(gca,'XTickLabel',{'0','0.05','0.1','0.15'});
         
         ylabel('${\color{red}\llbracket \frac{2}{3}\frac{\kappa}{Ca_k} \rrbracket} - {\color{blue} \mu^{\pm}}$','Interpreter','Latex');
         title('(d)'); pbaspect([1 1 1]);
-        inset2(fMain,fsub_d,0.15,[0.71,0.47]);  
+        if(n1 == 3)
+            inset2(fMain,fsub_d,0.15,[0.71,0.47]);    
+        elseif(n1 == 2)
+            inset2(fMain,fsub_c,0.15,[0.23,0.27]);
+        end
         %SaveFigure(['BC_d_along_Interface',num2str(Ca)],parameters);
         
-        subplot(3,2,5); %figure('Position',[0 0 300 250],'color','white');               
+        subplot(n1,n2,5); %figure('Position',[0 0 300 250],'color','white');               
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCe',defaultOpts);   xlim(xl);
         ylabel('$\llbracket  \IrrevStressTensor^{12} \rrbracket$','Interpreter','Latex');
         title('(e)'); ylim([-0.01 0.002]); pbaspect([1 1 1]);
         %SaveFigure(['BC_e_along_Interface',num2str(Ca)],parameters);        
         
-        subplot(3,2,6); %figure('Position',[0 0 300 250],'color','white');                       
+        subplot(n1,n2,6); %figure('Position',[0 0 300 250],'color','white');                       
         PlotAsymptoticInterfaceResults(dataN,iCak,iy2Max,'BCf',defaultOpts);   xlim(xl);        
         ylim([-2 0]);%set(gca,'YTick',[-2 -1 0]);
         ylabel('${\color{red}\llbracket - p + \IrrevStressTensor^{22} \rrbracket}-({\color{blue}- 2\mu^{\pm}})$','Interpreter','Latex');
         title('(f)');  pbaspect([1 1 1]);
-        inset2(fMain,fsub_f,0.15,[0.71,0.16]);  
+        if(n1 == 3)
+            inset2(fMain,fsub_f,0.15,[0.71,0.16]);  
+        elseif(n1 == 2)
+            inset2(fMain,fsub_f,0.15,[0.78,0.22]);
+        end
         %SaveFigure(['BC_f_along_Interface',num2str(Ca)],parameters);
         SaveFigure(['BCs_along_Interface',num2str(Ca)],parameters);
 
