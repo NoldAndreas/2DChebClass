@@ -3,7 +3,7 @@
     AddPaths('CodePaper');            
     close all;
     
-    advancing = false;
+    advancing = true;
     if(advancing)
         alpha_deg = 135;
         epw       = 0.856; %= 90 degree contact angle

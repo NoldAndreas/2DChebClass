@@ -1,17 +1,18 @@
-%function ContactLineDynamics_45degrees()
+function ContactLineDynamics_45degrees()
 
     AddPaths('CodePaper');            
     close all;
     
-    advancing = true;
+    advancing = false;
     if(~advancing)
         alpha_deg = 45;
         epw       = 0.856; %= 90 degree contact angle
         maxT      = 400;
     else
         alpha_deg = 60;
-        epw       = 1.154; %= 45 degree contact angle
-        maxT      = 600;
+        epw       = 1.22;  %= +/- 30 degree contact angle
+        %epw       = 1.154; %= 45 degree contact angle
+        maxT      = 400;
     end
     
     PhysArea = struct('N',[40,40],...
@@ -85,7 +86,7 @@
     rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
-    CL.PostprocessDynamics();
+    CL.PostprocessDynamics([4,5.5]);
     
        
     CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});

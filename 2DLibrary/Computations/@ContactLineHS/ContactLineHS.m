@@ -468,7 +468,12 @@ classdef ContactLineHS < DDFT_2D
             end
             fullName = SaveCurrentFigure@Computation(this,filename);            
         end
-        function PostprocessDynamics(this)                        
+        function PostprocessDynamics(this,y2Lim)
+
+            if(nargin < 2)
+                y2Lim = [5 7.5];
+            end
+            
             PostprocessDynamics@DDFT_2D(this);
                         
             %Compute Position Of Contact Line
@@ -492,12 +497,12 @@ classdef ContactLineHS < DDFT_2D
             this.dynamicsResult.fittedInterface.y1 = zeros(length(y2_Interface),nSpecies,no_t);
             this.dynamicsResult.fittedInterface.y2 = zeros(length(y2_Interface),nSpecies,no_t);
             
-            ak = [];
+            ak = [];            
             for nt = 1:no_t
                 rho_eq        = rho_t(:,1,nt);
                 %y1_0_Cart(nt) = fsolve(@rhoX1,0,fsolveOpts);
                 
-                [y1_0_Cart(nt),ca_deg(nt),y1_Interface{nt},ak]= ExtrapolateInterface(this,rho_eq,y2_Interface,ak);
+                [y1_0_Cart(nt),ca_deg(nt),y1_Interface{nt},ak]= ExtrapolateInterface(this,rho_eq,y2_Interface,ak,y2Lim);
                 this.dynamicsResult.fittedInterface.y1(:,1,nt) = y1_Interface{nt};
                 this.dynamicsResult.fittedInterface.y2(:,1,nt) = y2_Interface;
             end         
@@ -519,7 +524,7 @@ classdef ContactLineHS < DDFT_2D
                 z        = IP*rho_eq-rho0;
             end 
         end
-        [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak)
+        [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak,y2Lim)
             
         %to delete
         [f,y1]  = PostProcess(this,y1Int)

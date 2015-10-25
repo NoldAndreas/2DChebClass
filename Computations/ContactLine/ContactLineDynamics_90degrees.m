@@ -17,11 +17,13 @@ function ContactLineDynamics_90degrees(opts)
     elseif(IsOption(opts,'chemical'))
         BCwall = [];
         if(IsOption(opts,'advancing'))        
-            maxT     = 600;
-            epw       = 1.154; %= 45 degree contact angle
+            maxT     = 400;
+            %epw       = 1.3; % = +/- 0 degree contact angle
+            epw       =  1.154; %= 45 degree contact angle
         elseif(IsOption(opts,'receding'))    
+            %epw       = 0.05; %= 180 degree contact angle
             epw       = 0.453; %= 135 degree contact angle
-            maxT      = 600;
+            maxT      = 400;
         end
     end
     

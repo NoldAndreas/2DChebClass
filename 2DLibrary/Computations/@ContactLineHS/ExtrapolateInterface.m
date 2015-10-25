@@ -1,10 +1,15 @@
-function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(this,rho,y2,ak_ig)
+function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(this,rho,y2,ak_ig,y2Lim)
             
 	%Based on values of the interface away from the wall at (y_1^k,y_2^k)
     %Interpolate to 
     % (EQ) y_1Interface = c*y_2*(1+sum_k  a_k exp(-lambda_k *y_2^k))
-       
-    y2k     = [4;5];
+    
+    
+   % y2k     = [4;5];
+    %y2k     = (4:0.1:5.5)';    
+    y2k     = (y2Lim(1):0.1:y2Lim(2))';
+    nk      = 1; %1;
+    
     lambdak = [0.5;0.6]; %Doesnt have to be equal y1k, I think.
     y2B     = 4;
     c       = 1/tan(this.optsNum.PhysArea.alpha_deg*pi/180);
@@ -23,15 +28,38 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
     
     %2nd step: solve (EQ) for a_k
     if((nargin < 4) || isempty(ak_ig))
-         ak_ig = [0;0.5];
+         if(nk == 2)
+            ak_ig = [0;0.5;0;0.5];
+         else
+            ak_ig = [0;0.5];
+         end
+         
 %         if(c > 1)
 %             ig = [1;0.5];
 %         else
 %             ig = [-1;0.5];
 %         end
     end
-    ak     = fsolve(@f_error,ak_ig,fsolveOpts);    
-	disp(['Fitting coefficient ak = ',num2str(ak')]);
+        
+%    if(ak_ig(2) < 0)
+%        ak_ig = [1;0.5];
+    %end
+    
+    if(length(y2k) > 2)
+        %'Display','final'
+        %ak_ig = [ak_ig(1);sqrt(ak_ig(2))];
+        opts  = optimset('TolX',1e-12,'TolFun',1e-12,'MaxFunEvals',10000);
+        ak    = fminsearch(@f_error_Av,ak_ig,opts);
+        %ak    = [ak(1);ak(2).^2];
+        if(ak(2) < 0)
+            ak(1) = fminsearch(@f_error_Av_Zero,0,opts);
+            ak(2) = 0;
+        end
+    else
+        ak  = fsolve(@f_error,ak_ig,fsolveOpts);
+    end
+    
+	disp(['Fitting coefficient ak = ',num2str(ak'),' with |error| = ',num2str(f_error_Av(ak))]);
     
 
     %3rd step: set interface, contact line position    
@@ -58,35 +86,30 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
         z        = IP*rho-rho0;
     end
 
+    function z_abs = f_error_Av_Zero(ak)
+        z_abs = sum(abs(f_error([ak;0])));
+    end
+
+    function z_abs = f_error_Av(ak)
+        z_abs = sum(abs(f_error(ak)));
+    end
+
     function z = f_error(ak)
         z      = f(y2k,ak) - y1k;
     end
 
-    function [z,dz] = f(y2,ak)
-        %z      = c*y2 + exp(-y2*lambdak')*ak;
-        %dz     = c - (exp(-y2*lambdak')*(ak.*lambdak));
+%    function z = f_errorSq(ak)
+%        z      = f_error([ak(1);ak(2).^2]);
+%    end
+
+    function [z,dz] = f(y2,ak)        
+        z      = c*y2  + exp(-y2*ak(2)).*(ak(1));
+        dz     = c     - ak(2)*ak(1)*exp(-y2*ak(2));        
         
-        %z      = c*y2 + exp(-y2*0.5).*(ak(1));
-        %dz     = c - 0.5*ak(1)*exp(-y2*0.5);
-        
-        z      = c*y2 + exp(-y2*ak(2)).*(ak(1));
-        dz     = c - ak(2)*ak(1)*exp(-y2*ak(2));
-        
-        %cexpL  = 2;
-        %z      = c*y2 + exp(-y2*0.5).*(ak(1)+ak(2).*(log(1./(0.5+y2))).^cexpL) ;        
-        %dz     = c - 0.5*exp(-y2*0.5).*(ak(1)+ak(2).*(log(1./(0.5+y2))).^cexpL)...
-%                      + exp(-y2*0.5).*(-cexpL*ak(2).*((-log(0.5+y2)).^(cexpL-1))./(0.5+y2));
-        
-        %z      = c*y2 + exp(-y2*0.5).*(ak(1)+ak(2)*(1./(0.5+y2)));
-        %dz     = c - (exp(-y2*lambdak')*(ak.*lambdak));
-        
-        %lambdak = 2;
-        %z      = c*y2 + (1./(1+y2).^(lambdak))*ak;        
-        %dz     = c - lambdak*(1./(1+y2).^(lambdak+1))*ak;
-        
-        %lambdak = 1;
-        %z      = c*y2 + (1./(1+y2*lambdak'))*ak;        
-        %dz     = c - (1./(1+y2*lambdak'))*(ak.*lambdak);
+        if(nk == 2)
+            z      = z  + exp(-y2.^2*ak(4)).*(ak(3));
+            dz     = dz - 2*ak(3)*ak(4)*exp(-y2.^2*ak(4));        
+        end
     end
 
     function [z,dz] = f_LinearExtrapolation(y2,ak)
