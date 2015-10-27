@@ -1,4 +1,4 @@
-unction ThesisNanoscale_Table_ComputeContactAngles()
+function ThesisNanoscale_Table_ComputeContactAngles()
 
     
     AddPaths('ThesisNanoscale');               

@@ -1,4 +1,4 @@
- function config = ThesisNanoscale_GetStandardConfig(alpha_deg,epw)
+ function config = ThesisNanoscale_GetStandardConfig(alpha_deg,epw,maxT)
  
     if(nargin < 1)
         alpha_deg = [];
@@ -6,24 +6,50 @@
     if(nargin < 2)
         epw = 0;
     end
+    if(nargin < 3)
+        maxT = 400;
+    end
             
     PhysArea = struct('N',[45 75],'L1',4,'L2',2,...
                       'alpha_deg',alpha_deg);
+                  
+    SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
+                          'y2Min',0.5,'y2Max',4.5,...
+                          'N',[40,40]);                  
     
     V2Num     = struct('Fex','SplitAnnulus','N',[50,50]);
     Fex_Num   = struct('Fex','FMTRosenfeld_3DFluid','Ncircle',1,'N1disc',30,'N2disc',30); 
+    
+    plotTimes  = struct('t_int',[0,maxT],'t_n',100);   
 
     optsNum = struct('PhysArea',PhysArea,...%'PlotAreaCart',PlotArea,...                     
                      'FexNum',Fex_Num,...
                      'V2Num',V2Num,...
-                     'maxComp_y2',25);
+                     'maxComp_y2',25,...
+                     'SubArea',SubArea,...
+                     'plotTimes',plotTimes);
 
     V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);
     V2 = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5); 
-
-    optsPhys = struct('V1',V1,'V2',V2,...                   
-                      'kBT',0.75,'Dmu',0.0,'nSpecies',1,'sigmaS',1);      
+     
+    optsViscosity = struct('etaLiq',5,'etaVap',1,...
+                           'zetaLiq',5,'zetaVap',1);                       
+    %optsViscosity = struct('etaC',1,'zetaC',0);    
+    %optsViscosity = struct('etaL1',2,'zetaC',1);
+    
+    optsPhys = struct('V1',V1,...
+                      'V2',V2,...                   
+                      'kBT',0.75,...
+                      'Dmu',0.0,...
+                      'nSpecies',1,...
+                      'sigmaS',1,...
+                      'viscosity',optsViscosity,...
+                      'Inertial',true,...
+                      'gammaS',0);        
 
     config = v2struct(optsNum,optsPhys);                        
+    
+    %config.optsPhys.BC_Wall_U = struct('bc','exp','tau',1,'u_max',0.2);  %struct('bc','sinHalf','tau',1);
+    %config.optsPhys.Fext      = [-1,0];                  
 
 end

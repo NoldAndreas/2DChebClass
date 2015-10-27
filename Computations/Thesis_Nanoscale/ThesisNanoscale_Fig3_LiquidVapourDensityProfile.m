@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig5_LiquidVapourDensityProfile
+function ThesisNanoscale_Fig3_LiquidVapourDensityProfile
 
     AddPaths('ThesisNanoscale');       
     
