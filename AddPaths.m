@@ -8,28 +8,31 @@
     global QuickOutput
     
     global recomputeAll
-    global loadAll
-     
-    if(exist('D:\','dir'))
-        dirData    = 'D:\2DChebData';    
-        dirDDFT    = pwd;
-    elseif(exist('/Users/NoldAndreas/','dir'))
-        dirData    = '/Users/NoldAndreas/Documents/2DChebData';
-        dirDDFT    = pwd;
-    elseif(exist('/home/an2609/','dir'))
-        dirData    = '/home/an2609/2DChebData';
-        dirDDFT    = pwd;        
-    elseif(exist('/home/bgoddard/','dir'))
-        dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-        dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/2DChebClass';        
-    elseif(exist('/Users/Ben/','dir'))
-        dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
-        dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/2DChebClass';        
-    else
-        disp('Unknown computer; using current directory to save data');
-        dirData     = pwd;
-        dirDDFT     = pwd;        
+    global loadAll         
+    
+    switch GetMacAddress()
+        case '24-BE-05-10-A1-52'  %Andreas' Windows Work PC
+            dirData    = 'D:\2DChebData';    
+            dirDDFT    = pwd;
+        case '00:88:65:35:a1:92'
+            dirData    = '/Users/NoldAndreas/Documents/2DChebData';
+            dirDDFT    = pwd;            
+        otherwise
+            disp('Unknown computer; using current directory to save data');
+            dirData     = pwd;
+            dirDDFT     = pwd;        
     end
+
+%    elseif(exist('/home/an2609/','dir'))
+%        dirData    = '/home/an2609/2DChebData';
+%        dirDDFT    = pwd;
+% %     elseif(exist('/home/bgoddard/','dir'))
+% %         dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
+% %         dirDDFT    = '/home/bgoddard/work/MATLAB/Fluids/2DChebClass';        
+% %     elseif(exist('/Users/Ben/','dir'))
+% %         dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
+% %         dirDDFT    = '/Users/Ben/work/MATLAB/Fluids/2DChebClass';                    
+% %     end
     
     addpath(genpath(dirDDFT));        
     rmpath(genpath([pwd filesep 'NoClass']));       
