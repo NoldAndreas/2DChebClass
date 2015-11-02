@@ -23,7 +23,7 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
     if(isfield(optsNum,'HIg'))
         g = str2func(optsNum.HIg);
     else
-        g = str2func(g_id_Spherical);
+        g = str2func('g_id_Spherical');
     end
 
     if(isfield(optsNum,'N'))

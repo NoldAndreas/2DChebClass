@@ -40,7 +40,7 @@ function DiffusionClosedBox_VariableMobility()
     IP            = abox.SubShapePts(subBox.Pts);
     Int_SubOnFull = subBox.ComputeIntegrationVector()*IP;
         
-    Int_of_path   = subBox.IntFluxThroughDomain(100,'cart')*blkdiag(IP,IP);
+    Int_of_path   = subBox.IntFluxThroughDomain(100)*blkdiag(IP,IP);
     
     h              = subBox.borderRight.InterpOntoBorder*IP;
     RightBorderPts = subBox.borderRight.normal*blkdiag(h,h);
@@ -67,7 +67,7 @@ function DiffusionClosedBox_VariableMobility()
         t       = outTimes(i);
         
         subplot(2,2,1)
-        doPlots_IP(Interp,rho);        
+        abox.plot(rho);        
         title(['Interpolation of Solution at t = ', num2str(t)]);       
         zlim([0 max(rho_ic)]);
                 
@@ -92,7 +92,7 @@ function DiffusionClosedBox_VariableMobility()
         
         subplot(2,2,3);
         fl   = GetFlux(rho,outTimes(i));
-        NormQuiverPlot(Pts,fl);
+        abox.plotFlux(fl); hold on; %NormQuiverPlot(Pts,fl);
         subBox.PlotBorders();
         
         subplot(2,2,4);   

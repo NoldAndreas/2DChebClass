@@ -1,20 +1,22 @@
-function TestAll(dirTest)
+function TestAll(dirTest,recomputeAll,rerun)
     global recomputeAll QuickOutput dirData dirDataOrg
   %  dbclear all;
     
-    no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 3 seconds.');
-    if(getkeywait(3) == -1)
-        for ih = 1:no
-            fprintf('\b');
-        end                        
-        recomputeAll = false;
-    else
-        for ih = 1:no
-            fprintf('\b');
-        end
-        no = fprintf('Thanks. All matrices will be recomputed.\n');
-        recomputeAll = true;
-    end    
+    if((nargin < 2) || isempty(recomputeAll))
+        no = fprintf('Do you want to recompute all matrices? (press any key), or wait for 3 seconds.');
+        if(getkeywait(3) == -1)
+            for ih = 1:no
+                fprintf('\b');
+            end                        
+            recomputeAll = false;
+        else
+            for ih = 1:no
+                fprintf('\b');
+            end
+            no = fprintf('Thanks. All matrices will be recomputed.\n');
+            recomputeAll = true;
+        end    
+    end
         
     QuickOutput  = true;
     comments = 'values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.';
@@ -54,19 +56,21 @@ function TestAll(dirTest)
         end
     end
     
-    no = fprintf('Do you want to rerun All files? (press any key), or wait for 3 seconds.');        
-    if(getkeywait(3) == -1)
-        for ih = 1:no
-            fprintf('\b');
-        end                        
-        rerun = false;
-    else
-        for ih = 1:no
-            fprintf('\b');
-        end
-        no = fprintf('Thanks. All files will be rerun.\n');
-        rerun = true;
-    end                
+    if((nargin < 3) || isempty(rerun))
+        no = fprintf('Do you want to rerun All files? (press any key), or wait for 3 seconds.');        
+        if(getkeywait(3) == -1)
+            for ih = 1:no
+                fprintf('\b');
+            end                        
+            rerun = false;
+        else
+            for ih = 1:no
+                fprintf('\b');
+            end
+            no = fprintf('Thanks. All files will be rerun.\n');
+            rerun = true;
+        end 
+    end
 
     %Run through all files
     for i = 1:length(MFiles)
@@ -87,26 +91,32 @@ function TestAll(dirTest)
                 if(nargout(f)>=2)
                     [~,res] = f();
                     
-                    for k = 1:length(res.fig_handles)                        
-                        fh = res.fig_handles{k};                        
-                        set(0, 'currentfigure', fh);
-                        
-                        ax = get(fh,'children');
-                        xlim = get(ax,'xlim');
-                        ylim = get(ax,'ylim');
-                        r    = (ylim(2)-ylim(1))/(xlim(2)-xlim(1));
-                        set(fh,'Position',[0 0 600 600*r],'color','white');                        
-                        pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
-                        set(ax,'fontsize',25);
-                        
-                        hand = get(ax,'xlabel'); set(hand,'str','');                        
-                        hand = get(ax,'ylabel'); set(hand,'str','');
-                        %hand = get(gca,'xlabel'); set(hand,'fontsize',35);                        
-                        %hand = get(gca,'ylabel'); set(hand,'fontsize',35);
+                    if(isstruct(res) && isfield(res,'fig_handles') && isnumeric(res.fig_handles{1}))
+                        for k = 1:length(res.fig_handles)                        
+                            fh = res.fig_handles{k};                        
+                            set(0, 'currentfigure', fh);
 
-                        str_fig = [strf,num2str(k)];
-                        set(0, 'currentfigure', fh);
-                        SaveFigure([dirDDFT_2D_LatexReport filesep str_fig]);                        
+                            ax = get(fh,'children');
+                            xlim = get(ax,'xlim');
+                            ylim = get(ax,'ylim');
+                            if(isnumeric(ylim)) %in case of subplots, this is a list
+                                r = (ylim(2)-ylim(1))/(xlim(2)-xlim(1));
+                                pbaspect(ax,[(xlim(2)-xlim(1)) (ylim(2)-ylim(1)) 1]);
+                                
+                                hand = get(ax,'xlabel'); set(hand,'str','');                        
+                                hand = get(ax,'ylabel'); set(hand,'str','');
+                                %hand = get(gca,'xlabel'); set(hand,'fontsize',35);                        
+                                %hand = get(gca,'ylabel'); set(hand,'fontsize',35);
+                            else
+                                r = 1;
+                            end
+                            set(fh,'Position',[0 0 600 600*r],'color','white');                                                    
+                            set(ax,'fontsize',25);                           
+
+                            str_fig = [strf,num2str(k)];
+                            set(0, 'currentfigure', fh);
+                            SaveFigure([dirDDFT_2D_LatexReport filesep str_fig]);                        
+                        end
                     end
                 else
                     f();

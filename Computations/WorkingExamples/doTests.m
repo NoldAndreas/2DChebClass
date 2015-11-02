@@ -1,4 +1,4 @@
-TestAll('WorkingExamples/DDFT_1D');
-TestAll('WorkingExamples/Diffusion');
-TestAll('WorkingExamples/DDFT_2D');
-TestAll('WorkingExamples/TestGeometries/2DGeometries');
+TestAll('WorkingExamples/DDFT_1D',true,true);
+TestAll('WorkingExamples/Diffusion',true,true);
+TestAll('WorkingExamples/DDFT_2D',true,true);
+TestAll('WorkingExamples/TestGeometries/2DGeometries',true,true);

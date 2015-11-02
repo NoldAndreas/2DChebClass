@@ -42,7 +42,7 @@ function [data,res] = SimulationTriangle(N1,N2,L1,L2,vext)
     %******** Plotting **********
     figure
     set(gcf,'Color','white'); %Set background color            
-    TR.plot(V,true);    
+    TR.plot(V);    
     title('Interpolation');    
     pbaspect([1 1 1]);  
     

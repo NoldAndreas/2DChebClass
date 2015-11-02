@@ -180,7 +180,6 @@ function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()
             end
         
     end
-
     function f11 = PutFigInSubplot(filename,figMain,subP)
         f11  = openfig([dirData filesep filename]);
         if(~isempty(figMain))

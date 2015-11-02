@@ -69,8 +69,7 @@
     %************************************************
         
     close all;
-    IntMatrFex_1D  = Get1DMatrices(IntMatrFex_2D,HS);    
-    IntMatrFex     = IntMatrFex_1D;
+    IntMatrFex = Get1DMatrices(IntMatrFex_2D,HS);        
     
     if(isempty(Conv))
         Conv = zeros(size(IntMatrFex));
@@ -133,16 +132,17 @@
     %************************************
     %*********** Postprocess   **********
     %************************************        
+    rho_cont    = exp(x_cont(:,2:end)/kBT); 	
+    par         = x_cont(:,1);  %res.dmu;
+    pts         = HS.Pts;
+        
     Int_1D(y2S > 45) = 0;    
     [res,~,params]  = DataStorage('IterativeContinuationPostProcess',...
                         @PostProcessAdsorptionIsotherm,optsPhys,x_cont);      
                     
-    rho_cont    = exp(x_cont(:,2:end)/kBT); 	
-    par         = res.dmu;
 	ell         = res.ell;
 	OmEx        = res.OmEx;
-	dmuCheck    = res.dmuCheck;    
-    pts         = HS.Pts;
+	dmuCheck    = res.dmuCheck;        
         
     %Check for adsorption isotherm:
     %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
@@ -303,8 +303,13 @@
             f_Vmu      = rho.*(getVAdd(y1S,y2S,0,optsPhys.V1)- mus);
         end
         
-        f_loc  = f_id + f_attr + f_Vmu;                 
-        OmEx    = Int_1D_AD*(f_hs-f_hs(end)) + Int_1D*(f_loc-f_loc(end));
+        f_loc  = f_id + f_attr + f_Vmu;        
+        if(length(Int_1D_AD) == length(f_hs))
+            OmEx    = Int_1D_AD*(f_hs-f_hs(end));
+        else
+            OmEx    = Int_1D*(f_hs-f_hs(end));
+        end        
+        OmEx    = OmEx + Int_1D*(f_loc-f_loc(end));
     end
 
      function n = US_ScalarProduct(x,y)

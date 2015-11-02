@@ -11,7 +11,7 @@ function Simulation1DInterpolation
     z       = BarkerHenderson_2D(y)';
     
     plot(y,z,'o','MarkerFaceColor','g'); hold on;
-    plot(yInterp,IP*z);
+    plot(yInterp,IP*z');
     xlim([0 10]);
         
 end

@@ -6,6 +6,11 @@ function FMTMatrices1DFull = Get1DMatrices(FMTMatrices3D,IDC,maskFull,maskCompos
         maskComposed = (IDC.AD.Pts.y1_kv == inf);            
     end
     
+    if(isempty(FMTMatrices3D))
+        FMTMatrices1DFull = [];
+        return;
+    end
+        
     for iSpecies = 1:length(IDC.R)
          
         
