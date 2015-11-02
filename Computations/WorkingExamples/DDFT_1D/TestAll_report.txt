@@ -1,11 +1,12 @@
 # ************************************************************ 
-# Computed at: 02-Nov-2015 15:39:59 Cumulative computation time: 00:00:00.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 02-Nov-2015 15:47:12 Cumulative computation time: 00:00:00.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
+SecondLine : Computed at: 02-Nov-2015 15:39:59 Cumulative computation time: 00:00:00.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.
 TestAll1D : -2
 Test_DDFT_DiffusionInfInterval : -2
-Test_DDFT_DiffusionInterval : -1
-Test_DDFT_DiffusionSphericalInfInterval : -1
-Test_DDFT_DiffusionSphericalInfInterval2 : -1
-Test_DDFT_InertiaInfInterval : -1
-Test_DDFT_InertiaInterval : -1
-Test_DDFT_InertiaSphericalInfInterval : -1
+Test_DDFT_DiffusionInterval : -2
+Test_DDFT_DiffusionSphericalInfInterval : -2
+Test_DDFT_DiffusionSphericalInfInterval2 : -2
+Test_DDFT_InertiaInfInterval : -2
+Test_DDFT_InertiaInterval : -2
+Test_DDFT_InertiaSphericalInfInterval : -2
