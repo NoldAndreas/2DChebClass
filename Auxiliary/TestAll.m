@@ -114,6 +114,7 @@ function TestAll(dirTest)
                 Parameters.(strf) = num2str(round(toc(tStart)));
             catch err
                 cprintf('*Red',['Error in ',strf,'\n']);
+                rethrow(err);  
                 Parameters.(strf) = num2str(-2);
             end
             close all;
