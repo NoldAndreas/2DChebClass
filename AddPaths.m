@@ -23,6 +23,26 @@
         case '10:40:f3:8a:30:f4' % Ben MacBook Air
             dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
             dirDDFT    = pwd;
+        case 'C8:1F:66:ED:06:8F' % compute64c
+            switch getenv('USER')
+                case 'bgoddard'
+                    dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
+                    dirDDFT    = pwd;
+                otherwise
+                    disp('Unknown computer; using current directory to save data');
+                    dirData     = pwd;
+                    dirDDFT     = pwd;        
+            end
+        case 'A0:36:9F:60:6C:C4' % compute64d
+            switch getenv('USER')
+                case 'bgoddard'
+                    dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
+                    dirDDFT    = pwd;
+                otherwise
+                    disp('Unknown computer; using current directory to save data');
+                    dirData     = pwd;
+                    dirDDFT     = pwd;        
+            end
         otherwise
             disp('Unknown computer; using current directory to save data');
             dirData     = pwd;
