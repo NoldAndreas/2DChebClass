@@ -19,7 +19,10 @@
             dirDDFT    = pwd;   
         case '1C:C1:DE:52:03:FF' % Ben office machine
             dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-            dirDDFT    = pwd;      
+            dirDDFT    = pwd;
+        case '10:40:f3:8a:30:f4' % Ben MacBook Air
+            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
+            dirDDFT    = pwd;
         otherwise
             disp('Unknown computer; using current directory to save data');
             dirData     = pwd;
