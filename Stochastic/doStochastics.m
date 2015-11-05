@@ -90,17 +90,23 @@ optsStocI.burnin       = optsStoc.burnin;
 
 fprintf(1,'Starting initial sampling ... ');
 
-optsPhys.t=0;
-opts.optsPhys = optsPhys;
-opts.optsPhys.tMax = [];  % initial sampling independent of final time
-opts.optsStoc = optsStocI;
+if(optsStoc.fixedInitial)
+    xInitial = optsStoc.initialGuess;
+    ICFilename = [];
+else
 
-ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
+    optsPhys.t=0;
+    opts.optsPhys = optsPhys;
+    opts.optsPhys.tMax = [];  % initial sampling independent of final time
+    opts.optsStoc = optsStocI;
 
-[xInitial,~,Parameters] = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
+    ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
-ICFilename = [dirData filesep ICDir filesep Parameters.Filename];
+    [xInitial,~,Parameters] = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
 
+    ICFilename = [dirData filesep ICDir filesep Parameters.Filename];
+end
+    
 fprintf(1,'Finished\n\n');
 
 %--------------------------------------------------------------------------

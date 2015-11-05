@@ -67,9 +67,9 @@ tMax=0.25;
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
 
-%nSamples=5000000;  
+nSamples=5000000;  
  
-nSamples=20000;
+%nSamples=200;
 
 initialGuess='makeGrid';
 
@@ -95,10 +95,10 @@ stocHIType={[],[],'RP','RPInv'};
 stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={true,true,true,true};
+loadStoc={false,true,true,true};
 
 % number of time steps
 tSteps={10^4,10^3,10^4,10^3};
@@ -107,7 +107,7 @@ tSteps={10^4,10^3,10^4,10^3};
 saveStoc={true,true,true,true};
 
 stocColour = {{'g','m'},{'g'},{'b'},{'m'}};
-stocStyle = {{':',':'}};
+stocStyle = {{'--','--'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -145,7 +145,9 @@ loadDDFT = {};
 
 %Nlist = [20;30;40;60]; % N contour plotS
 
-Nlist = 60;
+%Nlist = 60;
+
+Nlist = [20;60];
 
 %for N = 10:2:60
 for iN = 1:length(Nlist);
@@ -167,30 +169,25 @@ end
         
 doPlots = false;
 
-% for N comparison
-%DDFTColour = {{'r','r'},{'g','g'},{'b','b'},{'m','m'}};
-%DDFTStyle = {{':',':'},{'--','--'},{'-','-'},{':',':'}};
+DDFTColour = {{'r','r'},{'g','g'},{'b','b'},{'m','m'}};
+DDFTStyle = {{':',':'},{'--','--'},{'-','-'},{':',':'}};
 
-% for comparison with stochastics
-DDFTColour = {{'r','b'},{'g','g'},{'b','b'},{'m','m'}};
-DDFTStyle = {{'-','-'},{'--','--'},{'-','-'},{':',':'}};
 
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
 
-%plotType = 'contour';
 plotType = 'surf';
 
 viewPoint = [-56;7];
 
 % x axis for position and velocity plots
-rMin=[-boxL;-boxL];
-rMax=[boxL;boxL];
+%rMin=[-boxL;-boxL];
+%rMax=[boxL;boxL];
 
-%rMin = [-2;-1.25];
-%rMax = [2;1.75];
+rMin = [-2;-1.25];
+rMax = [2;1.75];
 
 pMin=rMin;
 pMax=rMax;
@@ -221,3 +218,24 @@ doMeans        = false;
 doEquilibria   = true;
 
 %sendEmail = true;
+
+%--------------------------------------------------------------------------
+% Code version
+%--------------------------------------------------------------------------
+% Branch: StocTest
+% Hash: 8a89ed0225bf4293fbfb950afd5fc34157651f2e
+
+%--------------------------------------------------------------------------
+% Stochastic output files
+%--------------------------------------------------------------------------
+% Sampling:
+%/home/bgoddard/work/MATLAB/Fluids/2DChebData/FMTTest_2Species2N/Stochastic/Initial/2015_5_8_15_52_3
+% no final sampling
+% no final sampling
+% Dynamics:
+%/home/bgoddard/work/MATLAB/Fluids/2DChebData/FMTTest_2Species2N/Stochastic/Dynamics/2015_5_9_11_55_51
+
+%--------------------------------------------------------------------------
+% DDFT output files
+%--------------------------------------------------------------------------
+%/home/bgoddard/work/MATLAB/Fluids/2DChebData/FMTTest_2Species2N/DDFT/DDFTDynamics//home/bgoddard/work/MATLAB/Fluids/2DChebData/FMTTest_2Species2N/DDFT/DDFTDynamics/2015_5_8_4_19_39

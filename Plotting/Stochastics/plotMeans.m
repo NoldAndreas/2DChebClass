@@ -11,6 +11,7 @@ switch geom         % for different geometries
         outputFile = plotMeans1D(stoc,ddft,optsPlot,equilibria);
         
     case 'planar2D'
+          
         outputFile = plotMeansPlanar2D(stoc,ddft,optsPlot,equilibria);
         
     case 'polar2D'

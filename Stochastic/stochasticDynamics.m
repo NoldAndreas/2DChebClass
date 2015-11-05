@@ -40,6 +40,8 @@ HI=optsStoc.HI;
 noise=optsStoc.noise;
 g=optsPhys.gamma;
 
+flow = optsPhys.flow;
+
 % get HI interaction function
 if(HI)
     makeHI=str2func(optsStoc.HIType);
@@ -163,6 +165,12 @@ switch type % Langevin or EM dynamics
         % perform evolution -- see Ermak McCammon '78
         % assuming d{D_ij}/d{r_j}=0, which it is for Rotne-Prager
         x(:,t) = x(:,t-1) - dt*D*DV/kBT + sqrt(2) *sqrt(dt)*A*f(:,t-1);
+        
+        if(flow)
+            U = getFlow(x(:,t-1),times(t),optsPhys);
+            x(:,t) = x(:,t) + U*dt;
+        end
+        
     end
     
     

@@ -16,8 +16,18 @@ AddPaths();
 %inputFile = 'ThreeSpeciesTest';
 %inputFile = 'ThreeSpeciesTestEq';
 
-%inputFile = 'HIWallTestTowards';
+%inputFile = 'HIWallTestTowards';  % CHECK
 %inputFile = 'HIWallTestAway';
+%inputFile = 'HIWallTestTowardsUnbounded';  % Shows large error when using
+                                            % Rosenfeld3D
+%inputFile = 'HIWallTestTowardsFMTTest';  % CHECK
+
+inputFile = 'HalfSpaceMove'; % WORKS!
+%inputFile = 'InfSpaceMove'; % WORKS!
+
+%inputFile = 'HIWallTestTowardsMove';
+%inputFile = 'HIWallTestAwayMove';  
+
 
 %inputFile = 'InertiaTest';
 %inputFile = 'InertiaTestInfDisc';
@@ -37,7 +47,14 @@ AddPaths();
 
 %inputFile = 'FMTTest_2Species'; % higher density, less accurate
 %inputFile = 'FMTTest_2Species2';
-inputFile = 'FMTTest_2Species2N';
+%inputFile = 'FMTTest_2Species2N';
+
+%inputFile = 'BoxTestFlow';
+%inputFile = 'BoxTestFlowIdeal';  % Want to check with large scale dynamics
+
+%inputFile = 'FMTTest_Unbounded'; % Want to check with large scale dynamics
+
+%inputFile = 'FlowCheck';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

@@ -115,16 +115,21 @@ geom=optsPlot.geom;
 dim=optsPlot.dim;
 
 % pre-calculate means for both stochastic and DDFT data
-meanrStoc=zeros(nPlots,nSpecies,dim,nStoc);
-meanvStoc=meanrStoc;
+% meanrStoc=zeros(nPlots,nSpecies,dim,nStoc);
+% meanvStoc=meanrStoc;
+% 
+% for iStoc=1:nStoc
+%     % loop through each set of stochastic data
+%     x=stoc(iStoc).x;
+%     p=stoc(iStoc).p;
+%     
+%     % compute means for each time, species and stochastic calculation
+%     [meanrStoc(:,:,:,iStoc),meanvStoc(:,:,:,iStoc)]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS,optsPlot.saveFileStocMeans{iStoc});
+% end
 
-for iStoc=1:nStoc
-    % loop through each set of stochastic data
-    x=stoc(iStoc).x;
-    p=stoc(iStoc).p;
-    
-    % compute means for each time, species and stochastic calculation
-    [meanrStoc(:,:,:,iStoc),meanvStoc(:,:,:,iStoc)]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS,optsPlot.saveFileStocMeans{iStoc});
+if(nStoc>0)
+    meanrStoc = stoc.rMean;
+    meanvStoc = stoc.vMean;
 end
 
 meanrDDFT=zeros(nPlots,nSpecies,dim,nDDFT);

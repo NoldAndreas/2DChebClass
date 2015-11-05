@@ -45,7 +45,7 @@ end
 % and reshape to give a vector
 r=reshape(r',dim*nParticles,1);
 
-sigmaMax=max(sigma);
+sigmaMax=max(max(sigma));
 
 % scale by twice (arbitrary) the particle size
 r=r*2*sigmaMax;

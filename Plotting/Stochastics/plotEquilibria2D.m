@@ -192,7 +192,8 @@ end
 
 if(nStoc>0)
 
-    for iStoc = 1:nStoc
+    %for iStoc = 1:nStoc
+    for iStoc = 1:1   % only one stochastic equilibrium
     
         rho   = equilibria(iStoc).data.REq;
         v     = equilibria(iStoc).data.vEq;

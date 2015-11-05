@@ -46,7 +46,7 @@ y2(abs(y2)==Inf)=0;
 
 % calculate mean at each time -- may be able to vectorize this
 for iTime=1:nTimes
-    % calculate rho and v from full rhov
+
     rho=rho_t(:,:,iTime);
 
     for iSpecies=1:nSpecies

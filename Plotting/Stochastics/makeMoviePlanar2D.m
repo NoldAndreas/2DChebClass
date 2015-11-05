@@ -77,6 +77,7 @@ plotTimes=optsPlot.plotTimes;
 if(nStoc>0)
     % choose colours
     lineColourStoc=optsPlot.lineColourStoc;
+    lineStyleStoc=optsPlot.lineStyleStoc;
     % get type info -- used to decide whether to plot the velocity
     stocType=optsPlot.stocType;
 else
@@ -88,6 +89,7 @@ end
 if(nDDFT>0)
     % choose colours
     lineColourDDFT=optsPlot.lineColourDDFT;
+    lineStyleDDFT=optsPlot.lineStyleDDFT;
     % get type info -- used to decide whether to plot the velocity
     DDFTType=optsPlot.DDFTType;
 else
@@ -167,6 +169,8 @@ switch optsPlot.plotType
             hPa = handles(2:2:end);
         
     case 'contour'
+            handles=tightsubplot(nAxes,1,0.075,0.075,0.075);
+            hRa = handles(1:end);
             hPa = axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
             hPa = hPa*ones(1,nAxes);
 end
@@ -247,6 +251,7 @@ for iPlot=1:nPlots
     for iStoc=1:nStoc
            
         optsPlot.faceColour=lineColourStoc{iStoc};   
+        optsPlot.lineStyle = lineStyleStoc{iStoc};
        
         rho   = stoc(iStoc).rho(:,:,:,iPlot);
         flux  = stoc(iStoc).flux(:,:,:,:,iPlot);
@@ -274,6 +279,7 @@ for iPlot=1:nPlots
         optsPlot.type=DDFTType{iDDFT};
         
         optsPlot.faceColour=lineColourDDFT{iDDFT};
+        optsPlot.lineStyle=lineStyleDDFT{iDDFT};
            
         % get values at appropriate time
         rhot=rho(:,:,iPlot);

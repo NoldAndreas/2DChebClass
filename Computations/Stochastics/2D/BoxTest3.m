@@ -186,7 +186,8 @@ DDFTName={'r10','r20','r30','r50'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,true};
+%doDDFT={true,true,true,true};
+doDDFT={false,true,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};

@@ -96,7 +96,8 @@ if(optsStruct.anyStoc)
                 'dim',optsStruct.stocDim, ...
                 'V1DV1',optsStruct.V1DV1, ...
                 'V2DV2',optsStruct.V2DV2, ...
-                'type','stoc');
+                'type','stoc', ...
+                'flow',optsStruct.flow);
  
     % merge in global parameters and parameters for potentials
     optsPhys=mergeStruct(optsPhysGlobal, ...
@@ -104,6 +105,14 @@ if(optsStruct.anyStoc)
                             optsStruct.potParams, ...
                             optsStruct.potParams2, ...
                             optsStruct.HIParams); 
+
+	% think about how to implement flow
+    if(optsStruct.flow)
+        U = struct('UDU',optsStruct.UDU);
+        U = mergeStruct(U,optsStruct.flowParams);
+        optsPhys = mergeStruct(optsPhys,U);
+    end
+                        
 end
 
 %--------------------------------------------------------------------------
@@ -131,11 +140,18 @@ if(optsStruct.anyDDFT)
         optsPhysDDFT(iDDFT).V1 = optsStruct.potParamsDDFT{iDDFT}; %#ok
         optsPhysDDFT(iDDFT).V2 = optsStruct.potParams2DDFT; %#ok
         optsPhysDDFT(iDDFT).HI = optsStruct.HIParamsDDFT; %#ok
+        if(optsStruct.flow)
+            optsPhysDDFT(iDDFT).U = optsStruct.flowParamsDDFT{iDDFT}; %#ok
+        end
     end
+    
+    % cut down to the calculations we want to do
+    optsPhysDDFT=optsPhysDDFT(cell2mat(optsStruct.doDDFT));
     
     if(~optsStruct.anyStoc)
         optsPhys=optsPhysDDFT(1);
     end
+    
     
 else
     

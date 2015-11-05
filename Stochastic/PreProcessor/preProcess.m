@@ -95,6 +95,16 @@ if (~optsStruct.anyStoc && ~optsStruct.anyDDFT)
 end
 
 %--------------------------------------------------------------------------
+% Determine if there is a background flow
+%--------------------------------------------------------------------------
+
+if(isfield(optsStruct,'UDU'))
+    optsStruct.flow = true;
+else
+    optsStruct.flow = false;
+end
+
+%--------------------------------------------------------------------------
 % Assign defaults to any missing values
 %--------------------------------------------------------------------------
 
@@ -124,6 +134,14 @@ optsStruct=setV1Params(optsStruct);
 %--------------------------------------------------------------------------
 
 optsStruct=setV2Params(optsStruct);
+
+%--------------------------------------------------------------------------
+% Set up flow parameters
+%--------------------------------------------------------------------------
+
+if(optsStruct.flow)
+    optsStruct=setUParams(optsStruct);
+end
 
 %--------------------------------------------------------------------------
 % Set up HI parameters

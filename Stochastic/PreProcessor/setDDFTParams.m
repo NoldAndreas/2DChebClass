@@ -42,7 +42,7 @@ if(optsStruct.anyDDFT)
 
     % construct DDFTParams
     DDFTParamsCmd=['optsStruct.DDFTParams = struct(' addVarText ');'];
-  
+
     eval(DDFTParamsCmd);
        
 end
