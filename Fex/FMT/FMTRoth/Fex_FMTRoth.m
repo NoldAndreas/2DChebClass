@@ -2,7 +2,7 @@ function FMT = Fex_FMTRoth(rho,IntMatrFex,kBT,R)
     % get number of species
     nSpecies=size(rho,2);
 
-    n0=zeros(size(rho,1),1);
+    n0=zeros(size(IntMatrFex(1).AD.n0,1),1);
     n2=n0;
     m0=n0;
     

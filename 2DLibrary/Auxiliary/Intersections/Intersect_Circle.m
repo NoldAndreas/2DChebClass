@@ -4,7 +4,6 @@ function [dataCircle] = Intersect_Circle(MainShape,circle)
     r       = circle.R;
     Ncircle = circle.N;
 
-
     if(isa(MainShape,'HalfSpace'))
         
         y2Min = MainShape.y2Min;
@@ -25,7 +24,7 @@ function [dataCircle] = Intersect_Circle(MainShape,circle)
             shapeLine.th2      = 3/2*pi-th;
 
             line               = Arc(shapeLine);
-            dataCircle.pts     = Pol2CartPts(line.Pts);
+            %dataCircle.pts     = Pol2CartPts(line.Pts);
         else
             exc = MException('HalfSpace_FMT:AverageDisk','case not implemented');
             throw(exc);                
@@ -46,8 +45,39 @@ function [dataCircle] = Intersect_Circle(MainShape,circle)
      
         [dataCircle.int,dataCircle.length] = line.ComputeIntegrationVector();        
         
-	else
-        exc = MException('Intersect_Circle','case not implemented');
+        
+    elseif(isa(MainShape,'InfCapillary') && (MainShape.y2Max - MainShape.y2Min)>= 2*r)   
+%         
+        y2Min = MainShape.y2Min;
+        y2Max = MainShape.y2Max;
+        if(isa(MainShape,'InfCapillarySkewed'))   
+            y2Min = y2Min*sin(MainShape.alpha);
+            y2Max = y2Max*sin(MainShape.alpha);
+        end   
+ 
+        shapeLine.N = Ncircle;
+        shapeLine.R = r;
+        
+        if((y20 < (y2Min + r)) && (y20 >= (y2Min - r)))
+            shapeLine.h        = y20 - y2Min;
+            shapeLine.WallPos  = 'S';
+            line               = Arc(shapeLine);
+        elseif( (y20 >= y2Min + r) && (y20 <= y2Max - r))           
+            line               = Circle(shapeLine);
+        elseif((y20 > (y2Max - r)) && (y20 <= (y2Max + r)))
+            shapeLine.h        = y2Max - y20;
+            shapeLine.WallPos  = 'N';
+            line               = Arc(shapeLine);
+        end
+
+        dataCircle.pts       = Pol2CartPts(line.Pts);   
+        dataCircle.pts.y2_kv = dataCircle.pts.y2_kv + y20;
+        dataCircle.ptsPolLoc = line.Pts;            
+
+        [dataCircle.int,dataCircle.length] = line.ComputeIntegrationVector(); 
+         
+    else
+        exc = MException('HalfSpace_FMT:Intersect_Circle','case not implemented');
         throw(exc);                
     end
 end    

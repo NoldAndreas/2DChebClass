@@ -22,11 +22,11 @@ AddPaths();
                                             % Rosenfeld3D
 %inputFile = 'HIWallTestTowardsFMTTest';  % CHECK
 
-inputFile = 'HalfSpaceMove'; % WORKS!
+%inputFile = 'HalfSpaceMove'; % WORKS!
 %inputFile = 'InfSpaceMove'; % WORKS!
 
 %inputFile = 'HIWallTestTowardsMove';
-%inputFile = 'HIWallTestAwayMove';  
+inputFile = 'HIWallTestAwayMove';  
 
 
 %inputFile = 'InertiaTest';

@@ -198,8 +198,8 @@ doDDFT={true,true,false,false};
 %doDDFT={true,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
-%loadDDFT={false,false};
+loadDDFT={false,false,true,true};
+%loadDDFT={false,false,false,false};
 
 DDFTColour = {{'r'},{'b'},{'g'},{'m'}};
 
@@ -242,4 +242,4 @@ doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;
 
-sendEmail = false;
+sendEmail = true;

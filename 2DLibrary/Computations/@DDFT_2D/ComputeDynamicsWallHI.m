@@ -70,7 +70,7 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
                             @ComputeDDFTDynamics,v2struct(optsNumT,optsPhys),[]);
                         
 	this.dynamicsResult.t = plotTimes;   
-                     
+  
     function data = ComputeDDFTDynamics(params,misc)        
         mM              = ones(M,1);        
         mM(Ind.finite)  = 0; 
@@ -102,10 +102,11 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
         end
 
         data       = v2struct(IntMatrFex,X_t,rho_t,mu,flux_t,V_t);
-        data.shape = this.IDC;
+        %data.shape = this.IDC;
         if(this.doSubArea) 
             data.Subspace = v2struct(subArea,accFlux);
         end
+
     end   
     function dxdt = dx_dt(t,x)
         

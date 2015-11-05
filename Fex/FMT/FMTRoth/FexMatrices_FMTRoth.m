@@ -26,7 +26,7 @@ function FMTMatricesFull = FexMatrices_FMTRoth(Parameters,IDC)
         
         [AD,AAD] = IDC.GetAverageDensities(Circle(shape), ...
                        {'cosPlc';'sinPlc';'cosSq';'sinSq';'cossin'});
-
+                   
         FMTMatrices.AD.m0       = AD(:,:,1);
                    
         FMTMatrices.AD.m1_1     = AD(:,:,2);

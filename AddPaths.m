@@ -71,7 +71,7 @@
     end
     
     if(isempty(recomputeAll))
-        recomputeAll = false;
+        recomputeAll = true;
     end
     
     if(isempty(loadAll))

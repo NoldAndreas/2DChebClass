@@ -114,6 +114,11 @@
     
     for i2Pts = 1:m2       
         data       = dataAD(i2Pts);     
+
+        % deal with circle/arc case
+        if(isfield(data,'length'));
+            data.area = data.length;
+        end
         
         for i = 1:length(data.pts.y1_kv)                        
             interp2      = CompSpace2(this,data.ptsOr.y2_kv(i));                                                        
