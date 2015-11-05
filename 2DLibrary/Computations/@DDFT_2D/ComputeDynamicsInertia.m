@@ -22,7 +22,8 @@ function ComputeDynamicsInertia(this)
     if(isfield(optsPhys,'Fext'))    
         Fext    = optsPhys.Fext;
     else
-        Fext    = [0,0];
+        %Fext    = [0,0];
+        Fext    = [];
     end
     
     if(isfield(optsPhys,'BCWall_U'))
