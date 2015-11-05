@@ -1,22 +1,22 @@
 # ************************************************************ 
-# Computed at: 02-Nov-2015 18:13:53 Cumulative computation time: 00:26:34.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 04-Nov-2015 18:14:02 Cumulative computation time: 00:29:15.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 SecondLine : Computed at: 24-Apr-2015 16:44:56 Cumulative computation time: 00:23:48.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.
-CheckFMTComputation : 9
-CheckFMTComputation_InfCapillary : 8
-Check_FMT_SumRule : 44
-DDFT_Diffusion1D_HalfSpace_FMT : 6
-DDFT_DiffusionBox_2Phase_1 : 8
-DDFT_DiffusionBox_2Phase_2 : 13
-DDFT_DiffusionBox_2Phase_3 : 13
-DDFT_DiffusionBox_2Phase_Sat_1 : 10
-DDFT_DiffusionBox_2Phase_Sat_2 : 11
-DDFT_DiffusionBox_2Species_1 : 23
-DDFT_DiffusionBox_LDA_Case1 : 9
-DDFT_DiffusionBox_MF : 10
-DDFT_DiffusionDisc_MF : 17
-DDFT_DiffusionHalfSpace_2Phase_Sat_1 : 9
-DDFT_DiffusionHalfSpace_2Phase_Sat_2 : 10
+CheckFMTComputation : 21
+CheckFMTComputation_InfCapillary : -2
+Check_FMT_SumRule : 66
+DDFT_Diffusion1D_HalfSpace_FMT : 15
+DDFT_DiffusionBox_2Phase_1 : 22
+DDFT_DiffusionBox_2Phase_2 : 28
+DDFT_DiffusionBox_2Phase_3 : 28
+DDFT_DiffusionBox_2Phase_Sat_1 : 23
+DDFT_DiffusionBox_2Phase_Sat_2 : 25
+DDFT_DiffusionBox_2Species_1 : 52
+DDFT_DiffusionBox_LDA_Case1 : 24
+DDFT_DiffusionBox_MF : 23
+DDFT_DiffusionDisc_MF : 34
+DDFT_DiffusionHalfSpace_2Phase_Sat_1 : -2
+DDFT_DiffusionHalfSpace_2Phase_Sat_2 : -2
 DDFT_DiffusionHalfSpace_BH_2Phase_Sat_2 : 10
 DDFT_DiffusionHalfSpace_FMT : 506
 DDFT_DiffusionHalfSpace_FMT_HIWall : 27
