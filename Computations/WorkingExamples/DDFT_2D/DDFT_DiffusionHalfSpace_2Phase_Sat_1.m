@@ -36,7 +36,7 @@ function [config,res] = DDFT_DiffusionHalfSpace_2Phase_Sat_1()
     AddPaths();
     EX     = DDFT_2D(config);
     EX.Preprocess();
-    EX.ComputeEquilibrium([],struct('solver','Picard'));
+    EX.ComputeEquilibrium([],struct('solver','Newton'));
     %EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                     
     EX.IDC.plot(EX.GetRhoEq());
     EX.ComputeDynamics();

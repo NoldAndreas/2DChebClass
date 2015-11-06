@@ -1,6 +1,4 @@
-# ************************************************************ 
-# Computed at: 04-Nov-2015 18:14:02 Cumulative computation time: 00:29:15.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
-# ************************************************************ 
+# Computed at: 06-Nov-2015 11:31:59 Cumulative computation time: 00:26:34.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 SecondLine : Computed at: 24-Apr-2015 16:44:56 Cumulative computation time: 00:23:48.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.
 CheckFMTComputation : 21
 CheckFMTComputation_InfCapillary : -2

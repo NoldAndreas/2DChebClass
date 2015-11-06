@@ -4,7 +4,14 @@ function [z,dzdr_r,alpha] = Phi2DLongRange(r,parameter)
 %dzdr_r = 1/r * dz/dr
 %alpha  = -(pi^2/2)*epsilon = 1/2*( 2*pi*int( r*f(r), r = 0..infinity ))
 
-    epsilon = parameter.epsilon;
+    if(nargin < 2)
+        epsilon = 1;
+    elseif(isstruct(parameter))
+        epsilon = parameter.epsilon;
+    else
+        epsilon = parameter;
+    end
+
     if(isstruct(r))
         r = r.y1_kv;
     end   

@@ -11,7 +11,7 @@ function [config,res] = DDFT_DiffusionHalfSpace_BH_2Phase_Sat_2()
                       'y2Min',0,'y2Max',2);    
                   	
     %V2Num   = struct('Fex','SplitDisk','L',1,'L2',[],'N',[20,20]);    
-    V2Num   = struct('Fex','SplitDisk','N',[30,30]);
+    V2Num   = struct('Fex','SplitDisk','N',[20,20]);
         
     optsNum = struct('PhysArea',Phys_Area,...
                      'PlotArea',Plot_Area,...
