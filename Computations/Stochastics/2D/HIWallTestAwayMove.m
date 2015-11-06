@@ -194,11 +194,11 @@ DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,false,false};
+doDDFT={true,true,true,true};
 %doDDFT={true,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={false,false,true,true};
+loadDDFT={true,true,true,true};
 %loadDDFT={false,false,false,false};
 
 DDFTColour = {{'r'},{'b'},{'g'},{'m'}};
@@ -237,9 +237,9 @@ nBins=[40;40];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = false;
-doInitialFinal = true;
+doMovieAvi     = true;
+doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
 
-sendEmail = true;
+sendEmail = false;
