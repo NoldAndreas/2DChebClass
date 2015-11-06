@@ -41,7 +41,7 @@ function [config,res] = DDFT_DiffusionHalfSpace_BH_2Phase_Sat_2()
     
 %	yPtsCheck          = [20 10 ; 0 2 ; 0 0 ; -10 0 ];
 %    EX.IDC.TestConvolutionMatrix(yPtsCheck,@Phi2DLongRange);
-    EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat);                    
+    EX.ComputeEquilibrium(EX.optsPhys.rhoGas_sat,struct('solver','Newton'));                    
     EX.IDC.plot(EX.GetRhoEq());
     EX.ComputeDynamics();
     res.fig_handles = EX.PlotDynamics();
