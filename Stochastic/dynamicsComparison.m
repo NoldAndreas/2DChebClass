@@ -26,7 +26,7 @@ AddPaths();
 %inputFile = 'InfSpaceMove'; % WORKS!
 
 %inputFile = 'HIWallTestTowardsMove';
-inputFile = 'HIWallTestAwayMove';  
+%inputFile = 'HIWallTestAwayMove';  
 
 
 %inputFile = 'InertiaTest';
@@ -49,7 +49,7 @@ inputFile = 'HIWallTestAwayMove';
 %inputFile = 'FMTTest_2Species2';
 %inputFile = 'FMTTest_2Species2N';
 
-%inputFile = 'BoxTestFlow';
+inputFile = 'BoxTestFlow';
 %inputFile = 'BoxTestFlowIdeal';  % Want to check with large scale dynamics
 
 %inputFile = 'FMTTest_Unbounded'; % Want to check with large scale dynamics

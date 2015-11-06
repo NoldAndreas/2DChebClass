@@ -9,6 +9,8 @@ classdef DDFT_2D < Computation
                
         Vext,Vext_grad,VAdd
         
+        u, u_grad
+        
         x_eq,mu
         FilenameEq,FilenameDyn
         dynamicsResult
@@ -295,12 +297,26 @@ classdef DDFT_2D < Computation
                 this.Vext_grad = GetPolarFromCartesianFlux(this.Vext_grad,ythS);                
             end
             this.VAdd  = getVAdd(y1S,y2S,0,this.optsPhys.V1);
-        end                
+        end          
+        
+        function Preprocess_ExternalFlow(this)
+            PtsCart  = this.IDC.GetCartPts();            
+            y1S      = repmat(PtsCart.y1_kv,1,this.optsPhys.nSpecies); 
+            y2S      = repmat(PtsCart.y2_kv,1,this.optsPhys.nSpecies);
+            ythS     = repmat(this.IDC.Pts.y2_kv,1,this.optsPhys.nSpecies);
 
+            [this.u,this.u_grad]  = getUDU(y1S,y2S,this.optsPhys.U);                  
+            if(strcmp(this.IDC.polar,'polar'))
+                this.u_grad = GetPolarFromCartesianFlux(this.u_grad,ythS);                
+            end
+        end          
+        
         res = ComputeEquilibrium(this,rho_ig,optsIn,miscIn)                
         function ComputeDynamics(this)
             if(this.doHIWall)
                 ComputeDynamicsWallHI(this);
+            elseif(isfield(this.optsPhys,'U'))
+                ComputeDynamicsOverdampedFlow(this);
             elseif(this.optsPhys.Inertial)
                 ComputeDynamicsInertia(this);
             else
