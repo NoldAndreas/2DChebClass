@@ -9,7 +9,7 @@ function [HS,res] = SimulationFittedHalfSpace()
 
     Phys_Area.Conv      = struct('L',3,'L2',1,'N',[20,20]);%'ep2Conv',0.1     
     
-    HS                             = HalfSpace(Phys_Area);%v2struct(L1,L2,N));
+    HS                        = HalfSpace(Phys_Area);%v2struct(L1,L2,N));
     [Pts,Diff,Int,Ind,Interp] = HS.ComputeAll(PlotArea);        
     
     figure;
