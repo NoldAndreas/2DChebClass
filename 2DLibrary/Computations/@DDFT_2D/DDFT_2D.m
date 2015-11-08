@@ -386,7 +386,11 @@ classdef DDFT_2D < Computation
 %             else
 %                 deltaT = 1;
 %             end
-                 deltaT = 1;
+            if(IsOption(opts,'Snapshots'))
+                deltaT = T_n_Max-1;
+            else
+                deltaT = 1;
+            end
             
             for i=1:deltaT:T_n_Max                
                 if(IsOption(opts,'MovingFrameOfReference'))                    
@@ -441,7 +445,9 @@ classdef DDFT_2D < Computation
                             maxVal = max(max(max(abs(val))));
                             fl     = val(:,iSpecies,i);
                             fl(1:end/2) = fl(1:end/2) - v1_ref;
-                            this.IDC.plotFlux(fl,[],maxVal,1.2,'k');   hold on;                      
+                            this.IDC.plotStreamlines(fl);   hold on;                      
+                            %this.IDC.plotFlux(fl,[],maxVal,1.2,'k');   hold on;                      
+                            
                         elseif(size(val,1) == 2)                            
                         end
                         
@@ -474,12 +480,15 @@ classdef DDFT_2D < Computation
                 
             end
             
+            
             if(IsOption(opts,'save'))                
-                allPdfFiles = [this.FilenameDyn,'_',name,'.pdf'];                
-    
-                system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
-                disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
-                %system(['del ',fileNames]);           
+                if(~IsOption(opts,'Snapshots'))
+                    allPdfFiles = [this.FilenameDyn,'_',name,'.pdf'];                
+
+                    system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
+                    disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
+                    %system(['del ',fileNames]);           
+                end
             end
             this.optsNum.PlotAreaCart = PlotAreaCartOrg;
         end 
