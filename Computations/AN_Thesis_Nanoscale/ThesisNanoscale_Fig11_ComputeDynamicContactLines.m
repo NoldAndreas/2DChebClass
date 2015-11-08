@@ -17,38 +17,53 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
       res{3} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
                          struct('alpha_deg',45,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                                          
-      
+                     
       res{4} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',60,'epw',1.27,'maxT',400),{}); %Eq: 0 degrees                                                               
+                         struct('alpha_deg',60,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                                                               
       
       res{5} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',120,'epw',0.0,'maxT',400),{}); %Eq: 180 degrees   
-                         
-                     
+                         struct('alpha_deg',60,'epw',1.27,'maxT',400),{}); %Eq: 0 degrees                                                               
+      
       res{6} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
+                           struct('alpha_deg',120,'epw',0.0,'maxT',400),{}); %Eq: 180 degrees         
+      res{6}.erratic = true;                     
+                                              
+      res{7} = DataStorage('MovingContactAngleResults',...
+                         @DoDynamicComputation,...
                          struct('alpha_deg',135,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                                                               
+                     
+      res{8} = DataStorage('MovingContactAngleResults',...
+                         @DoDynamicComputation,...
+                         struct('alpha_deg',120,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                                                                                    
 
+	
       
     col = {'sk','vb','sm','vg','sr','vy'};
 	figure('color','white');
-    index = 75;
+    index = 90;
     for i = 1:6
+        if(isfield(res{i},'erratic'))
+            continue;
+        end
         %plot(cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq),res{i}.contactangle_0(end),['s',col{i}]);  hold on;
         plot(cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq),res{i}.contactlineVel_y1_0(index),[col{i}]);  hold on;
         %plot(cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq),res{i}.contactangle_0(end)*180/pi,'sk');  hold on;
     end
     
     for i = 1:6
+        if(isfield(res{i},'erratic'))
+            continue;
+        end
         res{i}.cosDifference = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq);
         subplot(3,1,1);
         plot(res{i}.t,res{i}.contactlineVel_y1_0,[col{i}]); hold on;
         subplot(3,1,2);
         plot(res{i}.t,res{i}.contactlinePos_y1_0,[col{i}]); hold on;
         subplot(3,1,3);
-        plot(res{i}.cosDifference,res{i}.contactangle_0,[col{i}]); hold on;
+        plot(res{i}.cosDifference,res{i}.contactlineVel_y1_0,[col{i}]); hold on;
     end
 	
     %Analyse Contact Line motion
@@ -109,14 +124,15 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             dynRes.contactangle_0      = CL.dynamicsResult.contactangle_0.val;
             
 %             %For Thesis %,'fittedInterface'
-%             CL.PlotDynamicValue({'rho_t','contactangle_0'},...
-%                 {'MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize'}); %'save'
+             CL.PlotDynamicValue({'rho_t','contactangle_0'},...
+                 {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize'});
 %             
-%             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},...
-%                 {'MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize'}); %'save'
+             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},...
+                 {'save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize'}); %'save'
 %             
 %             %For Movie:
 %             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+            close all;
         catch err
             disp('ERROR')
             rethrow(err);        

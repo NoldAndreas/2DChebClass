@@ -373,7 +373,7 @@ classdef DDFT_2D < Computation
                 name      = varName;
             end
                         
-            if(IsOptions(opts,'PublicationSize'))
+            if(IsOption(opts,'PublicationSize'))
                 figure('Color','white','Position', [0 0 300 250]);
             else
                 figure('Color','white','Position', [0 0 800 800]);
