@@ -1,4 +1,4 @@
-function newmap = b2r(cmin_input,cmax_input)
+function newmap = b2r(cmin_input,cmax_input,color_num)
 %BLUEWHITERED   Blue, white, and red color map.
 %   this matlab file is designed to draw anomaly figures. the color of
 %   the colorbar is from blue to white and then to red, corresponding to 
@@ -53,7 +53,9 @@ blue_bottom = [0 0 1];
 
 %% color interpolation 
 
-color_num = 251;   
+if(nargin < 3)
+    color_num = 251;   
+end
 color_input = [blue_bottom;  white_middle;  red_top];
 oldsteps = linspace(-1, 1, size(color_input,1));
 newsteps = linspace(-1, 1, color_num);  

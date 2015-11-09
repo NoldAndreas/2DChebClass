@@ -68,7 +68,6 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 	
     %Analyse Contact Line motion
 	
-    
 %     DoDynamicComputation(90,1.154,400); %Eq: 45 degrees
 %     DoDynamicComputation(90,0.453,400); %Eq: 135 degrees
 %     
@@ -88,7 +87,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             config = ThesisNanoscale_GetStandardConfig(alpha_deg,epw,maxT);
             config.optsNum.PlotAreaCart       = struct('y1Min',-7.5,'y1Max',7.5,...
                                                    'y2Min',0.5,'y2Max',15.5,...
-                                                   'N1',100,'N2',100,'NFlux',20);
+                                                   'N1',100,'N2',100,'NFlux',10);
 
             CL = ContactLineHS(config);
             CL.Preprocess(); 

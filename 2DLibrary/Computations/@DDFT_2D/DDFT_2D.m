@@ -374,7 +374,7 @@ classdef DDFT_2D < Computation
             end
                         
             if(IsOption(opts,'PublicationSize'))
-                figure('Color','white','Position', [0 0 300 250]);
+                figure('Color','white','Position', [0 0 350 300]);
             else
                 figure('Color','white','Position', [0 0 800 800]);
             end
@@ -437,9 +437,9 @@ classdef DDFT_2D < Computation
                                 this.IDC.plot(val(:,iSpecies,i),'color'); hold on;
                                 m = max(max(val(:,iSpecies,i)));
                                 if(m==0)
-                                    colormap(b2r(0,1));
+                                    colormap(b2r(0,1)); %30
                                 else
-                                    colormap(b2r(0,m));
+                                    colormap(b2r(0,m)); %30
                                 end
                                 colorbar;                                
                                 cont = true;
