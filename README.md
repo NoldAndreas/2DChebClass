@@ -2,8 +2,6 @@
 
 2DChebClass is a code Andreas Nold and Ben Goddard developed as a project for some simple DFT computations in 2012 by at Imperial College London. Since then, it evolved into a library of classes and functions to solve 1D and 2D DFT and DDFT problems. 
 
-I had to port the code from assembla to Bitbucket, because in assembla, the number of team members was restricted to three.
-
 ## To get started
 
 After downloading the version control system 'git', run, in the folder you want your git repository to be created
