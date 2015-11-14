@@ -16,7 +16,7 @@ Please add an option to the switch statement to identify your computer via its M
 
 ```
 case '67-CF-65-55-C1-82'  %YOUR MAC ADDRESS
-            dirData    = 'D:\2DChebData';    %Location of the data folder. Has to be different from pwd.
+            dirData    = 'D:\2DChebData';    %Location of the data folder.
 ```
 
 The content in the dirDDFT folder will be uploaded, so don't add data files here, as this means that the data limit we have on bitbucket would be exceeded quickly.
