@@ -4,14 +4,24 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
         opts = {}; %possible opts: 4Snapshots        
     end
 
+    if(~isstr(input) && isa(input,'ContactLineHS'))        
+        subArea    = input.subArea;
+        optsPhys   = input.optsPhys;
+        optsNum    = input.optsNum;
+        data       = input.dynamicsResult;
+        filename   = input.FilenameDyn;
+        shape      = input.IDC;
+    else
+        v2struct(input);
+    end
+    
     %*****************************
-    %Initialization of Data     
-    v2struct(input);
+    %Initialization of Data         
     v2struct(data);
     
     plotTimes  = t;%optsNum.plotTimes;    
     n          = length(plotTimes);
-    fl_norm    = 0.1*max(max(max(abs(flux_t))));
+    fl_norm    = 0.1*max(max(max(abs(UV_t))));
     disp(['Flux normalized with ',num2str(fl_norm)]);
     
     %Choose times for snapshots
@@ -27,10 +37,9 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
 	mark    = (mod(ct-1,d) == 0);
 	rows    = ceil(sum(mark)/cols);        
     
-        
 	if(size(rho_t,3) == 1)
         rho_s(:,1,:)   = rho_t;  rho_t = rho_s;
-        flux_s(:,1,:)  = flux_t; flux_t = flux_s;        
+        flux_s(:,1,:)  = UV_t;   flux_t = flux_s;        
     end
 	nSpecies = size(rho_t,2);
     
@@ -70,8 +79,8 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
         for iSpecies=1:nSpecies
              optsPlot.linecolor = lineColour{iSpecies};              
              
-             shape.plotFlux(flux_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
-             shape.plotFlux(flux_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
+             shape.plotFlux(UV_t(:,iSpecies,j),shape.Ind.bound,fl_norm,1.5,lineColour{iSpecies}); hold on;                  
+             shape.plotFlux(UV_t(:,iSpecies,j),~shape.Ind.bound,fl_norm,0.5,lineColour{iSpecies}); hold on;           
              
              if(isfield(optsPhys,'rhoLiq_sat') && isfield(optsPhys,'rhoGas_sat'))
                 %optDetails.y2CartShift = -0.5;

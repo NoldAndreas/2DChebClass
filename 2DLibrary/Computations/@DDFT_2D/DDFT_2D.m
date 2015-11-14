@@ -373,8 +373,11 @@ classdef DDFT_2D < Computation
                 name      = varName;
             end
                         
-            
-            figure('Color','white','Position', [0 0 800 800]);
+            if(IsOption(opts,'PublicationSize'))
+                figure('Color','white','Position', [0 0 350 300]);
+            else
+                figure('Color','white','Position', [0 0 800 800]);
+            end
             
             PlotAreaCartOrg       = this.optsNum.PlotAreaCart;
             T_n_Max = length(plotTimes);            
@@ -386,9 +389,15 @@ classdef DDFT_2D < Computation
 %             else
 %                 deltaT = 1;
 %             end
-                 deltaT = 1;
+            if(IsOption(opts,'start'))
+                T_n_Min = 1;
+                T_n_Max = 1;
+            elseif(IsOption(opts,'end'))
+                T_n_Min = T_n_Max;
+            end
+            deltaT = 1;
             
-            for i=1:deltaT:T_n_Max                
+            for i=T_n_Min:deltaT:T_n_Max                
                 if(IsOption(opts,'MovingFrameOfReference'))                    
                     PlotAreaCart       = PlotAreaCartOrg;
                     PlotAreaCart.y1Min = PlotAreaCart.y1Min + this.dynamicsResult.contactlinePos_y1_0(i);
@@ -409,23 +418,28 @@ classdef DDFT_2D < Computation
                 hold off;
                 for iSpecies=1:size(valC{1},2)   
                     
-                    cont = false;
+                    if(IsOption(opts,'contour'))
+                        cont = true;
+                    else
+                        cont = false;
+                    end
+                    
                     
                     for k = 1:length(valC)
                         val = valC{k};
                         
                         if(isstruct(val) && isfield(val,'y1'))                            
-                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'linewidth',3,'color','m'); hold on;
+                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'--','linewidth',1.5,'color','m'); hold on;
                         elseif(isstruct(val) && isfield(val,'str'))
                             titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),3)];
-                        elseif(size(val,1) == this.IDC.M)                            
+                        elseif(size(val,1) == this.IDC.M)             
                             if(~cont)
                                 this.IDC.plot(val(:,iSpecies,i),'color'); hold on;
                                 m = max(max(val(:,iSpecies,i)));
                                 if(m==0)
-                                    colormap(b2r(0,1));
+                                    colormap(b2r(0,1)); %30
                                 else
-                                    colormap(b2r(0,m));
+                                    colormap(b2r(0,m)); %30
                                 end
                                 colorbar;                                
                                 cont = true;
@@ -441,7 +455,29 @@ classdef DDFT_2D < Computation
                             maxVal = max(max(max(abs(val))));
                             fl     = val(:,iSpecies,i);
                             fl(1:end/2) = fl(1:end/2) - v1_ref;
+                            
+                            if(IsOption(opts,'streamlines'))
+                                n1 = 5; n2 = 5;
+                                
+                                y2Min = this.optsNum.PlotAreaCart.y2Min;
+                                y2Max = this.optsNum.PlotAreaCart.y2Max;
+
+                                y1Min = this.optsNum.PlotAreaCart.y1Min;
+                                y1Max = this.optsNum.PlotAreaCart.y1Max;
+
+                                y2L = y2Min + (y2Max-y2Min-1)*(0:n2-1)'/(n2-1);            
+                                y1L = y1Min + (y1Max-y1Min)*(1:n1-1)'/(n1-1);            
+
+                                startPtsy1    = [y1Max*ones(size(y2L))-0.1;...
+                                                 y1Min*ones(size(y2L))+0.1;...
+                                                 y1L];
+                                startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
+                                
+                                optsSL = struct('color','k');
+                                this.IDC.plotStreamlines(fl,startPtsy1,startPtsy2,optsSL);   hold on;                      
+                            end
                             this.IDC.plotFlux(fl,[],maxVal,1.2,'k');   hold on;                      
+                            
                         elseif(size(val,1) == 2)                            
                         end
                         
@@ -451,8 +487,10 @@ classdef DDFT_2D < Computation
                 title(titlestr);               
                 set(gca,'fontsize',20);
                 set(gca,'linewidth',1.5);                
-                %xlabel('$y_1$','Interpreter','Latex','fontsize',25);
-                %ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                if(IsOption(opts,'dimensionlessLabels'))
+                    xlabel('$y_1$','Interpreter','Latex','fontsize',25);
+                    ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+                end
                 %view([2,5,2]);
 
                 h = get(gca,'xlabel'); set(h,'fontsize',35);
@@ -464,7 +502,8 @@ classdef DDFT_2D < Computation
                           (PlotAreaCart.y2Max-PlotAreaCart.y2Min),1]);
                 pause(0.2);                
                 
-                if(IsOption(opts,'save'))
+                if(IsOption(opts,'save') && ... 
+                     ~IsOption(opts,'Snapshots'))
                     fileName = getPDFMovieFile('Movie1',i);
                     disp(fileName);                    
                     save2pdf(fileName,gcf);
@@ -474,12 +513,16 @@ classdef DDFT_2D < Computation
                 
             end
             
-            if(IsOption(opts,'save'))                
-                allPdfFiles = [this.FilenameDyn,'_',name,'.pdf'];                
-    
-                system(['C:\pdftk.exe ', fileNames ,' cat output ',allPdfFiles]);    
-                disp(['Concatenated pdf file saved in: ',allPdfFiles]);            
-                %system(['del ',fileNames]);           
+            
+            if(IsOption(opts,'save'))  
+                finalFilename = [this.FilenameDyn,'_',name];
+                if(IsOption(opts,'Snapshots'))
+                    SaveFigure(finalFilename);
+                else
+                    system(['C:\pdftk.exe ', fileNames ,' cat output ',finalFilename,'.pdf']);    
+                    disp(['Concatenated pdf file saved in: ',finalFilename,'.pdf']);
+                    %system(['del ',fileNames]);           
+                end
             end
             this.optsNum.PlotAreaCart = PlotAreaCartOrg;
         end 
