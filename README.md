@@ -21,6 +21,11 @@ case '67-CF-65-55-C1-82'  %YOUR MAC ADDRESS
 
 The content in the dirDDFT folder will be uploaded, so don't add data files here, as this means that the data limit we have on bitbucket would be exceeded quickly.
 
+### How do I run tests? ###
+
+* Go to 
+* Deployment instructions
+
 ## Matlab-Versions
 The code currently runs using Matlab2014a.
 
@@ -30,22 +35,12 @@ The code currently runs using Matlab2014a.
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
 ### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
+ (i.e. 'don't merge onto the master branch, put your name on the branches, a link to git commands') 
+
+* only edit/ create branches which start with your first name
+* merging of personal branches with the master branch is only done by Andreas and Ben 
+* computations are performed 
 
 ### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
