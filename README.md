@@ -34,9 +34,3 @@ The code currently runs using Matlab2014a.
 * only edit/ create branches which start with your first name
 * merging of personal branches with the master branch should be done by Andreas and Ben 
 * computations are performed 
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
