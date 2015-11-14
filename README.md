@@ -23,8 +23,7 @@ The content in the dirDDFT folder will be uploaded, so don't add data files here
 
 ### How do I run tests? ###
 
-* Go to 
-* Deployment instructions
+* Go to Computations/WorkingExamples. Run "doTests.m"
 
 ## Matlab-Versions
 The code currently runs using Matlab2014a.
