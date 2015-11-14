@@ -12,12 +12,11 @@ $ git clone https://NoldAndreas@bitbucket.org/NoldAndreas/2dchebclass.git/wiki
 This should download the content of the code to your computer. 
 
 The first file to edit once you have downloaded the code is "AddPaths.m" in the main folder. 
-Please add an option to the switch statement to identify your computer via its MAC address. Also, define via "dirData" a folder where the computational results should be saved, and via "dirDDFT" the directory of the code.
+Please add an option to the switch statement to identify your computer via its MAC address. Also, define via "dirData" a folder where the computational results should be saved.
 
 ```
 case '67-CF-65-55-C1-82'  %YOUR MAC ADDRESS
-            dirDDFT    = pwd;                %Location of the code folder
-            dirData    = 'D:\2DChebData';    %Location of the data folder. Has to be different from dirDDFT.
+            dirData    = 'D:\2DChebData';    %Location of the data folder. Has to be different from pwd.
 ```
 
 The content in the dirDDFT folder will be uploaded, so don't add data files here, as this means that the data limit we have on bitbucket would be exceeded quickly.
