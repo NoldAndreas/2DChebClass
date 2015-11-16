@@ -6,7 +6,7 @@
 
 After downloading the version control system 'git', run, in the folder you want your git repository to be created
 ```
-$ git clone https://NoldAndreas@bitbucket.org/NoldAndreas/2dchebclass.git/wiki
+$ git clone https://[LOGIN]@bitbucket.org/NoldAndreas/2dchebclass.git/[LOCATION_TO_CLONE_TO]
 ```
 
 This should download the content of the code to your computer. 
@@ -33,4 +33,3 @@ The code currently runs using Matlab2014a.
 
 * only edit/ create branches which start with your first name
 * merging of personal branches with the master branch should be done by Andreas and Ben 
-* computations are performed 
