@@ -144,7 +144,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
         end
         res{i}.cosDifference = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq);
         %subplot(3,1,1);
-        plot(res{i}.t,res{i}.contactlineVel_y1_0,[res{i}.lin,res{i}.col]); hold on;
+        plot(res{i}.t, res{i}.contactlineVel_y1_0,[res{i}.lin,res{i}.col]); hold on;
         %subplot(3,1,2);
         %plot(res{i}.t,res{i}.contactlinePos_y1_0,res{i}.col); hold on;
         %subplot(3,1,3);
