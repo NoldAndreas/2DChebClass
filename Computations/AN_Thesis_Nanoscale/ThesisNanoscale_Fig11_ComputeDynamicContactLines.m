@@ -6,13 +6,14 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %     config = ThesisNanoscale_GetStandardConfig(90,[]);
 %     epw = FindEpwFromContactAngle(config,180);
 %     disp(epw);     
+      recomp = false;      
       res{1} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{}); %Eq: 120 degrees                              
+                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{},recomp); %Eq: 120 degrees                              
                      
       res{2} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',90,'epw',1.071,'maxT',400),{}); %Eq: 60 degrees                     
+                         struct('alpha_deg',90,'epw',1.071,'maxT',400),{},recomp); %Eq: 60 degrees                     
                      
       res{3} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
@@ -20,15 +21,15 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
                      
       res{4} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',60,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                                                               
+                         struct('alpha_deg',60,'epw',0.856,'maxT',400),{},recomp); %Eq: 90 degrees                                                               
       
       res{5} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',60,'epw',1.27,'maxT',400),{}); %Eq: 0 degrees                                                               
+                         struct('alpha_deg',60,'epw',1.27,'maxT',400),{},recomp); %Eq: 0 degrees                                                               
       
       res{6} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                           struct('alpha_deg',120,'epw',0.0,'maxT',400),{}); %Eq: 180 degrees         
+                           struct('alpha_deg',120,'epw',0.0,'maxT',400),{},recomp); %Eq: 180 degrees         
       res{6}.erratic = true;                     
                                               
       res{7} = DataStorage('MovingContactAngleResults',...
@@ -38,7 +39,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
                      
       res{8} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                         struct('alpha_deg',120,'epw',0.856,'maxT',400),{}); %Eq: 90 degrees                     
+                         struct('alpha_deg',120,'epw',0.856,'maxT',400),{},recomp); %Eq: 90 degrees                     
 
 	 res{9} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
@@ -129,7 +130,8 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
         end
         
         %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
-        plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
+        %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
+        plot(res{i}.GDiff,res{i}.contactlineVel_y1_0(index),...
                     res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
     end
     pbaspect([1 1 1]);
@@ -143,12 +145,14 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             continue;
         end
         res{i}.cosDifference = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq);
-        %subplot(3,1,1);
+        subplot(3,1,1);
         plot(res{i}.t, res{i}.contactlineVel_y1_0,[res{i}.lin,res{i}.col]); hold on;
         %subplot(3,1,2);
         %plot(res{i}.t,res{i}.contactlinePos_y1_0,res{i}.col); hold on;
-        %subplot(3,1,3);
-        %plot(res{i}.cosDifference,res{i}.contactlineVel_y1_0,res{i}.col); hold on;
+        subplot(3,1,2);
+        plot(res{i}.cosDifference,res{i}.contactlineVel_y1_0,res{i}.col); hold on;
+        subplot(3,1,3);
+        plot(res{i}.GDiff,res{i}.contactlineVel_y1_0,res{i}.col); hold on;
     end
     pbaspect([1 1 1]);
     xlabel('$t$','Interpreter','Latex');
@@ -216,11 +220,16 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             
 %             %For Thesis %,'fittedInterface'
              CL.PlotDynamicValue({'rho_t','contactangle_0'},...
-                 {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize'});
+                 {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize','CLy2Shift'});
 %             
-             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},...
-                 {'save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize'}); %'save'
+             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},... %
+                 {'save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize','CLy2Shift'}); %'save'
+             
+             %without entropy plot
+             CL.PlotDynamicValue({'rho_t','fittedInterface','UV_t','contactangle_0'},... %
+                 {'contour','save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize','CLy2Shift'}); %'save'
 %             
+             disp(['final CL velocity: ',num2str(CL.dynamicsResult.contactlineVel_y1_0(end))]);
 %             %For Movie:
 %             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
             close all;
