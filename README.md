@@ -8,9 +8,17 @@ After downloading the version control system 'git', run, in the folder you want 
 ```
 $ git clone https://[LOGIN]@bitbucket.org/NoldAndreas/2dchebclass.git/[LOCATION_TO_CLONE_TO]
 ```
-
 This should download the content of the code to your computer. 
 
+The remote repository is located at 
+```
+https://[LOGIN]@bitbucket.org/NoldAndreas/2dchebclass.git
+```
+This should appear when typing 
+```
+$git remote -v
+```
+ 
 The first file to edit once you have downloaded the code is "AddPaths.m" in the main folder. 
 Please add an option to the switch statement to identify your computer via its MAC address. Also, define via "dirData" a folder where the computational results should be saved.
 
@@ -32,4 +40,4 @@ The code currently runs using Matlab2014a.
 ### Contribution guidelines ###
 
 * only edit/ create branches which start with your first name
-* merging of personal branches with the master branch should be done by Andreas and Ben 
+* merging of personal branches with the master branch should be done by Andreas and Ben
