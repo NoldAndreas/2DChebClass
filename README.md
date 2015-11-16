@@ -16,7 +16,7 @@ https://[LOGIN]@bitbucket.org/NoldAndreas/2dchebclass.git
 ```
 This should appear when typing 
 ```
-$git remote -v
+$ git remote -v
 ```
  
 The first file to edit once you have downloaded the code is "AddPaths.m" in the main folder. 
