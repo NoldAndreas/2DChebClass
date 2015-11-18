@@ -15,8 +15,8 @@
             dirData    = 'D:\2DChebData';    
             dirDDFT    = pwd;
         case '00:88:65:35:a1:92'
-            dirData    = '/Volumes/BACKUP_IC/2DChebData';
-            %dirData    = '/Users/NoldAndreas/Documents/2DChebData';
+            %dirData    = '/Volumes/BACKUP_IC/2DChebData';
+            dirData    = '/Users/NoldAndreas/Documents/2DChebData';
             dirDDFT    = pwd;
         case '1C:C1:DE:52:03:FF' % Ben office machine
             dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
