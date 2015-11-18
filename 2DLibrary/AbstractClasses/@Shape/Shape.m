@@ -215,7 +215,11 @@ classdef (Abstract) Shape < handle
             
             yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);                        
             y1M    = reshape(yCart.y1_kv,this.Interp.Nplot2,this.Interp.Nplot1);
-            y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);                               
+            y2M    = reshape(yCart.y2_kv,this.Interp.Nplot2,this.Interp.Nplot1);      
+            
+            if((nargin >= 4) && isfield(opts,'y2CartShift'))
+                y2M = y2M + opts.y2CartShift;
+            end
             
             if((nargin == 2) || isempty(startMask1))
                 startMask1 = this.Ind.bound;           
@@ -243,7 +247,8 @@ classdef (Abstract) Shape < handle
                 set(h,'linewidth',opts.linewidth);
             end
         end        
-        function [y1_s,y2_s,fl_y1,fl_y2] = plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain)
+        function [y1_s,y2_s,fl_y1,fl_y2] = plotFlux(this,flux,maskAdd,fl_norm,lw,c,plain,y2CartShift)
+                        
             global PersonalUserOutput
             if(~PersonalUserOutput)
                 return;
@@ -284,6 +289,10 @@ classdef (Abstract) Shape < handle
             yCart  = GetCartPts(this,pts.y1_kv,pts.y2_kv);
             y1_s   = yCart.y1_kv(mask);     
             y2_s   = yCart.y2_kv(mask);
+            
+            if(nargin >= 8)
+                y2_s = y2_s + y2CartShift;
+            end
             
             if(exist('fl_norm','var') && ~isempty(fl_norm))                
                 y1_s  = [min(y1_s);y1_s];

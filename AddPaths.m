@@ -12,42 +12,39 @@
     
     switch GetMacAddress()
         case '24-BE-05-10-A1-52'  %Andreas' Windows Work PC
-            dirData    = 'D:\2DChebData';    
-            dirDDFT    = pwd;
+            dirData    = 'D:\2DChebData';                
         case '00:88:65:35:a1:92'
             %dirData    = '/Volumes/BACKUP_IC/2DChebData';
             dirData    = '/Users/NoldAndreas/Documents/2DChebData';
-            dirDDFT    = pwd;
         case '1C:C1:DE:52:03:FF' % Ben office machine
-            dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-            dirDDFT    = pwd;
+            dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';            
         case '10:40:f3:8a:30:f4' % Ben MacBook Air
-            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
-            dirDDFT    = pwd;
+            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';            
         case 'C8:1F:66:ED:06:8F' % compute64c
             switch getenv('USER')
                 case 'bgoddard'
                     dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-                    dirDDFT    = pwd;
                 otherwise
                     disp('Unknown computer; using current directory to save data');
                     dirData     = pwd;
-                    dirDDFT     = pwd;        
             end
         case 'A0:36:9F:60:6C:C4' % compute64d
             switch getenv('USER')
                 case 'bgoddard'
                     dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';
-                    dirDDFT    = pwd;
                 otherwise
                     disp('Unknown computer; using current directory to save data');
                     dirData     = pwd;
-                    dirDDFT     = pwd;        
             end
         otherwise
             disp('Unknown computer; using current directory to save data');
             dirData     = pwd;
-            dirDDFT     = pwd;        
+    end
+    dirDDFT    = pwd;
+    
+    if(strcmp(dirData,dirDDFT))
+        dirData = [];
+        error('Please define "dirData" that is different from main code directory "dirDDFT".');
     end
 
 %    elseif(exist('/home/an2609/','dir'))

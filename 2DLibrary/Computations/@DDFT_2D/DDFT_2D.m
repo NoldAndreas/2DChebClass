@@ -373,6 +373,12 @@ classdef DDFT_2D < Computation
                 name      = varName;
             end
                         
+            if(IsOption(opts,'CLy2Shift'))
+                optDetails.y2CartShift = -0.5;
+            else
+                optDetails.y2CartShift = 0;
+            end
+                        
             if(IsOption(opts,'PublicationSize'))
                 figure('Color','white','Position', [0 0 350 300]);
             else
@@ -429,12 +435,14 @@ classdef DDFT_2D < Computation
                         val = valC{k};
                         
                         if(isstruct(val) && isfield(val,'y1'))                            
-                            plot(val.y1(:,iSpecies,i),val.y2(:,iSpecies,i),'--','linewidth',1.5,'color','m'); hold on;
+                            plot(val.y1(:,iSpecies,i),...
+                                 val.y2(:,iSpecies,i)+optDetails.y2CartShift,...
+                                 '--','linewidth',1.5,'color','m'); hold on;
                         elseif(isstruct(val) && isfield(val,'str'))
                             titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),3)];
                         elseif(size(val,1) == this.IDC.M)             
                             if(~cont)
-                                this.IDC.plot(val(:,iSpecies,i),'color'); hold on;
+                                this.IDC.plot(val(:,iSpecies,i),'color',optDetails); hold on;
                                 m = max(max(val(:,iSpecies,i)));
                                 if(m==0)
                                     colormap(b2r(0,1)); %30
@@ -445,9 +453,9 @@ classdef DDFT_2D < Computation
                                 cont = true;
                             else
                                 if(strcmp(varName{k},'rho_t'))
-                                    PlotDensityContours(this,rho_t(:,iSpecies,i));  hold on;                               
+                                    PlotDensityContours(this,rho_t(:,iSpecies,i),optDetails);  hold on;                               
                                 else
-                                    this.IDC.plot(val(:,iSpecies,i),'contour'); hold on;
+                                    this.IDC.plot(val(:,iSpecies,i),'contour',optDetails); hold on;
                                 end                                
                             end
                             
@@ -473,10 +481,10 @@ classdef DDFT_2D < Computation
                                                  y1L];
                                 startPtsy2    = [y2L;y2L;y2Max*ones(size(y1L))];
                                 
-                                optsSL = struct('color','k');
-                                this.IDC.plotStreamlines(fl,startPtsy1,startPtsy2,optsSL);   hold on;                      
+                                optDetails.color = 'k';
+                                this.IDC.plotStreamlines(fl,startPtsy1,startPtsy2,optDetails);   hold on;                      
                             end
-                            this.IDC.plotFlux(fl,[],maxVal,1.2,'k');   hold on;                      
+                            this.IDC.plotFlux(fl,[],[],1.2,'k',false,optDetails.y2CartShift);   hold on;                      
                             
                         elseif(size(val,1) == 2)                            
                         end
@@ -497,7 +505,7 @@ classdef DDFT_2D < Computation
                 h = get(gca,'ylabel'); set(h,'fontsize',35);
                 h = get(gca,'title');  set(h,'fontsize',35);
                 xlim([PlotAreaCart.y1Min,PlotAreaCart.y1Max]);
-                ylim([PlotAreaCart.y2Min,PlotAreaCart.y2Max]);
+                ylim([PlotAreaCart.y2Min,PlotAreaCart.y2Max]+optDetails.y2CartShift);
                 pbaspect([(PlotAreaCart.y1Max-PlotAreaCart.y1Min),...
                           (PlotAreaCart.y2Max-PlotAreaCart.y2Min),1]);
                 pause(0.2);                
