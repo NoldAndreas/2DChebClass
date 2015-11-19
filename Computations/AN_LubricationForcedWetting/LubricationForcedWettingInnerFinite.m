@@ -1,6 +1,5 @@
 function res = LubricationForcedWettingInnerFinite(delta)
 
-
     global dirData
     AddPaths();        
     ChangeDirData([dirData filesep 'ForcedWetting'],'ORG');    
