@@ -2,8 +2,7 @@ function ThesisNanoscale_Fig5_YoungContactAngles()
     
     AddPaths('ThesisNanoscale');       
     
-    config = ThesisNanoscale_GetStandardConfig(90);    
-	
+     config = ThesisNanoscale_GetStandardConfig(90);    
     
      %***************************************************
      %***************************************************

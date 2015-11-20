@@ -29,8 +29,8 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
       
       res{6} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                           struct('alpha_deg',120,'epw',0.0,'maxT',400),{},recomp); %Eq: 180 degrees         
-      res{6}.erratic = true;                     
+                           struct('alpha_deg',120,'epw',0.1,'maxT',400),{},recomp); %Eq: 170 degrees
+%      res{6}.erratic = true;
                                               
       res{7} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
@@ -92,13 +92,25 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %                           struct('alpha_deg',90,'epw',1.0,'maxT',400),{}); %Eq: 70.86 degrees                                              
 
     %Postprocess
-    for i = 1:length(res)
-        res{i}.thetaEq = res{i}.thetaEq*180/pi;
-        res{i}.cosDiff = cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq*pi/180);
+    for i = 1:length(res)        
+        if(isfield(res{i},'erratic'))
+            continue;
+        end
+        
+        res{i}.thetaEq   = res{i}.thetaEq*180/pi;
+        res{i}.cosDiff   = cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq*pi/180);
+        res{i}.cosDiff_t = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq*pi/180);
+        %res{i}.cosDiff_t = cos(res{i}.thetaInitial*pi/180)-cos(res{i}.contactangle_0*pi/180);
         
         lambdaEta      = 0.2;
         res{i}.GDiff   = GHR_lambdaEta(res{i}.thetaInitial*pi/180,lambdaEta)-...
                          GHR_lambdaEta(res{i}.thetaEq*pi/180,lambdaEta);
+                     
+        %res{i}.GDiff_t   = GHR_lambdaEta(res{i}.contactangle_0*pi/180,lambdaEta)-...
+%                           GHR_lambdaEta(res{i}.thetaEq*pi/180,lambdaEta);            
+                       
+        res{i}.GDiff_t   = GHR_lambdaEta(res{i}.thetaInitial*pi/180,lambdaEta) - ...
+                            GHR_lambdaEta(res{i}.contactangle_0*pi/180,lambdaEta);                                   
         
         if(res{i}.thetaEq < res{i}.thetaInitial)
             res{i}.sym = 's';
@@ -129,34 +141,47 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             continue;
         end
         
+        subplot(1,2,1);
+        plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
+            res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
         %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
-        %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
+        subplot(1,2,2);
         plot(res{i}.GDiff,res{i}.contactlineVel_y1_0(index),...
                     res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
+                
     end
     pbaspect([1 1 1]);
+    
+    subplot(1,2,1);
     xlabel('$\cos(\theta_{in})-\cos(\theta_{eq})$','Interpreter','Latex');
+    subplot(1,2,2);
+    xlabel('$G(\theta_{in})-G(\theta_{eq})$','Interpreter','Latex');
     ylabel('$U_{CL}$','Interpreter','Latex');
 	SaveFigure('ContactLineMeasurement_T_APSDFD2015');
     
     f2 = figure('color','white','Position',[0 0 250 200]);
-    for i = 1:2%length(res)
+    for i = 1:length(res)
         if(isfield(res{i},'erratic'))
             continue;
-        end
-        res{i}.cosDifference = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq);
-        subplot(3,1,1);
+        end        
+        mark = (20:100);
+        
+        subplot(2,2,1);
         plot(res{i}.t, res{i}.contactlineVel_y1_0,[res{i}.lin,res{i}.col]); hold on;
-        %subplot(3,1,2);
-        %plot(res{i}.t,res{i}.contactlinePos_y1_0,res{i}.col); hold on;
-        subplot(3,1,2);
-        plot(res{i}.cosDifference,res{i}.contactlineVel_y1_0,res{i}.col); hold on;
-        subplot(3,1,3);
-        plot(res{i}.GDiff,res{i}.contactlineVel_y1_0,res{i}.col); hold on;
+        plot(res{i}.t, res{i}.contactlineVel_y1_0,['o',res{i}.lin,res{i}.col]); hold on;
+        subplot(2,2,2);
+        plot(res{i}.t,res{i}.contactangle_0,res{i}.col); hold on;
+        plot(res{i}.t,res{i}.contactangle_0,['o',res{i}.col]); hold on;
+        subplot(2,2,3);
+        plot(res{i}.cosDiff_t(mark),res{i}.contactlineVel_y1_0(mark),res{i}.col); hold on;
+        plot(res{i}.cosDiff_t(mark),res{i}.contactlineVel_y1_0(mark),['o',res{i}.col]); hold on;
+        subplot(2,2,4);
+        plot(res{i}.GDiff_t(mark),res{i}.contactlineVel_y1_0(mark),['o',res{i}.col]); hold on;
+        plot(res{i}.GDiff_t(mark),res{i}.contactlineVel_y1_0(mark),res{i}.col); hold on;
     end
     pbaspect([1 1 1]);
-    xlabel('$t$','Interpreter','Latex');
-    ylabel('$U_{CL}$','Interpreter','Latex');
+    %xlabel('$t$','Interpreter','Latex');
+    %ylabel('$U_{CL}$','Interpreter','Latex');
     
     %inset2(f1,f2,0.4,[0.3,0.5]);
     %close(f2);    

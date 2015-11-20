@@ -99,12 +99,12 @@ classdef ContactLineHS < DDFT_2D
                 [rho1D,params]   = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,[]);   
             elseif(strcmp(WLWGLG,'WL'))
                 optss.rho_iguess = this.optsPhys.rhoLiq_sat;
-                [rho1D,params] = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,this.IntMatrV2.Conv);
+                [rho1D,params] = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,this.IntMatrV2.Conv,{'plot'});
                 this.ST_1D.om_wallLiq = params.Fex;
                 this.rho1D_wl         = rho1D;                
             elseif(strcmp(WLWGLG,'WG'))
                 optss.rho_iguess = this.optsPhys.rhoGas_sat;
-                [rho1D,params] = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,this.IntMatrV2.Conv);
+                [rho1D,params] = FMT_1D(this.IDC,this.IntMatrFex,optss,Fex_Num,this.IntMatrV2.Conv,{'plot'});
                 
                 this.ST_1D.om_wallGas = params.Fex;
                 this.rho1D_wg         = rho1D;                
@@ -162,8 +162,18 @@ classdef ContactLineHS < DDFT_2D
             rhoGas_sat    = this.optsPhys.rhoGas_sat;
             kBT           = this.optsPhys.kBT;            
             
-            p         = (this.rho1D_lg-rhoGas_sat)/(rhoLiq_sat-rhoGas_sat);    
-            rho_ig    = kron(p,this.rho1D_wl) + kron(1-p,this.rho1D_wg);         
+            if(nargin < 2)
+                if(~isempty(this.rho1D_lg))
+                    p = (this.rho1D_lg-rhoGas_sat)/(rhoLiq_sat-rhoGas_sat);    
+                else
+                    p = 1;
+                end
+                rho_ig    = kron(p,this.rho1D_wl) + kron(1-p,this.rho1D_wg);         
+            else
+                if(length(rho_ig)==1)
+                    rho_ig = rho_ig * ones(this.IDC.M,1);                
+                end
+            end
             y0        = kBT*log(rho_ig)+this.Vext;
         end
         
