@@ -2,7 +2,7 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
             
 	%Based on values of the interface away from the wall at (y_1^k,y_2^k)
     %Interpolate to 
-    % (EQ) y_1Interface = c*y_2*(1+sum_k  a_k exp(-lambda_k *y_2^k))
+    % (EQ) y_1Interface = c*y_2+sum_k  a_k exp(-lambda_k *y_2^k)
     
     
    % y2k     = [4;5];
