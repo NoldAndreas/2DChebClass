@@ -14,7 +14,7 @@
         case '24-BE-05-10-A1-52'  %Andreas' Windows Work PC
             dirData    = 'D:\2DChebData';                
         case '00:88:65:35:a1:92'
-            %dirData    = '/Volumes/BACKUP_IC/2DChebData';
+            %dirData    = '/Volumes/BACKUP_IC\ 1';
             dirData    = '/Users/NoldAndreas/Documents/2DChebData';
         case '1C:C1:DE:52:03:FF' % Ben office machine
             dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';            

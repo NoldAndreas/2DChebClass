@@ -209,17 +209,17 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         else
             bool_collPts = 'o';%[]; %'o'
         end
-        f1 = figure;
+        f1 = figure;        
         
         subplot(3,3,[1,2,4,5,7,8]);
         HS.do1DPlotNormal(rho_ic1D,bool_collPts); hold on;
         h = xlabel(xLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
         h = ylabel(yLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
         
-        plot([0 10],[rhoBulk,rhoBulk],'k--','linewidth',2);
+        plot([0 10],[rhoBulk,rhoBulk],'k--');
         if(~isempty(IntMatrFex) && ~isempty(checkContactDensity))
-            plot([0 10],[checkContactDensity,checkContactDensity],'k--','linewidth',2);
-        end       
+            plot([0 10],[checkContactDensity,checkContactDensity],'k--');
+        end               
         xlim([0 7]);
             
         deltaY = 0.5;
@@ -228,10 +228,10 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
             Interp1D.InterPol         = Interp1D.InterPol(:,markComp);
             Interp1D.ptsCart          = HS.GetCartPts(Interp1D.pts1,Interp1D.pts2);
             dataMC = LoadGrootData(eta*6/pi);                        
-            plot(dataMC.y-deltaY,dataMC.rho,'ks','markersize',8,'markerFace','k'); hold on;
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on; %'markersize',8
             
             f2 = figure('Color','white');
-            plot(dataMC.y-deltaY,dataMC.rho,'ks','markersize',8,'markerFace','k'); hold on;
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on; %'markersize',8
             if(eta == 0.4783)
                 %shift = struct('xmin',0.5,'xmax',.6,'ymin',0.,'ymax',11.,'yref',0,'xref',0.5);
                 %PlotBackgroundImage(['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'Inset_PackingFraction0_4783_RothFMTReview.gif'],shift);
@@ -244,17 +244,24 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
                 xlim([1.3 1.8]-0.5);   ylim([0.65 1.55]);
             end
             %plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
-            plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k','linewidth',1.5);  %Interp1D.pts2
+            plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k'); %'linewidth',1.5 %Interp1D.pts2
             h = xlabel(xLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
             h = ylabel(yLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-            pbaspect([1 1 1]);                
-            set(gca,'fontsize',20);                        
-            set(gca,'linewidth',1.5);                
+            pbaspect([1 1 1]);                            
+            if(~IsOption(opts,'plotTex'))
+                set(gca,'fontsize',20); 
+                set(gca,'linewidth',1.5);                
+            end
             hold off;           
 
             inset(f1,f2,0.35,[.35 .6]);   colormap(gray);    
             set(gcf,'Color','white');  close(f2); close(f1);
-            set(gcf, 'Position', [0 0 1400 1000]);            
+            
+            if(IsOption(opts,'plotTex'))
+                set(gcf, 'Position', [0 0 400 300]);                        
+            else
+                set(gcf, 'Position', [0 0 1400 1000]);            
+            end
         end
 
                
