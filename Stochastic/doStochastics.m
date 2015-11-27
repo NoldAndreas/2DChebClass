@@ -91,7 +91,14 @@ optsStocI.burnin       = optsStoc.burnin;
 fprintf(1,'Starting initial sampling ... ');
 
 if(optsStoc.fixedInitial)
-    xInitial = optsStoc.initialGuess;
+    getInitial = str2func(optsStoc.initialGuess);
+    initialTemp = getInitial(optsPhys);
+    initialTemp = initialTemp';
+    
+    % repeat for number of runs
+    nRuns = optsStoc.nRuns;
+    xInitial = repmat(initialTemp,nRuns,1);
+    
     ICFilename = [];
 else
 

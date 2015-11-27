@@ -56,6 +56,6 @@ switch geom         % for different geometries
         
     case 'full'
         
-        C=x(:);
+        C=x';
         
 end

@@ -49,6 +49,7 @@ if(S.anyStoc)
     D.noise=true;
     D.MBp=true;
     D.initialGuess='makeGrid';
+    D.useNewHS = false;
     D.nSamples=10*S.nRuns;
     D.thin=1;
     D.burnin=0;

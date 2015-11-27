@@ -145,7 +145,13 @@ parfor iRun=1:nRuns
     end
  
     % do dynamics
-    [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
+    if(isfield(optsStoc,'useNewHS') && optsStoc.useNewHS)
+        disp('new')
+        [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamicsHS(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
+    else 
+        disp('old')
+        [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
+    end
 
     if(poolsize>1)
         task   = getCurrentTask();

@@ -19,11 +19,15 @@ d = size(C,2);        % geometry dimension
 if (d==1)
     x = x1;
     x1=C;
-else  % d=2
+elseif (d==2) 
     x1=C(:,1);
     x2=C(:,2);
+else
+    x1=C(:,1);
+    x2=C(:,2);    
+    x3=C(:,3);
 end
-               
+
 %--------------------------------------------------------------------------
 % Get potential and gradient structures
 %--------------------------------------------------------------------------
@@ -42,12 +46,19 @@ if(d==1)      % 1D potential
     else
         [VBackStruct,VAddStruct] = V1DV1(x1,t,optsPhys);
     end
-else                  % 2D potential
+elseif(d==2)                  % 2D potential
     if(confined)
         [VBackStruct,VAddStruct,VGeomStruct] = V1DV1(x1,x2,t,optsPhys);
     else
         [VBackStruct,VAddStruct] = V1DV1(x1,x2,t,optsPhys);
     end
+else                  % 3D potential
+    if(confined)
+        [VBackStruct,VAddStruct,VGeomStruct] = V1DV1(x1,x2,x3,t,optsPhys);
+    else
+        [VBackStruct,VAddStruct] = V1DV1(x1,x2,x3,t,optsPhys);
+    end
+
 end
 
 %--------------------------------------------------------------------------
@@ -138,7 +149,7 @@ if (d==1)
 % 2-dimensional potentials
 %------------------------------------------------------------------
 
-else % d=2
+elseif(d==2)
 
     switch geom
 
@@ -198,7 +209,31 @@ else % d=2
     % convert to (nParticles,1) with correct x1, x2
     % ordering
     DV1 = DV1(:);
+    
+%------------------------------------------------------------------
+% 3-dimensional potentials
+%------------------------------------------------------------------
 
+else
+
+    % only one geometry in this case
+    
+    DV11 = VBackStruct.dy1 + VAddStruct.dy1;
+    DV12 = VBackStruct.dy2 + VAddStruct.dy2;
+    DV13 = VBackStruct.dy3 + VAddStruct.dy3;
+
+    if(confined)
+        DV11 = DV11 + VGeomStruct.dy1;
+        DV12 = DV12 + VGeomStruct.dy2;
+        DV13 = DV13 + VGeomStruct.dy3;
+    end
+    
+    % put each derivative into a row (3,nParticles)
+    DV1 = [DV11' ; DV12'; DV13'];
+    % convert to (nParticles,1) with correct x1, x2, x3
+    % ordering
+    DV1 = DV1(:);
+    
 end    % dimension switch
       
 end

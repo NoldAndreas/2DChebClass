@@ -10,6 +10,8 @@ AddPaths();
 % Choose input file
 %--------------------------------------------------------------------------
 
+inputFile = 'sedimentation9New';
+
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
 
@@ -49,7 +51,7 @@ AddPaths();
 %inputFile = 'FMTTest_2Species2';
 %inputFile = 'FMTTest_2Species2N';
 
-inputFile = 'BoxTestFlow';
+%inputFile = 'BoxTestFlow';
 %inputFile = 'BoxTestFlowIdeal';  % Want to check with large scale dynamics
 
 %inputFile = 'FMTTest_Unbounded'; % Want to check with large scale dynamics

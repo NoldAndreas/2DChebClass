@@ -164,4 +164,5 @@ optsStruct.anyPlots=any([optsStruct.doPdfs,optsStruct.doMovieGif,optsStruct.doMo
 optsStruct.anyPlotsP=any([optsStruct.doPdfsP,optsStruct.doMovieGifP,optsStruct.doMovieSwfP, ...
                optsStruct.doInitialFinalP,optsStruct.doCustomP]);
 
+
 end

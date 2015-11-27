@@ -1,4 +1,4 @@
-function [x,p]=stochasticDynamics(f,x0,p0,optsPhys,optsStoc,plotPosMask)
+function [x,p]=stochasticDynamicsHS(f,x0,p0,optsPhys,optsStoc,plotPosMask)
 % [x,p]=Dynamics(f,x0,p0,optsPhys,optsStoc,plotPosMask)
 %   performs stochastic dynamics calculattion with noise f and initial
 %   positions x0 and momenta p0
@@ -29,6 +29,9 @@ function [x,p]=stochasticDynamics(f,x0,p0,optsPhys,optsStoc,plotPosMask)
 %                 (dim x nParticles, length(plotTimes))
 %  p           -- a matrix of momenta of size 
 %                 (dim x nParticles, length(plotTimes))
+
+% remove HS part of potential - dealt with via resampling collisions
+optsPhys.V2DV2 = 'free';
 
 % extract physical values for ease of use
 dim=optsPhys.dim;
@@ -81,43 +84,66 @@ for t=2:tSteps+1
     % perform evolution -- see Ermak McCammon '78
     r = x(:,t-1) + dr;
 
-    [pairs,nij,Rij] = findOverlaps(r,sigma,dim);
+    pairs = findOverlaps(r,sigma,dim);
     
     nOverlaps = size(pairs,1);
     
     for iOverlap = 1:nOverlaps
         p1 = pairs(iOverlap,1);
-        p2 = pairs(iOverlap,1);
-        n12 = nij(:,p1,p2);
-        q0 = Rij(p1,p2) - sigma(p1,p2);
+        p2 = pairs(iOverlap,2);
+        
+        pos1 = dim*(p1-1)+1:dim*(p1-1)+dim;
+        pos2 = dim*(p2-1)+1:dim*(p2-1)+dim;
+        
+        r1 = x(pos1,t-1);
+        r2 = x(pos2,t-1);
+        
+        [r12,n12] = getRij(r1,r2,dim);
+        n12 = squeeze(n12);
+        e12 = - n12;
+        
+        q0 = r12 - sigma(p1,p2);
         
         D1 = D(dim*p1,dim*p1);
         D2 = D(dim*p2,dim*p2);
         
         Dq = D1 + D2;
         
-        pos1 = dim*(p1-1)+1:dim*(p1-1)+dim;
-        pos2 = dim*(p2-1)+1:dim*(p2-1)+dim;
-        
         v12 = v(pos1) - v(pos2);
         v12 = sum(v12.*n12);
-        [q,~] = HScorrection3(dt,q0,v12,Dq);
+        [q,~] = HSCollisionSampling(dt,q0,v12,Dq);
         
         dq = q - q0;
         
         dr1 = dr(pos1);
         dr2 = dr(pos2);
         
-        dr12n = sum( (dr1 - dr2) .* n12);
+        dr21e = sum( (dr2 - dr1) .* e12 );
         
-        dr1s = dr1 + D1/Dq * ( dr12n + dq) * n12;
-        dr2s = dr1 - D2/Dq * ( dr12n + dq) * n12;
+        dr1s = dr1 + D1/Dq * ( dr21e - dq) * e12;
+        dr2s = dr2 - D2/Dq * ( dr21e - dq) * e12;
         
         drs(pos1) = dr1s;
         drs(pos2) = dr2s;
+            
     end
     
     x(:,t) = x(:,t-1) + drs;
+    
+%     if(nOverlaps>0)
+%         
+%         pairsNew = findOverlaps(x(:,t),sigma,dim);
+%         
+%         pairs;
+%         
+%         if(~isempty(pairsNew))
+%             disp('overlap!');
+%         else
+%             disp('ok');
+%         end
+%           
+%     end
+
     
 end
     

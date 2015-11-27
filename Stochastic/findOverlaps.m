@@ -1,8 +1,8 @@
-function [pairs,nij,Rij] = findOverlaps(x,sigma,dim)
+function pairs = findOverlaps(x,sigma,dim)
 
 %overlaps = zeros(length(x)/dim);
 
-[Rij,nij] = getRij(x,x,dim);
+[Rij,~] = getRij(x,x,dim);
 
 % add in diagonal elements to avoid counting self-overlaps
 Rij = Rij+2*diag(diag(sigma));
