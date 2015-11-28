@@ -1,15 +1,15 @@
 function [data,res] = SimulationBall(N1,N2,vext)
 
     disp('** Simulation Ball **');
-    AddPaths();
+   % AddPaths();
     
     close all;
     
     %Initialization
     if(nargin == 0)
-        N1 = 20;   N2 = 20;
+        N1 = 10;   N2 = 10;
         vext  = @VTest;
-        R     = 3;
+        R     = 1;
         theta1 = pi/5;
         theta2 = 3/4*pi;
         Origin = [0;0];
@@ -43,7 +43,7 @@ function [data,res] = SimulationBall(N1,N2,vext)
     figure
     VI = V.*(2*R^2*sin(SG.Pts.y1_kv));    
     SG.plot(VI,{'comp','SC'});
-    SaveFigure(['SimulationBall'],shape);
+    SaveFigure(['SimulationBall']);
     
     figure
     set(gcf,'Color','white'); %Set background color                
@@ -56,8 +56,8 @@ function [data,res] = SimulationBall(N1,N2,vext)
     	
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
-    xlim([-3.1 3.1]);
-    ylim([-2.5 2.5]);
+    %xlim([-3.1 3.1]);
+    %ylim([-2.5 2.5]);
     res.fig_handles{1} = gcf;
     
     %***************************************************************

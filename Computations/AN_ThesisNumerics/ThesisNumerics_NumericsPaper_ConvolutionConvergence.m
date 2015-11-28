@@ -1,4 +1,4 @@
-function Fig5_NumericsPaper_ConvolutionConvergence()
+function ThesisNumerics_NumericsPaper_ConvolutionConvergence()
     
     AddPaths('CodePaper');
 
@@ -63,7 +63,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
 %    xlim([0,10]);    
     %**********************************************
     gray = 0.5*[1 1 1];
-    figure('color','white','Position',[0 0 900 800]);     
+    figure('color','white','Position',[0 0 400 300]);
     legendstring = {};    
     %PlotMatrixError('ConvBH_HardCutoff','>','k','\phi_{HC}');
     %PlotMatrixError('ConvSplitDiskExp','^','k','\phi_{Exp}');
@@ -82,14 +82,14 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
     PlotMatrixError('AAD_n2_v_1','v',gray,'w_{2AD,1}');
     PlotMatrixError('AAD_n2_v_2','<',gray,'w_{2AD,2}');%PlotMatrixError('AAD_n2_v_2','v','r','w_{2AD,2}');
     
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
+    set(gca,'YScale','log');    
     set(gca,'fontsize',20);
     xlabel('$M$','Interpreter','Latex','fontsize',20);
     ylabel(['$\|{\bf C}_{\phi}(M)-{\bf C}_\phi(M+',num2str(NS_d),')\|_2$'],...
                             'Interpreter','Latex','fontsize',20);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     ylim([1e-16 1]);
+    pbaspect([1 1 1]);
     SaveFigure('ConvolutionError1',v2struct(N,NS,config));
     %legend(legendstring,'Location','northOutside','Orientation','horizontal');
    
@@ -98,7 +98,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
 % 	saveas(gcf,[dirData filesep filename '.fig']);        
 %     disp(['Figures saved in ',dirData filesep filename '.fig/eps']);    
     
-    figure('color','white','Position',[0 0 800 800]); 
+    figure('color','white','Position',[0 0 400 300]); 
 %    PlotErrorGraph('error_convBH_HardCutoff','>','k');
 %    PlotErrorGraph('error_conv_SplitDiskExp','^','k');
     PlotErrorGraph('error_conv_SplitDisk','*','k');
@@ -112,13 +112,13 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
     PlotErrorGraph('error_n3AD_ones','p','b');
     PlotErrorGraph('error_n2v2AD_ones','v','b');    
     
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
+    set(gca,'YScale','log');    
     set(gca,'fontsize',15);
     xlabel('$N$','Interpreter','Latex','fontsize',15);
     ylabel('error$(\Phi_{2D} \ast {\bf 1})$','Interpreter','Latex','fontsize',15);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     ylim([1e-16 1]);
+    pbaspect([1 1 1]);
     
     SaveFigure('ConvolutionError2',v2struct(N,NS,config));
     
@@ -296,7 +296,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
             end
         end     
         plot(line_N,line,...
-                        ['-',sym],'color',col,'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                        ['-',sym],'color',col,'MarkerFaceColor',col); hold on;%,'MarkerSize',10
         %plot(line_N,line,col);        
         
         legendstring(end+1) = {name};
@@ -318,7 +318,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
             end
         end
         plot(line_N,line,...
-                        ['-',sym],'color',col,'MarkerSize',10,'MarkerFaceColor',col); hold on;        
+                        ['-',sym],'color',col,'MarkerFaceColor',col); hold on;        %'MarkerSize',10,
     end
 
 end

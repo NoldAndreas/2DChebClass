@@ -5,7 +5,7 @@ function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
     close all;
     
     %Initialization
-    N1 =  20;   N2 = 20;
+    N1 =  10;   N2 = 10;
     R       = 1;
     L1      = 1;    
     Origin  = [0;0];
@@ -40,9 +40,9 @@ function [SMD,res] = SimulationHalfSpaceMinusHalfDisk()
     display([' Error in Integration: ', num2str(data.Int)]);                
         
     %******** Plotting **********
-    figure('Color','white')
-    SMD.plot(V,'SC'); 
-    title('Interpolation');
+    %figure('Color','white')
+    %SMD.plot(V,'SC'); 
+    %title('Interpolation');
     
     %***************************************************************
     %   Auxiliary functions:

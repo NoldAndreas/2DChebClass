@@ -5,7 +5,7 @@ function [SMD,res] = SimulationStripMinusDisk()
     close all;
     
     %Initialization
-    N1 =  20;   N2 = 20;        
+    N1 =  10;   N2 = 10;
     R       = 1;
     L1      = 0.5;
     y2Wall  = 0;    
@@ -22,6 +22,7 @@ function [SMD,res] = SimulationStripMinusDisk()
     SMD.PlotGrid();
     SMD.PlotIsoline(0,'y1');
     xlim([-2 2]);
+    ylim([0 2]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
     res.fig_handles{1} = gcf;    
@@ -40,9 +41,9 @@ function [SMD,res] = SimulationStripMinusDisk()
     display([' Error in Integration: ', num2str(data.Int)]);                
         
     %******** Plotting **********
-    figure('Color','white')
-    SMD.plot(V,'SC'); 
-    title('Interpolation');
+    %figure('Color','white')
+    %SMD.plot(V,'SC'); 
+    %title('Interpolation');
     
     %***************************************************************
     %   Auxiliary functions:

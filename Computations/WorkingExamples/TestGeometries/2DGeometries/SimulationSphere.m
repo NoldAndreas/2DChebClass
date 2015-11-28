@@ -1,13 +1,13 @@
 function [data,res] = SimulationSphere()
 
     disp('** Simulation Ball - Sphere**');
-    AddPaths();
+  %  AddPaths();
     
     close all;
     
     %Initialization
-    N1 = 20;
-    N2 = 20;
+    N1 = 10;
+    N2 = 10;
     vext  = @VTestt;
     R      = 1;
     theta1 = pi/5;%pi/2;

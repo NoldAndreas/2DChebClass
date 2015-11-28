@@ -1,11 +1,10 @@
 function [AS,res] = SimulationInfAnnulus()
 
-    disp('** Simulation InfAnnulus **');
-    AddPaths();    
+    disp('** Simulation InfAnnulus **');    
     close all;
     
     %Initialization
-    N1 =  20;   N2 = 20;        
+    N1 =  10;   N2 = 10;        
     RMin    = 1;
     L       = 1;
     Origin = [0,0];
@@ -39,9 +38,9 @@ function [AS,res] = SimulationInfAnnulus()
     display([' Error in Integration: ', num2str(data.Int)]);                
         
     %******** Plotting **********
-    figure('Color','white')
-    AS.plot(V,'SC'); 
-    title('Interpolation');
+    %figure('Color','white')
+    %AS.plot(V,'SC'); 
+    %title('Interpolation');
     
     %***************************************************************
     %   Auxiliary functions:

@@ -1,11 +1,10 @@
 function [data,res] = SimulationAnnulus()
 
-    disp('** Simulation Annulus **');
-    AddPaths();    
+    disp('** Simulation Annulus **');    
     close all;
     
     %Initialization
-    N1 =  20;   N2 = 20;
+    N1 =  10;   N2 = 10;
     RMin     = 1;
     RMax     = 2.55;
     Origin  = [0,0];%[-2;3];
@@ -16,6 +15,7 @@ function [data,res] = SimulationAnnulus()
     Interp             = AS.ComputeInterpolationMatrix((-1:0.02:1)',(-1:0.02:1)',true,true);
     
     
+    %******** Plotting **********    
     figure('color','white');%,'Position',[0 0 600 600]);
     AS.PlotGridLines();    
     AS.PlotGrid();    	
@@ -24,19 +24,17 @@ function [data,res] = SimulationAnnulus()
     hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);            
     
-    set(gca,'fontsize',20); set(gca,'linewidth',1.5);
     xlim([-3 3]); ylim([-3 3]);
     
     ax = get(gcf,'children');
-    xl = get(ax,'xlim');
-    yl = get(ax,'ylim');
-	pbaspect(ax,[(xl(2)-xl(1)) (yl(2)-yl(1)) 1]);
-    
+%     xl = get(ax,'xlim');
+%     yl = get(ax,'ylim');
+% 	pbaspect(ax,[(xl(2)-xl(1)) (yl(2)-yl(1)) 1]);
+%     
     %pbaspect([(xl(2)-xl(1)) (yl(2)-yl(1)) 1])
-    SaveFigure('FiniteAnnulus');
-    
     res.fig_handles{1} = gcf;    
- 
+    %SaveFigure('FiniteAnnulus');
+    
     Origin = [2;3];
     AS.Origin = Origin;
     
@@ -51,12 +49,11 @@ function [data,res] = SimulationAnnulus()
     
     %Check Integration
     data.Int = abs(Int*V-VInt);
-    display([' Error in Integration: ', num2str(data.Int)]);                
-        
-    %******** Plotting **********
-    figure('Color','white')
-    AS.plot(V,'SC'); 
-    title('Interpolation');
+    display([' Error in Integration: ', num2str(data.Int)]);                            
+    
+	%figure%('Color','white')
+    %AS.plot(V,'SC'); 
+    %title('Interpolation');
     
     %***************************************************************
     %   Auxiliary functions:

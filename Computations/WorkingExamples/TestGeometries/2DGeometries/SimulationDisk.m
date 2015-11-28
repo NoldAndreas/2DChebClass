@@ -11,7 +11,7 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     if(nargin == 0)
         R       = 1;
         vext    = @Vext2;
-        N1      = 20;
+        N1      = 10;
         N2      = 10;
         N       = [N1;N2];
         Origin  = [0,0];
@@ -60,8 +60,8 @@ function [data,res] = SimulationDisk(N1,N2,L1,L2,vext)
     DC.PlotGridLines();    
     DC.PlotGrid();
     	
-    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
-    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);        
+    hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex');
+    hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex');
     res.fig_handles{1} = gcf;
     
     %******** Plotting **********
