@@ -400,6 +400,8 @@ classdef DDFT_2D < Computation
                 T_n_Max = 1;
             elseif(IsOption(opts,'end'))
                 T_n_Min = T_n_Max;
+            else
+                T_n_Min = 1;
             end
             deltaT = 1;
             
