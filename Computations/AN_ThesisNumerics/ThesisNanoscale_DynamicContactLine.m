@@ -27,7 +27,7 @@ function ThesisNanoscale_DynamicContactLine()
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856,...%0.928,...%0.94,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.865,...%0.856,...%0.928,...%0.94,...
                 'tau',5,'epsilon_w_max',1);
 
     optsPhys = struct('V1',V1,'V2',V2,...
@@ -38,9 +38,14 @@ function ThesisNanoscale_DynamicContactLine()
     config = v2struct(optsNum,optsPhys);                                
     
     N = 20:10:60;
-    ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
+    ignoreList = {'config_optsNum_PhysArea_N',...
+                  'config_optsNum_PhysArea_L2_AD',...
+                  'config_optsNum_PhysArea_y2wall',...
+                  'config_optsNum_PhysArea_N2bound',...
+                  'config_optsNum_PhysArea_h',...
+                  'config_optsNum_PlotAreaCart'};    
     comp       = [];    
-    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);    
+    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);        
                 
     config.optsPhys.Inertial = true;    
     config.optsPhys.gammaS   = 2;        
@@ -64,13 +69,12 @@ function ThesisNanoscale_DynamicContactLine()
     lines = {'-','--',':','-.'}; nolines = length(lines);   
     
     
-    saveC   = res{2}.config;
+    saveC   = res{end}.config;
 	saveC.N = N;         
         
     %PlotResultsOverTime(res{1},'massError_dt');
     %PlotResults(res{1},'massError_dtMax');        
     
-   
     %PlotResultsOverTime(res,'massErrorRel_dt');  %SaveFigure('Dynamics_MassErrorTime',saveC);
     PlotResultsOverTime(res,'mass',{'maxN'}); ylim([2.2 3]); f1 = gcf; %SaveFigure(['Dynamics_Mass'],saveC);        
     PlotResults(res,'massErrorRel_dtMax');    f2 = gcf;  
@@ -88,10 +92,10 @@ function ThesisNanoscale_DynamicContactLine()
         conf = res{1}(3).config;
         conf.optsNum.PlotAreaCart =     struct('y1Min',-5,'y1Max',5,...
                                                'y2Min',0.5,'y2Max',10.5,...
-                                                'N1',100,'N2',100);        
+                                                'N1',100,'N2',100,'NFlux',10);
         CL = ContactLineHS(conf);
         CL.Preprocess(); 
-        CL.ComputeEquilibrium();              
+      %  CL.ComputeEquilibrium();              
         CL.ComputeDynamics();            
         CL.PostprocessDynamics();
             
@@ -160,12 +164,11 @@ function ThesisNanoscale_DynamicContactLine()
             clear('CL');            
         end        
     end
-
     function PlotResultsOverTime(res,var,opts)
         if(nargin < 3)
             opts = {};
         end
-        figure('color','white','Position',[0 0 800 800]); 
+        figure('color','white','Position',[0 0 300 250]); 
         
         for i0 = 1:length(res)
             lin = lines{i0};
@@ -187,7 +190,7 @@ function ThesisNanoscale_DynamicContactLine()
                                        
     end
     function PlotResults(res,var)
-        figure('color','white','Position',[0 0 800 800]);                 
+        figure('color','white','Position',[0 0 300 250]);                 
         
         for i0 = 1:length(res)
             
