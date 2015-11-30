@@ -1,4 +1,4 @@
-function Fig2_NumericsPaper_GaussianInterpolation    
+function ThesisNumerics_NumericsPaper_GaussianInterpolation    
 
     AddPaths('CodePaper');
     set(0,'defaultaxesfontsize',20);

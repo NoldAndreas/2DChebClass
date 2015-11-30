@@ -7,7 +7,7 @@ function [WDG,res] = SimulationWedgeCutSide
     close all;
         
     Geometry = struct('R_in',1,'R_out',2.5,...
-                      'h',0.9,'N',[20,20],...
+                      'h',0.9,'N',[10,10],...
                       'leftRight','left');
     
     vext              = @Vext7;
@@ -42,8 +42,8 @@ function [WDG,res] = SimulationWedgeCutSide
      [V,Vdiff] = vext(Pts.y1_kv,Pts.y2_kv);   
      VP        = vext(Interp.pts1,Interp.pts2);           
        
-     figure;     
-     WDG.plot(V);
+%      figure;     
+%      WDG.plot(V);
 	 
      vplot     = Interp.InterPol*V;
      displayErrors(vplot,VP,V,Vdiff,Diff);

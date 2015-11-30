@@ -30,8 +30,8 @@ function [WDG,res] = SimulationWedgeCut
      [V,Vdiff] = vext(Pts.y1_kv,Pts.y2_kv);   
      VP        = vext(Interp.pts1,Interp.pts2);           
        
-     figure;     
-     WDG.plot(V);
+%     figure;     
+%     WDG.plot(V);
 	 
      vplot     = Interp.InterPol*V;
      displayErrors(vplot,VP,V,Vdiff,Diff);

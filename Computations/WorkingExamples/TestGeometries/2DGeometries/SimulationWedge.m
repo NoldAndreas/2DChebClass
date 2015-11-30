@@ -12,7 +12,7 @@ function [WDG,res] = SimulationWedge
     half_wedge_angle    = pi*3/4;%4*pi/5;
     Geometry = struct('R_in',1,'R_out',R,...
                       'th1',pi/2-half_wedge_angle,...
-                      'th2',pi/2+half_wedge_angle,'N',[20,20]);
+                      'th2',pi/2+half_wedge_angle,'N',[10,10]);
     
     vext              = @Vext7;
     
@@ -63,9 +63,9 @@ function [WDG,res] = SimulationWedge
      display([' Error in Integration: ', num2str(Int*V-VInt)]);
     
      %Check Convolution
-     figure
-     fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
-     WDG.plot(fP_Conv);
+     %figure
+     %fP_Conv  = Conv*f1(Pts.y1_kv,Pts.y2_kv);
+     %WDG.plot(fP_Conv);
                           
     %***************************************************************
     %   Auxiliary functions:
