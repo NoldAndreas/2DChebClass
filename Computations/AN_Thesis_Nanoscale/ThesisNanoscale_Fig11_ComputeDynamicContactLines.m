@@ -7,6 +7,10 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %     epw = FindEpwFromContactAngle(config,180);
 %     disp(epw);     
       recomp = false;      
+      
+    %********************************************   
+    %*** 90 degrees initial contact angle
+    %********************************************      
      res90{1} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
                            struct('alpha_deg',90,'epw',0.594,'maxT',400),{},recomp); %Eq: 120 degrees                              
@@ -39,6 +43,8 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
     res60{2} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
                          struct('alpha_deg',60,'epw',0.9,'maxT',400),{});                                                                                    
+    res60{2}.erratic = true;
+                     
                      
     res60{3} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
@@ -87,8 +93,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
                          @DoDynamicComputation,...
                          struct('alpha_deg',120,'epw',0.856,'maxT',400),{},recomp); %Eq: 90 degrees                                                                  
     
-     %********************************************             
-     %********************************************                                      
+     %********************************************                  
     
       res{1} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
@@ -105,6 +110,26 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
    %  res{10} = DataStorage('MovingContactAngleResults',...
 %                           @DoDynamicComputation,...
 %                           struct('alpha_deg',90,'epw',1.0,'maxT',400),{}); %Eq: 70.86 degrees                                              
+
+    %********************************************                                      
+    % Output results for thesis
+    %********************************************                                      
+    
+    %ewf = 1.071, theta_n = 90
+    GetDataForThesis(res90{5});        
+    %ewf = 0.594, theta_n = 90
+    GetDataForThesis(res90{1});    
+    %ewf = 1.270, theta_n = 60
+    GetDataForThesis(res60{6});        
+    %ewf = 0.856, theta_n = 60
+    GetDataForThesis(res60{1});
+    %ewf = 0.100, theta_n = 120
+    GetDataForThesis(res120{1});    
+    %ewf = 0.856, theta_n = 120
+    GetDataForThesis(res120{6});    
+    
+    %********************************************                                      
+    %********************************************                                      
 
     
     res60 = PostProcess(res60);    
@@ -158,15 +183,26 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %     DoDynamicComputation(120,0.856,400); %Eq: 90 degrees
 %     DoDynamicComputation(135,0.453,400); %Eq: 135 degrees
 
+    function GetDataForThesis(res)
+        i_plot = 100;
+        disp(['Data for epw = ',num2str(res.epw),...
+              ' theta_in = ',num2str(res.thetaInitial),...
+              ' at t = ',num2str(res.t(i_plot)),...
+              ' : U_CL = ',num2str(res.contactlineVel_y1_0(i_plot)),...
+              ' theta = ',num2str(res.contactangle_0(i_plot))]);                
+    end
+
     function PlotMKTComparison(res)
         gammaLV =  0.2853;
         
         figure('color','white','Position',[0 0 300 250]);
-        index = 90;
+        index = 80;
         leg = {};
         
-        zeta_advancing = 0; n_advancing = 0;
-        zeta_receding  = 0; n_receding  = 0;
+        %zeta_advancing = 0; n_advancing = 0;
+        %zeta_receding  = 0; n_receding  = 0;        
+        wAdvSum = 0; wRecSum = 0;
+        UAdvSum = 0; URecSum = 0;
         
         for i = 1:length(res)
             if(isfield(res{i},'erratic'))
@@ -174,7 +210,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             end
 
             %subplot(1,2,1);
-            w = gammaLV*res{i}.cosDiff_t(75);
+            w = gammaLV*res{i}.cosDiff_t(index);
             U = res{i}.contactlineVel_y1_0(index);
             plot(w,U,res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
             %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
@@ -186,19 +222,24 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             
             if(U ~= 0)
                 if(res{i}.thetaEq < res{i}.thetaInitial)
-                    n_advancing    = n_advancing + 1;
-                    zeta_advancing = zeta_advancing + w/U;
-                    disp(w/U);
+                    wAdvSum = wAdvSum + w;
+                    UAdvSum = UAdvSum + U;
+%                     n_advancing    = n_advancing + 1;
+%                     zeta_advancing = zeta_advancing + w/U;
+%                     disp(w/U);
                 else
-                    n_receding     = n_receding + 1;
-                    zeta_receding  = zeta_receding + w/U;
+                    wRecSum = wRecSum + w;
+                    URecSum = URecSum + U;
+                    %n_receding     = n_receding + 1;
+                    %zeta_receding  = zeta_receding + w/U;
                 end
             end
             
         end
-        
-        zeta_receding  = zeta_receding  / n_receding;
-        zeta_advancing = zeta_advancing / n_advancing;
+        zeta_receding  = 8;%wRecSum/URecSum;
+        zeta_advancing = 30;%wAdvSum/UAdvSum;
+%         zeta_receding  = zeta_receding  / n_receding;
+%         zeta_advancing = zeta_advancing / n_advancing;
         
         plot([0;0.11],[0;0.13]/zeta_receding,'k');
         plot([0;-0.13],[0;-0.13]/zeta_advancing,'--k');
@@ -219,12 +260,12 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 
     function PlotVelocitiesForThesis(res,varName,yLabel)
         figure('color','white','Position',[0 0 200 150]);
-        for i = 1:length(res)
-            if(isfield(res{i},'erratic'))
+        for ii = 1:length(res)
+            if(isfield(res{ii},'erratic'))
                 continue;
             end        
             %mark = (20:100);            
-            plot(res{i}.t, res{i}.(varName),[res{i}.lin,res{i}.col]); hold on;
+            plot(res{ii}.t, res{ii}.(varName),[res{ii}.lin,res{ii}.col]); hold on;
            % plot(res{i}.t, res{i}.contactlineVel_y1_0,['o',res{i}.lin,res{i}.col]); hold on;            
         end
         pbaspect([1 1 1]);
