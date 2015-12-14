@@ -1,4 +1,4 @@
-function ThesisNanoscale_Fig2_NumParaemeterStudy()  
+function ThesisNanoscale_FigX_NumParaemeterStudy()  
     
     AddPaths('ThesisNanoscale');
 

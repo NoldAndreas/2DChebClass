@@ -18,7 +18,6 @@ function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()
     PlotData(120,-7.5,'2015_9_20_4_1_22',[-0.1 0],[-0.1,0.05],0.48);
     PlotData(135,-7.5,'2015_9_20_7_53_56',[-0.04 -0.02 0],[-0.04 0],0.48);
     
-    
     function res = ComputeData(alpha_deg,epw,bounds1)
         bounds1 = bounds1 + [0 15];
         AddPaths('ThesisNanoscale');   
@@ -33,9 +32,7 @@ function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()
             rethrow(err);        
         end
 
-    end
-    
-    
+    end  
     function PlotData(alpha_deg,bounds1,nameEq,yTicksDP,yLimsDP,subPlotPosX)        
         
         bounds1 = bounds1 + [0 15];
@@ -241,8 +238,7 @@ function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()
                 
         [~,fn] = fileparts(CLT.FilenameEq);
         nameEq = [fn,'_'];            
-    end
-   
+    end   
     function [filename] = ComputeExactAdsorptionIsotherm(opts)
         
         config = ThesisNanoscale_GetStandardConfig(90,opts.epw);

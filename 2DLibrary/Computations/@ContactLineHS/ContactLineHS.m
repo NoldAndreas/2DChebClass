@@ -277,7 +277,6 @@ classdef ContactLineHS < DDFT_2D
             y1   = this.y1_SpectralLine.Pts.y;    
 
             f2 = figure('Color','white','Position',[0 0 1000 750]);            
-
             plot([-10 35],[0 0],'k'); hold on;
             if(~isempty(this.disjoiningPressure_II))
                 plot(y1,this.disjoiningPressure_II,'k--');
