@@ -13,7 +13,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
     %********************************************      
      res90{1} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{},recomp); %Eq: 120 degrees                              
+                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{},true); %Eq: 120 degrees                              
                      
                        
      res90{2} = DataStorage('MovingContactAngleResults',...
@@ -387,6 +387,25 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
              disp(['final CL velocity: ',num2str(CL.dynamicsResult.contactlineVel_y1_0(end))]);
 %             %For Movie:
 %             CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+
+            %*************************
+            % Get Entropy
+            CL.optsNum.PlotAreaCart       = struct('y1Min',-5,'y1Max',5,...
+                                                   'y2Min',0.5,'y2Max',10.5,...
+                                                   'N1',40,'N2',40,'NFlux',10);
+            CL.IDC.InterpolationPlotCart(CL.optsNum.PlotAreaCart,true);
+            figure('color','white','Position',[0 0 300 300]);                        
+            CL.IDC.plot(CL.dynamicsResult.entropy(:,:,end));
+            view([-120 10]);
+            xlabel('$y_1$');
+            ylabel('$y_2$');
+            %pbaspect([(PlotAreaCart.y1Max-PlotAreaCart.y1Min),...
+            %          (PlotAreaCart.y2Max-PlotAreaCart.y2Min),1]);
+            SaveFigure('entropy');
+            %*****
+            
+
+
             close all;
         catch err
             disp('ERROR')

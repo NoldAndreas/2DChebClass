@@ -443,15 +443,19 @@ classdef DDFT_2D < Computation
                         elseif(isstruct(val) && isfield(val,'str'))
                             titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),3)];
                         elseif(size(val,1) == this.IDC.M)             
-                            if(~cont)
-                                this.IDC.plot(val(:,iSpecies,i),'color',optDetails); hold on;
-                                m = max(max(val(:,iSpecies,i)));
-                                if(m==0)
-                                    colormap(b2r(0,1)); %30
+                            if(~cont)                                
+                                if(IsOption(opts,'3D'))
+                                    this.IDC.plot(val(:,iSpecies,i)); hold on;
                                 else
-                                    colormap(b2r(0,m)); %30
+                                    this.IDC.plot(val(:,iSpecies,i),'color',optDetails); hold on;
+                                    m = max(max(val(:,iSpecies,i)));
+                                    if(m==0)
+                                        colormap(b2r(0,1)); %30
+                                    else
+                                        colormap(b2r(0,m)); %30
+                                    end
+                                    colorbar;                                
                                 end
-                                colorbar;                                
                                 cont = true;
                             else
                                 if(strcmp(varName{k},'rho_t'))
