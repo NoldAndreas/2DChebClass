@@ -19,6 +19,11 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
     %Initialization of Data         
     v2struct(data);
     
+    % overdamped case
+    if(~exist('UV_t','var'))
+        UV_t = flux_t;
+    end
+    
     plotTimes  = t;%optsNum.plotTimes;    
     n          = length(plotTimes);
     fl_norm    = 0.1*max(max(max(abs(UV_t))));
