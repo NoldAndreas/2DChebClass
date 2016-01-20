@@ -10,12 +10,11 @@ function [data,res] = SimulationBox(N1,N2,L1,L2,vext)
     if(nargin == 0)
         N1 =  15;    N2 = 15;
         L1    = 2;  L2    = 2;
-        Origin = [-L1;-L2]/2;
-        
-        
         vext  = @Vext2;
-        N     = [N1,N2];
     end        
+    
+    Origin = [-L1;-L2]/2;
+    N     = [N1,N2];
     
     abox               = Box(v2struct(L1,L2,Origin,N));
     [Pts,Diff,Int,Ind] = abox.ComputeAll();
