@@ -86,7 +86,7 @@
         QuickOutput = false;
     end
     
-    recomputeAll = true;
+    %recomputeAll = true;
     
     if(recomputeAll)
         cprintf('*m','!!! No precomputed data will be used. recomputeAll = true !!!\n');

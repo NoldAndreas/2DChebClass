@@ -96,12 +96,14 @@ for iWorker=1:poolsize
 end
 
 % if there's already a pool open, close it and kill all jobs
-poolobj = gcp('nocreate'); % If no pool, do not create new one.
-if (~isempty(poolobj))
-    poolobj.delete;
-end
+% poolobj = gcp('nocreate'); % If no pool, do not create new one.
+% if (~isempty(poolobj))
+%     poolobj.delete;
+% end
 
-poolobj = parpool(poolsize);
+% if(poolsize>1)
+%     poolobj = parpool(poolsize);
+% end
 
 % if(matlabpool('size')>0)
 %     fprintf(1,'\n');
@@ -124,7 +126,7 @@ printList = 1;
 
 nowLength = length(datestr(now));
 
-delString = repmat(char(8),1,printLength + nowLength + 4);
+%delString = repmat(char(8),1,printLength + nowLength + 4);
 
 tic
 
@@ -133,8 +135,13 @@ tStart = clock;
 disp([num2str(0,printFormat) '%']);
 disp(datestr(now));
 
+% prevent opening parallel session for one worker
+if(poolsize == 1)
+    poolsize = 0;
+end
+
 % note this for loop can be done in parallel
-parfor iRun=1:nRuns
+parfor (iRun=1:nRuns, poolsize)
     if(noise)
         % create stochastic force for this run
         f=randn(dim*nParticles,tSteps); 
