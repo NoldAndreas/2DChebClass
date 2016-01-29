@@ -304,10 +304,12 @@ end
 % %--------------------------------------------------------------------------
 % 
 
-if(optsPlotParticles.doMovieGifP || optsPlotParticles.doMovieSwfP || optsPlotParticles.doPdfsP)
-    makeMovieParticles(meanStruct,optsPlotParticles)
+if(anyPlotsP)
+    if(optsPlotParticles.doMovieGifP || optsPlotParticles.doMovieSwfP || optsPlotParticles.doPdfsP)
+        makeMovieParticles(meanStruct,optsPlotParticles)
+    end
 end
-
+    
 %--------------------------------------------------------------------------
 % make custom plot
 %--------------------------------------------------------------------------

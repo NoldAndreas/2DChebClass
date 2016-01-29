@@ -10,7 +10,9 @@ AddPaths();
 % Choose input file
 %--------------------------------------------------------------------------
 
-inputFile = 'sedimentation9New';
+%inputFile = 'sedimentation9New';
+
+inputFile='APS12HS50new';
 
 %inputFile='APS12HS50';
 %inputFile='APS12G50';

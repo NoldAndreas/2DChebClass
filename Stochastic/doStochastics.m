@@ -221,7 +221,7 @@ for iStoc=1:nStoc
                 ': ' stocName ' ... ']);
 
     dynDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Dynamics'];
-            
+    
     [xpStruct,~,Parameters] = DataStorage(dynDir,@stochasticStatistics,opts,ICStruct,~loadStoc);
     
     % store in output structure
