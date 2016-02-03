@@ -108,6 +108,8 @@ saveStoc={true,true,true,true};
 % Plotting setup
 %--------------------------------------------------------------------------
 
+%nPlots = 10;
+%plotTimes=0 : tMax / nPlots : tMax;
 
 % x axis for position and velocity plots
 rMin=0;
@@ -192,6 +194,6 @@ pScale=5;
 
 % particle movies/plots
 doInitialFinalP=false;
-doMovieGifP=true;
-doPdfsP=false;
+doMovieGifP=false;
+doPdfsP=true;
 doMovieSwfP=false;

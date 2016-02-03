@@ -12,7 +12,7 @@ AddPaths();
 
 %inputFile = 'sedimentation9New';
 
-inputFile='APS12HS50new';
+%inputFile='APS12HS50new';
 
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
@@ -29,7 +29,7 @@ inputFile='APS12HS50new';
 %inputFile = 'HalfSpaceMove'; % WORKS!
 %inputFile = 'InfSpaceMove'; % WORKS!
 
-%inputFile = 'HIWallTestTowardsMove';
+inputFile = 'HIWallTestTowardsMove';
 %inputFile = 'HIWallTestAwayMove';  
 
 

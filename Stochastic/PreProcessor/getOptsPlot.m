@@ -103,7 +103,7 @@ optsLeg=makeLegLine(optsStruct);
 global dirData
 
 plotDir    = [dirData filesep optsStruct.potNames filesep 'Output'];
-pdfDir     = [plotDir filesep 'pdfs'];
+pdfDir     = [plotDir filesep 'pdfs' filesep];
 movieFile  = [plotDir filesep 'dynamics'];
 meansFile  = [plotDir filesep 'means.pdf'];
 eqFile     = [plotDir filesep 'equlibria.pdf'];

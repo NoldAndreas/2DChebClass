@@ -45,7 +45,8 @@ optsPlot=optsPlot(1);
 
 % set up figure and axes
 fullscreen = get(0,'ScreenSize');
-hRf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+%hRf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+hRf=figure('Position',[0 0 600 600]);
 %hRf=figure;
 hRa=axes;
 % collect handles
@@ -129,17 +130,15 @@ for iPlot=1:nPlots
         end
     end
     
-    % DON'T USE
     if(doPdfs || doSwf)
-        %outputFile=[pdfDir num2str(iPlot,nd) '.pdf'];
-        outputFile=[pdfDir num2str(iPlot,nd) '.tiff'];
+        outputFile=[pdfDir num2str(iPlot,nd) '.pdf'];
     
         pdfFileNames = cat(2, pdfFileNames, [' ' outputFile]);
     
         if(doPdfs)
-            %save2pdf(outputFile,hRf,dpi);
-            save2tiff(outputFile,hRf,dpi);
+            save2pdf(outputFile,hRf,dpi);
         end
+              
     end
     
 end
@@ -163,6 +162,17 @@ if(doSwf)
     fprintf(1,'Making swf movie ... ');
     swfCmd=['gif2swf ' gifFile ' -o ' swfFile];
     system(swfCmd);
+    fprintf(1,'Finished\n');
+end
+
+if(doPdfs)
+    fprintf(1,'Combining pdf ... ');
+    fullPdfFile=[movieFile '.pdf'];
+
+    gsCmd= ['gs -dNOPAUSE -sDEVICE=pdfwrite ' ...
+              '-sOUTPUTFILE=' fullPdfFile ' -dBATCH -dQUIET ' pdfFileNames];
+
+    system(gsCmd);
     fprintf(1,'Finished\n');
 end
 

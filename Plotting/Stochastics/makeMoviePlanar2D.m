@@ -302,7 +302,7 @@ for iPlot=1:nPlots
         end
             
         % plot the distributions
-        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iDDFT));
+        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC,optsPlot,handlesRP(iDDFT));
         
 %         for iAxis = 1:nAxes
 %             hold(hRa(iAxis),'on');
@@ -434,7 +434,7 @@ for iPlot=1:nPlots
         
         if(doPdfs)
             % save the pdf file for this time step
-            save2pdf(outputFile,hRPf,dpi);
+            save2pdf(outputFile,hRPf,[]);
         end
     end
     
@@ -467,6 +467,17 @@ end
 
 if(doAvi)
     close(writerObj);
+end
+
+if(doPdfs)
+    fprintf(1,'Combining pdf ... ');
+    fullPdfFile=[movieFile '.pdf'];
+
+    gsCmd= ['gs -dNOPAUSE -sDEVICE=pdfwrite ' ...
+              '-sOUTPUTFILE=' fullPdfFile ' -dBATCH -dQUIET ' pdfFileNames];
+
+    system(gsCmd);
+    fprintf(1,'Finished\n');
 end
 
 close(hRPf);

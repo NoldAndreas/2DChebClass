@@ -1,4 +1,4 @@
-function handles=plotRhoVdistDDFT2D(rho,v,Interp,Pts,optsPlot,plotHandles)
+function handles=plotRhoVdistDDFT2D(rho,v,IDC,optsPlot,plotHandles)
 %plotRhoVdistDDFT(rhov,r,optsPlot,plotHandles,type)
 %   plots position and velocity distributions in axes given by plotHandles
 %
@@ -24,6 +24,17 @@ function handles=plotRhoVdistDDFT2D(rho,v,Interp,Pts,optsPlot,plotHandles)
 %                  hr for the position and if type=rv also hp for velocity
 
 %plotRhoVdistDDFT2D(rhoEnd,[],temp.Interp.pts1,temp.Interp.pts1,opts,[],'r')
+
+Interp = IDC.Interp;
+
+PlotArea.y1Min = max(optsPlot.rMin(1),min(IDC.Pts.y1));
+PlotArea.y2Min = max(optsPlot.rMin(2),min(IDC.Pts.y2));
+PlotArea.y1Max = min(optsPlot.rMax(1),max(IDC.Pts.y1));
+PlotArea.y2Max = min(optsPlot.rMax(2),max(IDC.Pts.y2));
+PlotArea.N1 = 10;
+PlotArea.N2 = 10;
+
+InterpFlux = IDC.InterpolationPlotCart(PlotArea,false);
 
 contourWidth=get(0,'defaultlinelinewidth');
 
@@ -77,21 +88,15 @@ else
 end
 
 
-y1Min=optsPlot.rMin(1);
-y2Min=optsPlot.rMin(2);
-
-y1Max=optsPlot.rMax(1);
-y2Max=optsPlot.rMax(2);
-
 faceColour=optsPlot.faceColour;
 lineStyle = optsPlot.lineStyle;
 
 x1=Interp.pts1;
 x2=Interp.pts2;
 
-% for fluxes
-x1f= Pts.y1_kv; 
-x2f = Pts.y2_kv;
+x1f = InterpFlux.pts1;
+x2f = InterpFlux.pts2;
+
 
 switch optsPlot.geom
 
@@ -114,7 +119,6 @@ end
 y1=reshape(y1,Nplot2,Nplot1);
 y2=reshape(y2,Nplot2,Nplot1);
 
-mask= (y1f >= y1Min) & (y1f <=  y1Max) & (y2f >= y2Min) & (y2f <=  y2Max);
 
 N1=Interp.N1;
 N2=Interp.N2;
@@ -127,10 +131,6 @@ y2pad=optsPlot.rMin(2)-1;
 
 fluxNorm=optsPlot.fluxNorm;
 
-%fluxNorm=0;
-
-% figure
-% ha=axes;
 
 for iSpecies=1:nSpecies
     
@@ -144,27 +144,20 @@ for iSpecies=1:nSpecies
     switch optsPlot.geom
 
         case 'polar2D'
-            
-            %u = ur.*cos(theta)-utheta.*sin(theta);
-            %v = ur.*sin(theta)+utheta.*cos(theta);
-            
             % flux is given in cartesian even in polar case
-%             fluxS1 = fluxS1temp.*cos(x2f) - fluxS2temp.*sin(x2f);
-%             fluxS2 = fluxS1temp.*sin(x2f) + fluxS2temp.*cos(x2f); 
 
             fluxS1=fluxS1temp;
             fluxS2=fluxS2temp;
 
-            
-            %rhoS=reshape(fft(reshape(rhoS,N2,N1)),N1*N2,1);
-            
         case 'planar2D'
         
             fluxS1=fluxS1temp;
             fluxS2=fluxS2temp;
     end
     
-    
+    fluxS1interp = InterpFlux.InterPol*fluxS1;
+    fluxS2interp = InterpFlux.InterPol*fluxS2;
+ 
     rhoS = real(Interp.InterPol*rhoS);
     
     rhoS=reshape(rhoS,Nplot2,Nplot1);
@@ -202,7 +195,12 @@ for iSpecies=1:nSpecies
     
     %quiver(ha,[y1f(mask)],[y2f(mask)],[fluxS1(mask)],[fluxS2(mask)]); 
     
-    h=quiver(hCa,[y1pad ; y1f(mask)],[y2pad; y2f(mask)],[fluxNorm; fluxS1(mask)],[0; fluxS2(mask)]); 
+    %h=quiver(hCa,[y1pad ; y1f(mask)],[y2pad; y2f(mask)],[fluxNorm; fluxS1(mask)],[0; fluxS2(mask)]); 
+    
+    %h=quiver(hCa,[y1pad ; y1f(mask)],[y2pad; y2f(mask)],[fluxNorm; fluxS1interp(mask)],[0; fluxS2interp(mask)]); 
+    h=quiver(hCa,[y1pad ; y1f],[y2pad; y2f],[fluxNorm; fluxS1interp],[0; fluxS2interp]); 
+    
+    
     set(h,'color',faceColour{iSpecies});
     axis(hCa,'equal');    
        

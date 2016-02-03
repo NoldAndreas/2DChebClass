@@ -170,14 +170,14 @@ if(nDDFT>0)
         if(~separateSpecies)
             optsPlot.faceColour = colours;
             % plot the distributions
-            plotRhoVdistDDFT2D(rhot,fluxt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP);
+            plotRhoVdistDDFT2D(rhot,fluxt,ddft(iDDFT).IDC,optsPlot,handlesRP);
 
             hold(hRa,'on');
             hold(hPa,'on');
         else
             for iSpecies = 1:nSpecies
                 optsPlot.faceColour = colours(iSpecies);
-                plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iSpecies));
+                plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(iDDFT).IDC,optsPlot,handlesRP(iSpecies));
                 hold(hRa(iSpecies),'on');
                 hold(hPa(iSpecies),'on');
             end

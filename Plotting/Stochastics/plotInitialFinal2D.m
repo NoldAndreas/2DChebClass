@@ -217,8 +217,9 @@ for iPlot=1:2
         optsPlot.lineStyle=lineStyleDDFT{iDDFT};
         
         % plot the distributions
-        %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
-        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
+        %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
+        
+        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC,optsPlot,handlesRP(iPlot));
         
         hold(hRa,'on');
         hold(hPa,'on');

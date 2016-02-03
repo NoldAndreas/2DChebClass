@@ -133,8 +133,8 @@ Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',100,...
-                       'y2Min',0.5,'y2Max',20,'N2',100);
+Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',50,...
+                       'y2Min',0.5,'y2Max',20,'N2',50);
 
 % Fex_Num   = struct('Fex','FMTRosenfeld',...
 %                        'Ncircle',10,'N1disc',10,'N2disc',10);
@@ -194,7 +194,7 @@ DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,true};
+doDDFT={true,false,true,false};
 %doDDFT={true,false,false,false};
 
 % do we load and save the DDFT data
@@ -237,7 +237,8 @@ nBins=[40;40];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
+doMovieAvi     = false;
+doPdfs         = true;
 doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;
