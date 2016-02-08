@@ -9,7 +9,9 @@ function [WDG,res] = SimulationWedge
     %Initialization
     
     R                   = 2.5;
-    half_wedge_angle    = pi*3/4;%4*pi/5;
+    h                   = 1.5;
+    
+    half_wedge_angle    = pi/2+asin(h/R);%pi*3/4;%4*pi/5;
     Geometry = struct('R_in',1,'R_out',R,...
                       'th1',pi/2-half_wedge_angle,...
                       'th2',pi/2+half_wedge_angle,'N',[10,10]);
@@ -28,7 +30,8 @@ function [WDG,res] = SimulationWedge
         
     figure('color','white','Position',[0 0 600 500]);
     WDG.PlotGridLines();  hold on;
-    WDG.PlotGrid();
+    WDG.PlotGrid()
+	WDG.PlotIsoline(0,'y1');;
    % xlim([-5 5]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    

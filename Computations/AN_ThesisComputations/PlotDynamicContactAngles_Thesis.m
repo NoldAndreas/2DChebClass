@@ -1,4 +1,4 @@
-function PlotDynamicContactAngles
+function PlotDynamicContactAngles_Thesis
     t = 0:0.01:pi;
 
     if(exist('D:\','dir'))
@@ -39,17 +39,35 @@ function PlotDynamicContactAngles
 
 	LoadDataFluidData('RameGaroff/CH3','v','g',struct('rad','deg','Ca','Ca'));
     LoadDataFluidData('RameGaroff/OH','o','g',struct('rad','deg','Ca','Ca'));
-   
-    PlotFHoffmanVsFGR(); SaveFigure('Hoffmann_vs_Cox');
-    PlotGThetaOverCa(); SaveFigure('Experiments_vs_Cox');
-    PlotThetaOverCaPlusF(data,'FHoffmann'); SaveFigure('Experiments_Hoffmann');
-    PlotThetaOverCaPlusF(data,'FGR');  SaveFigure('Experiments_Cox');
     
-    PlotThetaOverCa(data);  
+    
+     PlotFHoffmanVsFGR();
+     fsub = gcf;
+    
+    figMain = figure('color','white');%,'Position',[0 0 500 300]);
+    subplot(1,2,1);
+    leg = PlotThetaOverCaPlusF(data,'FGR');      
+    a = get(gca,'Children')
+    
+    subplot(1,2,2);    
+    PlotGThetaOverCa();
+    b = get(gca,'Children')
+    
+    legend(plotLegend,'Location','southoutside');              
+    
+    inset2(figMain,fsub,0.3,[0.8,0.2]);
+    
+    SaveFigure('ExperimentalData');        
+   
+   % PlotFHoffmanVsFGR(); SaveFigure('Hoffmann_vs_Cox');
+   % PlotGThetaOverCa(); SaveFigure('Experiments_vs_Cox');
+   % PlotThetaOverCaPlusF(data,'FHoffmann'); SaveFigure('Experiments_Hoffmann');
+   % PlotThetaOverCaPlusF(data,'FGR');  SaveFigure('Experiments_Cox');
+    
+   % PlotThetaOverCa(data);  
              
-    function PlotFHoffmanVsFGR()
-        figure('color','white','Position',[0 0 800 800]);
-                               
+    function PlotFHoffmanVsFGR()        
+        figure('color','white','Position',[0 0 800 800]);                               
         
        f_hoffmann = HoffmannFit.Feq + HoffmannFit.Ca;
        %semilogx(HoffmannFit.Ca+HoffmannFit.Feq,HoffmannFit.theta,...
@@ -106,17 +124,17 @@ function PlotDynamicContactAngles
         saveas(gcf,'ThetaOverCa.fig');
          
     end
-    function PlotThetaOverCaPlusF(data,FHoffmann_FGHR)
-        figure('color','white','Position',[0 0 800 800]);
+    function plotLegend = PlotThetaOverCaPlusF(data,FHoffmann_FGHR)
+       
         noPlots = 1;                        
         
         
-       % if(strcmp(FHoffmann_FGHR,'FHoffmann'))
+        if(strcmp(FHoffmann_FGHR,'FHoffmann'))
             semilogx(HoffmannFit.Ca+HoffmannFit.Feq,HoffmannFit.theta,...
                             HoffmannFit.symbol,'linewidth',HoffmannFit.lw); hold on;
             plotLegend{noPlots} = HoffmannFit.legend;
             noPlots = noPlots + 1;        
-        %elseif(strcmp(FHoffmann_FGHR,'FGR'))
+        elseif(strcmp(FHoffmann_FGHR,'FGR'))
             thetaM = (0:0.01:pi)';
             G_thM  = GHR_lambdaEta0(thetaM);    
             for k = 1:length(L_Lambda)
@@ -124,7 +142,7 @@ function PlotDynamicContactAngles
                 plotLegend{noPlots} = ['Fit to G with L/lambda = ',num2str(L_Lambda(k))];
                 noPlots = noPlots + 1;  
             end
-       % end  
+        end  
         
         hold on;
                 
@@ -152,42 +170,43 @@ function PlotDynamicContactAngles
             else                
                 semilogx(data{i}.Ca+data{i}.Feq,data{i}.theta,...
                     data{i}.symbol,...
-                    'color',data{i}.color,'MarkerFaceColor',data{i}.color,...
-                    'MarkerSize',data{i}.MarkerSize); hold on;
+                    'color',data{i}.color,...
+                    'MarkerFaceColor',data{i}.color,...
+                    'MarkerEdgeColor',data{i}.color); hold on;
             end                        
             hold on;
         end                      
         
-        h_legend = legend(plotLegend,'Location','Northwest');          
-        set(h_legend,'FontSize',10);        
+        %h_legend = legend(plotLegend,'Location','Northwest');          
+        %set(h_legend,'FontSize',10);        
         
         for i = 1:length(data)
-            semilogx(data{i}.Feq,data{i}.thetaEq,...
-                    data{i}.symbol,...
-                    'LineWidth',2,...
-                    'MarkerEdgeColor','g','MarkerFaceColor',data{i}.color,...
-                    'MarkerSize',data{i}.MarkerSize+2); hold on; 
+            if(data{i}.thetaEq == 0)
+                continue;
+            else
+                semilogx(data{i}.Feq,data{i}.thetaEq,...
+                    data{i}.symbol,...                    
+                    'MarkerEdgeColor','c','MarkerFaceColor',data{i}.color); hold on; 
+            end
         end
 
         %xlim([1e-5 100]); ylim([0 180]);
         
-        ylabel('$\theta_m [^\circ]$','Interpreter','Latex','fontsize',20);
+        ylabel('$\theta_m [^\circ]$','Interpreter','Latex');
         set(gca,'fontsize',20);
         
          if(strcmp(FHoffmann_FGHR,'FHoffmann'))                
-            xlabel('$Ca + F_H(\theta_{eq})$','Interpreter','Latex','fontsize',20);
+            xlabel('$Ca + F_H(\theta_{eq})$','Interpreter','Latex');
             filename = 'ThetaOverCaF_H';
         elseif(strcmp(FHoffmann_FGHR,'FGR'))
-            xlabel('$Ca + F_G(\theta_{eq})$','Interpreter','Latex','fontsize',20);
+            xlabel('$Ca + F_G(\theta_{eq})$','Interpreter','Latex');
             filename = 'ThetaOverCaF_G';
          end        
 
-        SaveFigure(filename);        
+       %SaveFigure(filename);        
         
     end
-    function PlotGThetaOverCa()
-        
-        figure('color','white','Position',[0 0 800 800]);
+    function PlotGThetaOverCa()            
         noPlots = 1;                                
         
         for i = 1:length(data)
@@ -203,20 +222,20 @@ function PlotDynamicContactAngles
             else                
                 loglog(data{i}.Ca,g,...
                     data{i}.symbol,'MarkerFaceColor',data{i}.color,...
-                    'MarkerSize',data{i}.MarkerSize); hold on;
+                    'MarkerEdgeColor',data{i}.color); hold on;
             end
             hold on;
         end
                       
         xP = 10.^(-6:0.1:1);%(0:1e-6:10);
         for k = 1:length(L_Lambda)
-            plot(xP,xP*log(L_Lambda(k)),lines{k},'linewidth',2);
+            plot(xP,xP*log(L_Lambda(k)),lines{k},'linewidth',1.5);
             plotLegend{noPlots} = ['analytical prediction with L/lambda = ',num2str(L_Lambda(k))];
             noPlots = noPlots + 1;
         end
         
-        h_legend = legend(plotLegend,'Location','Northwest');          
-        set(h_legend,'FontSize',10);                       
+        %h_legend = legend(plotLegend,'Location','Northwest');          
+        %set(h_legend,'FontSize',10);                       
                  
         xlabel('$Ca$','Interpreter','Latex','fontsize',20);        
         ylabel('$G(\theta_m) - G(\theta_{eq})$','Interpreter','Latex','fontsize',20);
@@ -225,9 +244,6 @@ function PlotDynamicContactAngles
         
         %xlim([1e-5,1e2]);
         %ylim([1e-4,1e2]);
-
-        print2eps('GThetaOverCa',gcf);  
-        saveas(gcf,'GThetaOverCa.fig');
         
     end        
    
@@ -295,11 +311,4 @@ function PlotDynamicContactAngles
         nData       = nData + 1;
                
     end
-%     function z = GHR(t)
-%         z = 1i*pi^2/24 - t/2.*log(1+exp(1i*t)) ...
-%             + 1i/2*(  dilog(1+exp(1i*t)) + ...
-%                       dilog(exp(1i*t)) ) - sin(t)/2;
-%         disp(['Max imaginary part: ',num2str(max(imag(z)))]);
-%         z = real(z);
-%     end
 end
