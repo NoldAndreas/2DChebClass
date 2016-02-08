@@ -11,7 +11,7 @@ function PlotDynamicContactAngles
     nData = 1;
     data  = {};
     
-    L_Lambda    = [10^4,exp(1.92/3)];
+    L_Lambda    = [10^4,1.9];%exp(1.92/3)];
     lines = {'k--','k:','k-.'};
     
     

@@ -112,9 +112,9 @@ function LubricationForcedWetting()
     
     lw = 2.5;
          
-    PlotThesisFigure_ForcedLubrication(y,hP,lambda,delta,thetaAP,h0P,h1P,h2P,...
-                                               hIP_0,hIP_1,hIP_2,...
-                                               HIS,yInner,ySInner);
+   % PlotThesisFigure_ForcedLubrication(y,hP,lambda,delta,thetaAP,h0P,h1P,h2P,...
+%                                               hIP_0,hIP_1,hIP_2,...
+%                                               HIS,yInner,ySInner);
 	PlotJFMPaperFigure();
     PlotInnerRegion();
     PlotFullResults();
@@ -278,6 +278,7 @@ function LubricationForcedWetting()
         xlim([1e-7 4]);             
 
         plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout),'r:','linewidth',1.5); 
+        plot(yP,thetaAP+(delta/thetaAP^2)*(log(yP)+Cout)+(delta^2/thetaAP^5)*(-(log(yP)).^2-2*Cout*log(yP)),'m:','linewidth',1.5);
         plot(yP,(thetaAP^3+3*delta*(log(yP)+Cout)).^(1/3),'g','linewidth',1.5);    
 
        % Tout_overlap = (thetaAP^3+3*delta*(log(yP))).^(1/3) + delta*Cout*(thetaAP^3+3*delta*(log(yP))).^(-2/3);    

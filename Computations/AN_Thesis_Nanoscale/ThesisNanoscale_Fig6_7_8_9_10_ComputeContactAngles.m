@@ -1,5 +1,4 @@
-function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()
-
+function ThesisNanoscale_Fig6_7_8_9_10_ComputeContactAngles()   
     
     AddPaths('ThesisNanoscale');   
     global dirData             

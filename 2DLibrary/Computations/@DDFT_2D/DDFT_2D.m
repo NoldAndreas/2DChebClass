@@ -436,16 +436,27 @@ classdef DDFT_2D < Computation
                     for k = 1:length(valC)
                         val = valC{k};
                         
-                        if(isstruct(val) && isfield(val,'y1'))                            
-                            plot(val.y1(:,iSpecies,i),...
-                                 val.y2(:,iSpecies,i)+optDetails.y2CartShift,...
-                                 '--','linewidth',1.5,'color','m'); hold on;
+                        if(isstruct(val) && isfield(val,'y1'))         
+                            if(IsOption(opts,'3D') && (k == 2))       
+                                pts.y1_kv = val.y1(:,iSpecies,i);
+                                pts.y2_kv = val.y2(:,iSpecies,i);
+                                IP = this.IDC.SubShapePtsCart(pts);
+                                plot3(pts.y1_kv,...
+                                       pts.y2_kv+optDetails.y2CartShift,...
+                                       IP*valC{1}(:,iSpecies,i),...
+                                       '-','linewidth',2.0,'color','y'); hold on;
+                                view([-120 10]);
+                            else
+                                plot(val.y1(:,iSpecies,i),...
+                                     val.y2(:,iSpecies,i)+optDetails.y2CartShift,...
+                                     '--','linewidth',1.5,'color','m'); hold on;
+                            end
                         elseif(isstruct(val) && isfield(val,'str'))
                             titlestr = [titlestr,' , ',val.str,'=',num2str(val.val(i),3)];
                         elseif(size(val,1) == this.IDC.M)             
                             if(~cont)                                
                                 if(IsOption(opts,'3D'))
-                                    this.IDC.plot(val(:,iSpecies,i)); hold on;
+                                    this.IDC.plot(val(:,iSpecies,i),{},optDetails); hold on;
                                 else
                                     this.IDC.plot(val(:,iSpecies,i),'color',optDetails); hold on;
                                     m = max(max(val(:,iSpecies,i)));

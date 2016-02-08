@@ -6,6 +6,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %     config = ThesisNanoscale_GetStandardConfig(90,[]);
 %     epw = FindEpwFromContactAngle(config,180);
 %     disp(epw);     
+    
       recomp = false;      
       
     %********************************************   
@@ -13,21 +14,21 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
     %********************************************      
      res90{1} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{},true); %Eq: 120 degrees                              
+                           struct('alpha_deg',90,'epw',0.594,'maxT',400),{},recomp); %Eq: 120 degrees                              
                      
                        
      res90{2} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.7,'maxT',400),{}); %Eq: 108.3 degrees                       
+                           struct('alpha_deg',90,'epw',0.7,'maxT',400),{},recomp); %Eq: 108.3 degrees                       
                        
                        
      res90{3} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.8,'maxT',400),{}); 
+                           struct('alpha_deg',90,'epw',0.8,'maxT',400),{},recomp); 
                        
      res90{4} = DataStorage('MovingContactAngleResults',...
                            @DoDynamicComputation,...
-                           struct('alpha_deg',90,'epw',0.9,'maxT',400),{});                          
+                           struct('alpha_deg',90,'epw',0.9,'maxT',400),{},recomp);                          
                      
      res90{5} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
@@ -69,7 +70,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
     
     res120{1} = DataStorage('MovingContactAngleResults',...
                          @DoDynamicComputation,...
-                           struct('alpha_deg',120,'epw',0.1,'maxT',400),{},recomp); %Eq: 170 degrees        
+                           struct('alpha_deg',120,'epw',0.0,'maxT',400),{},recomp); %Eq: 170 degrees        
     res120{1}.erratic = true;
                      
     res120{2} = DataStorage('MovingContactAngleResults',...
@@ -128,10 +129,8 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
     %ewf = 0.856, theta_n = 120
     GetDataForThesis(res120{6});    
     
-    %********************************************                                      
-    %********************************************                                      
-
-    
+    %********************************************
+    %********************************************    
     res60 = PostProcess(res60);    
     res120 = PostProcess(res120);    
     res90 = PostProcess(res90);    
@@ -391,17 +390,13 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
             %*************************
             % Get Entropy
             CL.optsNum.PlotAreaCart       = struct('y1Min',-5,'y1Max',5,...
-                                                   'y2Min',0.5,'y2Max',10.5,...
+                                                   'y2Min',0.5,'y2Max',7.5,...
                                                    'N1',40,'N2',40,'NFlux',10);
             CL.IDC.InterpolationPlotCart(CL.optsNum.PlotAreaCart,true);
             figure('color','white','Position',[0 0 300 300]);                        
-            CL.IDC.plot(CL.dynamicsResult.entropy(:,:,end));
-            view([-120 10]);
-            xlabel('$y_1$');
-            ylabel('$y_2$');
-            %pbaspect([(PlotAreaCart.y1Max-PlotAreaCart.y1Min),...
-            %          (PlotAreaCart.y2Max-PlotAreaCart.y2Min),1]);
-            SaveFigure('entropy');
+            CL.PlotDynamicValue({'entropy','fittedInterface'},... %
+                 {'3D','save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize','CLy2Shift'}); %'save'
+            %CL.IDC.plot(CL.dynamicsResult.entropy(:,:,end));            
             %*****
             
 
