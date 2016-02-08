@@ -105,6 +105,16 @@ else
 end
 
 %--------------------------------------------------------------------------
+% Determine if there is a set initial condition
+%--------------------------------------------------------------------------
+
+if(isfield(optsStruct,'ICrho'))
+    optsStruct.IC = true;
+else
+    optsStruct.IC = false;
+end
+
+%--------------------------------------------------------------------------
 % Assign defaults to any missing values
 %--------------------------------------------------------------------------
 
@@ -141,6 +151,14 @@ optsStruct=setV2Params(optsStruct);
 
 if(optsStruct.flow)
     optsStruct=setUParams(optsStruct);
+end
+
+%--------------------------------------------------------------------------
+% Set up IC parameters
+%--------------------------------------------------------------------------
+
+if(optsStruct.IC)
+    optsStruct=setICParams(optsStruct);
 end
 
 %--------------------------------------------------------------------------

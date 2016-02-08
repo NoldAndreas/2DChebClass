@@ -143,6 +143,9 @@ if(optsStruct.anyDDFT)
         if(optsStruct.flow)
             optsPhysDDFT(iDDFT).U = optsStruct.flowParamsDDFT{iDDFT}; %#ok
         end
+        if(optsStruct.IC)
+            optsPhysDDFT(iDDFT).IC = optsStruct.ICParamsDDFT{iDDFT}; %#ok
+        end
     end
     
     % cut down to the calculations we want to do
