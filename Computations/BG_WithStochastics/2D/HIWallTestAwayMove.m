@@ -149,19 +149,23 @@ Fex_Num   = struct('Fex','FMTRoth',...
 %eq_Num    = struct('eqSolver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
 eq_Num = struct('eqSolver','fsolve');
                    
-PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area};
+PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area, Phys_Area};
 
-SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area};
+SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area, Sub_Area};
 
-PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num};
+FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num, Fex_Num};
 
-V2Num    = {[],[],[],[]};
+V2Num    = {[],[],[],[],[]};
 
-eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num};
+eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num,eq_Num};
 
 HINum    = {[], ...
+            struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','Oseen_2D_noConv', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D', ...
+                      'HIWallFull',true,'doConv',false,...
+                      'Wall','SelfWallTermZero'), ...
             struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','FullWallHI_2D_noConv', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
@@ -176,32 +180,34 @@ HINum    = {[], ...
                       'Wall','SelfWallTermKN'), ...
            };
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}};
 
 HIParamsNamesDDFT={'sigmaH','sigma'};               
                
-DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
+DDFTName={'No HI','Just Oseen','Full HI','Just Wall','Oseen + Wall'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r','r','r'};
+DDFTType={'r','r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,true};
-%doDDFT={true,false,false,false};
+doDDFT={true,true,true,true,true};
+%doDDFT={false,true,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
-%loadDDFT={false,false,false,false};
+loadDDFT={true,true,true,true,true};
+%loadDDFT={false,false};
 
-DDFTColour = {{'r'},{'b'},{'g'},{'m'}};
+DDFTColour = {{'r'},{'b'},{'g'},{'m'},{'c'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -237,9 +243,9 @@ nBins=[40;40];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
+doMovieAvi     = false;
 doInitialFinal = false;
-doMeans        = false;
+doMeans        = true;
 doEquilibria   = false;
 
 sendEmail = false;

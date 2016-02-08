@@ -28,7 +28,8 @@ V1DV1='V1_Well_Move_HalfInf';
 % appropriate physical parameters for potentials in V1DV1
 V0S        = 0.01;
 V0addS     = 2.5;
-tauS       = 0.1;
+%tauS       = 0.1;
+tauS       = 0.5;
 
 sigma1AddS = 8;
 sigma2AddS = 2;
@@ -133,8 +134,8 @@ Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',50,...
-                       'y2Min',0.5,'y2Max',20,'N2',50);
+Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',100,...
+                       'y2Min',0.5,'y2Max',20,'N2',100);
 
 % Fex_Num   = struct('Fex','FMTRosenfeld',...
 %                        'Ncircle',10,'N1disc',10,'N2disc',10);
@@ -149,19 +150,23 @@ Fex_Num   = struct('Fex','FMTRoth',...
 %eq_Num    = struct('eqSolver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
 eq_Num = struct('eqSolver','fsolve');
                    
-PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area};
+PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area, Phys_Area};
 
-SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area};
+SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area, Sub_Area};
 
-PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num};
+FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num, Fex_Num};
 
-V2Num    = {[],[],[],[]};
+V2Num    = {[],[],[],[],[]};
 
-eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num};
+eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num,eq_Num};
 
 HINum    = {[], ...
+            struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','Oseen_2D_noConv', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D', ...
+                      'HIWallFull',true,'doConv',false,...
+                      'Wall','SelfWallTermZero'), ...
             struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','FullWallHI_2D_noConv', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
@@ -176,32 +181,34 @@ HINum    = {[], ...
                       'Wall','SelfWallTermKN'), ...
            };
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}};
 
 HIParamsNamesDDFT={'sigmaH','sigma'};               
                
-DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
+DDFTName={'No HI','Just Oseen','Full HI','Just Wall','Oseen + Wall'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r','r','r'};
+DDFTType={'r','r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,false,true,false};
-%doDDFT={true,false,false,false};
+doDDFT={true,true,true,true,true};
+%doDDFT={false,true,false,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
+loadDDFT={true,true,true,true,true};
 %loadDDFT={false,false};
 
-DDFTColour = {{'r'},{'b'},{'g'},{'m'}};
+DDFTColour = {{'r'},{'b'},{'g'},{'m'},{'c'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -226,8 +233,8 @@ PMin=[-1;-1];
 PMax=[1;1];
 
 % y axis for mean position and velocity plots
-RMMin=[-3;5];
-RMMax=[3;7];
+RMMin=[-3;5.64];
+RMMax=[3;5.67];
 PMMin=[-1;-1];
 PMMax=[1;1];
 
@@ -238,9 +245,9 @@ nBins=[40;40];
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
-doPdfs         = true;
-doInitialFinal = true;
-doMeans        = false;
+doPdfs         = false;
+doInitialFinal = false;
+doMeans        = true;
 doEquilibria   = false;
 
 sendEmail = false;

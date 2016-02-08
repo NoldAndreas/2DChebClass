@@ -84,7 +84,7 @@ function ComputeDynamicsWallHI(this,x_ic,mu)
 
         accFlux   = X_t(:,1:nSpecies);
         X_t       = X_t(:,nSpecies+1:end)';
-
+ 
         rho_t     = exp((X_t-Vext(:)*ones(1,nPlots))/kBT);
 
         X_t       = reshape(X_t,M,nSpecies,nPlots);
