@@ -7,7 +7,7 @@ function [SMD,res] = SimulationStripMinusDisk()
     %Initialization
     N1 =  10;   N2 = 10;
     R       = 1;
-    L1      = 0.5;
+    L1      = 1;
     y2Wall  = 0;    
     Origin  = [0;1.5];
     N       = [N1;N2];
@@ -21,7 +21,7 @@ function [SMD,res] = SimulationStripMinusDisk()
     SMD.PlotGridLines();  hold on;
     SMD.PlotGrid();
     SMD.PlotIsoline(0,'y1');
-    xlim([-2 2]);
+    xlim([-2.5 2.5]);
     ylim([0 2]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    

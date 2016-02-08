@@ -6,7 +6,7 @@ function [WDG,res] = SimulationWedgeCut
     end        
     close all;
         
-    Geometry = struct('R_in',1,'R_out',2,...
+    Geometry = struct('R_in',1,'R_out',2.5,...
                       'h',1.5,'N',[10,10]);
     
     vext              = @Vext7;
@@ -20,8 +20,9 @@ function [WDG,res] = SimulationWedgeCut
     figure;
     WDG.PlotGridLines();  hold on;
     WDG.PlotGrid();
-    xlim([-1.5 1.5]);
-    ylim([-1.6 -0.7]);
+    WDG.PlotIsoline(0,'y1');
+    xlim([-2.25 2.25]);
+    ylim([-1.5 -0.5]);
 	hl = xlabel('$y_1$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);
     hl = ylabel('$y_2$'); set(hl,'Interpreter','Latex'); set(hl,'fontsize',25);    
     res.fig_handles{1} = gcf;    

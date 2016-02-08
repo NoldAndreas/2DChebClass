@@ -8,12 +8,14 @@ function ThesisNanoscale_DifferentShapes
     %SavePic('SimulationSphere');    
     %SavePic('SimulationBall');        
     
-    SavePic('SimulationStripMinusDisk');
-    SavePic('SimulationHalfSpaceMinusHalfDisk');
-    SavePic('SimulationHalfStripMinusDisk');    
-    SavePic('SimulationWedge');
-    SavePic('SimulationWedgeCut');
-    SavePic('SimulationWedgeCutSide');
+%     SavePic('SimulationHalfSpaceMinusHalfDisk');  %P_1
+%     SavePic('SimulationHalfStripMinusDisk'); %P_2   
+%     SavePic('SimulationStripMinusDisk'); %P_3
+%     
+%        
+%     SavePic('SimulationWedgeCutSide'); %P_4
+%    SavePic('SimulationWedgeCut'); %P_5
+%    SavePic('SimulationWedge'); %P_6
     
 
     function SavePic(strf)
