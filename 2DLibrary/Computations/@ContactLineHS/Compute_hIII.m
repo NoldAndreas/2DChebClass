@@ -1,7 +1,10 @@
-function Compute_hIII(this)
+function hIII = Compute_hIII(this,rho)
 
 	y1             = this.y1_SpectralLine.Pts.y;    
-    rho            = this.GetRhoEq();   
+    
+    if(nargin < 2)
+        rho            = this.GetRhoEq();
+    end
     
     if(this.IDC.alpha > pi/2)
         rho_ref = rho(this.IDC.Ind.top&this.IDC.Ind.right);
@@ -23,5 +26,7 @@ function Compute_hIII(this)
     end
     close(hw);
 
-	this.hIII  = hIII;    
+    if(nargin < 2)
+        this.hIII  = hIII;   
+    end
 end

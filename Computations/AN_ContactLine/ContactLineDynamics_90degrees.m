@@ -1,4 +1,5 @@
-function ContactLineDynamics_90degrees(opts)
+%function ContactLineDynamics_90degrees(opts)
+    opts = {'chemical','receding'};
 
     AddPaths('CodePaper');            
     close all;
@@ -104,7 +105,8 @@ function ContactLineDynamics_90degrees(opts)
         CL.ComputeEquilibrium(struct('solver','Picard'));
     end
     CL.ComputeDynamics();
-    CL.PostprocessDynamics();
+    CL.PostprocessDynamics([4 5.5]);
+    CL.PlotInterfaceFittingQuality([25,50,75,100]);
     
     CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
     %CL.PlotDynamicValue({'UV_t','entropy'},{'save'});

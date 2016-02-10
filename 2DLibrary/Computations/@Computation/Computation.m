@@ -137,7 +137,7 @@ classdef Computation < handle
             s.optsNum     = this.optsNum;
             s.optsPhys    = this.optsPhys;
             s.configName  = this.configName;
-            fullName =  SaveFigure(filename,s);
+            fullName      =  SaveFigure(filename,s);
         end
 %         
 %         function LoadSnapshot(this)

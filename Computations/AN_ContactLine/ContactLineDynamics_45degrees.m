@@ -1,9 +1,9 @@
-function ContactLineDynamics_45degrees()
+%function ContactLineDynamics_45degrees()
 
     AddPaths('CodePaper');            
     close all;
     
-    advancing = false;
+    advancing = true;
     if(~advancing)
         alpha_deg = 45;
         epw       = 0.856; %= 90 degree contact angle
@@ -87,7 +87,7 @@ function ContactLineDynamics_45degrees()
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics([4,5.5]);
-    
+    CL.PlotInterfaceFittingQuality([25,50,75,100]);
        
     CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
     %CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});

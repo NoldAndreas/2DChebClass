@@ -311,6 +311,7 @@ classdef ContactLineHS < DDFT_2D
         PlotDensitySlicesNormalInterface(this,y1Lim)
         PlotDensitySlices(this)
         PlotDensitySlicesMovie(this);  
+        PlotInterfaceFittingQuality(this,nts);
                 
         %Adsorption Isotherm
         ComputeAdsorptionIsotherm(this,n,drying)
@@ -384,9 +385,9 @@ classdef ContactLineHS < DDFT_2D
         [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
         
         %Compute height profiles
-        Compute_hI(this)
-        Compute_hII(this,II_or_IV)
-        Compute_hIII(this)
+        Compute_hI(this);
+        Compute_hII(this,II_or_IV);
+        hIII = Compute_hIII(this,rho);
         function Compute_hContour(this,level)
             rho_eq       = this.GetRhoEq(); 
             N            = this.y1_SpectralLine.N;
@@ -505,15 +506,17 @@ classdef ContactLineHS < DDFT_2D
             
             this.dynamicsResult.fittedInterface.y1 = zeros(length(y2_Interface),nSpecies,no_t);
             this.dynamicsResult.fittedInterface.y2 = zeros(length(y2_Interface),nSpecies,no_t);
+            this.dynamicsResult.ak                 = zeros(2,no_t);
             
             ak = [];            
             for nt = 1:no_t
                 rho_eq        = rho_t(:,1,nt);
                 %y1_0_Cart(nt) = fsolve(@rhoX1,0,fsolveOpts);
                 
-                [y1_0_Cart(nt),ca_deg(nt),y1_Interface{nt},ak]= ExtrapolateInterface(this,rho_eq,y2_Interface,ak,y2Lim);
+                [y1_0_Cart(nt),ca_deg(nt),y1_Interface{nt},ak] = ExtrapolateInterface(this,rho_eq,y2_Interface,ak,y2Lim);
                 this.dynamicsResult.fittedInterface.y1(:,1,nt) = y1_Interface{nt};
                 this.dynamicsResult.fittedInterface.y2(:,1,nt) = y2_Interface;
+                this.dynamicsResult.ak(:,nt)                   = ak;
             end         
             
             vel_0_Cart(1) = (y1_0_Cart(2)-y1_0_Cart(1))/(times(2)-times(1));
@@ -533,7 +536,7 @@ classdef ContactLineHS < DDFT_2D
                 z        = IP*rho_eq-rho0;
             end 
         end
-        [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak,y2Lim)
+        [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak,y2Lim,opts,t)
             
         %to delete
         [f,y1]  = PostProcess(this,y1Int)
