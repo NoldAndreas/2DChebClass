@@ -4,7 +4,12 @@ function [VBack_S,VAdd_S]=EricV1(y,t,optsPhys)
     Vm      = optsPhys.Vm;
     Vq      = optsPhys.Vq;
     alpha   = optsPhys.alpha;
-    yt      = optsPhys.y0;
+    
+    if(t==0)
+        yt = optsPhys.y0;
+    else
+        yt = optsPhys.y1;
+    end    
 
     h       =  (erf((y+yt)/alpha) - erf((y-yt)/alpha))/2;
     Dh      =  1/sqrt(pi)/alpha*( exp(-(y+yt).^2/alpha^2) - exp(-(y-yt).^2/alpha^2) );
@@ -13,10 +18,6 @@ function [VBack_S,VAdd_S]=EricV1(y,t,optsPhys)
     VBack  = Vm.*y.^2;
     DVBack = 2*Vm.*y;
     %--------------------------------------------------------------------------
-
-%     if(t==0)
-%         yt = 0;
-%     end
     
     VAdd    =  Vq.*h.*(yt - y.^2);
     VAdd(abs(y)==inf) = 0;

@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical_GivenIC(optsPhys,optsNum,optsPlot)
 
     if(nargin == 0)
         [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionSphericalInfInterval();
@@ -168,10 +168,10 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     x_ic     = x_ic(2:end,:);
     x_icFull = mirror(x_ic);
 
-    rho_ic = exp((x_icFull - Vext)/kBT);
-    plot(yS,rho_ic)
-    
-    pause
+%     rho_ic = exp((x_icFull - Vext)/kBT);
+%     plot(yS,rho_ic)
+%     
+%     pause
     
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);

@@ -17,7 +17,8 @@ mS=1;
 
 r0 = 0.080961;
 
-gammaS=6*pi*r0;
+%gammaS=6*pi*r0;
+gammaS = 1;
 D0S=kBT./mS./gammaS;
 
 %--------------------------------------------------------------------------
@@ -35,14 +36,18 @@ ICParamsNames = {'nParticles'};
 V1DV1='EricV1';
 
 % appropriate physical parameters for potentials in V1DV1
-VmS = 46;    
-VqS = 50;
-y0S  = 2.5;
-alphaS = 0.2;
+VmS = 0.01;    
+VqS = 0.5;
+y0S = 3;
+y1S = 4;
+
+%alphaS = 0.2;
+
+alphaS = 1;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
-potParamsNames = {'Vm','Vq','y0','alpha'};
+potParamsNames = {'Vm','Vq','y0','y1','alpha'};
 
 %--------------------------------------------------------------------------
 % V2 parameters
@@ -67,7 +72,7 @@ tMax=1;
 %--------------------------------------------------------------------------
 
 
-Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',4);
+Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',2);
 Plot_Area = struct('N',200,'yMin',0,'yMax',20);
 Fex_Num   = struct('Fex','FMT','N',100);
 
@@ -110,13 +115,13 @@ plotCurrent=false;
 
 % x axis for position and velocity plots
 rMin=0;
-rMax=12;
+rMax=5;
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=12;
+RMax=300;
 
 PMin=-0.5;
 PMax=0.2;
