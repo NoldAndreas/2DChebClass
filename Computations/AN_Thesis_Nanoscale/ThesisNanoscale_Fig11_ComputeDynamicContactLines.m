@@ -256,7 +256,6 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
         disp(['zeta_advancing = ',num2str(zeta_advancing)]);
         disp(['zeta_receding = ',num2str(zeta_receding)]);
     end
-
     function PlotVelocitiesForThesis(res,varName,yLabel)
         figure('color','white','Position',[0 0 200 150]);
         for ii = 1:length(res)
@@ -274,8 +273,7 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
         %inset2(f1,f2,0.4,[0.3,0.5]);
         %close(f2);    
         SaveFigure(['ContactLine_t_',varName]);
-    end
-          
+    end          
     function res = PostProcess(res)
         
         cols = {'r','m','k','b','c','g'};

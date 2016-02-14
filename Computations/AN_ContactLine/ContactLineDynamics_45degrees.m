@@ -1,77 +1,41 @@
-%function ContactLineDynamics_45degrees()
+function ContactLineDynamics_45degrees(config,opts)
 
     AddPaths('CodePaper');            
     close all;
     
-    advancing = true;
-    if(~advancing)
-        alpha_deg = 45;
-        epw       = 0.856; %= 90 degree contact angle
-        maxT      = 400;
-    else
-        alpha_deg = 60;
-        epw       = 1.22;  %= +/- 30 degree contact angle
-        %epw       = 1.154; %= 45 degree contact angle
-        maxT      = 400;
+    if(nargin < 1)
+        opts = {'advancing'};
     end
     
-    PhysArea = struct('N',[40,40],...
-                      'L1',4,'L2',2,...                        
-                      'alpha_deg',alpha_deg);
-                  
-	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
-                          'y2Min',0.5,'y2Max',2.5,...
-                          'N',[40,40]);
-                          
-%     PlotAreaCart =     struct('y1Min',-5,'y1Max',20,...
-%                               'y2Min',0.5,'y2Max',15.5,...
-%                               'N1',100,'N2',100,'NFlux',40);
-
-     PlotAreaCart =     struct('y1Min',-5,'y1Max',10,...
+    if(IsOption(opts,'receding'))
+        alpha_deg = 45;
+        epw       = 0.856; %= 90 degree contact angle        
+    elseif(IsOption(opts,'advancing'))
+        alpha_deg = 60;
+        epw       = 1.22;  %= +/- 30 degree contact angle
+        %epw       = 1.154; %= 45 degree contact angle        
+    else
+        return;
+    end
+        
+    PlotAreaCart =     struct('y1Min',-5,'y1Max',10,...
                                'y2Min',0.5,'y2Max',15.5,...
                                'N1',100,'N2',100,'NFlux',20);
-                      
-    V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
-
-    FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);
-                   
-	plotTimes = struct('t_int',[0,maxT],'t_n',100);
-
-    optsNum = struct('PhysArea',PhysArea,...
-                     'PlotAreaCart',PlotAreaCart,...
-                     'FexNum',FexNum,'V2Num',V2Num,...
-                     'SubArea',SubArea,...
-                     'maxComp_y2',10,...%'y1Shift',0,...
-                     'plotTimes',plotTimes);
-
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);%,...%1.154 = 45 degrees
-                %'tau',5,'epsilon_w_end',1.0);
-            
-    %optsViscosity = struct('etaC',1,'zetaC',0);    
-    %optsViscosity = struct('etaL1',2,'zetaC',1);
-    optsViscosity = struct('etaLiq',5,'etaVap',1,...
-                           'zetaLiq',5,'zetaVap',1);
-                            %'zetaC',1);
-    %BCwall        = struct('bc','sinHalf','tau',1);
-	BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
-
-    optsPhys = struct('V1',V1,'V2',V2,...
-                      'kBT',0.75,...                                               
-                      'Dmu',0.0,'nSpecies',1,...
-                      'sigmaS',1,...
-                      'Inertial',true,'gammaS',0,...%4% 'Fext',[-1,0],...%);%,...% 'BCWall_U',BCwall,...%);                     
-                      'viscosity',optsViscosity);	
-
-    config = v2struct(optsNum,optsPhys);                                    
+                                                      
+    config.optsNum.V2Num.N       = [80,80];        
+    config.optsNum.FexNum.N1disc = 50;
+    config.optsNum.FexNum.N2disc = 50;                   
+	
+    config.optsNum.PlotAreaCart       = PlotAreaCart;
+    config.optsNum.PhysArea.alpha_deg = alpha_deg;
+    config.optsPhys.V1.epsilon_w      = epw;                           
         
     CL = ContactLineHS(config);
     CL.Preprocess(); 
-    
-%     %**********************************************
-%     % Equilibration from off-equilibrium IC
-%     %**********************************************
+
+    %**********************************************
+    % Equilibration from off-equilibrium IC
+    %**********************************************
     rhoGas = CL.optsPhys.rhoGas_sat;
     rhoLiq = CL.optsPhys.rhoLiq_sat;
 
@@ -87,9 +51,11 @@
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
     CL.ComputeDynamics();
     CL.PostprocessDynamics([4,5.5]);
-    CL.PlotInterfaceFittingQuality([25,50,75,100]);
-       
-    CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+    CL.PlotInterfaceFittingQuality([1,26,51,76,100]);
+    
+    if(IsOption(opts,'videos'))
+        CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+    end
     %CL.PlotDynamicValue({'UV_t','entropy'},{'save','MovingFrameOfReference'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              
@@ -145,6 +111,5 @@
 %     CL.optsPhys.ModifyEq_to_IC.a0 = -3;
 %     CL.ComputeDynamics();
 %     CL.PostprocessDynamics();    
-%     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
-                
-%end
+%     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});                
+end

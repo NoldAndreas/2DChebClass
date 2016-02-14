@@ -17,18 +17,19 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
     
        % y2k     = [4;5];
         %y2k     = (4:0.1:5.5)';    
-        y2k     = (y2Lim(1):0.1:y2Lim(2))';        
-
+        y2k_full     = (y2Lim(1):0.1:y2Lim(2))';        
+        y1k_full     = zeros(size(y2k_full));
+        
         lambdak = [0.5;0.6]; %Doesnt have to be equal y1k, I think.
         CartPts = this.IDC.GetCartPts;
 
         %1st step: get y1k            
-        y1k     = zeros(size(y2k));
+        
         fsolveOpts  = optimset('Display','off');
 
-        for k = 1:length(y2k)
-            pt.y2_kv    = y2k(k);        
-            y1k(k)      = fsolve(@rhoX1,0,fsolveOpts);                                
+        for k = 1:length(y2k_full)
+            pt.y2_kv    = y2k_full(k);        
+            y1k_full(k) = fsolve(@rhoX1,0,fsolveOpts);                                
         end    
             
         %2nd step: solve (EQ) for a_k
@@ -40,11 +41,18 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
              end         
         end
         
+        y1k = [y1k_full(1),y1k_full(end)];
+        y2k = [y2k_full(1),y2k_full(end)];
+        ak_if  = fsolve(@f_error,ak_ig,fsolveOpts);                
+        
         if(length(y2k) > 2)
+            y1k = y1k_full;
+            y2k = y2k_full;
             %'Display','final'
             %ak_ig = [ak_ig(1);sqrt(ak_ig(2))];
             %opts_min  = optimset('TolX',1e-12,'TolFun',1e-12,'MaxFunEvals',10000);
-            opts_min  = optimset('TolX',1e-4,'TolFun',1e-4,'MaxFunEvals',10000);
+            opts_min  = optimset('TolX',1e-2,'TolFun',1e-2,'MaxFunEvals',10000);
+            %ak_ig     = [(y1k(end)-y1k(1))/(y2k(end)-y2k(1));mean(y1k)];
             ak        = fminsearch(@f_error_Av,ak_ig,opts_min);                
             %ak        = fminsearch(@f_error_Av_log,ak,opts_min);        
             %ak    = [ak(1);ak(2).^2];
@@ -77,6 +85,7 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
         else
             %**Get Isoline
             y2Plot      = (2:0.1:15)';
+            y2Plot_Fit  = (0:0.1:7)';
             y1Plot      = zeros(size(y2Plot));
             fsolveOpts  = optimset('Display','off');
             for k = 1:length(y2Plot)
@@ -88,29 +97,34 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
                 end
                     y1Plot(k)   = fsolve(@rhoX1,y1Guess,fsolveOpts);                                
             end    
-            y1Plot_Fit = f_LinearExtrapolation(y2Plot,ak);
+            y1Plot_Fit = f_LinearExtrapolation(y2Plot_Fit,ak);
             
             if(~IsOption(opts,'full'))
                 y1Plot     = y1Plot - c*y2Plot;
-                y1Plot_Fit = y1Plot_Fit - c*y2Plot;
+                y1Plot_Fit = y1Plot_Fit - c*y2Plot_Fit;
             end                
             
-            plot(y2Plot,y1Plot,'k'); hold on;        
+            plot(y1Plot,y2Plot,'k'); hold on;        
             if(IsOption(opts,'fit'))
-                plot(y2Plot,y1Plot_Fit,'k:'); hold on;    
+                plot(y1Plot_Fit,y2Plot_Fit,'k:'); hold on;    
             end
-            xlabel('$y_2$','Interpreter','Latex');
-            ylabel('$y_1- y_2/\tan\klamm{\theta}$','Interpreter','Latex');      
+            
+            if(IsOption(opts,'full'))
+                xlabel('$y_1$','Interpreter','Latex');
+            else
+                xlabel('$y_1 - y_2/\tan \theta$','Interpreter','Latex');
+            end
+            ylabel('$y_2$','Interpreter','Latex');      
             if(nargin > 6)
-                text(y2Plot(end),y1Plot(end),...
-                     ['$t = ',num2str(t,3),'$'],'Interpreter','Latex');     
+                text(y1Plot(end),y2Plot(end),...
+                     ['$t = ',num2str(t,3),'$'],'Interpreter','Latex','rotation',90);     
             end
             
 
             %Compute R-Value in Interval [4,10]:
-            ybar = mean(y1Plot);
-            R = 1 - sum((y1Plot-y1Plot_Fit).^2)/sum((y1Plot-ybar).^2);
-            disp(['for t = ',num2str(t,3),', R = ',num2str(R)]);
+            %ybar = mean(y1Plot);
+            %R = 1 - sum((y1Plot-y1Plot_Fit).^2)/sum((y1Plot-ybar).^2);
+            %disp(['for t = ',num2str(t,3),', R = ',num2str(R)]);
         end
     end
     
@@ -131,7 +145,7 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
     end
 
     function z_abs = f_error_Av(ak)
-        z_abs = sum(abs(f_error(ak)));
+        z_abs = sum((f_error(ak)).^2);
     end
 
     function z = f_error(ak)
@@ -147,13 +161,15 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
 %    end
 
     function [z,dz] = f(y2,ak)        
-        z      = c*y2  + exp(-y2*ak(2)).*(ak(1));
-        dz     = c     - ak(2)*ak(1)*exp(-y2*ak(2));        
+        z  = ak(1)*y2 + ak(2);
+        dz = ak(1);
+        %z      = c*y2  + exp(-y2*ak(2)).*(ak(1));
+        %dz     = c     - ak(2)*ak(1)*exp(-y2*ak(2));        
         
-        if(nk == 2)
-            z      = z  + exp(-y2.^2*ak(4)).*(ak(3));
-            dz     = dz - 2*ak(3)*ak(4)*exp(-y2.^2*ak(4));        
-        end
+        %if(nk == 2)
+%            z      = z  + exp(-y2.^2*ak(4)).*(ak(3));
+%            dz     = dz - 2*ak(3)*ak(4)*exp(-y2.^2*ak(4));        
+%        end
     end
 
     function [z,dz] = f_LinearExtrapolation(y2,ak)

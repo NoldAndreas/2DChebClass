@@ -1,4 +1,4 @@
-function ContactLineDynamics_135degrees(config,opts)
+function ContactLineDynamics_X_degrees(config,opts)
 
     AddPaths('CodePaper');            
     close all;
@@ -7,20 +7,55 @@ function ContactLineDynamics_135degrees(config,opts)
         opts = {'advancing'};
     end
     
-    if(IsOption(opts,'advancing'))
-        alpha_deg = 135;
-        epw       = 0.856; %= 90 degree contact angle
-    elseif(IsOption(opts,'receding'))
-        alpha_deg = 120;
-        epw       = 0.453; %= 135 degree contact angle
-    else
-        return;
+    if(IsOption(opts,'135'))
+        if(IsOption(opts,'advancing'))
+            alpha_deg = 135;
+            epw       = 0.856; %= 90 degree contact angle
+        elseif(IsOption(opts,'receding'))
+            alpha_deg = 120;
+            epw       = 0.453; %= 135 degree contact angle
+        else
+            return;
+        end
+        PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
+                                   'y2Min',0.5,'y2Max',15.5,...
+                                   'N1',100,'N2',100,'NFlux',20);                               
+    elseif(IsOption(opts,'90'))
+         alpha_deg = 90;
+        if(IsOption(opts,'advancing'))                
+            %epw       = 1.3; % = +/- 0 degree contact angle
+            epw       =  1.154; %= 45 degree contact angle
+        elseif(IsOption(opts,'receding'))    
+            %epw       = 0.05; %= 180 degree contact angle
+            epw       = 0.453; %= 135 degree contact angle        
+        end    
+        PlotAreaCart = struct('y1Min',-7.5,'y1Max',7.5,...
+                              'y2Min',0.5,'y2Max',15.5,...
+                              'N1',100,'N2',100,'NFlux',20);
+    elseif(IsOption(opts,'45'))
+        if(IsOption(opts,'receding'))
+            alpha_deg = 45;
+            epw       = 0.856; %= 90 degree contact angle        
+        elseif(IsOption(opts,'advancing'))
+            alpha_deg = 60;
+            epw       = 1.22;  %= +/- 30 degree contact angle
+            %epw       = 1.154; %= 45 degree contact angle        
+        else
+            return;
+        end
+        PlotAreaCart =     struct('y1Min',-5,'y1Max',10,...
+                                   'y2Min',0.5,'y2Max',15.5,...
+                                   'N1',100,'N2',100,'NFlux',20);
+        config.optsNum.V2Num.N       = [80,80];        
+        config.optsNum.FexNum.N1disc = 50;
+        config.optsNum.FexNum.N2disc = 50;  
     end
-                          
-    PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
-                               'y2Min',0.5,'y2Max',15.5,...
-                               'N1',100,'N2',100,'NFlux',20);                                                     
- 
+
+    %************************************************
+    %************************************************
+    %************************************************
+    %************************************************
+    
     config.optsNum.PlotAreaCart       = PlotAreaCart;
     config.optsNum.PhysArea.alpha_deg = alpha_deg;
     config.optsPhys.V1.epsilon_w      = epw;                           

@@ -1,5 +1,8 @@
-%function ContactLineDynamics_90degrees(opts)
-    opts = {'chemical','receding'};
+function ContactLineDynamics_90degrees(config,opts)
+
+    if(nargin < 1)
+        opts = {'advancing'}; %'chemical'
+    end    
 
     AddPaths('CodePaper');            
     close all;
@@ -7,84 +10,38 @@
     %advancing = false;
     alpha_deg = 90;
    
-    if(IsOption(opts,'dragging'))        
-            epw      = 0.856; %= 90 degree contact angle
-            maxT     = 20;            
-        if(IsOption(opts,'advancing'))        
-            BCwall   = struct('bc','exp','tau',1,'u_max',-0.2);            
-        elseif(IsOption(opts,'receding'))                
-            BCwall   = struct('bc','exp','tau',1,'u_max',0.2);            
-        end
-    elseif(IsOption(opts,'chemical'))
-        BCwall = [];
-        if(IsOption(opts,'advancing'))        
-            maxT     = 400;
-            %epw       = 1.3; % = +/- 0 degree contact angle
-            epw       =  1.154; %= 45 degree contact angle
-        elseif(IsOption(opts,'receding'))    
-            %epw       = 0.05; %= 180 degree contact angle
-            epw       = 0.453; %= 135 degree contact angle
-            maxT      = 400;
-        end
+%     if(IsOption(opts,'dragging'))        
+%             epw      = 0.856; %= 90 degree contact angle
+%             maxT     = 20;            
+%         if(IsOption(opts,'advancing'))        
+%             BCwall   = struct('bc','exp','tau',1,'u_max',-0.2);            
+%         elseif(IsOption(opts,'receding'))                
+%             BCwall   = struct('bc','exp','tau',1,'u_max',0.2);            
+%         end
+%     elseif(IsOption(opts,'chemical'))    
+    if(IsOption(opts,'advancing'))                
+        %epw       = 1.3; % = +/- 0 degree contact angle
+        epw       =  1.154; %= 45 degree contact angle
+    elseif(IsOption(opts,'receding'))    
+        %epw       = 0.05; %= 180 degree contact angle
+        epw       = 0.453; %= 135 degree contact angle        
     end
+%    end
     
-    PhysArea = struct('N',[40,40],...
-                      'L1',4,'L2',2,...                        
-                      'alpha_deg',alpha_deg);
-                  
-	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
-                          'y2Min',0.5,'y2Max',2.5,...
-                          'N',[40,40]);
-                          
-    %PlotAreaCart =     struct('y1Min',-20,'y1Max',5,...
-%                              'y2Min',0.5,'y2Max',15.5,...
-%                              'N1',100,'N2',100,'NFlux',40);
-                          
-    PlotAreaCart =     struct('y1Min',-7.5,'y1Max',7.5,...
-                               'y2Min',0.5,'y2Max',15.5,...
-                               'N1',100,'N2',100,'NFlux',20);                          
-                      
-    V2Num    = struct('Fex','SplitAnnulus','N',[60,60]);
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
-
-    FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',40,'N2disc',40);
-                   
-	plotTimes = struct('t_int',[0,maxT],'t_n',100);
-
-    optsNum = struct('PhysArea',PhysArea,...
-                     'PlotAreaCart',PlotAreaCart,...
-                     'FexNum',FexNum,'V2Num',V2Num,...
-                     'SubArea',SubArea,...
-                     'maxComp_y2',10,...%'y1Shift',0,...
-                     'plotTimes',plotTimes);
-
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',epw);%,...%1.154 = 45 degrees
-                %'tau',5,'epsilon_w_end',1.0);
-            
-    %optsViscosity = struct('etaC',1,'zetaC',0);    
-    %optsViscosity = struct('etaL1',2,'zetaC',1);
-    optsViscosity = struct('etaLiq',5,'etaVap',1,...
-                           'zetaLiq',5,'zetaVap',1);
-                        %'zetaC',1);
-    %BCwall        = struct('bc','sinHalf','tau',1);
-	%BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
-
-    optsPhys = struct('V1',V1,'V2',V2,...
-                      'kBT',0.75,...                                               
-                      'Dmu',0.0,'nSpecies',1,...
-                      'sigmaS',1,...
-                      'Inertial',true,'gammaS',0,...%4% 'Fext',[-1,0],...%);%,...% 
-                      'BCWall_U',BCwall,...%);                     
-                      'viscosity',optsViscosity);	
-
-    config = v2struct(optsNum,optsPhys);                                    
+	PlotAreaCart = struct('y1Min',-7.5,'y1Max',7.5,...
+                          'y2Min',0.5,'y2Max',15.5,...
+                          'N1',100,'N2',100,'NFlux',20);
+ 
+    config.optsNum.PlotAreaCart       = PlotAreaCart;
+    config.optsNum.PhysArea.alpha_deg = alpha_deg;
+    config.optsPhys.V1.epsilon_w      = epw;
         
     CL = ContactLineHS(config);
     CL.Preprocess(); 
     
-    if(IsOption(opts,'chemical'))
-    
+    if(IsOption(opts,'dragging'))
+        CL.ComputeEquilibrium(struct('solver','Picard'));
+    else    
     %     %**********************************************
     %     % Equilibration from off-equilibrium IC
     %     %**********************************************
@@ -100,15 +57,15 @@
         rho1D_lg = kronecker(rho1D_lg,ones(CL.IDC.N2,1));
     
         rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
-        CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;    
-    elseif(IsOption(opts,'dragging'))
-        CL.ComputeEquilibrium(struct('solver','Picard'));
+        CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;        
     end
     CL.ComputeDynamics();
     CL.PostprocessDynamics([4 5.5]);
-    CL.PlotInterfaceFittingQuality([25,50,75,100]);
+    CL.PlotInterfaceFittingQuality([1,26,51,76,100]);
     
-    CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+    if(IsOption(opts,'videos'))
+        CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});
+    end
     %CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
     %CL.ComputeEquilibrium(struct('solver','Newton'));    
     %CL.ComputeEquilibrium();              

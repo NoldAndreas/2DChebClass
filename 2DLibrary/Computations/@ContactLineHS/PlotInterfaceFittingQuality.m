@@ -23,9 +23,13 @@ function PlotInterfaceFittingQuality(this,nts)
         ExtrapolateInterface(this,this.dynamicsResult.rho_t(:,1,nt),...
                                    y2_Interface,...
                                    this.dynamicsResult.ak(:,nt),...
-                                   [],{'analyse'},...
+                                   [],{'analyse','fit'},...%'full'
                                    this.dynamicsResult.t(nt));                                                                   
-        hIII = Compute_hIII(this,this.dynamicsResult.rho_t(:,1,nt));
+                      
+        if(this.optsNum.PhysArea.alpha_deg == 90)
+            continue;
+        end
+        hIII = Compute_hIII(this,this.dynamicsResult.rho_t(:,1,nt)) + 0.5;
         
         mark = (hIII < 15);
         hIII = hIII(mark);
@@ -34,13 +38,12 @@ function PlotInterfaceFittingQuality(this,nts)
         if(nt == 1);
             [~,calInd] = min(abs(hIII-10));            
             y10 = y1P(calInd) - c*hIII(calInd);            
-        end        
-        plot(hIII,y1P-c*hIII - y10,'b'); hold on;
+        end 
+        plot(y1P-c*hIII,hIII,'b'); hold on;
         
-        ax = gca;                
-        set(ax,'YScale','log');
+        %ax = gca; set(ax,'YScale','log');
     end       
+    ylim([0 (this.optsNum.PlotAreaCart.y2Max + 3)])
     pbaspect([1 1 1]);    
-    SaveCurrentFigure(this,'InterfaceFitting');
-
+    SaveCurrentFigure(this,['InterfaceFitting_epw_',num2str(this.optsPhys.V1.epsilon_w,2)]);
 end
