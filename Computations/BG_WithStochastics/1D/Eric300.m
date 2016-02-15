@@ -15,7 +15,7 @@ nParticlesS=300;
 kBT=1;          % temperature
 mS=1;
 
-r0 = 0.080961;
+r0 = 1;%0.080961;
 
 %gammaS=6*pi*r0;
 gammaS = 1;
@@ -36,14 +36,13 @@ ICParamsNames = {'nParticles'};
 V1DV1='EricV1';
 
 % appropriate physical parameters for potentials in V1DV1
-VmS = 0.01;    
-VqS = 0.5;
-y0S = 3;
-y1S = 4;
+VmS = 0.301;    
+VqS = 0.328;
+y0S = 31;
+y1S = 25;
 
-%alphaS = 0.2;
-
-alphaS = 1;
+alphaS = 2.47;
+%alphaS = 1;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -56,9 +55,9 @@ potParamsNames = {'Vm','Vq','y0','y1','alpha'};
 V2DV2='EricV2';
 
 sigmaS = r0;  % particle radius
-V0S    = 100;
+%V0S    = 1;%100;
 
-potParams2Names={'sigma','V0'};
+potParams2Names={'sigma'};%,'V0'};
 
 %--------------------------------------------------------------------------
 % Save time setup
@@ -72,8 +71,8 @@ tMax=1;
 %--------------------------------------------------------------------------
 
 
-Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',2);
-Plot_Area = struct('N',200,'yMin',0,'yMax',20);
+Phys_Area = struct('shape','InfSpectralLineSpherical','N',200,'L',20);
+Plot_Area = struct('N',200,'yMin',0,'yMax',40);
 Fex_Num   = struct('Fex','FMT','N',100);
 
 PhysArea = {Phys_Area};
@@ -81,8 +80,8 @@ PlotArea = {Plot_Area};
 FexNum   = {Fex_Num};
 HINum    = {[]};
 
-%DDFTCode = {'DDFT_Inertia_1D_Spherical'};
-DDFTCode = {'DDFT_Diffusion_1D_Spherical_GivenIC'};
+DDFTCode = {'DDFT_Inertia_1D_Spherical'};
+%DDFTCode = {'DDFT_Diffusion_1D_Spherical_GivenIC'};
        
 doPlots = true;
 
