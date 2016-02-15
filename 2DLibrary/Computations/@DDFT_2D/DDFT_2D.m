@@ -686,6 +686,8 @@ classdef DDFT_2D < Computation
             if(isfield(optsPhys,'viscosity') && optsPhys.Inertial && (nSpecies == 1))
             
                 entropy = zeros(size(rho_t));
+                comprEntr = zeros(size(rho_t));
+                shearEntr = zeros(size(rho_t));
                 Diff = this.IDC.Diff;
                 
                 for nt = 1:size(rho_t,3)
@@ -699,11 +701,18 @@ classdef DDFT_2D < Computation
                     v    = this.dynamicsResult.UV_t(1+end/2:end,:,nt);
 
                     divUV = Diff.div*[u;v];
-                    entropy(:,:,nt) = zeta.*(divUV.^2) +...
-                                      eta/2.*( ((2*Diff.Dy1)*u - 2/3*divUV).^2 ...
+                    
+                    
+                    comprEntr(:,:,nt)   = divUV.^2;
+                    shearEntr(:,:,nt)   = 1/2*(((2*Diff.Dy1)*u - 2/3*divUV).^2 ...
                                              + ((2*Diff.Dy2)*v - 2/3*divUV).^2 ...
-                                             + 2*(Diff.Dy1*v+Diff.Dy2*u).^2 );     
+                                             + 2*(Diff.Dy1*v+Diff.Dy2*u).^2);
+                    entropy(:,:,nt) = zeta.*comprEntr(:,:,nt) +...
+                                      eta.*shearEntr(:,:,nt);     
                 end                
+                
+                this.dynamicsResult.comprEntr = comprEntr;
+                this.dynamicsResult.shearEntr = shearEntr;
                 this.dynamicsResult.entropy = entropy;
             end
             

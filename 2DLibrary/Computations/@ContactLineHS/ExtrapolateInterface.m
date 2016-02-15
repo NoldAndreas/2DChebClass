@@ -27,9 +27,11 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
         
         fsolveOpts  = optimset('Display','off');
 
-        for k = 1:length(y2k_full)
+        pt.y2_kv    = y2k_full(1);
+        y1k_full(1) = fsolve(@rhoX1,0,fsolveOpts);                                
+        for k = 2:length(y2k_full)
             pt.y2_kv    = y2k_full(k);        
-            y1k_full(k) = fsolve(@rhoX1,0,fsolveOpts);                                
+            y1k_full(k) = fsolve(@rhoX1,y1k_full(k-1),fsolveOpts);                                
         end    
             
         %2nd step: solve (EQ) for a_k

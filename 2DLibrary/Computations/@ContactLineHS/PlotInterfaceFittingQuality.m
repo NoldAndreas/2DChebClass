@@ -45,5 +45,5 @@ function PlotInterfaceFittingQuality(this,nts)
     end       
     ylim([0 (this.optsNum.PlotAreaCart.y2Max + 3)])
     pbaspect([1 1 1]);    
-    SaveCurrentFigure(this,['InterfaceFitting_epw_',num2str(this.optsPhys.V1.epsilon_w,2)]);
+    SaveCurrentFigure(this,['InterfaceFitting_epw_',num2str(this.optsPhys.V1.epsilon_w,3)]);
 end

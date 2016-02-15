@@ -47,13 +47,17 @@ function ContactLineDynamics_45_90_135(kBT)
                       'viscosity',optsViscosity);	
 
     config = v2struct(optsNum,optsPhys);      
+
+    %config.optsPhys.kBT = 0.9;    
+    ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
+    ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});
     
-    ContactLineDynamics_X_degrees(config,{'45','advancing'});
-    ContactLineDynamics_X_degrees(config,{'45','receding'});        
+    ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
+    ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});    
     
-    ContactLineDynamics_X_degrees(config,{'90','advancing'});
-    ContactLineDynamics_X_degrees(config,{'90','receding'});        
+    ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
+    ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});        
     
-    ContactLineDynamics_X_degrees(config,{'135','advancing'});
-    ContactLineDynamics_X_degrees(config,{'135','receding'});
+    ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
+    ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
 end
