@@ -48,15 +48,18 @@ function ContactLineDynamics_45_90_135(kBT)
 
     config = v2struct(optsNum,optsPhys);      
 
-    %config.optsPhys.kBT = 0.9;    
+    config.optsPhys.kBT = 0.9;        
+    
+    if(config.optsPhys.kBT == 0.9)
+        config.optsNum.plotTimes.t_int(2) = 800;
+        config.optsNum.PhysArea.L1 = 6;
+    end
+    
     ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
     ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});
     
     ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
-    ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});    
-    
-    ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
-    ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});        
+    ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
     
     ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
     ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
