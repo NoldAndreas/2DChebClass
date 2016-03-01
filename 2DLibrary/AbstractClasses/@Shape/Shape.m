@@ -566,9 +566,9 @@ classdef (Abstract) Shape < handle
                 nthGridLines = 1;
             end            
             
-            xI = (-1:0.01:1)';
-            x1I = (min(this.Pts.x1):0.01:1)';
-            x2I = (min(this.Pts.x2):0.01:1)';
+            xI = (-1:0.05:1)';
+            x1I = (min(this.Pts.x1):0.05:1)';
+            x2I = (min(this.Pts.x2):0.05:1)';
             
             O  = ones(size(xI));
             O1  = ones(size(x1I));
