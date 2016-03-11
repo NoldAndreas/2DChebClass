@@ -1,4 +1,4 @@
-function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys,optsNum,optsPlot)
+function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical_GivenIC(optsPhys,optsNum,optsPlot)
 
     if(nargin == 0)
         [data,optsPhys,optsNum,optsPlot] = Test_DDFT_DiffusionSphericalInfInterval();
@@ -108,33 +108,54 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     %****************************************************************    
     
     tic
-    [Vext,Vext_grad]  = getVBackDVBack1D(yS,0,optsPhys.V1);
     
-    x0 = getInitialGuess(0);   
-    x0 = cut(x0);
+    if(isfield(optsPhys,'IC'))
+        
+        ICfn = str2func(optsPhys.IC.ICrho);
+        rho_ic = ICfn(yS,optsPhys.IC);
+        % rho_s = exp((x-Vext)/kBT);
+        
+        [Vext,Vext_grad]  = getVBackDVBack1D(yS,0,optsPhys.V1);
+        
+        x_ic = kBT*log(rho_ic) + Vext;
+        x_ic = cut(x_ic);
+        
+        mu0 = zeros(1,nSpecies);
+        x_ic = [mu0;x_ic];
+        
+        flag = 0;
     
-    mu0 = zeros(1,nSpecies);
-    x0mu0 = [mu0;x0];
+    else
+        
+        [Vext,Vext_grad]  = getVBackDVBack1D(yS,0,optsPhys.V1);
 
-    paramsIC.optsPhys.V1          = optsPhys.V1;
-    paramsIC.optsPhys.V2          = optsPhys.V2;
-    paramsIC.optsPhys.mS          = optsPhys.mS;
-    paramsIC.optsPhys.kBT         = optsPhys.kBT;
-    paramsIC.optsPhys.nParticlesS = optsPhys.nParticlesS;
+        x0 = getInitialGuess(0);   
+        x0 = cut(x0);
 
-    paramsIC.optsNum.FexNum   = optsNum.FexNum;
-    paramsIC.optsNum.PhysArea = optsNum.PhysArea;
-    
-    fsolveOpts=optimset('Display','off');
-    paramsIC.fsolveOpts = fsolveOpts;
-    
-    fprintf(1,'Computing initial condition ...');        
-    eqStruct= DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
-    fprintf(1,'done.\n');
-    
-    x_ic = eqStruct.x_ic;
-    flag = eqStruct.flag;
-    
+        mu0 = zeros(1,nSpecies);
+        x0mu0 = [mu0;x0];
+
+        paramsIC.optsPhys.V1          = optsPhys.V1;
+        paramsIC.optsPhys.V2          = optsPhys.V2;
+        paramsIC.optsPhys.mS          = optsPhys.mS;
+        paramsIC.optsPhys.kBT         = optsPhys.kBT;
+        paramsIC.optsPhys.nParticlesS = optsPhys.nParticlesS;
+
+        paramsIC.optsNum.FexNum   = optsNum.FexNum;
+        paramsIC.optsNum.PhysArea = optsNum.PhysArea;
+
+        fsolveOpts=optimset('Display','off');
+        paramsIC.fsolveOpts = fsolveOpts;
+
+        fprintf(1,'Computing initial condition ...');        
+        eqStruct= DataStorage(['EquilibriumData' filesep class(aLine)],@ComputeEquilibrium,paramsIC,x0mu0);
+        fprintf(1,'done.\n');
+
+        x_ic = eqStruct.x_ic;
+        flag = eqStruct.flag;
+
+    end
+        
     if(flag<0)
         fprintf(1,'fsolve failed to converge\n');
         pause
@@ -146,7 +167,12 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     mu       = repmat(mu,N,1);
     x_ic     = x_ic(2:end,:);
     x_icFull = mirror(x_ic);
-        
+
+%     rho_ic = exp((x_icFull - Vext)/kBT);
+%     plot(yS,rho_ic)
+%     
+%     pause
+    
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
    
