@@ -1,7 +1,10 @@
-function ContactLineDynamics_X_degrees(config,opts)
+function ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
 
     AddPaths('CodePaper');            
     close all;
+    
+    config.optsNum.PhysArea.alpha_deg = alpha_deg;
+	config.optsPhys.V1.epsilon_w      = epw;
     
     if(nargin < 1)
         opts = {'advancing'};
@@ -45,10 +48,10 @@ function ContactLineDynamics_X_degrees(config,opts)
     elseif(IsOption(opts,'45'))
         if(IsOption(opts,'receding'))
             config.optsNum.PhysArea.alpha_deg = 45;
-            config.optsPhys.V1.epsilon_w       = 0.856; %= 90 degree contact angle        
+            config.optsPhys.V1.epsilon_w      = 0.856; %= 90 degree contact angle        
         elseif(IsOption(opts,'advancing'))
             config.optsNum.PhysArea.alpha_deg = 60;
-            config.optsPhys.V1.epsilon_w       = 1.22;  %= +/- 30 degree contact angle
+            config.optsPhys.V1.epsilon_w      = 1.22;  %= +/- 30 degree contact angle
             %epw       = 1.154; %= 45 degree contact angle        
         else
             return;

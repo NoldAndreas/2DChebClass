@@ -32,9 +32,19 @@ function ContactLineDynamics_45_90_135(kBT)
             
     %optsViscosity = struct('etaC',1,'zetaC',0);    
     %optsViscosity = struct('etaL1',2,'zetaC',1);
-    optsViscosity = struct('etaLiq',5,'etaVap',1,...
-                           'zetaLiq',5,'zetaVap',1);
-                        %'zetaC',1);
+    
+    
+    %******************************************************
+    %******************************************************
+    %Test on 11/03/2016
+	optsViscosity = struct('etaLiq',3,'etaVap',0.1,...
+                           'zetaLiq',3,'zetaVap',0.1);                       
+    %previous version
+    %optsViscosity = struct('etaLiq',5,'etaVap',1,...
+    %                           'zetaLiq',5,'zetaVap',1);
+    %******************************************************
+    %******************************************************
+                       
     %BCwall        = struct('bc','sinHalf','tau',1);
 	%BCwall        = struct('bc','exp','tau',1,'u_max',0.2);
     BCwall = [];
@@ -48,19 +58,19 @@ function ContactLineDynamics_45_90_135(kBT)
 
     config = v2struct(optsNum,optsPhys);      
 
-    config.optsPhys.kBT = 0.9;        
-    
+    %config.optsPhys.kBT = 0.9;            
     if(config.optsPhys.kBT == 0.9)
         config.optsNum.plotTimes.t_int(2) = 800;
         config.optsNum.PhysArea.L1 = 6;
     end
-    
+     
     ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
-    ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});
+    %ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
+    %ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
     
+    config.optsNum.plotTimes.t_int(2) = 200;    
+    %ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});   
     ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
-    ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
-    
-    ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
     ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
+    
 end

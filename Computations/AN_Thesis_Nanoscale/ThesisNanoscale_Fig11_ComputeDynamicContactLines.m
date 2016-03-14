@@ -7,7 +7,12 @@ function ThesisNanoscale_Fig11_ComputeDynamicContactLines()
 %     epw = FindEpwFromContactAngle(config,180);
 %     disp(epw);     
     
-      recomp = false;      
+    recomp = false;      
+    
+    
+    res60{1} = DataStorage('MovingContactAngleResults',...
+                         @DoDynamicComputation,...
+                         struct('alpha_deg',60,'epw',0.856,'maxT',400),{},true); %Eq: 90 degrees                                                               
       
     %********************************************   
     %*** 90 degrees initial contact angle

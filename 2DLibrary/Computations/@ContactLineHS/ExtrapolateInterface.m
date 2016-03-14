@@ -23,15 +23,20 @@ function [contactlinePos,contactAngle_deg,y1Interface,ak]= ExtrapolateInterface(
         lambdak = [0.5;0.6]; %Doesnt have to be equal y1k, I think.
         CartPts = this.IDC.GetCartPts;
 
-        %1st step: get y1k            
+        %1st step: get y1k                    
+        fsolveOpts  = optimset('Display','off');        
         
-        fsolveOpts  = optimset('Display','off');
-
-        pt.y2_kv    = y2k_full(1);
-        y1k_full(1) = fsolve(@rhoX1,0,fsolveOpts);                                
-        for k = 2:length(y2k_full)
-            pt.y2_kv    = y2k_full(k);        
-            y1k_full(k) = fsolve(@rhoX1,y1k_full(k-1),fsolveOpts);                                
+        for k = 1:length(y2k_full)
+            pt.y2_kv    = y2k_full(k);  
+            
+            [~,mark1] = min(abs(CartPts.y2_kv-pt.y2_kv));
+            mark1     = (CartPts.y2_kv == CartPts.y2_kv(mark1));
+            
+            [~,mark2] = min(abs(rho(mark1)-rho0));
+            y1I       = CartPts.y1_kv(mark1);
+            y1I       = y1I(mark2);
+                                                 
+            y1k_full(k) = fsolve(@rhoX1,y1I,fsolveOpts);                                
         end    
             
         %2nd step: solve (EQ) for a_k
