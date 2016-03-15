@@ -485,6 +485,18 @@ classdef ContactLineHS < DDFT_2D
             end
             
             PostprocessDynamics@DDFT_2D(this);
+            
+            this.dynamicsResult.pathlines{1} = this.GetPathlines(0,0.5);
+            this.dynamicsResult.pathlines{2} = this.GetPathlines(0,1);            
+            this.dynamicsResult.pathlines{3} = this.GetPathlines(0,2);
+            
+            this.dynamicsResult.pathlines{4} = this.GetPathlines(-1,0.5);
+            this.dynamicsResult.pathlines{5} = this.GetPathlines(-1,1);            
+            this.dynamicsResult.pathlines{6} = this.GetPathlines(-1,2);
+            
+            this.dynamicsResult.pathlines{7} = this.GetPathlines(1,0.5);
+            this.dynamicsResult.pathlines{8} = this.GetPathlines(1,1);            
+            this.dynamicsResult.pathlines{9} = this.GetPathlines(1,2);
                         
             %Compute Position Of Contact Line
             rho_t       = this.dynamicsResult.rho_t;

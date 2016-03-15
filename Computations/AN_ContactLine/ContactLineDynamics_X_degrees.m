@@ -1,78 +1,35 @@
-function ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
+function dynRes = ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
 
     AddPaths('CodePaper');            
-    close all;
+    close all;        
+    
+    %************************************************
+    % Initialization
+    %************************************************
+    
+    if(alpha_deg <= 80)
+        y1_Int = [-5,10];
+    elseif(alpha_deg >= 100)
+        y1_Int = [-10,5];
+    else
+        y1_Int = [-7.5,7.5];
+    end
+    
+    config.optsNum.PlotAreaCart.y1Min = y1_Int(1);
+	config.optsNum.PlotAreaCart.y1Max = y1_Int(2);
     
     config.optsNum.PhysArea.alpha_deg = alpha_deg;
-	config.optsPhys.V1.epsilon_w      = epw;
-    
-    if(nargin < 1)
-        opts = {'advancing'};
-    end   
-    
-    if(IsOption(opts,'135'))
-        if(IsOption(opts,'advancing'))
-            config.optsNum.PhysArea.alpha_deg = 135;
-            config.optsPhys.V1.epsilon_w       = 0.856; %= 90 degree contact angle
-        elseif(IsOption(opts,'receding'))
-            config.optsNum.PhysArea.alpha_deg = 120;
-            config.optsPhys.V1.epsilon_w       = 0.453; %= 135 degree contact angle
-        else
-            return;
-        end
-        config.optsNum.PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
-                                                 'y2Min',0.5,'y2Max',15.5,...
-                                                 'N1',100,'N2',100,'NFlux',10);                               
-    elseif(IsOption(opts,'90'))        
-        config.optsNum.PhysArea.alpha_deg = 90;
-        if(config.optsPhys.kBT == 0.75)
-            if(IsOption(opts,'advancing'))                
-                %epw       = 1.3; % = +/- 0 degree contact angle
-                config.optsPhys.V1.epsilon_w  =  1.154; %= 45 degree contact angle
-            elseif(IsOption(opts,'receding'))    
-                %epw       = 0.05; %= 180 degree contact angle
-                config.optsPhys.V1.epsilon_w  = 0.453; %= 135 degree contact angle        
-            end    
-        else
-            if(IsOption(opts,'advancing'))
-                config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,45);
-            elseif(IsOption(opts,'receding'))
-                config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,135);        
-            else
-                config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,90);
-            end
-        end                
-        config.optsNum.PlotAreaCart = struct('y1Min',-7.5,'y1Max',7.5,...
-                                             'y2Min',0.5,'y2Max',15.5,...
-                                             'N1',100,'N2',100,'NFlux',10);
-    elseif(IsOption(opts,'45'))
-        if(IsOption(opts,'receding'))
-            config.optsNum.PhysArea.alpha_deg = 45;
-            config.optsPhys.V1.epsilon_w      = 0.856; %= 90 degree contact angle        
-        elseif(IsOption(opts,'advancing'))
-            config.optsNum.PhysArea.alpha_deg = 60;
-            config.optsPhys.V1.epsilon_w      = 1.22;  %= +/- 30 degree contact angle
-            %epw       = 1.154; %= 45 degree contact angle        
-        else
-            return;
-        end
-        config.optsNum.PlotAreaCart = struct('y1Min',-5,'y1Max',10,...
-                                             'y2Min',0.5,'y2Max',15.5,...
-                                             'N1',100,'N2',100,'NFlux',10);
-        config.optsNum.V2Num.N       = [80,80];        
-        config.optsNum.FexNum.N1disc = 50;
-        config.optsNum.FexNum.N2disc = 50;  
-    end
+	config.optsPhys.V1.epsilon_w      = epw;%FindEpwFromContactAngle(config,alpha_eq);
+    %************************************************
+    %************************************************
 
-    %************************************************
-    %************************************************
-    %************************************************
     CL = ContactLineHS(config);
     CL.Preprocess(); 
-    
+
     %**********************************************
     % Equilibration from off-equilibrium IC
     %**********************************************
+
     rhoGas = CL.optsPhys.rhoGas_sat;
     rhoLiq = CL.optsPhys.rhoLiq_sat;
 
@@ -90,6 +47,16 @@ function ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
     CL.PostprocessDynamics([4 5.5]);
     CL.PlotInterfaceFittingQuality([25,50,75,100]);
     %CL.PostprocessDynamics();
+
+    %********************************************************************
+    dynRes.epw                 = CL.optsPhys.V1.epsilon_w;
+    dynRes.thetaEq             = CL.alpha_YCA;
+    dynRes.thetaInitial        = CL.optsNum.PhysArea.alpha_deg;
+    dynRes.t                   = CL.dynamicsResult.t;
+    dynRes.contactlinePos_y1_0 = CL.dynamicsResult.contactlinePos_y1_0;
+    dynRes.contactlineVel_y1_0 = CL.dynamicsResult.contactlineVel_y1_0;
+    dynRes.contactangle_0      = CL.dynamicsResult.contactangle_0.val;
+    %********************************************************************
     
     if(IsOption(opts,'videos'))
         CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});        
@@ -179,5 +146,72 @@ function ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
 %     CL.ComputeDynamics();
 %     CL.PostprocessDynamics();    
 %     CL.PlotDynamicValue({'UV_t','entropy'},{'save'});
-                
+%
+%
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%******************************************************************
+%
+%     if(nargin < 1)
+%         opts = {'advancing'};
+%     end   
+%     
+%     if(IsOption(opts,'135'))
+%         if(IsOption(opts,'advancing'))
+%             config.optsNum.PhysArea.alpha_deg = 135;
+%             config.optsPhys.V1.epsilon_w       = 0.856; %= 90 degree contact angle
+%         elseif(IsOption(opts,'receding'))
+%             config.optsNum.PhysArea.alpha_deg = 120;
+%             config.optsPhys.V1.epsilon_w       = 0.453; %= 135 degree contact angle
+%         else
+%             return;
+%         end
+%         config.optsNum.PlotAreaCart =     struct('y1Min',-10,'y1Max',5,...
+%                                                  'y2Min',0.5,'y2Max',15.5,...
+%                                                  'N1',100,'N2',100,'NFlux',10);                               
+%     elseif(IsOption(opts,'90'))        
+%         config.optsNum.PhysArea.alpha_deg = 90;
+%         if(config.optsPhys.kBT == 0.75)
+%             if(IsOption(opts,'advancing'))                
+%                 %epw       = 1.3; % = +/- 0 degree contact angle
+%                 config.optsPhys.V1.epsilon_w  =  1.154; %= 45 degree contact angle
+%             elseif(IsOption(opts,'receding'))    
+%                 %epw       = 0.05; %= 180 degree contact angle
+%                 config.optsPhys.V1.epsilon_w  = 0.453; %= 135 degree contact angle        
+%             end    
+%         else
+%             if(IsOption(opts,'advancing'))
+%                 config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,45);
+%             elseif(IsOption(opts,'receding'))
+%                 config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,135);        
+%             else
+%                 config.optsPhys.V1.epsilon_w = FindEpwFromContactAngle(config,90);
+%             end
+%         end                
+%         config.optsNum.PlotAreaCart = struct('y1Min',-7.5,'y1Max',7.5,...
+%                                              'y2Min',0.5,'y2Max',15.5,...
+%                                              'N1',100,'N2',100,'NFlux',10);
+%     elseif(IsOption(opts,'45'))
+%         if(IsOption(opts,'receding'))
+%             config.optsNum.PhysArea.alpha_deg = 45;
+%             config.optsPhys.V1.epsilon_w      = 0.856; %= 90 degree contact angle        
+%         elseif(IsOption(opts,'advancing'))
+%             config.optsNum.PhysArea.alpha_deg = 60;
+%             config.optsPhys.V1.epsilon_w      = 1.22;  %= +/- 30 degree contact angle
+%             %epw       = 1.154; %= 45 degree contact angle        
+%         else
+%             return;
+%         end
+%         config.optsNum.PlotAreaCart = struct('y1Min',-5,'y1Max',10,...
+%                                              'y2Min',0.5,'y2Max',15.5,...
+%                                              'N1',100,'N2',100,'NFlux',10);
+%         config.optsNum.V2Num.N       = [80,80];        
+%         config.optsNum.FexNum.N1disc = 50;
+%         config.optsNum.FexNum.N2disc = 50;  
+%     end     
 end

@@ -365,7 +365,15 @@ classdef DDFT_2D < Computation
                 valC{1}   = this.dynamicsResult.(varName{1});
                 name      = [name,'_',varName{1}];                    
                 for k = 2:length(varName)             
-                    valC{k}   = this.dynamicsResult.(varName{k});
+                    varNamek = this.dynamicsResult.(varName{k});
+                    if(iscell(varNamek))
+                        for kk = 1:length(varNamek)                            
+                            valC{end+1} = varNamek{kk};
+                        end
+                    else
+                        valC{end+1}   = varNamek;
+                    end
+    
                     name      = [name,'_',varName{k}];                    
                 end
             else
@@ -717,6 +725,23 @@ classdef DDFT_2D < Computation
             end
             
             
+        end
+        
+        function pts = GetPathlines(this,y1_0,y2_0)
+            
+            %Intgrate velocity
+            pts.y1_kv(1) = y1_0;
+            pts.y2_kv(1) = y2_0;
+            for i = 1:(length(this.dynamicsResult.t)-1)
+                deltaT = this.dynamicsResult.t(i+1) - this.dynamicsResult.t(i);
+                
+                pt.y1_kv = pts.y1_kv(i);
+                pt.y2_kv = pts.y2_kv(i);
+                IP = this.IDC.SubShapePtsCart(pt);
+                uv = this.dynamicsResult.UV_t(:,:,i);
+                pts.y1_kv(i+1) = pts.y1_kv(i) + IP*uv(1:end/2)*deltaT;
+                pts.y2_kv(i+1) = pts.y2_kv(i) + IP*uv(1+end/2:end)*deltaT;
+            end
         end
     end
 end

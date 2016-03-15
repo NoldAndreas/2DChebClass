@@ -19,9 +19,14 @@ function ContactLineDynamics_45_90_135(kBT)
     FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',1,'N1disc',40,'N2disc',40);
                    
-	plotTimes = struct('t_int',[0,400],'t_n',100);
+	plotTimes = struct('t_int',[0,250],'t_n',100);
+    
+    PlotAreaCart = struct('y1Min',-7.5,'y1Max',7.5,...
+                          'y2Min',0.5,'y2Max',15.5,...
+                          'N1',100,'N2',100,'NFlux',10);    
 
-    optsNum = struct('PhysArea',PhysArea,... %'PlotAreaCart',PlotAreaCart,...                     
+    optsNum = struct('PhysArea',PhysArea,... 
+                     'PlotAreaCart',PlotAreaCart,...                     
                      'FexNum',FexNum,'V2Num',V2Num,...
                      'SubArea',SubArea,...
                      'maxComp_y2',10,...%'y1Shift',0,...
@@ -38,7 +43,7 @@ function ContactLineDynamics_45_90_135(kBT)
     %******************************************************
     %Test on 11/03/2016
 	optsViscosity = struct('etaLiq',3,'etaVap',0.1,...
-                           'zetaLiq',3,'zetaVap',0.1);                       
+                           'zetaLiq',1.3,'zetaVap',0.01);
     %previous version
     %optsViscosity = struct('etaLiq',5,'etaVap',1,...
     %                           'zetaLiq',5,'zetaVap',1);
@@ -63,14 +68,54 @@ function ContactLineDynamics_45_90_135(kBT)
         config.optsNum.plotTimes.t_int(2) = 800;
         config.optsNum.PhysArea.L1 = 6;
     end
-     
-    ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
-    %ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
-    %ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
+
+    alphas  = [0,30,40,45,50,60,70,80,90,100,110,120,130,135,140,150];    
+    eps     = DataStorage([],@FindEps,struct('alpha_degs',alphas),...
+                                config,[],{});
     
-    config.optsNum.plotTimes.t_int(2) = 200;    
-    %ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});   
-    ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
-    ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
+    %***************************************************
+    optsDefault = {'snapshots'};
+    dynRes = {};
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==60),optsDefault);    
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==120),optsDefault);
+                                            
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==90),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==0),optsDefault);                                            
+                                            
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==90),optsDefault);
+    
+    %****************************************************
+    % further computations
+    optsDefault = {};
+	dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==70),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==80),optsDefault);
+	dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==100),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==110),optsDefault);
+    
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==40),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==50),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==70),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==80),optsDefault);
+    
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==100),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==110),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==130),optsDefault);
+    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==140),optsDefault);
+                                                                                                                                
+    %***************************************************
+     
+%     ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
+%     %ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
+%     %ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
+%     
+%     config.optsNum.plotTimes.t_int(2) = 200;
+%     %ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});   
+%     ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
+%     ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
+
+    function eps = FindEps(input,config)
+        config.optsNum.PhysArea.alpha_deg = 90;
+        eps  = FindEpwFromContactAngle(config,input.alpha_degs);
+    end
     
 end
