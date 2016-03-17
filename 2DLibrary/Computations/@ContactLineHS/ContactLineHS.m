@@ -486,17 +486,14 @@ classdef ContactLineHS < DDFT_2D
             
             PostprocessDynamics@DDFT_2D(this);
             
-            this.dynamicsResult.pathlines{1} = this.GetPathlines(0,0.5);
-            this.dynamicsResult.pathlines{2} = this.GetPathlines(0,1);            
-            this.dynamicsResult.pathlines{3} = this.GetPathlines(0,2);
-            
-            this.dynamicsResult.pathlines{4} = this.GetPathlines(-1,0.5);
-            this.dynamicsResult.pathlines{5} = this.GetPathlines(-1,1);            
-            this.dynamicsResult.pathlines{6} = this.GetPathlines(-1,2);
-            
-            this.dynamicsResult.pathlines{7} = this.GetPathlines(1,0.5);
-            this.dynamicsResult.pathlines{8} = this.GetPathlines(1,1);            
-            this.dynamicsResult.pathlines{9} = this.GetPathlines(1,2);
+            this.dynamicsResult.pathlines = {};   
+            this.dynamicsResult.streaklines = {};   
+            for y1_i = -5:2.5:5
+                for y2_i = 0.5:1:4.5
+                    this.dynamicsResult.pathlines{end+1}   = this.GetPathlines(y1_i,y2_i);
+                    this.dynamicsResult.streaklines{end+1} = this.GetStreaklines(y1_i,y2_i);                    
+                end
+            end
                         
             %Compute Position Of Contact Line
             rho_t       = this.dynamicsResult.rho_t;
@@ -541,6 +538,17 @@ classdef ContactLineHS < DDFT_2D
             this.dynamicsResult.contactangle_0.val = ca_deg;
             this.dynamicsResult.contactangle_0.str = '\theta';
             this.dynamicsResult.contactlineVel_y1_0 = vel_0_Cart;
+            
+            this.dynamicsResult.pathlines_MovingFrameOfReference   = this.dynamicsResult.pathlines;
+            this.dynamicsResult.streaklines_MovingFrameOfReference = this.dynamicsResult.streaklines;
+            
+            for jj = 1:length(this.dynamicsResult.pathlines)                
+                this.dynamicsResult.pathlines_MovingFrameOfReference{jj}.y1 = ...
+                    this.dynamicsResult.pathlines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
+                
+                this.dynamicsResult.streaklines_MovingFrameOfReference{jj}.y1 = ...
+                    this.dynamicsResult.streaklines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
+            end
             
             function z = rhoX1(y1)
                 pt.y1_kv = y1;

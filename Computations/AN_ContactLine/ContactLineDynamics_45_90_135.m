@@ -1,6 +1,9 @@
 function ContactLineDynamics_45_90_135(kBT)
     
+    AddPaths();
+
     if(nargin < 1)
+        %kBT = 0.75;
         kBT = 0.75;
     end
 
@@ -55,7 +58,7 @@ function ContactLineDynamics_45_90_135(kBT)
     BCwall = [];
 
     optsPhys = struct('V1',V1,'V2',V2,...
-                      'kBT',0.75,...                                               
+                      'kBT',kBT,...                                               
                       'Dmu',0.0,'nSpecies',1,...
                       'sigmaS',1,...
                       'Inertial',true,'gammaS',0,...%4% 'Fext',[-1,0],...%);%,...% %'BCWall_U',BCwall,...%);                     
@@ -76,46 +79,72 @@ function ContactLineDynamics_45_90_135(kBT)
     %***************************************************
     optsDefault = {'snapshots'};
     dynRes = {};
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==60),optsDefault);    
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==120),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==60),optsDefault);    
+    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==120),optsDefault);
                                             
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==90),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==0),optsDefault);                                            
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==90),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==0),optsDefault);                                            
                                             
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==90),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==90),optsDefault);
     
     %****************************************************
     % further computations
     optsDefault = {};
-	dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==70),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==80),optsDefault);
-	dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==100),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,90,eps(alphas==110),optsDefault);
+	dynRes{end+1} = MCL_Comp(config,90,eps(alphas==70),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==80),optsDefault);
+	dynRes{end+1} = MCL_Comp(config,90,eps(alphas==100),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==110),optsDefault);
     
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==40),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==50),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==70),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,60,eps(alphas==80),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==40),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==50),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==70),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==80),optsDefault);
     
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==100),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==110),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==130),optsDefault);
-    dynRes{end+1} = ContactLineDynamics_X_degrees(config,120,eps(alphas==140),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==100),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==110),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==130),optsDefault);
+    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==140),optsDefault);
                                                                                                                                 
     %***************************************************
      
-%     ContactLineDynamics_X_degrees(config,{'90','advancing','snapshots'});
-%     %ContactLineDynamics_X_degrees(config,{'45','advancing','snapshots'});        
-%     %ContactLineDynamics_X_degrees(config,{'135','advancing','snapshots'});
+%     MCL_Comp(config,{'90','advancing','snapshots'});
+%     %MCL_Comp(config,{'45','advancing','snapshots'});        
+%     %MCL_Comp(config,{'135','advancing','snapshots'});
 %     
 %     config.optsNum.plotTimes.t_int(2) = 200;
-%     %ContactLineDynamics_X_degrees(config,{'90','receding','snapshots'});   
-%     ContactLineDynamics_X_degrees(config,{'45','receding','snapshots'});        
-%     ContactLineDynamics_X_degrees(config,{'135','receding','snapshots'});
+%     %MCL_Comp(config,{'90','receding','snapshots'});   
+%     MCL_Comp(config,{'45','receding','snapshots'});        
+%     MCL_Comp(config,{'135','receding','snapshots'});
 
     function eps = FindEps(input,config)
         config.optsNum.PhysArea.alpha_deg = 90;
         eps  = FindEpwFromContactAngle(config,input.alpha_degs);
+    end
+    
+    function res = MCL_Comp(config,alpha_deg,epw,opts)
+        
+        recomp = [];
+         
+        config.optsNum.PhysArea.alpha_deg = alpha_deg;
+        config.optsPhys.V1.epsilon_w      = epw;
+         
+        if(alpha_deg <= 80)
+            y1_Int = [-5,10];
+        elseif(alpha_deg >= 100)
+            y1_Int = [-10,5];
+        else
+            y1_Int = [-7.5,7.5];
+        end
+
+        config.optsNum.PlotAreaCart.y1Min = y1_Int(1);
+        config.optsNum.PlotAreaCart.y1Max = y1_Int(2);
+         
+        input.config = config;
+        input.opts   = opts;
+        
+        res = DataStorage('MovingContactAngleResults',...
+                        @ContactLineDynamics_X_degrees,...
+                          input,{},recomp); %Eq: 170 degrees      
     end
     
 end

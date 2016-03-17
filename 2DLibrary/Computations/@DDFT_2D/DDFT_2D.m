@@ -730,18 +730,49 @@ classdef DDFT_2D < Computation
         function pts = GetPathlines(this,y1_0,y2_0)
             
             %Intgrate velocity
-            pts.y1_kv(1) = y1_0;
-            pts.y2_kv(1) = y2_0;
+            pts.y1 = zeros(length(this.dynamicsResult.t),1,1);
+            pts.y2 = zeros(length(this.dynamicsResult.t),1,1);
+            
+            pts.y1(1) = y1_0;
+            pts.y2(1) = y2_0;
             for i = 1:(length(this.dynamicsResult.t)-1)
                 deltaT = this.dynamicsResult.t(i+1) - this.dynamicsResult.t(i);
                 
-                pt.y1_kv = pts.y1_kv(i);
-                pt.y2_kv = pts.y2_kv(i);
+                pt.y1_kv = pts.y1(i);
+                pt.y2_kv = pts.y2(i);
                 IP = this.IDC.SubShapePtsCart(pt);
                 uv = this.dynamicsResult.UV_t(:,:,i);
-                pts.y1_kv(i+1) = pts.y1_kv(i) + IP*uv(1:end/2)*deltaT;
-                pts.y2_kv(i+1) = pts.y2_kv(i) + IP*uv(1+end/2:end)*deltaT;
-            end
+                pts.y1(i+1) = pts.y1(i) + IP*uv(1:end/2)*deltaT;
+                pts.y2(i+1) = pts.y2(i) + IP*uv(1+end/2:end)*deltaT;
+            end            
+        end
+                
+        function pts = GetStreaklines(this,y1_0,y2_0)
+            
+            %Intgrate velocity
+            pts.y1 = zeros(length(this.dynamicsResult.t),1,1);
+            pts.y2 = zeros(length(this.dynamicsResult.t),1,1);
+            
+            pts.y1(1) = y1_0;
+            pts.y2(1) = y2_0;
+            for i = 1:(length(this.dynamicsResult.t)-1)
+                deltaT = this.dynamicsResult.t(i+1) - this.dynamicsResult.t(i);                
+                
+                pt.y1_kv = pts.y1(1:i);
+                pt.y2_kv = pts.y2(1:i);
+                IP = this.IDC.SubShapePtsCart(pt);
+                uv = this.dynamicsResult.UV_t(:,:,i);
+                pts.y1(2:(i+1)) = pts.y1(1:i) + IP*uv(1:end/2)*deltaT;
+                pts.y2(2:(i+1)) = pts.y2(1:i) + IP*uv(1+end/2:end)*deltaT;
+%                 for ii = i:-1:1                                                        
+%                     pt.y1_kv = pts.y1(ii);
+%                     pt.y2_kv = pts.y2(ii);
+%                     IP = this.IDC.SubShapePtsCart(pt);
+%                     uv = this.dynamicsResult.UV_t(:,:,i);
+%                     pts.y1(ii+1) = pts.y1(ii) + IP*uv(1:end/2)*deltaT;
+%                     pts.y2(ii+1) = pts.y2(ii) + IP*uv(1+end/2:end)*deltaT;
+%                 end
+            end            
         end
     end
 end

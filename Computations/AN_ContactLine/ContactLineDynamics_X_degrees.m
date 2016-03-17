@@ -1,25 +1,11 @@
-function dynRes = ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
+function dynRes = ContactLineDynamics_X_degrees(input,misc) %config,alpha_deg,epw,opts)
+
+    config    = input.config;    
+    opts      = input.opts;    
 
     AddPaths('CodePaper');            
     close all;        
     
-    %************************************************
-    % Initialization
-    %************************************************
-    
-    if(alpha_deg <= 80)
-        y1_Int = [-5,10];
-    elseif(alpha_deg >= 100)
-        y1_Int = [-10,5];
-    else
-        y1_Int = [-7.5,7.5];
-    end
-    
-    config.optsNum.PlotAreaCart.y1Min = y1_Int(1);
-	config.optsNum.PlotAreaCart.y1Max = y1_Int(2);
-    
-    config.optsNum.PhysArea.alpha_deg = alpha_deg;
-	config.optsPhys.V1.epsilon_w      = epw;%FindEpwFromContactAngle(config,alpha_eq);
     %************************************************
     %************************************************
 
@@ -62,14 +48,23 @@ function dynRes = ContactLineDynamics_X_degrees(config,alpha_deg,epw,opts)
         CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},{'save','MovingFrameOfReference'});        
     end
     
-    if(IsOption(opts,'snapshots'))        
-             CL.PlotDynamicValue({'rho_t','contactangle_0'},...
+    if(IsOption(opts,'snapshots'))  
+             CL.PlotDynamicValue({'rho_t','contactangle_0','pathlines'},...
+                         {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize','CLy2Shift'});
+                     
+             CL.PlotDynamicValue({'rho_t','contactangle_0','streaklines'},...
+                         {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize','CLy2Shift'});                     
+                     
+             CL.PlotDynamicValue({'rho_t','contactangle_0','pathlines_MovingFrameOfReference'},...
+                         {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize','CLy2Shift'});                     
+        
+             CL.PlotDynamicValue({'rho_t','contactangle_0','pathlines_MovingFrameOfReference'},...
                  {'save','MovingFrameOfReference','Snapshots','dimensionlessLabels','start','contour','PublicationSize','CLy2Shift'});
              
              CL.PlotDynamicValue({'entropy','rho_t','fittedInterface','UV_t','contactangle_0'},... %
                  {'save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize','CLy2Shift'}); %'save'
                           
-             CL.PlotDynamicValue({'rho_t','fittedInterface','UV_t','contactangle_0'},... %
+             CL.PlotDynamicValue({'rho_t','fittedInterface','UV_t','contactangle_0',},... %
                  {'contour','save','MovingFrameOfReference','Snapshots','streamlines','dimensionlessLabels','end','PublicationSize','CLy2Shift'}); %'save'
              
              disp(['final CL velocity: ',num2str(CL.dynamicsResult.contactlineVel_y1_0(end))]);
