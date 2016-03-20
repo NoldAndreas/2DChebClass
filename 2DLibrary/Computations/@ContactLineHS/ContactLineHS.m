@@ -557,6 +557,15 @@ classdef ContactLineHS < DDFT_2D
             end 
         end
         [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak,y2Lim,opts,t)
+        function sliplength = GetSliplength(this,y2Bar)
+            pt.y1_kv = this.dynamicsResult.contactlinePos_y1_0(end);
+            pt.y2_kv = y2Bar + 0.5;
+            IP = this.IDC.SubShapePtsCart(pt);
+            
+            uBar  = IP*CL.dynamicsResult.UV_t(1:end/2,:,end);
+            duBar = IP*CL.IDC.Diff.Dy2*CL.dynamicsResult.UV_t(1:end/2,:,end/2);
+            sliplength = uBar/duBar - y2Bar;
+        end
             
         %to delete
         [f,y1]  = PostProcess(this,y1Int)

@@ -29,8 +29,8 @@ function dynRes = ContactLineDynamics_X_degrees(input,misc) %config,alpha_deg,ep
     
     rho_ic = rho1D_wg + (rho1D_wl - rho1D_wg).*(rho1D_lg-rhoGas)/(rhoLiq - rhoGas);
     CL.x_eq = CL.optsPhys.kBT*log(rho_ic) + CL.Vext;            
-    CL.ComputeDynamics();
-    CL.PostprocessDynamics([4 5.5]);
+    CL.ComputeDynamics();    
+    CL.PostprocessDynamics(input.fitInterval);
     CL.PlotInterfaceFittingQuality([25,50,75,100]);
     %CL.PostprocessDynamics();
 
