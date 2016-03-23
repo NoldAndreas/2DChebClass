@@ -13,7 +13,7 @@ AddPaths();
 %inputFile = 'sedimentation9New';
 
 %inputFile='APS12HS50new';
-inputFile = 'Eric300';
+%inputFile = 'Eric300';
 
 %inputFile='APS12HS50';
 %inputFile='APS12G50';
@@ -48,7 +48,7 @@ inputFile = 'Eric300';
 %inputFile = 'GaussianBoxTest3';
 
 %inputFile = 'BoxTest3';
-%inputFile = 'BoxTest3N';
+inputFile = 'BoxTest3N';
 
 %inputFile = 'FMTTest_2Species'; % higher density, less accurate
 %inputFile = 'FMTTest_2Species2';
