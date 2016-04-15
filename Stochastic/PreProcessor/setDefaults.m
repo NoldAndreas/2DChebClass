@@ -134,6 +134,7 @@ D.custom='';
 D.plotType='contour';
 
 D.separateSpecies = false;
+D.separateError = false;
 D.separateComp = false;
 
 D.legPos='off';

@@ -70,19 +70,19 @@ mx=floor(nx/2)+1;
 my=floor(ny/2)+1;
 
 if(nx>2)
-    xLabelPos=[xticks(mx)+(xticks(mx+1)-xticks(mx))/2, -0.1*(yMax-yMin)+yMin, zMin];
+    xLabelPos=[xticks(mx)+(xticks(mx+1)-xticks(mx))/2, -0.2*(yMax-yMin)+yMin, zMin];
 end
 
 if(ny>2)
     sgny=sign(viewPoint(1));
 
     if (sgny>0)
-        xVal=0.1*(xMax-xMin)+xMax;
+        xVal=0.2*(xMax-xMin)+xMax;
     else
-        xVal=-0.1*(xMax-xMin)+xMin;
+        xVal=-0.2*(xMax-xMin)+xMin;
     end
 
-    yLabelPos=[xVal, yticks(my)+(yticks(my+1)-yticks(my))/2, zMin];
+    yLabelPos=[xVal, yticks(my)+(yticks(my+1)-yticks(my))/2, zMin - 0.1*(zMax-zMin)];
 end
 
 % FIX THIS FOR VIEW FROM OTHER SIDE?

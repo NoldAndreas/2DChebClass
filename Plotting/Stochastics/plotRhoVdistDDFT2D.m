@@ -191,6 +191,7 @@ for iSpecies=1:nSpecies
     
     set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
     clabel(C,h,'Color',faceColour{iSpecies});
+    set(h,'ShowText','off');
     hold(hCa,'on');
     
     %quiver(ha,[y1f(mask)],[y2f(mask)],[fluxS1(mask)],[fluxS2(mask)]); 
@@ -198,8 +199,12 @@ for iSpecies=1:nSpecies
     %h=quiver(hCa,[y1pad ; y1f(mask)],[y2pad; y2f(mask)],[fluxNorm; fluxS1(mask)],[0; fluxS2(mask)]); 
     
     %h=quiver(hCa,[y1pad ; y1f(mask)],[y2pad; y2f(mask)],[fluxNorm; fluxS1interp(mask)],[0; fluxS2interp(mask)]); 
-    h=quiver(hCa,[y1pad ; y1f],[y2pad; y2f],[fluxNorm; fluxS1interp],[0; fluxS2interp]); 
     
+    if(isfield(optsPlot,'doFlux') && ~optsPlot.doFlux)
+        % don't plot flux
+    else
+        h=quiver(hCa,[y1pad ; y1f],[y2pad; y2f],[fluxNorm; fluxS1interp],[0; fluxS2interp]); 
+    end
     
     set(h,'color',faceColour{iSpecies});
     axis(hCa,'equal');    

@@ -102,9 +102,9 @@ tMax = 5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-nSamples=2000000;  
+nSamples=2000000;  % done
 
-%nSamples=500000;  
+%nSamples=50000;  %done
 
 sampleFinal = false;
 
@@ -142,7 +142,7 @@ tSteps={10^4,10^3,2*10^4,10^3};
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
-stocColour = {{'r','b','g'},{'g'},{'b'},{'m'}};
+stocColour = {{'r','m','g'},{'g'},{'b'},{'m'}};
 stocStyle = {{'--','--','--'}};
 
 %--------------------------------------------------------------------------
@@ -156,9 +156,15 @@ Phys_Area20 = struct('shape','Box','N',[20;20],'L1',L1S,'L2',L2S);
 Phys_Area30 = struct('shape','Box','N',[30;30],'L1',L1S,'L2',L2S);
 Phys_Area50 = struct('shape','Box','N',[50;50],'L1',L1S,'L2',L2S);
 
+% for surface
+% Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',30,...
+%                        'y2Min',0,'y2Max',L2S,'N2',30);
+
+% for contour
 Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',50,...
                        'y2Min',0,'y2Max',L2S,'N2',50);
-
+                   
+                   
 V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
 
 PhysArea = {Phys_Area10, Phys_Area20, Phys_Area30, Phys_Area50};
@@ -186,8 +192,8 @@ DDFTName={'r10','r20','r30','r50'};
 DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
-%doDDFT={true,true,true,true};
-doDDFT={false,true,false,false};
+doDDFT={true,true,true,true};
+%doDDFT={false,false,false,true};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
@@ -197,14 +203,23 @@ loadDDFT={true,true,true,true};
 %DDFTStyle = {{':',':',':'},{'-.','-.','-.'},{'--','--','--'},{'-','-','-'}};
 
 % for N computations
-DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
-DDFTStyle = {{':',':',':'},{'--','--','--'},{'-','-','-'},{':',':',':'}};
+%DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
+
+% surface
+%DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'r','m','g'}};
+%DDFTStyle = {{':',':',':'},{'--','--','--'},{'-','-','-'},{'-','-','-'}};
+
+
+DDFTColour = {{[0.7;0.7;0.7],[0.7;0.7;0.7],[0.7;0.7;0.7]},{[0.5;0.5;0.5],[0.5;0.5;0.5],[0.5;0.5;0.5]}, ...
+              {[0.3;0.3;0.3],[0.3;0.3;0.3],[0.3;0.3;0.3]},{'k','k','k'}};
+DDFTStyle = {{'-','-','-'},{'-','-','-'},{'-','-','-'},{'--','--','--'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
 %--------------------------------------------------------------------------
 
 plotType = 'contour';
+%plotType = 'surf';
 
 % x axis for position and velocity plots
 
@@ -213,7 +228,11 @@ plotType = 'contour';
 %rMax=[L1S;L2S];
 
 % for N computation
-rMin = [0;0];
+%rMin = [0;0];
+%rMax = [10;10];
+
+
+rMin = [4;3];
 rMax = [10;10];
 
 pMin=rMin;
@@ -234,9 +253,12 @@ PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
 %nBins=[100;100];
-nBins=[50;50];
+nBins=[30;30];
+
+%viewPoint=[-37.5,30];
 
 separateSpecies = true;
+separateError = true;
 
 % determine which movies/plots to make
 % distribution movies/plots
@@ -245,4 +267,4 @@ doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = true;
 
-%sendEmail = true;
+sendEmail = false;

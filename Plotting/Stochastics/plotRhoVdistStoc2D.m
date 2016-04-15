@@ -82,7 +82,7 @@ for iSpecies=1:nSpecies
     switch optsPlot.plotType
         case 'surf'
             % surface plot
-            %hr(iSpecies)=surf(hRa(iSpecies),xRS(:,:,1),xRS(:,:,2),nRS);
+            
             hr(iSpecies)=surf(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
             set(hr(iSpecies),'FaceColor',faceColour{iSpecies}) %, ...
                 %'EdgeColor','none','LineStyle','none','FaceLighting','phong');

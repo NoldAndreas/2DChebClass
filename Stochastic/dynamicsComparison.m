@@ -47,8 +47,8 @@ AddPaths();
 %inputFile = 'GaussianBoxTest2';
 %inputFile = 'GaussianBoxTest3';
 
-%inputFile = 'BoxTest3';
-inputFile = 'BoxTest3N';
+inputFile = 'BoxTest3';
+%inputFile = 'BoxTest3N';
 
 %inputFile = 'FMTTest_2Species'; % higher density, less accurate
 %inputFile = 'FMTTest_2Species2';
