@@ -131,7 +131,9 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
                 
         if(strcmp(params.solver,'Newton'))    
             x_ig_n = zeros(NFull+1,nSpecies);
-            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
+            %[x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.2);
+            %[x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
             [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
             errorHistory            = [errorHistory1 errorHistory2];
         else

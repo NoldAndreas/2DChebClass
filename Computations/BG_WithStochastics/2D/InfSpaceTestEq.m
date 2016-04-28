@@ -128,7 +128,10 @@ stocColour = {{'g'},{'g'},{'b'}};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+% Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+%                    'y2Min',-inf,'y2Max',inf,'L2',4);
+
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
                    'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
@@ -152,41 +155,42 @@ Fex_Num3D   = struct('Fex','FMTRosenfeld_3DFluid',...
 eq_NumNewton   = struct('solver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
 eq_NumFsolve   = struct('solver','fsolve');
                    
-PhysArea = {Phys_Area, Phys_Area};
+PhysArea = {Phys_Area, Phys_Area, Phys_Area};
 
-SubArea  = {Sub_Area, Sub_Area};
+SubArea  = {Sub_Area, Sub_Area, Sub_Area};
 
-PlotArea = {Plot_Area, Plot_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_NumRosenfeld, Fex_NumRosenfeld_J};
+FexNum   = {Fex_NumRosenfeld, Fex_NumRosenfeld_J, Fex_NumRosenfeld_J};
 
-V2Num    = {[],[]};
+V2Num    = {[],[],[]};
 
-eqNum    = {eq_NumFsolve, eq_NumFsolve};
+eqNum    = {eq_NumFsolve, eq_NumFsolve, eq_NumNewton};
 
 HINum    = {[],[]};
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}};
 
 HIParamsNamesDDFT={};               
                
-DDFTName={'Standard','Jacobian'};
+DDFTName={'Old','New','Jacobian'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r'};
+DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true}; 
+doDDFT={false,true,true}; 
 
 % do we load and save the DDFT data
-loadDDFT={true,true};
+loadDDFT={true,true,true};
 %loadDDFT={false,false};
 
 DDFTColour = {{'r'},{'b'},{'g'}};
@@ -225,8 +229,8 @@ nBins=[20;20];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
-doInitialFinal = false;
+doMovieAvi     = false;
+doInitialFinal = true;
 doMeans        = false;
 doEquilibria   = false;
 

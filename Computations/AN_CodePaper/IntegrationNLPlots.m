@@ -21,7 +21,7 @@ end
 hIntErr = figure('Position',defaultPos);
 imagesc(log10(IntErr));
 colormap(hIntErr,gray)
-
+colorbar
 
 
 set(gca,'YTick',1:length(Nvals));
