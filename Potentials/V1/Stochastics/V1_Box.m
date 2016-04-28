@@ -9,6 +9,8 @@ kBT = 1;
 
 if(isfield(optsPhys,'sigma'))
     sigma = optsPhys.sigma;
+    % sigma is nParticles x nParticles
+    sigma = sigma(1);
 else
     sigma = 0;
 end

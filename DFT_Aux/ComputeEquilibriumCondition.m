@@ -9,6 +9,7 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     nSpecies   = params.optsPhys.nSpecies;
     N          = size(Vext,1);            
     
+    
     if(~isfield(params,'solver'))
         params.solver = 'fsolve';
     end
@@ -126,7 +127,8 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         end        
         
     else                
-        nParticlesS             = params.optsPhys.nParticlesS;                
+        nParticlesS             = params.optsPhys.nParticlesS;     
+                
         if(strcmp(params.solver,'Newton'))    
             x_ig_n = zeros(NFull+1,nSpecies);
             [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);

@@ -10,8 +10,8 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-%nParticlesS=20;
-nParticlesS=10;
+nParticlesS=50;
+%nParticlesS=10;
 
 kBT=1;          % temperature
 mS=1;
@@ -27,28 +27,21 @@ V1DV1='V1_Well_Move_HalfInf';
 
 % appropriate physical parameters for potentials in V1DV1
 V0S        = 0.01;
-V0addS     = 3;
+%V0addS     = 3;
+%V0addS     = 2; % works for 30
+
+V0addS     = 1.5;% works for 50
+
 tauS       = 0.1;
-%sigma1AddS = 0.5;
-%sigma2AddS = 0.5;
 
 sigma1AddS = 1;
 sigma2AddS = 1;
 
-% y10aS       = -2;
-% y20aS       = 2;
-% y10bS       = -2;
-% y20bS       = 3;
-
-% y10aS       = -2;
-% y20aS       = 2;
-% y10bS       = 2;
-% y20bS       = 2;
-
 y10aS       = 2;
 y20aS       = 2;
 y10bS       = -2;
-y20bS       = 2;
+%y20bS       = 2;
+y20bS       = 1;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -78,7 +71,8 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.5;
+%tMax=0.5;
+tMax=3;
 
 
 %--------------------------------------------------------------------------
@@ -120,7 +114,7 @@ stocHIType={[],'RP','OseenPlusWall2D'};
 stocName={'noHI','RP','OseenWall'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,false,false};
+doStoc={false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
@@ -140,6 +134,13 @@ stocColour = {{'g'},{'g'},{'b'}};
 
 Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+
+% Phys_Area = struct('shape','HalfSpace_FMT','N',[30;30],'L1',3,'L2',3, ...
+%                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+
+% Phys_Area = struct('shape','HalfSpace_FMT','N',[20;20],'L1',3,'L2',3, ...
+%                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);

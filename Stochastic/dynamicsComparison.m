@@ -27,11 +27,24 @@ AddPaths();
                                             % Rosenfeld3D
 %inputFile = 'HIWallTestTowardsFMTTest';  % CHECK
 
+%-----------------------------------
+
+% Validation of 2D dynamics
+
 %inputFile = 'HalfSpaceMove'; % WORKS!
 %inputFile = 'InfSpaceMove'; % WORKS!
 
+%inputFile = 'HalfSpaceMoveN';
+%inputFile = 'InfSpaceMoveN';
+
+% test Newton vs fsolve
+inputFile = 'InfSpaceTestEq';
+
+%-----------------------------------
+
 %inputFile = 'HIWallTestTowardsMove';
 %inputFile = 'HIWallTestAwayMove';  
+%inputFile = 'HIWallTestTowardsMoveNew';
 
 
 %inputFile = 'InertiaTest';
@@ -47,7 +60,7 @@ AddPaths();
 %inputFile = 'GaussianBoxTest2';
 %inputFile = 'GaussianBoxTest3';
 
-inputFile = 'BoxTest3';
+%inputFile = 'BoxTest3'; % for code paper
 %inputFile = 'BoxTest3N';
 
 %inputFile = 'FMTTest_2Species'; % higher density, less accurate
@@ -60,6 +73,9 @@ inputFile = 'BoxTest3';
 %inputFile = 'FMTTest_Unbounded'; % Want to check with large scale dynamics
 
 %inputFile = 'FlowCheck';
+
+%inputFile = 'Karolis';
+
 
 %--------------------------------------------------------------------------
 % Get parameters from input file

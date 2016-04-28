@@ -11,7 +11,7 @@ stocDim=2;
 DDFTDim=2;
 
 %nParticlesS=20;
-nParticlesS=10;
+nParticlesS=50;
 
 kBT=1;          % temperature
 mS=1;
@@ -23,32 +23,21 @@ D0S=kBT./mS./gammaS;
 % V1 parameters
 %--------------------------------------------------------------------------
 
-V1DV1='V1_Well_Move_HalfInf';
+V1DV1='V1_Well_Move_Inf';
 
 % appropriate physical parameters for potentials in V1DV1
 V0S        = 0.01;
-V0addS     = 3;
+V0addS     = 1.5;
 tauS       = 0.1;
-%sigma1AddS = 0.5;
-%sigma2AddS = 0.5;
 
 sigma1AddS = 1;
 sigma2AddS = 1;
 
-% y10aS       = -2;
-% y20aS       = 2;
-% y10bS       = -2;
-% y20bS       = 3;
-
-% y10aS       = -2;
-% y20aS       = 2;
-% y10bS       = 2;
-% y20bS       = 2;
-
 y10aS       = 2;
 y20aS       = 2;
 y10bS       = -2;
-y20bS       = 2;
+%y20bS       = 2;
+y20bS       = 1;
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -69,7 +58,7 @@ potParams2Names={'sigma'};
 % HI parameters
 %--------------------------------------------------------------------------
 
-sigmaHS = 0.5;
+sigmaHS = 1;
 
 HIParamsNames={'sigmaH'};
 
@@ -89,8 +78,9 @@ tMax=0.5;
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
 
-
-nSamples = 1000000;  % done
+%burnin = 20000;
+nSamples = 1000000;  
+ 
 
 %nSamples = 50000;
 
@@ -102,7 +92,7 @@ sampleFinal = false;
 
 nRuns=50000;
 
-%nRuns = 25000;
+%nRuns = 1000;
 
 % number of cores to use in parallel processing
 poolsize=16;
@@ -120,7 +110,7 @@ stocHIType={[],'RP','OseenPlusWall2D'};
 stocName={'noHI','RP','OseenWall'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,false,false};
+doStoc={false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
@@ -138,8 +128,8 @@ stocColour = {{'g'},{'g'},{'b'}};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
-                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+                   'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
@@ -147,55 +137,57 @@ Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
 Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',100,...
                        'y2Min',0.5,'y2Max',20,'N2',100);
 
-Fex_Num1   = struct('Fex','FMTRosenfeld',...
+Fex_NumRosenfeld   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
 
-Fex_Num2   = struct('Fex','FMTRoth',...
+Fex_NumRosenfeld_J   = struct('Fex','FMTRosenfeld_J',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
-
-Fex_Num3   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',20,'N1disc',20,'N2disc',20);
-
-%eq_Num    = struct('eqSolver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
-eq_Num = struct('eqSolver','fsolve');
                    
-PhysArea = {Phys_Area, Phys_Area, Phys_Area};
+Fex_NumRoth   = struct('Fex','FMTRoth',...
+                       'Ncircle',20,'N1disc',20,'N2disc',20);
 
-SubArea  = {Sub_Area, Sub_Area, Sub_Area};
+Fex_Num3D   = struct('Fex','FMTRosenfeld_3DFluid',...
+                       'Ncircle',20,'N1disc',20,'N2disc',20);
 
-PlotArea = {Plot_Area, Plot_Area, Plot_Area};
+eq_NumNewton   = struct('solver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
+eq_NumFsolve   = struct('solver','fsolve');
+                   
+PhysArea = {Phys_Area, Phys_Area};
 
-FexNum   = {Fex_Num1, Fex_Num2, Fex_Num3};
+SubArea  = {Sub_Area, Sub_Area};
 
-V2Num    = {[],[],[]};
+PlotArea = {Plot_Area, Plot_Area};
 
-eqNum    = {eq_Num,eq_Num,eq_Num};
+FexNum   = {Fex_NumRosenfeld, Fex_NumRosenfeld_J};
 
-HINum    = {[], [],[]};
+V2Num    = {[],[]};
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
+eqNum    = {eq_NumFsolve, eq_NumFsolve};
+
+HINum    = {[],[]};
+
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
-                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}};
 
 HIParamsNamesDDFT={};               
                
-DDFTName={'Rosenfeld','Roth','Rosenfeld3D'};
+DDFTName={'Standard','Jacobian'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r','r'};
+DDFTType={'r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,false};
-%doDDFT={false,true,false};
+doDDFT={true,true}; 
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true};
+loadDDFT={true,true};
+%loadDDFT={false,false};
 
 DDFTColour = {{'r'},{'b'},{'g'}};
 
