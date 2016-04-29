@@ -128,11 +128,11 @@ stocColour = {{'g'},{'g'},{'b'}};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-% Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
-%                    'y2Min',-inf,'y2Max',inf,'L2',4);
-
-Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
                    'y2Min',-inf,'y2Max',inf,'L2',4);
+
+% Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
+%                    'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
@@ -161,11 +161,11 @@ SubArea  = {Sub_Area, Sub_Area, Sub_Area};
 
 PlotArea = {Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_NumRosenfeld, Fex_NumRosenfeld_J, Fex_NumRosenfeld_J};
+FexNum   = {Fex_NumRosenfeld_J, Fex_Num3D, Fex_Num3D};
 
 V2Num    = {[],[],[]};
 
-eqNum    = {eq_NumFsolve, eq_NumFsolve, eq_NumNewton};
+eqNum    = {eq_NumNewton, eq_NumFsolve, eq_NumNewton};
 
 HINum    = {[],[]};
 
@@ -179,7 +179,7 @@ DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','do
 
 HIParamsNamesDDFT={};               
                
-DDFTName={'Old','New','Jacobian'};
+DDFTName={'Jacobian 2D','Fsolve 3D','Jacobian 3D'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
@@ -187,7 +187,7 @@ DDFTName={'Old','New','Jacobian'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={false,true,true}; 
+doDDFT={true,false,true}; 
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true};

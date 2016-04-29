@@ -65,7 +65,7 @@ fullscreen = get(0,'ScreenSize');
 % Set up figure
 %----------------------------------------------------------------------
 
-hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+hRPf=figure('Position',[0 0 0.75*fullscreen(3) 0.75*fullscreen(4)]);
 % set background colour to white
 set(hRPf,'Color','w');
 

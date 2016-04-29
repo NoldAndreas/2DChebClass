@@ -39,7 +39,10 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
        params.optsPhys.mu =  params.optsPhys.mu_sat + params.optsPhys.Dmu;       
     end
     
-    if(strcmp(FexNum.Fex,'FMTRosenfeld_3DFluid') && strcmp(params.solver,'Newton'))
+    knownJacobian = strcmp(FexNum.Fex,'FMTRosenfeld_3DFluid') || ...
+                    strcmp(FexNum.Fex,'FMTRosenfeld_J');
+    
+    if(knownJacobian && strcmp(params.solver,'Newton'))
         fullInput = true; %case only implemented for 1 species
     else
         fullInput = false;
@@ -51,13 +54,25 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
         else
             rho_ig   = exp((x_ig(2:end)-Vext)/kBT);
         end
-        x_ig     = [x_ig;     
-                    IntMatrFex(1).AD.n2 * rho_ig;...
-                    IntMatrFex(1).AD.n3 * rho_ig;...
-                    IntMatrFex(1).AD.n2_v_1 * rho_ig;...
-                    IntMatrFex(1).AD.n2_v_2 * rho_ig];       
         
-        N_AD     = size(IntMatrFex(1).AD.n2,1); %size(n2_i,1);
+        if(strcmp(FexNum.Fex,'FMTRosenfeld_3DFluid'))
+            x_ig     = [x_ig;     
+                        IntMatrFex(1).AD.n2 * rho_ig;...
+                        IntMatrFex(1).AD.n3 * rho_ig;...
+                        IntMatrFex(1).AD.n2_v_1 * rho_ig;...
+                        IntMatrFex(1).AD.n2_v_2 * rho_ig];       
+        
+            N_AD     = size(IntMatrFex(1).AD.n2,1);
+        elseif(strcmp(FexNum.Fex,'FMTRosenfeld_J'))
+            x_ig     = [x_ig;     
+                        IntMatrFex(1).AD.n1 * rho_ig;...
+                        IntMatrFex(1).AD.n2 * rho_ig;...
+                        IntMatrFex(1).AD.n1_v_1 * rho_ig;...
+                        IntMatrFex(1).AD.n1_v_2 * rho_ig];       
+        
+            N_AD     = size(IntMatrFex(1).AD.n1,1);
+        end
+            
         NFull    = N+4*N_AD;         
         if(isfield(params,'maxComp_y2'))
             markFull = [(misc.PtsCart.y2_kv <= params.maxComp_y2);...
@@ -129,10 +144,14 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     else                
         nParticlesS             = params.optsPhys.nParticlesS;     
                 
-        if(strcmp(params.solver,'Newton'))    
-            x_ig_n = zeros(NFull+1,nSpecies);
+        if(strcmp(params.solver,'Newton'))
+            if(knownJacobian)
+                x_ig_n = x_ig;
+            else
+                x_ig_n = zeros(NFull+1,nSpecies);
+            end
             %[x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
-            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.2);
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
             %[x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
             [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
             errorHistory            = [errorHistory1 errorHistory2];
