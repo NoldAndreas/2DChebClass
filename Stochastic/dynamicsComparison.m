@@ -38,7 +38,8 @@ AddPaths();
 %inputFile = 'InfSpaceMoveN';
 
 % test Newton vs fsolve
-inputFile = 'InfSpaceTestEq';
+%inputFile = 'InfSpaceTestEq';
+inputFile = 'HalfSpaceTestEq';
 
 %-----------------------------------
 

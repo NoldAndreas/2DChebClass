@@ -35,9 +35,9 @@ function FMTMatricesFull = FexMatrices_FMTRoth(Parameters,IDC)
         FMTMatrices.AD.m2_11    = AD(:,:,4);
         FMTMatrices.AD.m2_22    = AD(:,:,5);
         FMTMatrices.AD.m2_12    = AD(:,:,6);
-        %FMTMatrices.AD.m2_21    = FMTMatrices.AD.m2_12;
+        FMTMatrices.AD.m2_21    = FMTMatrices.AD.m2_12;
         
-        %FMTMatrices.AD.n0       = FMTMatrices.AD.m0/(2*pi*R);
+        FMTMatrices.AD.n0       = FMTMatrices.AD.m0/(2*pi*R);
 
                 
         FMTMatrices.AAD.m0       = AAD(:,:,1);
@@ -48,9 +48,9 @@ function FMTMatricesFull = FexMatrices_FMTRoth(Parameters,IDC)
         FMTMatrices.AAD.m2_11    = AAD(:,:,4);
         FMTMatrices.AAD.m2_22    = AAD(:,:,5);
         FMTMatrices.AAD.m2_12    = AAD(:,:,6);
-        %FMTMatrices.AAD.m2_21    = FMTMatrices.AAD.m2_12;
+        FMTMatrices.AAD.m2_21    = FMTMatrices.AAD.m2_12;
         
-        %FMTMatrices.AAD.n0       = FMTMatrices.AAD.m0/(2*pi*R);
+        FMTMatrices.AAD.n0       = FMTMatrices.AAD.m0/(2*pi*R);
         
         FMTMatricesFull(iSpecies) = FMTMatrices;
         

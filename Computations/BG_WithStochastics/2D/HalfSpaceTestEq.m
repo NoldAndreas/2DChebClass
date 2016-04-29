@@ -23,7 +23,7 @@ D0S=kBT./mS./gammaS;
 % V1 parameters
 %--------------------------------------------------------------------------
 
-V1DV1='V1_Well_Move_Inf';
+V1DV1='V1_Well_Move_HalfInf';
 
 % appropriate physical parameters for potentials in V1DV1
 V0S        = 0.01;
@@ -67,7 +67,7 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.5;
+tMax=3;
 
 
 %--------------------------------------------------------------------------
@@ -128,11 +128,8 @@ stocColour = {{'g'},{'g'},{'b'}};
 % DDFT setup
 %--------------------------------------------------------------------------
 
-Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
-                   'y2Min',-inf,'y2Max',inf,'L2',4);
-
-% Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[30,30],'L1',4,...
-%                    'y2Min',-inf,'y2Max',inf,'L2',4);
+Phys_Area = struct('shape','HalfSpace_FMT','N',[30;30],'L1',3,'L2',3, ...
+                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
@@ -143,17 +140,14 @@ Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',100,...
 Fex_NumRosenfeld   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
                    
-Fex_NumRoth   = struct('Fex','FMTRoth_old',...
-                       'Ncircle',20,'N1disc',20,'N2disc',20);
-
-Fex_NumRoth_J   = struct('Fex','FMTRoth',...
+Fex_NumRoth   = struct('Fex','FMTRoth',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
                    
                    
 Fex_Num3D   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
 
-eq_NumNewton   = struct('solver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
+eq_NumNewton   = struct('solver','Newton','NewtonLambda1',0.5,'NewtonLambda2',1);
 eq_NumFsolve   = struct('solver','fsolve');
                    
 PhysArea = {Phys_Area, Phys_Area, Phys_Area};
@@ -162,7 +156,7 @@ SubArea  = {Sub_Area, Sub_Area, Sub_Area};
 
 PlotArea = {Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_NumRoth, Fex_NumRoth_J, Fex_NumRosenfeld};
+FexNum   = {Fex_NumRoth, Fex_NumRoth, Fex_NumRosenfeld};
 
 V2Num    = {[],[],[]};
 
@@ -180,7 +174,7 @@ DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','do
 
 HIParamsNamesDDFT={};               
                
-DDFTName={'Old','New','Rosenfeld'};
+DDFTName={'Fsolve','Newton','Rosenfeld'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
@@ -188,10 +182,10 @@ DDFTName={'Old','New','Rosenfeld'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,false}; 
+doDDFT={false,true,false}; 
 
 % do we load and save the DDFT data
-loadDDFT={true,false,true};
+loadDDFT={true,true,true};
 %loadDDFT={false,false};
 
 DDFTColour = {{'r'},{'b'},{'g'}};

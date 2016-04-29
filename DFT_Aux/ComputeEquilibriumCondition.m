@@ -40,7 +40,8 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
     end
     
     knownJacobian = strcmp(FexNum.Fex,'FMTRosenfeld_3DFluid') || ...
-                    strcmp(FexNum.Fex,'FMTRosenfeld_J');
+                    strcmp(FexNum.Fex,'FMTRosenfeld') || ...
+                    strcmp(FexNum.Fex,'FMTRoth');
     
     if(knownJacobian && strcmp(params.solver,'Newton'))
         fullInput = true; %case only implemented for 1 species
@@ -60,25 +61,44 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
                         IntMatrFex(1).AD.n2 * rho_ig;...
                         IntMatrFex(1).AD.n3 * rho_ig;...
                         IntMatrFex(1).AD.n2_v_1 * rho_ig;...
-                        IntMatrFex(1).AD.n2_v_2 * rho_ig];       
+                        IntMatrFex(1).AD.n2_v_2 * rho_ig];
+                    
+            Naux = 4;
         
             N_AD     = size(IntMatrFex(1).AD.n2,1);
-        elseif(strcmp(FexNum.Fex,'FMTRosenfeld_J'))
+        elseif(strcmp(FexNum.Fex,'FMTRosenfeld'))
             x_ig     = [x_ig;     
                         IntMatrFex(1).AD.n1 * rho_ig;...
                         IntMatrFex(1).AD.n2 * rho_ig;...
                         IntMatrFex(1).AD.n1_v_1 * rho_ig;...
                         IntMatrFex(1).AD.n1_v_2 * rho_ig];       
         
+            Naux = 4;
+                    
             N_AD     = size(IntMatrFex(1).AD.n1,1);
+            
+        elseif(strcmp(FexNum.Fex,'FMTRoth'))
+            x_ig     = [x_ig;     
+                        IntMatrFex(1).AD.m0 * rho_ig;...
+                        IntMatrFex(1).AD.n2 * rho_ig;...
+                        IntMatrFex(1).AD.m1_1 * rho_ig;...
+                        IntMatrFex(1).AD.m1_2 * rho_ig; ...
+                        IntMatrFex(1).AD.m2_11 * rho_ig; ...
+                        IntMatrFex(1).AD.m2_22 * rho_ig; ...
+                        IntMatrFex(1).AD.m2_12 * rho_ig];       
+        
+            Naux = 7;
+                    
+            N_AD     = size(IntMatrFex(1).AD.m0,1);
+            
         end
             
-        NFull    = N+4*N_AD;         
+        NFull    = N+Naux*N_AD;         
         if(isfield(params,'maxComp_y2'))
             markFull = [(misc.PtsCart.y2_kv <= params.maxComp_y2);...
                          repmat(misc.AD.PtsCart.y2_kv <= params.maxComp_y2+R,4,1)];   
         else
-            markFull = true(N+4*N_AD,1);
+            markFull = true(N+Naux*N_AD,1);
         end
     else
         markFull = mark;
@@ -133,8 +153,22 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
              end                  
              fprintf('\n'); no = 0;
         elseif(strcmp(params.solver,'Newton'))
-            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,0.7,{'returnLastIteration'});
-            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs,1e-10,10000,1,{'returnLastIteration'});
+            
+            if(isfield(params,'NewtonLambda1'))
+                lambda1 = params.NewtonLambda1;
+            else
+                lambda1 = 0.7;
+            end
+
+            if(isfield(params,'NewtonLambda2'))
+                lambda2 = params.NewtonLambda2;
+            else
+                lambda2 = 1;
+            end
+
+            
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(markFull),@fs,1e-10,20,lambda1,{'returnLastIteration'});
+            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs,1e-10,10000,lambda2,{'returnLastIteration'});
             errorHistory            = [errorHistory1 errorHistory2];
         else
             fsolveOpts             = optimset('TolFun',1e-8,'TolX',1e-8);
@@ -150,10 +184,21 @@ function [sol] = ComputeEquilibriumCondition(params,misc)
             else
                 x_ig_n = zeros(NFull+1,nSpecies);
             end
-            %[x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
-            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,0.7);
-            %[x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
-            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,1,{'returnLastIteration'});
+            
+            if(isfield(params,'NewtonLambda1'))
+                lambda1 = params.NewtonLambda1;
+            else
+                lambda1 = 0.7;
+            end
+
+            if(isfield(params,'NewtonLambda2'))
+                lambda2 = params.NewtonLambda2;
+            else
+                lambda2 = 1;
+            end
+            
+            [x_ic,errorHistory1]    = NewtonMethod(x_ig_n(:),@fs_canonical,1,100,lambda1);
+            [x_ic,errorHistory2]    = NewtonMethod(x_ic,@fs_canonical,1e-10,200,lambda2,{'returnLastIteration'});
             errorHistory            = [errorHistory1 errorHistory2];
         else
             x_ig_n                  = x_ig([true;mark],:);
