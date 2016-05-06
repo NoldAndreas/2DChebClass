@@ -58,7 +58,7 @@ potParams2Names={'sigma'};
 % HI parameters
 %--------------------------------------------------------------------------
 
-sigmaHS = 1;
+sigmaHS = 0.5;
 
 HIParamsNames={'sigmaH'};
 
@@ -110,7 +110,7 @@ stocHIType={[],'RP','OseenPlusWall2D'};
 stocName={'noHI','RP','OseenWall'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,false,false};
+doStoc={false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
@@ -146,6 +146,11 @@ Fex_NumRoth   = struct('Fex','FMTRoth',...
 Fex_Num3D   = struct('Fex','FMTRosenfeld_3DFluid',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
 
+HI_RP = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D');
+
+HIParamsNamesDDFT={'sigmaH','sigma'};                  
+                  
 %eq_Num    = struct('eqSolver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
 eq_Num = struct('eqSolver','fsolve');
                    
@@ -155,31 +160,27 @@ SubArea  = {Sub_Area, Sub_Area, Sub_Area};
 
 PlotArea = {Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_NumRosenfeld, Fex_NumRoth, Fex_Num3D, Fex_NumRoth};
+FexNum   = {Fex_NumRosenfeld, Fex_NumRoth, Fex_NumRoth};
 
-V2Num    = {[],[],[],[]};
+V2Num    = {[],[],[]};
 
-eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num};
+eqNum    = {eq_Num,eq_Num,eq_Num};
 
 HINum    = {[], ...
             [], ...
-            [], ...
-            struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','RP12_2D', ...
-                      'HIPreprocess', 'RotnePragerPreprocess2D'), ...
+            HI_RP,...
            };
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
-DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
-                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
-                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
-                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}};
-
-HIParamsNamesDDFT={};               
+DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','HINum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','HINum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','HINum','doPlots'}};
+             
                
-DDFTName={'Rosenfeld','Roth','Rosenfeld3D'};
+DDFTName={'Rosenfeld','Roth','Roth HI'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
@@ -187,11 +188,11 @@ DDFTName={'Rosenfeld','Roth','Rosenfeld3D'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,false};   % 3D case doesn't seem to work?
+doDDFT={false,true,true}; 
 %doDDFT={false,true,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,false};
+loadDDFT={true,true,true};
 
 DDFTColour = {{'r'},{'b'},{'g'}};
 

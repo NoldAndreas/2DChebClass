@@ -34,12 +34,16 @@ AddPaths();
 %inputFile = 'HalfSpaceMove'; % WORKS!
 %inputFile = 'InfSpaceMove'; % WORKS!
 
-%inputFile = 'HalfSpaceMoveN';
-%inputFile = 'InfSpaceMoveN';
+%inputFile = 'HalfSpaceMoveN'; 
+%inputFile = 'InfSpaceMoveN'; % WORKS! - needs more samples?
+%inputFile = 'InfSpaceMoveN_HI';
+%inputFile = 'InfSpaceMoveN_HI_2';
+
+inputFile = 'InfSpaceMoveN_HI_3';
 
 % test Newton vs fsolve
 %inputFile = 'InfSpaceTestEq';
-inputFile = 'HalfSpaceTestEq';
+%inputFile = 'HalfSpaceTestEq';
 
 %-----------------------------------
 

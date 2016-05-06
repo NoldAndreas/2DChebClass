@@ -127,11 +127,6 @@ dim=optsPlot.dim;
 %     [meanrStoc(:,:,:,iStoc),meanvStoc(:,:,:,iStoc)]=getRVmeansStoc2D(x,p,geom,nParticlesS,mS,optsPlot.saveFileStocMeans{iStoc});
 % end
 
-if(nStoc>0)
-    meanrStoc = stoc.rMean;
-    meanvStoc = stoc.vMean;
-end
-
 meanrDDFT=zeros(nPlots,nSpecies,dim,nDDFT);
 meanvDDFT=meanrDDFT;
 
@@ -198,8 +193,11 @@ for iStoc=1:nStoc
     optsPlot.lineMarker=lineMarkerStoc{iStoc};
     optsPlot.lineColour=lineColourStoc{iStoc};
     
-    meanrStocS=meanrStoc(:,:,:,iStoc);
-    meanvStocS=meanvStoc(:,:,:,iStoc);
+    meanrStocS = stoc(iStoc).rMean;
+    meanvStocS = stoc(iStoc).vMean;
+    
+    %meanrStocS=meanrStoc(:,:,:,iStoc);
+    %meanvStocS=meanvStoc(:,:,:,iStoc);
     
     % plot means of r and v up to current time    
     for iDim=1:dim
