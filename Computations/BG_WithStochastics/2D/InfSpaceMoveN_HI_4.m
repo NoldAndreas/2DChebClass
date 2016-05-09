@@ -10,8 +10,8 @@ stocDim=2;
 % it's one in certain places
 DDFTDim=2;
 
-%nParticlesS=10;
-nParticlesS=50;
+nParticlesS=10;
+%nParticlesS=50;
 
 kBT=1;          % temperature
 mS=1;
@@ -43,8 +43,11 @@ sigma2AddS = 50;
 
 y10aS       = -2;
 y20aS       = -2;
-y10bS       = 0;
-y20bS       = 2;
+% y10bS       = 0;
+% y20bS       = 2;
+
+y10bS       = -2;
+y20bS       = -2;
 
 
 % form into structure to make it easy to pass arbitrary parameters to
@@ -75,8 +78,8 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-%tMax=2;
-tMax=1.5;
+tMax=1;
+%tMax=1.5;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -89,9 +92,9 @@ tMax=1.5;
 
 %nSamples = 1000000;  
  
-nSamples = 1000000;  
+nSamples = 100000;  
 
-initialGuess='makeGridPos';
+initialGuess='makeGrid';
 
 sampleFinal = false;
 
@@ -110,23 +113,26 @@ stocType={'r','r','r'};
 
 % whether to include hydrodynamic interactions
 stocHI={false,true,true};
+stocUseDivergence = {false,false,true};
+
+
 % HI interaction matrices
-stocHIType={[],'RP','OseenPlusWall2D'};
+stocHIType={[],'RP','RP2D'};
 
 % names for stochastic calculations -- used as legend text
-stocName={'noHI','RP','OseenWall'};
+stocName={'noHI','RP','RP div'};
 
 % whether to do Langevin and Brownian dynamics
-%doStoc={false,false,false};
-doStoc={true,true,false};
+%doStoc={true,false,false};
+doStoc={true,true,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
 
 % number of time steps
 %tSteps={10^4,10^3,10^3};
-%tSteps={10^4,10^4,10^3};
-tSteps={5*10^4,5*10^4,10^3};
+tSteps={10^4,10^4,10^4};
+%tSteps={5*10^4,5*10^4,10^3};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true};
@@ -141,11 +147,11 @@ stocColour = {{'g'},{'m'},{'b'}};
 y1Plot=10;
 y2Plot=10;
 
-Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
-                 'y2Min',-inf,'y2Max',inf,'L2',4);
+%Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+%                  'y2Min',-inf,'y2Max',inf,'L2',4);
 
-%  Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
-%                     'y2Min',-inf,'y2Max',inf,'L2',4);
+ Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+                    'y2Min',-inf,'y2Max',inf,'L2',4);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
@@ -232,7 +238,7 @@ pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.4;
+RMax=0.15;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -251,7 +257,7 @@ nBins=[20;20];
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
 doInitialFinal = true;
-doMeans        = true;
-doEquilibria   = true;
+doMeans        = false;
+doEquilibria   = false;
 
 sendEmail = true;

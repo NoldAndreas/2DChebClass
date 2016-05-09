@@ -270,7 +270,7 @@ for iPlot=1:2
         
     
     % write the figure files
-    save2pdf(outputFile,hRPf,100,true);
+    %save2pdf(outputFile,hRPf,100,true);
     %close(hRPf);
     
     outputFiles = cat(2,outputFiles,outputFile);

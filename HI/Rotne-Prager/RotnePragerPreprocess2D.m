@@ -16,7 +16,7 @@ function params = RotnePragerPreprocess2D(params)
     alpha   = (1+lambda.^2)./(1+lambda).^2;
     
     params.alpha = alpha;
-    params.RMin  = sigma; 
+    params.RMin  = sigma/2; 
 
     %params.RMax = 50;
     

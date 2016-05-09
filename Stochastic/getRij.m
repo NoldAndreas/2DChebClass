@@ -1,4 +1,4 @@
-function [Rij,nij]=getRij(x,y,dim)
+function [Rij,nij,Z]=getRij(x,y,dim)
 %  Rij=getRij(x,y,dim)
 %   calculates particle separation matrix of size nParticlesx x nParticlessy
 %   and unit separation vectors
