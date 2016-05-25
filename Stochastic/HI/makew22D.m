@@ -59,8 +59,8 @@ d = 2;
 sigmaH = sigmaH(1,1);
 alpha = alpha(1,1);
 
-Dw2_1 = (3-d) *nij(:,:,1) .*( 3/8*sigmaH.*RijInv2 + 3 * 1/8*alpha.*sigmaH.^3.*RijInv4);
-Dw2_2 = (3-d) *nij(:,:,2) .*( 3/8*sigmaH.*RijInv2 + 3 * 1/8*alpha.*sigmaH.^3.*RijInv4);
+Dw2_1 = (3-d) *nij(:,:,1) .*( 3/8*sigmaH.*RijInv2 - 3 * 1/8*alpha.*sigmaH.^3.*RijInv4);
+Dw2_2 = (3-d) *nij(:,:,2) .*( 3/8*sigmaH.*RijInv2 - 3 * 1/8*alpha.*sigmaH.^3.*RijInv4);
 
 Dw2_1 = sum(Dw2_1,2);
 Dw2_2 = sum(Dw2_2,2);
