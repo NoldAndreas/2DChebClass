@@ -1,4 +1,4 @@
-function [D,sumDivD] = RP2D_2(x,optsPhys)
+function [D,sumDivD] = fullWall2D(x,optsPhys)
 % D = RP(x,optsPhys)
 %   returns the Rotne-Prager diffusion tensor for particles at positions x
 %
@@ -17,10 +17,12 @@ D0=optsPhys.D0;
 sigmaH=optsPhys.sigmaH;
 dim=optsPhys.dim;
 
-[w2,Dw2]=makew22D(x,sigmaH,dim);
+[DRP,sumDivDRP]=makew22D(x,sigmaH,dim);
+
+[Dwall,sumDivDwall]=wallRP2D(x,sigmaH);
 
 % calculate Rotne-Prager form
-D=diag(D0)*(eye(length(x))+w2);
+D=diag(D0)*(eye(length(x)) + DRP + Dwall);
 
-sumDivD = -Dw2;
+sumDivD = sumDivDRP + sumDivDwall;
 end

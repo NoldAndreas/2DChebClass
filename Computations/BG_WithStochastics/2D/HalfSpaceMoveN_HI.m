@@ -37,9 +37,13 @@ sigma1AddS = 250;
 sigma2AddS = 50;
 
 y10aS       = 0;
-y20aS       = 8;
 y10bS       = 0;
+y20aS       = 8;
 y20bS       = 4;
+
+% y20aS       = 10;
+% y20bS       = 2;
+
 
 % form into structure to make it easy to pass arbitrary parameters to
 % potentials
@@ -69,8 +73,8 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
+%tMax=1.5;
 tMax=1;
-%tMax=2;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -90,43 +94,45 @@ sampleFinal = false;
 % number of runs of stochastic dynamics to do, and average over
 
 
-nRuns = 5000;
+%nRuns = 5000;
 
-%nRuns = 500;
+nRuns = 10000;
 
+%nRuns = 100;
 
 % number of cores to use in parallel processing
 poolsize=12;
 %poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
-stocType={'r','r'};
+stocType={'r','r','r'};
 
 % whether to include hydrodynamic interactions
-stocHI={false,true};
-stocUseDivergence = {false,true};
+stocHI={false,true,true};
+stocUseDivergence = {false,true,true};
 
 
 % HI interaction matrices
-stocHIType={[],'RP2D'};
+stocHIType={[],'RP2D','wallMobility2D'};
 
 % names for stochastic calculations -- used as legend text
-stocName={'noHI','RP div'};
+stocName={'noHI','RP','wallMobility'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true};
+% doStoc={true,true,true};
+doStoc={true,true,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={true,true};
+loadStoc={true,true,true};
 
 % number of time steps
-tSteps={5*10^4,5*10^4};
+tSteps={5*10^4,5*10^4,5*10^4};
 
 % whether to save output data (you probably should)
-saveStoc={true,true};
+saveStoc={true,true,true};
 
-stocStyle = {{'-'},{'-'}};
-stocColour = {{'g'},{'c'}};
+stocStyle = {{'-'},{'-'},{'-'}};
+stocColour = {{'r'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -211,7 +217,8 @@ DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
 %doDDFT={true,true,true,true}; 
-doDDFT={true,false,false,true}; 
+doDDFT={true,false,true,true}; 
+%doDDFT={true,false,true,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
@@ -245,8 +252,8 @@ PMin=[-1;-1];
 PMax=[1;1];
 
 % y axis for mean position and velocity plots
-RMMin=[0;-2];
-RMMax=[1;2];
+RMMin=[-1;6];
+RMMax=[1;7];
 PMMin=[-1;-1];
 PMMax=[1;1];
 
@@ -256,9 +263,9 @@ nBins=[20;20];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
+doMovieAvi     = false;
 doInitialFinal = true;
-doMeans        = false;
-doEquilibria   = false;
+doMeans        = true;
+doEquilibria   = true;
 
 sendEmail = true;
