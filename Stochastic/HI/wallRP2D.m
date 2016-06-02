@@ -111,7 +111,7 @@ D(zxMask) = -c8.*DORzx - ca24.*DRPRzx + c4.*deltaDOzx + ca24.*deltaDRPzx;
 % selfTermPer = - 9/16*diag(sigmaH)*zInv + 1/16*(diag(sigmaH)*zInv).^3
 
 
-divOx = c8 .* ( 6*z1z2.* Rx.* R5 - Rx.*R7 );
+divOx = c8 .* ( 6*z1z2.* Rx.* R5 - Rx.*R3 );
 divOz = c4 .* ( z2.*R3 - Rz.*R3/2 );
 divRPx = ca24 .* Rx.* ( -5*Rz.^2.*R7 + R5 );
 divRPz = ca24 .* Rz.* ( -5*Rz.^2.*R7 + R5 );

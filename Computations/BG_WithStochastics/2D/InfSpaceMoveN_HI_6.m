@@ -254,9 +254,9 @@ nBins=[20;20];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
-doInitialFinal = false;
-doMeans        = false;
+doMovieAvi     = false;
+doInitialFinal = true;
+doMeans        = true;
 doEquilibria   = false;
 
 sendEmail = false;

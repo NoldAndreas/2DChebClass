@@ -105,34 +105,33 @@ poolsize=12;
 %poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
-stocType={'r','r','r'};
+stocType={'r','r','r','r'};
 
 % whether to include hydrodynamic interactions
-stocHI={false,true,true};
-stocUseDivergence = {false,true,true};
+stocHI={false,true,true,true};
+stocUseDivergence = {false,true,true,true};
 
 
 % HI interaction matrices
-stocHIType={[],'RP2D','wallMobility2D'};
+stocHIType={[],'fullWall2D','wallMobility2D','RP2D'};
 
 % names for stochastic calculations -- used as legend text
-stocName={'noHI','RP','wallMobility'};
+stocName={'No HI','Full HI','Only Wall', 'RP'};
 
 % whether to do Langevin and Brownian dynamics
-% doStoc={true,true,true};
-doStoc={true,true,true};
+doStoc={true,true,false,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
-loadStoc={true,true,true};
+loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={5*10^4,5*10^4,5*10^4};
+tSteps={5*10^4,5*10^4,5*10^4,5*10^4};
 
 % whether to save output data (you probably should)
-saveStoc={true,true,true};
+saveStoc={true,true,true,true};
 
-stocStyle = {{'-'},{'-'},{'-'}};
-stocColour = {{'r'},{'b'},{'m'}};
+stocStyle = {{'-'},{'-'},{'-'},{'-'}};
+stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -167,6 +166,7 @@ HI_Full = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','FullWallHI_RP_2D_noC
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
                       'Wall','SelfWallTermKN');
+                  
 HI_OnlyWall = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','noHI_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
@@ -217,7 +217,7 @@ DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
 %doDDFT={true,true,true,true}; 
-doDDFT={true,false,true,true}; 
+doDDFT={true,true,false,true}; 
 %doDDFT={true,false,true,false};
 
 % do we load and save the DDFT data
@@ -231,7 +231,7 @@ DDFTColour = {{'r'},{'g'},{'b'},{'m'}};
 
 plotType = 'surf';
 
-%separateComp = true;
+separateComp = true;
 
 %viewPoint = [65;10];
 viewPoint = [79;14];
@@ -258,14 +258,14 @@ PMMin=[-1;-1];
 PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=[20;20];
+nBins=[40;40];
 
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
 doInitialFinal = true;
-doMeans        = true;
-doEquilibria   = true;
+doMeans        = false;
+doEquilibria   = false;
 
-sendEmail = true;
+sendEmail = false;

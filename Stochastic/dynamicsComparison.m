@@ -45,6 +45,7 @@ AddPaths();
 %inputFile = 'InfSpaceMoveN_HI_6';  % WORKS!!
 
 inputFile = 'HalfSpaceMoveN_HI'; 
+%inputFile = 'HalfSpaceTestHIDiv';
 
 
 % test Newton vs fsolve
