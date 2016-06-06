@@ -136,7 +136,7 @@ tSteps={5*10^4,10^4,5*10^4};
 saveStoc={true,true,true};
 
 stocStyle = {{'-'},{'-'},{'-'}};
-stocColour = {{'g'},{'b'},{'c'}};
+stocColour = {{'r'},{'c'},{'b'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -145,17 +145,17 @@ stocColour = {{'g'},{'b'},{'c'}};
 y1Plot=10;
 y2Plot=10;
 
-%Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
-%                  'y2Min',-inf,'y2Max',inf,'L2',4);
-
- Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
+Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                     'y2Min',-inf,'y2Max',inf,'L2',4);
 
+% Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[20,20],'L1',4,...
+%                     'y2Min',-inf,'y2Max',inf,'L2',4);
+                
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-y1Plot,'y1Max',y1Plot,'N1',50,...
-                       'y2Min',-y2Plot,'y2Max',y2Plot,'N2',50);
+Plot_Area = struct('y1Min',-y1Plot,'y1Max',y1Plot,'N1',40,...
+                       'y2Min',-y2Plot,'y2Max',y2Plot,'N2',40);
 
 Fex_NumRosenfeld   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
@@ -208,13 +208,13 @@ DDFTName={'Rosenfeld','Roth','Roth HI'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={false,true,true}; 
-%doDDFT={false,true,false};
+%doDDFT={false,true,true}; 
+doDDFT={false,true,true};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true};
 
-DDFTColour = {{'r'},{'b'},{'r'}};
+DDFTColour = {{'c'},{'r'},{'b'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -255,8 +255,9 @@ nBins=[20;20];
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
-doInitialFinal = true;
-doMeans        = true;
+doInitialFinal = false;
+doMeans        = false;
 doEquilibria   = false;
+doSnapshotsError = true;
 
 sendEmail = false;

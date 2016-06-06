@@ -52,6 +52,7 @@ if(isempty(plotHandles))
 else
     hRa=plotHandles.hRa;
     hPa=plotHandles.hPa;
+    hRPf = plotHandles.hRPf;
     
     if(length(hRa)<nSpecies)
         hRa = hRa(1)*ones(1,nSpecies);
@@ -79,7 +80,10 @@ if(isfield(optsPlot,'contours') && ~optsPlot.contours)
     doContours = false;
 end
 
+figure(hRPf);
+
 for iSpecies=1:nSpecies
+    
     
     rhoS=rho(:,:,iSpecies);
     %vS=v(:,:,:,iSpecies);
@@ -87,13 +91,16 @@ for iSpecies=1:nSpecies
     
     switch optsPlot.plotType
         case 'surf'
-            % surface plot
+            % colour map plot
+   
+            axes(hRa(iSpecies));
             
-            hr(iSpecies)=surf(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
-            set(hr(iSpecies),'FaceColor',faceColour{iSpecies}) %, ...
-                %'EdgeColor','none','LineStyle','none','FaceLighting','phong');
-%           set(hr(iSpecies),'EdgeColor',faceColour{iSpecies});
-            alpha(hr(iSpecies),0.5);
+            maxRho = max(max(rhoS));            
+            hr(iSpecies)=pcolor(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
+            
+            caxis([0,maxRho]);
+            colormap(gray);
+            colorbar;
             
             hCa=hPa(iSpecies);
 

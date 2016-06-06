@@ -278,8 +278,18 @@ if(anyPlots)
         plotFiles = cat(2,plotFiles,meanFile);
     end
 
-end    
+    %--------------------------------------------------------------------------
+    % make error snapshot plots
+    %--------------------------------------------------------------------------
+
+    if(optsPlot.doSnapshotsError)
+        errorFile = plotSnapshotsError2D(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,errorFile);
+    end
+
     
+end    
+   
 %--------------------------------------------------------------------------
 % get mean (over runs) position and momentum of each particle at each time.
 % only useful when particles are 'distinguishable'

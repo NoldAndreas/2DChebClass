@@ -178,7 +178,8 @@ optsStruct=setDDFTParams(optsStruct);
 %--------------------------------------------------------------------------
 
 optsStruct.anyPlots=any([optsStruct.doPdfs,optsStruct.doMovieGif,optsStruct.doMovieSwf,optsStruct.doMovieAvi, ...
-              optsStruct.doInitialFinal,optsStruct.doMeans,optsStruct.doCustom,optsStruct.doEquilibria]);
+              optsStruct.doInitialFinal,optsStruct.doMeans,optsStruct.doCustom,optsStruct.doEquilibria, ...
+              optsStruct.doSnapshotsError]);
 optsStruct.anyPlotsP=any([optsStruct.doPdfsP,optsStruct.doMovieGifP,optsStruct.doMovieSwfP, ...
                optsStruct.doInitialFinalP,optsStruct.doCustomP]);
 

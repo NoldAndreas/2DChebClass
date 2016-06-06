@@ -27,7 +27,7 @@ ylim(h,[yMin, yMax]);
 % Set aspect ratio
 %--------------------------------------------------------------------------
 
-pbaspect(h,[ (xMax-xMin)   (yMax-yMin)   1 ]);
+%pbaspect(h,[ (xMax-xMin)   (yMax-yMin)   1 ]);
 
 
 % label axes
@@ -64,7 +64,7 @@ if(~isempty(time))
     % add the time to the plot
     axes(h);  %#ok % need this as you can't use gca with text
     
-    textX=0.8*xMax;
+    textX=0.65*xMax;
     textY=yMin+0.95*(yMax-yMin);
     
     text(textX,textY,['t=' num2str(time, '%6.4f')]);

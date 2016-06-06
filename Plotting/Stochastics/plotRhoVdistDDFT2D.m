@@ -36,12 +36,20 @@ PlotArea.N2 = 10;
 
 InterpFlux = IDC.InterpolationPlotCart(PlotArea,false);
 
+PlotArea.N1 = 30;
+PlotArea.N2 = 30;
+
+InterpRho = IDC.InterpolationPlotCart(PlotArea,false);
+
 contourWidth=get(0,'defaultlinelinewidth');
 
 nSpecies=size(rho,2);
 
-Nplot1=Interp.Nplot1;
-Nplot2=Interp.Nplot2;
+Nplot1=InterpRho.Nplot1;
+Nplot2=InterpRho.Nplot2;
+
+%Nplot1=Interp.Nplot1;
+%Nplot2=Interp.Nplot2;
 
 %type=optsPlot.type;
 
@@ -91,8 +99,8 @@ end
 faceColour=optsPlot.faceColour;
 lineStyle = optsPlot.lineStyle;
 
-x1=Interp.pts1;
-x2=Interp.pts2;
+x1=InterpRho.pts1;
+x2=InterpRho.pts2;
 
 x1f = InterpFlux.pts1;
 x2f = InterpFlux.pts2;
@@ -158,7 +166,8 @@ for iSpecies=1:nSpecies
     fluxS1interp = InterpFlux.InterPol*fluxS1;
     fluxS2interp = InterpFlux.InterPol*fluxS2;
  
-    rhoS = real(Interp.InterPol*rhoS);
+    %rhoS = real(Interp.InterPol*rhoS);
+    rhoS = real(InterpRho.InterPol*rhoS);
     
     rhoS=reshape(rhoS,Nplot2,Nplot1);
     

@@ -120,6 +120,7 @@ stocName={'No HI','Full HI','Only Wall', 'RP'};
 
 % whether to do Langevin and Brownian dynamics
 doStoc={true,true,false,true};
+%doStoc={false,false,false,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -149,8 +150,8 @@ Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-10,'y1Max',10,'N1',100,...
-                       'y2Min',0.5,'y2Max',20,'N2',100);
+Plot_Area = struct('y1Min',-10,'y1Max',10,'N1',20,...
+                       'y2Min',0.5,'y2Max',10,'N2',20);
 
 Fex_NumRosenfeld   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
@@ -218,7 +219,7 @@ DDFTType={'r','r','r','r'};
 % whether to do DDFT calculations
 %doDDFT={true,true,true,true}; 
 doDDFT={true,true,false,true}; 
-%doDDFT={true,false,true,false};
+%doDDFT={false,false,false,true};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
@@ -238,7 +239,7 @@ viewPoint = [79;14];
 %viewPoint = [0;0];
 
 % x axis for position and velocity plots
-rMin=[-10;0];
+rMin=[-10;0.5];
 %rMin=[2;0];
 rMax=[10;10];
 pMin=rMin;
@@ -258,14 +259,15 @@ PMMin=[-1;-1];
 PMMax=[1;1];
 
 % number of bins for histograming of stochastic data
-nBins=[40;40];
+nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
-doInitialFinal = true;
+doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
+doSnapshotsError = true;
 
 sendEmail = false;
