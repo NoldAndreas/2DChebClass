@@ -225,7 +225,7 @@ plotType = 'surf';
 %separateComp = true;
 
 %viewPoint = [65;10];
-viewPoint = [79;14];
+viewPoint = [-5;25];
 %viewPoint = [0;0];
 
 % x axis for position and velocity plots
@@ -237,7 +237,7 @@ pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.4;
+RMax=0.3;
 
 PMin=[-1;-1];
 PMax=[1;1];

@@ -38,8 +38,8 @@ sigma2AddS = 50;
 
 y10aS       = 0;
 y10bS       = 0;
-y20aS       = 8;
-y20bS       = 4;
+y20aS       = 6;
+y20bS       = 8;
 
 % y20aS       = 10;
 % y20bS       = 2;
@@ -73,7 +73,6 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-%tMax=1.5;
 tMax=1;
 
 %--------------------------------------------------------------------------
@@ -119,8 +118,8 @@ stocHIType={[],'fullWall2D','wallMobility2D','RP2D'};
 stocName={'No HI','Full HI','Only Wall', 'RP'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,true,false,true};
-%doStoc={false,false,false,true};
+%doStoc={true,true,false,true};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -142,9 +141,9 @@ y1Plot=10;
 y2Plot=10;
 
 Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
-                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
 
-% Phys_Area = struct('shape','HalfSpace_FMT','N',[20;20],'L1',3,'L2',3, ...
+% Phys_Area = struct('shape','HalfSpace_FMT','N',[30;30],'L1',3,'L2',3, ...
 %                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
@@ -268,6 +267,7 @@ doMovieAvi     = false;
 doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
-doSnapshotsError = true;
+doSnapshotsError = false;
+doSnapshotsDDFT = true;
 
 sendEmail = false;

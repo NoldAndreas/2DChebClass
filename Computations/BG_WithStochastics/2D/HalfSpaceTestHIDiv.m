@@ -39,7 +39,7 @@ sigma2AddS = 50;
 y10aS       = 0;
 y10bS       = 0;
 y20aS       = 8;
-y20bS       = 4;
+y20bS       = 8;
 
 % y20aS       = 10;
 % y20bS       = 2;
@@ -74,7 +74,7 @@ HIParamsNames={'sigmaH'};
 
 % end time of calculation
 %tMax=1.5;
-tMax=1;
+tMax=0.1;
 
 %--------------------------------------------------------------------------
 % Stochastic setup
@@ -85,7 +85,8 @@ tMax=1;
 % only relevant if fixedInitial=false or sampleFinal=true
 
 
-nSamples = 1000000;  
+nSamples = 100000;  
+burnin = 20000;
 
 initialGuess='makeGridPos';
 
@@ -94,11 +95,8 @@ sampleFinal = false;
 % number of runs of stochastic dynamics to do, and average over
 
 
-%nRuns = 5000;
+nRuns = 1000;
 
-nRuns = 10000;
-
-%nRuns = 100;
 
 % number of cores to use in parallel processing
 poolsize=12;
@@ -120,19 +118,19 @@ stocName={'No HI','Full HI','Only Wall', 'RP'};
 
 % whether to do Langevin and Brownian dynamics
 doStoc={true,true,false,true};
-%doStoc={false,false,false,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
 
 % number of time steps
-tSteps={5*10^4,5*10^4,5*10^4,5*10^4};
+%tSteps={5*10^4,5*10^4,5*10^4,5*10^4};
+tSteps={2*10^3,2*10^3,2*10^3,2*10^3};
 
 % whether to save output data (you probably should)
 saveStoc={true,true,true,true};
 
 stocStyle = {{'-'},{'-'},{'-'},{'-'}};
-stocColour = {{'r'},{'m'},{'g'},{'b'}};
+stocColour = {{'r'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % DDFT setup
@@ -150,8 +148,8 @@ Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-10,'y1Max',10,'N1',20,...
-                       'y2Min',0.5,'y2Max',10,'N2',20);
+Plot_Area = struct('y1Min',-10,'y1Max',10,'N1',100,...
+                       'y2Min',0.5,'y2Max',20,'N2',100);
 
 Fex_NumRosenfeld   = struct('Fex','FMTRosenfeld',...
                        'Ncircle',20,'N1disc',20,'N2disc',20);
@@ -167,7 +165,6 @@ HI_Full = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','FullWallHI_RP_2D_noC
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
                       'Wall','SelfWallTermKN');
-                  
 HI_OnlyWall = struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','noHI_2D', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
@@ -218,13 +215,13 @@ DDFTType={'r','r','r','r'};
 
 % whether to do DDFT calculations
 %doDDFT={true,true,true,true}; 
-doDDFT={true,true,false,true}; 
-%doDDFT={false,false,false,true};
+%doDDFT={true,true,false,true}; 
+doDDFT={false,false,false,false};
 
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
 
-DDFTColour = {{'r'},{'m'},{'g'},{'b'}};
+DDFTColour = {{'r'},{'g'},{'b'},{'m'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -232,14 +229,14 @@ DDFTColour = {{'r'},{'m'},{'g'},{'b'}};
 
 plotType = 'surf';
 
-separateComp = true;
+%separateComp = true;
 
 %viewPoint = [65;10];
-viewPoint = [-65;20];
+viewPoint = [79;14];
 %viewPoint = [0;0];
 
 % x axis for position and velocity plots
-rMin=[-10;0.5];
+rMin=[-10;0];
 %rMin=[2;0];
 rMax=[10;10];
 pMin=rMin;
@@ -265,9 +262,8 @@ nBins=[20;20];
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
-doInitialFinal = false;
-doMeans        = false;
+doInitialFinal = true;
+doMeans        = true;
 doEquilibria   = false;
-doSnapshotsError = true;
 
 sendEmail = false;

@@ -93,13 +93,16 @@ for iSpecies=1:nSpecies
         case 'surf'
             % colour map plot
    
-            axes(hRa(iSpecies));
+            axes(hPa(iSpecies));
             
             maxRho = max(max(rhoS));            
-            hr(iSpecies)=pcolor(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
+            hr(iSpecies)=pcolor(hPa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
             
             caxis([0,maxRho]);
-            colormap(gray);
+            
+            myGray = flipud(gray/2 + 1/2);
+            
+            colormap(myGray);
             colorbar;
             
             hCa=hPa(iSpecies);

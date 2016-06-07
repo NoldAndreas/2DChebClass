@@ -286,6 +286,15 @@ if(anyPlots)
         errorFile = plotSnapshotsError2D(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
         plotFiles = cat(2,plotFiles,errorFile);
     end
+    
+    %--------------------------------------------------------------------------
+    % make DDFT snapshot plots
+    %--------------------------------------------------------------------------
+
+    if(optsPlot.doSnapshotsDDFT)
+        DDFTFile = plotSnapshotsDDFT2D(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,DDFTFile);
+    end
 
     
 end    

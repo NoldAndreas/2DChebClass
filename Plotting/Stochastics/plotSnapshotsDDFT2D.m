@@ -1,4 +1,4 @@
-function outputFiles = plotSnapshotsError2D(stoc,ddft,optsPlot,equilibria)
+function outputFiles = plotSnapshotsDDFT2D(stoc,ddft,optsPlot,equilibria)
 %plotInitialFinal(stoc,ddft,optsPlotGIF,xInitial,xFinal,pEq,pdfFile)
 %   makes initial and final plots from given stochastic and DDFT data
 %
@@ -51,37 +51,13 @@ function outputFiles = plotSnapshotsError2D(stoc,ddft,optsPlot,equilibria)
 %                     are used)
 
 
-fprintf(1,'Making snapshot error plots ... ');
+fprintf(1,'Making snapshot DDFT plots ... ');
 
 % number of stochastic and DDFT plots to do
-nStoc=size(stoc,2);
 nDDFT=size(ddft,2);
 
 % easy way to check if any of the computations include momentum
 %doP=~isempty(optsPlot.legTextP);
-
-if(nStoc>0)
-    doEqStoc=[true;true];
-else
-    doEqStoc=[false;false];
-end
-
-if(nDDFT>0)
-    doEqDDFT=[true;true];
-else
-    doEqDDFT=[false;false];
-end
-
-for iEq = 1:2
-    if( ~isempty( equilibria(iEq).data ))
-        doEqStoc(iEq)=true;
-    end
-    
-    if( nDDFT>0 )
-        doEqDDFT(iEq)=true;
-    end
-    
-end
 
 outputFiles = {};
 
@@ -96,10 +72,10 @@ nSaves = length(optsPlot.plotTimes);
 %plotPos = 1:dPlot:nSaves;
 
 
-plotPos = [1;ceil(nSaves/3);ceil(2*nSaves/3)]; % wall
-%plotPos = [1;ceil(nSaves/2);ceil(nSaves)]; %unbounded
+%plotPos = [1;ceil(nSaves/3);ceil(2*nSaves/3)]; % wall towards
+plotPos = [1;ceil(nSaves/2);ceil(nSaves)]; %unbounded, away
 
-nComps = nStoc;
+nComps = nDDFT;
 
 for iPlot=1:nPlots  
 
@@ -133,73 +109,13 @@ for iPlot=1:nPlots
         % get time to add to plot
         plotTimes=optsPlot.plotTimes;
         plotTime=plotTimes(plotPos(iPlot));
-
-
-        lineColourStoc=optsPlot.lineColourStoc;
-        lineStyleStoc = optsPlot.lineStyleStoc;
-        % get type info -- used to decide whether to plot the velocity
-        stocType=optsPlot.stocType;
         
         lineColourDDFT=optsPlot.lineColourDDFT;
         lineStyleDDFT=optsPlot.lineStyleDDFT;
         % get type info -- used to decide whether to plot the velocity
         DDFTType=optsPlot.DDFTType;
 
-        % and file to save in
-    %    outputFile=optsPlot.IFFiles{iPlot};
-    
-    
         %----------------------------------------------------------------------
-        % Error plots
-        %----------------------------------------------------------------------
-
-        optsPlot.faceColour=lineColourStoc{iComp};
-        optsPlot.lineStyle = lineStyleStoc{iComp};
-
-        rho   = stoc(iComp).rho(:,:,:,plotPos(iPlot));
-        %v     = stoc(iComp).v(:,:,:,:plotPos(iPlot));
-        %flux  = stoc(iComp).flux(:,:,:,:,plotPos(iPlot));
-        boxes =  stoc(iComp).boxes(:,:,:,:,plotPos(iPlot));
-
-
-        y1C = boxes(:,:,1,1);
-        y2C = boxes(:,:,2,1);
-        y1C_kv = y1C(:);
-        y2C_kv = y2C(:);
-        IDC = ddft(iComp).IDC;
-
-        pts         = IDC.GetInvCartPts(y1C_kv,y2C_kv);
-
-        InterPol = IDC.InterpolationMatrix_Pointwise(pts.y1_kv,pts.y2_kv);
-
-        rhoDDFT = ddft(iComp).dynamicsResult.rho_t;
-        rhoDDFT = rhoDDFT(:,:,1);
-
-        rhoDDFTBoxes = InterPol*rhoDDFT;
-
-
-        nBins = optsPlot.nBins;
-        N1 = nBins(1);
-        N2 = nBins(2);
-
-        %optsPlot.plotTime=plotTime;
-        optsPlot.type=stocType{iComp};
-
-        % only for one species
-
-        rhoDDFTBoxesS = reshape( rhoDDFTBoxes, N1,N2);
-        rhoError = abs(rho - rhoDDFTBoxesS);
-        
-        relL2Error = sum(sum(rhoError.^2))/sum(sum(rhoDDFTBoxes.^2))
-        
-        %maxError = max(max(rhoError));
-        optsPlot.contours = false;
-        plotRhoVdistStocColour2D(rhoError,[],boxes,optsPlot,handlesC);
-        hold(hCa,'on');
-        hold(hPCa,'on');
-
-        
-               %----------------------------------------------------------------------
         % DDFT data plots
         %----------------------------------------------------------------------
 
