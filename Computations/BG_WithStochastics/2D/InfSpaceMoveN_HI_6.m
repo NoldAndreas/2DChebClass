@@ -258,6 +258,6 @@ doMovieAvi     = false;
 doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
-doSnapshotsError = true;
+doSnapshotsError = false;
 
 sendEmail = false;

@@ -38,8 +38,8 @@ sigma2AddS = 50;
 
 y10aS       = 0;
 y10bS       = 0;
-y20aS       = 6;
-y20bS       = 8;
+y20aS       = 8;
+y20bS       = 4;
 
 % y20aS       = 10;
 % y20bS       = 2;
@@ -73,6 +73,7 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
+%tMax=1.5;
 tMax=1;
 
 %--------------------------------------------------------------------------
@@ -141,10 +142,10 @@ y1Plot=10;
 y2Plot=10;
 
 Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
-                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
+                       'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
 
-% Phys_Area = struct('shape','HalfSpace_FMT','N',[30;30],'L1',3,'L2',3, ...
-%                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90);
+% Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',2.5,'L2',2.5, ...
+%                         'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90);
 
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
@@ -223,7 +224,7 @@ doDDFT={true,true,false,true};
 % do we load and save the DDFT data
 loadDDFT={true,true,true,true};
 
-DDFTColour = {{'r'},{'m'},{'g'},{'b'}};
+DDFTColour = {{'r'},{'g'},{'m'},{'b'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -231,15 +232,16 @@ DDFTColour = {{'r'},{'m'},{'g'},{'b'}};
 
 plotType = 'surf';
 
-separateComp = true;
+separateComp = false;
 
 %viewPoint = [65;10];
 viewPoint = [-65;20];
 %viewPoint = [0;0];
 
 % x axis for position and velocity plots
-rMin=[-10;0.5];
+rMin=[0;0.5];
 %rMin=[2;0];
+%rMax=[10;10];
 rMax=[10;10];
 pMin=rMin;
 pMax=rMax;
@@ -264,10 +266,10 @@ nBins=[20;20];
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
 doMovieAvi     = false;
+doFigs         = true;
 doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
 doSnapshotsError = false;
-doSnapshotsDDFT = false;
 
 sendEmail = false;

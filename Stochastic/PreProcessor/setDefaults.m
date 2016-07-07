@@ -117,6 +117,7 @@ end
 D.doMovieGif=false;
 D.doMovieAvi=false;
 D.doPdfs=false;
+D.doFigs=false;
 D.doMovieSwf=false;
 D.doInitialFinal=false;
 D.doEquilibria=false;
@@ -127,6 +128,9 @@ D.doInitialFinalP=false;
 D.doMovieGifP=false;
 D.doPdfsP=false;
 D.doMovieSwfP=false;
+D.doInitialFinalP=false;
+D.doSnapshotsError = false;
+D.doSnapshotsDDFT = false;
 
 D.doCustom=false;
 D.doCustomP=false;

@@ -1,4 +1,4 @@
-function handles=plotRhoVdistStoc2D(rho,v,boxes,optsPlot,plotHandles)
+function handles=plotRhoVdistStocColour2D(rho,v,boxes,optsPlot,plotHandles)
 %plotRhoVdistStoc(x,p,optsPlot,plotHandles,type)
 %   plots position and velocity distributions in axes given by plotHandles
 %

@@ -245,7 +245,7 @@ if(anyPlots)
     % make movie
     %--------------------------------------------------------------------------
 
-    if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs) 
+    if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs || optsPlot.doFigs) 
         movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
         plotFiles = cat(2,plotFiles,movieFile);
     end

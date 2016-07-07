@@ -113,9 +113,11 @@ doGif=optsPlot.doMovieGif;
 doAvi=optsPlot.doMovieAvi;
 doSwf=optsPlot.doMovieSwf;
 doPdfs=optsPlot.doPdfs;
+doFigs=optsPlot.doFigs;
 
 % get movie files and options
 pdfDir=optsPlot.pdfDir;
+figDir=optsPlot.figDir;
 movieFile=[optsPlot.movieFile optsPlot.plotType ...
            '-' num2str(separateSpecies) '-' num2str(separateComp)];
 fps=optsPlot.fps;
@@ -131,6 +133,17 @@ if(doPdfs || doSwf)
     nDigits=ceil(log10(nPlots));
     nd=['%0' num2str(nDigits) 'd'];
 end
+
+% set up fig file names
+if(doFigs)
+    if(~exist(figDir,'dir'))
+        mkdir(figDir);
+    end       
+    figFileNames=[];
+    nDigits=ceil(log10(nPlots));
+    nd=['%0' num2str(nDigits) 'd'];
+end
+
 
 %--------------------------------------------------------------------------
 % Set up figure
@@ -440,7 +453,18 @@ for iPlot=1:nPlots
             save2pdf(outputFile,hRPf,[]);
         end
     end
-    
+
+    %----------------------------------------------------------------------
+    % Get figure frames
+    %----------------------------------------------------------------------
+
+    if(doFigs)
+        % determine output file, of the form iPlot.pdf, with leading zeros
+        outputFile=[figDir num2str(iPlot,nd) '.fig'];
+        % add to list of pdf files used to make movie
+        figFileNames = cat(2, figFileNames, [' ' outputFile]);
+        savefig(hRPf,outputFile);
+    end    
 end
 
 fprintf(1,'Finished\n');
