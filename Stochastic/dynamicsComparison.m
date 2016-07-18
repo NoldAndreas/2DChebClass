@@ -31,7 +31,7 @@ AddPaths();
 
 % Validation of 2D dynamics
 
-%inputFile = 'HalfSpaceMove'; % WORKS!
+inputFile = 'HalfSpaceMove'; % WORKS!
 %inputFile = 'InfSpaceMove'; % WORKS!
 
 %inputFile = 'HalfSpaceMoveN'; 
@@ -51,7 +51,7 @@ AddPaths();
 %inputFile = 'HalfSpaceMoveParallelN_HI';
 
 %inputFile = 'InfSpaceMoveN_HI_6_TestTiming';
-inputFile = 'HalfSpaceMoveN_HI_Short';
+%inputFile = 'HalfSpaceMoveN_HI_Short';
 
 
 % test Newton vs fsolve

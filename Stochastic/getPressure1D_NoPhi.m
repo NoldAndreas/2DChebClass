@@ -1,6 +1,4 @@
-function [PK,PV,binMids,nR,meanP] = getPressure1D(R,P,nBins,optsPhys)
-
-nParticlesS = optsPhys.nParticlesS;
+function [PK,PV] = getPressure1D(R,P,nBins,nParticlesS)
 
 % R, P = nParticles x nSamples
 nSamples=size(R,2);
@@ -18,8 +16,6 @@ meanP=nR;
 xR=nR;
 PK = nR;
 PV = nR;
-
-V2DV2 = str2func(optsPhys.V2DV2);
 
 for iSpecies=1:nSpecies
 
@@ -64,12 +60,14 @@ for iSpecies=1:nSpecies
     PK(:,iSpecies) = sumP2(:,iSpecies) - 2*meanP(:,iSpecies).*sumP(:,iSpecies) ...
                     + nR(:,iSpecies).*meanP(:,iSpecies).^2;
     
-    %PK(:,iSpecies)./nRtemp
-                
     % get max and min R and Rij for each pair in each sample
     [RSp,RSm] = getRpRmLoop(R,nParticlesS(iSpecies),nSamples);  
     RijS = getRijLoop1D(R); %Zij is signed Rij
     
+    RSp
+    RSm
+    RijS
+
     RijS = RijS(:);
     RSp = RSp(:);
     RSm = RSm(:);
@@ -80,8 +78,8 @@ for iSpecies=1:nSpecies
     RijS  = RijS(:,ones(nBins,1));
 
     % find right and left ends of bins
-    binR = binEnds(2:end);
-    binL = binEnds(1:end-1);
+    binR = binEnds(2:end)
+    binL = binEnds(1:end-1)
    
     % replicate for samples*particles
     BR = kron(binR,ones(size(RijS,1),1));
@@ -93,14 +91,11 @@ for iSpecies=1:nSpecies
     tempD = min(tempC,binWidth);
     temp  = min(tempD,RijS);    
 
-    %[~,dPhidr_r] = Gaussian(RijS(:),optsPhys);
-    [~,dPhidr_r] = V2DV2(RijS(:),optsPhys);
-    dPhidr = reshape(dPhidr_r,size(RijS)).*RijS;
-
+    temp
 
     % for the moment, take phi'=1
-    PV = - 1/2 * sum(temp.*dPhidr,1)/nSamples/binWidth;
-    PV = PV(:);
+    PV = - 1/2 * sum(temp,1)/nSamples/binWidth;
+    PV = PV(:)
 
 
     % still need to include other terms

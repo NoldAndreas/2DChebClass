@@ -1,6 +1,4 @@
-function [PK,PV,binMids,nR,meanP] = getPressure1D(R,P,nBins,optsPhys)
-
-nParticlesS = optsPhys.nParticlesS;
+function [PK,PV,tempA] = getPressure1D(R,P,nBins,nParticlesS)
 
 % R, P = nParticles x nSamples
 nSamples=size(R,2);
@@ -19,13 +17,13 @@ xR=nR;
 PK = nR;
 PV = nR;
 
-V2DV2 = str2func(optsPhys.V2DV2);
-
 for iSpecies=1:nSpecies
 
     % extract R, P for this species
     RS=R(speciesStart(iSpecies):speciesEnd(iSpecies),:);
     PS=P(speciesStart(iSpecies):speciesEnd(iSpecies),:);
+    
+    Rsamples = RS;
     
     % make into column vector
     RS=RS(:);
@@ -64,45 +62,58 @@ for iSpecies=1:nSpecies
     PK(:,iSpecies) = sumP2(:,iSpecies) - 2*meanP(:,iSpecies).*sumP(:,iSpecies) ...
                     + nR(:,iSpecies).*meanP(:,iSpecies).^2;
     
-    %PK(:,iSpecies)./nRtemp
-                
-    % get max and min R and Rij for each pair in each sample
-    [RSp,RSm] = getRpRmLoop(R,nParticlesS(iSpecies),nSamples);  
-    RijS = getRijLoop1D(R); %Zij is signed Rij
+    % get max and min R for each pair as a diagonal block for each sample
+    % (can we do this more efficiently?)
+    [RSp,RSm] = getRpRm(RS,nParticlesS(iSpecies),nSamples);
     
-    RijS = RijS(:);
-    RSp = RSp(:);
-    RSm = RSm(:);
+    [RSpL,RSmL] = getRpRmLoop(R,nParticlesS(iSpecies),nSamples);
+    
+    RijS = getRij(RS,RS,1);
+    
+    [RijSL,ZijSL] = getRijLoop1D(R);
+    
+    
+    RijSL(:)
+    RSpL(:)
+
+
+    % set anything not in the same sample to be infinitely far apart
+    sampleMask = kron(eye(nSamples),ones(nParticlesS(iSpecies)));
+    RijS(~sampleMask) = inf;
     
     % replicate for each bin
-    RSp   = RSp(:,ones(nBins,1));
-    RSm   = RSm(:,ones(nBins,1));
-    RijS  = RijS(:,ones(nBins,1));
-
+    RSp   = RSp(:,:,ones(nBins,1));
+    RSm   = RSm(:,:,ones(nBins,1));
+    RijS  = RijS(:,:,ones(nBins,1));
+    
     % find right and left ends of bins
     binR = binEnds(2:end);
     binL = binEnds(1:end-1);
    
-    % replicate for samples*particles
-    BR = kron(binR,ones(size(RijS,1),1));
-    BL = kron(binL,ones(size(RijS,1),1));
-        
+    % replicate for particles
+    BR(1,1,:) = binR(:);
+    BL(1,1,:) = binL(:);
+    NS = size(RijS,1);
+    BR = BR(ones(NS,1),ones(NS,1),:);
+    BL = BL(ones(NS,1),ones(NS,1),:);
+    
+    
+    
     tempA = max(0,RSp - BL);
     tempB = max(0,BR - RSm);
     tempC = min(tempA,tempB);
     tempD = min(tempC,binWidth);
-    temp  = min(tempD,RijS);    
-
-    %[~,dPhidr_r] = Gaussian(RijS(:),optsPhys);
-    [~,dPhidr_r] = V2DV2(RijS(:),optsPhys);
-    dPhidr = reshape(dPhidr_r,size(RijS)).*RijS;
-
-
-    % for the moment, take phi'=1
-    PV = - 1/2 * sum(temp.*dPhidr,1)/nSamples/binWidth;
-    PV = PV(:);
-
-
+    temp = min(tempD,RijS);
+    
+    
+    
+    %sampleMask = sampleMask(:,:,ones(nBins,1));
+        
+    %temp = temp.*sampleMask
+    
+    PV = squeeze(sum(sum(temp,1),2))/nSamples/binWidth;
+    
+    
     % still need to include other terms
     
 end
