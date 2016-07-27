@@ -1,4 +1,4 @@
-function [PK,PV,binMids,nR,meanP] = getPressure1D(R,P,nBins,optsPhys)
+function [PK,PV,binMids,nR,meanP,PbyBin] = getPressure1D(R,P,nBins,optsPhys)
 
 nParticlesS = optsPhys.nParticlesS;
 
@@ -30,80 +30,114 @@ for iSpecies=1:nSpecies
     % make into column vector
     RS=RS(:);
     PS=PS(:);
-       
+
+    if(~isfield(optsPhys,'rMax'))
+        rMax = max(RS);
+        rMin = min(RS);
+    else
+        rMax = optsPhys.rMax;
+        rMin = optsPhys.rMin;
+    end
+
     % determine spatial bins
-    binEnds=linspace(min(RS),max(RS),nBins+1);
+    binEnds=linspace(rMin,rMax,nBins+1);
     binWidth = binEnds(2)-binEnds(1);
     binMids = (binEnds(1:end-1)+binWidth/2).';
     
     % bin mids for output
     xR(:,iSpecies)=binMids;
     
+    % add fake particle to each bin to ensure it's counted
+    RSTemp = [RS;binMids];
+    PSTemp = [PS;zeros(size(binMids))];
+    
     % determine which bin each R is in
-    RSboxes = floor( nBins* ( RS-min(RS) ) / (max(RS)-min(RS)) ) +1;
-    RSboxes(RSboxes==nBins+1)=nBins;
-
+    RSboxes = floor( nBins* ( RSTemp-rMin ) / (rMax-rMin) ) +1;
+        
+    % end bins contain all particles outside range so may well be junk
+    RSboxes(RSboxes > nBins)=nBins;
+    RSboxes(RSboxes < 1)=1;
+    
+    tempCount = ( accumarray(RSboxes, ones(size(RSTemp)) ) ).';
+    tempCount = tempCount - ones(size(tempCount));
+    
     % number of particles in each bin
-    nR(:,iSpecies)=( accumarray(RSboxes, ones(size(RS)) ) ).';
+    nR(:,iSpecies) = tempCount;
     
     % find P and P^2 in each box
-    sumP(:,iSpecies)=accumarray(RSboxes, PS);    
-    sumP2(:,iSpecies)=accumarray(RSboxes, PS.^2);    
+    sumP(:,iSpecies)=accumarray(RSboxes, PSTemp);    
+    sumP2(:,iSpecies)=accumarray(RSboxes, PSTemp.^2);    
 
+    % remove fake particles
+    boxMask = RSboxes(1:length(RS));
+    
+    % determine collection of momenta in each bin
+    PbyBin = cell(nBins,1);
+    for iBin = 1:nBins
+        PbyBin{iBin} = P(boxMask == iBin);
+    end
+    
     % determine mean momentum
     nRtemp=nR(:,iSpecies);
     nRtemp(nR(:,iSpecies)==0)=1;    
     meanP(:,iSpecies)=sumP(:,iSpecies)./nRtemp;
     
     % normalize to nParticlesS(iSpecies)
-    nR(:,iSpecies)=nR(:,iSpecies)/nSamples/binWidth;
-    sumP(:,iSpecies)=sumP(:,iSpecies)/nSamples/binWidth;
-    sumP2(:,iSpecies)=sumP2(:,iSpecies)/nSamples/binWidth;
+    nR(:,iSpecies)=nR(:,iSpecies);
+    sumP(:,iSpecies)=sumP(:,iSpecies);
+    sumP2(:,iSpecies)=sumP2(:,iSpecies);
     
     % do we actually want to take off the mean in the box??
     PK(:,iSpecies) = sumP2(:,iSpecies) - 2*meanP(:,iSpecies).*sumP(:,iSpecies) ...
                     + nR(:,iSpecies).*meanP(:,iSpecies).^2;
     
-    %PK(:,iSpecies)./nRtemp
-                
-    % get max and min R and Rij for each pair in each sample
+    PK(:,iSpecies) = PK(:,iSpecies)/nSamples/binWidth;
+    
+    nR(:,iSpecies) = nR(:,iSpecies)/nSamples/binWidth;
+    
+    %get max and min R and Rij for each pair in each sample
     [RSp,RSm] = getRpRmLoop(R,nParticlesS(iSpecies),nSamples);  
-    RijS = getRijLoop1D(R); %Zij is signed Rij
-    
-    RijS = RijS(:);
-    RSp = RSp(:);
-    RSm = RSm(:);
-    
-    % replicate for each bin
-    RSp   = RSp(:,ones(nBins,1));
-    RSm   = RSm(:,ones(nBins,1));
-    RijS  = RijS(:,ones(nBins,1));
+    RijS = getRijLoop1D(R);
+
+    % nParticles x nParticles x nSamples
 
     % find right and left ends of bins
     binR = binEnds(2:end);
     binL = binEnds(1:end-1);
-   
-    % replicate for samples*particles
-    BR = kron(binR,ones(size(RijS,1),1));
-    BL = kron(binL,ones(size(RijS,1),1));
+
+    PV = zeros(nBins,1);
+
+    hw = waitbar(0,'Computing PV');
+    
+    for iSample = 1:nSamples
+
+        waitbar(iSample/nSamples,hw);
         
-    tempA = max(0,RSp - BL);
-    tempB = max(0,BR - RSm);
-    tempC = min(tempA,tempB);
-    tempD = min(tempC,binWidth);
-    temp  = min(tempD,RijS);    
+        RSpi = RSp(:,:,iSample);
+        RSmi = RSm(:,:,iSample);
+        RijSi = RijS(:,:,iSample);
 
-    %[~,dPhidr_r] = Gaussian(RijS(:),optsPhys);
-    [~,dPhidr_r] = V2DV2(RijS(:),optsPhys);
-    dPhidr = reshape(dPhidr_r,size(RijS)).*RijS;
+        [~,dPhidr_r] = V2DV2(RijSi,optsPhys);  
+        dPhidr = dPhidr_r.*RijSi;
 
+        for iBin = 1:nBins
 
-    % for the moment, take phi'=1
-    PV = - 1/2 * sum(temp.*dPhidr,1)/nSamples/binWidth;
-    PV = PV(:);
+            tempA = max(0,RSpi - binL(iBin));
+            tempB = max(0,binR(iBin) - RSmi);
+            tempC = min(tempA,tempB);
+            tempD = min(tempC,binWidth);
+            lij  = min(tempD,RijSi);   
 
+            PV(iBin) = PV(iBin) - 1/2 * sum(sum(lij.*dPhidr));
+        end
 
-    % still need to include other terms
+    end
+    
+    close(hw);
+    
+    PV = PV/nSamples/binWidth;
+    
+    
     
 end
     

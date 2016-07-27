@@ -94,7 +94,6 @@ classdef InfSpectralLineSpherical < Spectral
                 geom.L   = shapeParams.L;
                 subShape = InfSpectralLine(geom);
             end
-                
             
             % initialize matrix
             fP = f(0,subShape.Pts.y);

@@ -212,6 +212,7 @@ if(~isempty(DDFTStruct))
             DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
             DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
             DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+            DDFTStruct(iDDFT).vMean = DDFTAveragesStruct.vMean;
             
         end
           

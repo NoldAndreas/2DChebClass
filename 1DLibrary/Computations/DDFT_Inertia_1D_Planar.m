@@ -171,13 +171,14 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Inertia_1D_Planar(optsPhys,opts
     
     rho_t     = zeros(N,nSpecies,nPlots);
     flux_t    = XV_t(end/2+1:end,:,:).*XV_t(1:end/2,:,:);
+    v_t       = XV_t(end/2+1:end,:,:);
     V_t       = zeros(N,nSpecies,nPlots);
     for i = 1:length(plotTimes)
         rho_t(:,:,i)  = exp((X_t(:,:,i)-Vext)/kBT);
         V_t(:,:,i)    = Vext + getVAddDVAdd1D(yS,plotTimes(i),optsPhys.V1);
     end
     
-    data       = v2struct(IntMatrFex,convStruct,HIStruct,X_t,rho_t,mu,flux_t,V_t);
+    data       = v2struct(IntMatrFex,convStruct,HIStruct,X_t,rho_t,mu,flux_t,v_t,V_t);
     data.shape = aLine;    
 
     if(~isfield(optsNum,'doPlots') ...

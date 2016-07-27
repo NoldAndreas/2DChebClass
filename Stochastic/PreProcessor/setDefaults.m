@@ -59,7 +59,7 @@ if(S.anyStoc)
     D.loadSamples=true;
     
     D.HIParamsNames={};
-    D.useDivergence = false;
+    D.stocUseDivergence = false;
     
     D.doStrip = false;
     

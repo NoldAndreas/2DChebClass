@@ -275,7 +275,8 @@ for iPlot=1:nPlots
         optsPlot.lineStyle=lineStyleStoc{iStoc};
         optsPlot.lineMarker=lineMarkerStoc{iStoc};
         
-        plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).fluxMean,plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
+        %plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).fluxMean,plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
+        plotRVmeans(stoc(iStoc).rMean,stoc(iStoc).vMean,plotTimes,iPlot,optsPlot,handlesM,stocType(iStoc));
 
         hold(hMRa,'on');
         hold(hMPa,'on');        
@@ -284,9 +285,11 @@ for iPlot=1:nPlots
         
         rho   = stoc(iStoc).rho(:,:,iPlot);
         flux  = stoc(iStoc).flux(:,:,iPlot);
+        v     = stoc(iStoc).v(:,:,iPlot);
         boxes = stoc(iStoc).boxes(:,:,iPlot);
         
-        plotRhoVdistStoc(rho,flux,boxes,optsPlot,handlesRP,stocType(iStoc));
+        %plotRhoVdistStoc(rho,flux,boxes,optsPlot,handlesRP,stocType(iStoc));
+        plotRhoVdistStoc(rho,v,boxes,optsPlot,handlesRP,stocType(iStoc));
                       
     end
 
@@ -299,6 +302,7 @@ for iPlot=1:nPlots
         % get rho, v, r and w (for means) values
         rho_t  = ddft(iDDFT).rho_t;
         flux_t = ddft(iDDFT).flux_t;
+        v_t = ddft(iDDFT).v_t;
         
         Interp=ddft(iDDFT).shape.Interp;
         
@@ -308,7 +312,8 @@ for iPlot=1:nPlots
         optsPlot.lineColour=lineColourDDFT{iDDFT};
         
         % plot means of r and v up to current time
-        plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).fluxMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
+        %plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).fluxMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
+        plotRVmeans(ddft(iDDFT).rMean,ddft(iDDFT).vMean,plotTimes,iPlot,optsPlot,handlesM,DDFTType(iDDFT));
 
         hold(hMRa,'on');
         hold(hMPa,'on');
@@ -316,12 +321,13 @@ for iPlot=1:nPlots
         % get values at appropriate time
         rho  = rho_t(:,:,iPlot);
         flux = flux_t(:,:,iPlot);
+        v    = v_t(:,:,iPlot);
         
         optsPlot.plotTime=plotTime;
         
         % plot the distributions
-        %plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
-        plotRhoFluxDDFT(rho,flux,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        plotRhoVdistDDFT(rho,v,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
+        %plotRhoFluxDDFT(rho,flux,Interp,optsPlot,handlesRP,DDFTType(iDDFT));
                
     end
     
