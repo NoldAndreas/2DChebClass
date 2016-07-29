@@ -92,16 +92,19 @@ AddPaths();
 
 %inputFile = 'FlowCheck';
 
-%inputFile = 'Karolis';
-
 %---------------------------------
 
 %inputFile = 'PressureTest1DFree';
 %inputFile = 'PressureTest1DFreeStill';
 %inputFile = 'PressureTest1DFreeFade';
-inputFile = 'PressureTest1DFreeFade2';
+%inputFile = 'PressureTest1DFreeFade2';  % Good example for failure of LE
 %inputFile = 'PressureTest1DGaussian';
 %inputFile = 'PressureTest1DFreeHill';
+
+%---------------------------------
+
+%inputFile = 'Karolis';
+inputFile = 'Box3DSampling';
 
 
 %--------------------------------------------------------------------------
@@ -189,40 +192,49 @@ if(optsStruct.anyPlots || optsStruct.anyPlotsP)
    plotFiles = doPlots(stocStruct,DDFTStruct,optsStoc,optsNumDDFT,optsPlot,optsPlotParticles,optsPhys);
 end
 
+%--------------------------------------------------------------------------
+% Pressure tensor testing
+%--------------------------------------------------------------------------
 
-R = stocStruct.x;
-P = stocStruct.p;
+doPressure = false;
 
-R = permute(R,[2,1,3]);  %nParticles x nSamples x nTimes
-P = permute(P,[2,1,3]);
+if(doPressure)
 
-nBins = 25;
-optsPhys.rMin = -2;
-optsPhys.rMax = 2;
+    R = stocStruct.x;
+    P = stocStruct.p;
 
-for tPos = 41:10:101
+    R = permute(R,[2,1,3]);  %nParticles x nSamples x nTimes
+    P = permute(P,[2,1,3]);
 
-    Rt = R(:,:,tPos);
-    Pt = P(:,:,tPos);
+    nBins = 25;
+    optsPhys.rMin = -2;
+    optsPhys.rMax = 2;
 
-    Rt = reshape(Rt,size(Rt,1),size(Rt,2)*size(Rt,3));
-    Pt = reshape(Pt,size(Pt,1),size(Pt,2)*size(Pt,3));
+    for tPos = 41:10:101
 
-    [PK,PV,binMids,nR,meanP,PbyBin] = getPressure1D(Rt,Pt,nBins,optsPhys);
+        Rt = R(:,:,tPos);
+        Pt = P(:,:,tPos);
 
-    figure
+        Rt = reshape(Rt,size(Rt,1),size(Rt,2)*size(Rt,3));
+        Pt = reshape(Pt,size(Pt,1),size(Pt,2)*size(Pt,3));
 
-    for iPlot = 1:nBins
-        hold off
-        [N,Pmid] = hist(PbyBin{iPlot},20);
-        bar(Pmid,N);
-        hold on
-        maxN = max(N);
-        plot(Pmid, maxN*exp(-(Pmid-meanP(iPlot)).^2/2) );
-        title(num2str(binMids(iPlot)));
-        pause
+        [PK,PV,binMids,nR,meanP,PbyBin] = getPressure1D(Rt,Pt,nBins,optsPhys);
+
+        figure
+
+        for iPlot = 1:nBins
+            hold off
+            [N,Pmid] = hist(PbyBin{iPlot},20);
+            bar(Pmid,N);
+            hold on
+            maxN = max(N);
+            plot(Pmid, maxN*exp(-(Pmid-meanP(iPlot)).^2/2) );
+            title(num2str(binMids(iPlot)));
+            pause
+        end
+
     end
-    
+
 end
     
 %--------------------------------------------------------------------------
