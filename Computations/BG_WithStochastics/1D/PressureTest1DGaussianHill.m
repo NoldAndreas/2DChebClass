@@ -15,7 +15,7 @@ nParticlesS=10;
 kBT=1;          % temperature
 mS=1;
 
-gammaS=0.5;
+gammaS=0.3;
 D0S=kBT./mS./gammaS;
 
 %--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ potParamsNames = {'Vm','Vp','V0Add','sigma2Add','y0','tau'};
 
 V2DV2='Gaussian';
 
-epsilonS = 0;  % no interaction
+epsilonS = 1; 
 alphaS   = 1;
 
 potParams2Names={'epsilon','alpha'};

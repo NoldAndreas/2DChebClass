@@ -100,11 +100,12 @@ AddPaths();
 %inputFile = 'PressureTest1DFreeFade2';  % Good example for failure of LE
 %inputFile = 'PressureTest1DGaussian';
 %inputFile = 'PressureTest1DFreeHill';
+inputFile = 'PressureTest1DGaussianHill';
 
 %---------------------------------
 
 %inputFile = 'Karolis';
-inputFile = 'Box3DSampling';
+%inputFile = 'Box3DSampling';
 
 
 %--------------------------------------------------------------------------
@@ -196,45 +197,13 @@ end
 % Pressure tensor testing
 %--------------------------------------------------------------------------
 
-doPressure = false;
+%doLE = true;
+doLE = false;
 
-if(doPressure)
+if(doLE)
 
-    R = stocStruct.x;
-    P = stocStruct.p;
-
-    R = permute(R,[2,1,3]);  %nParticles x nSamples x nTimes
-    P = permute(P,[2,1,3]);
-
-    nBins = 25;
-    optsPhys.rMin = -2;
-    optsPhys.rMax = 2;
-
-    for tPos = 41:10:101
-
-        Rt = R(:,:,tPos);
-        Pt = P(:,:,tPos);
-
-        Rt = reshape(Rt,size(Rt,1),size(Rt,2)*size(Rt,3));
-        Pt = reshape(Pt,size(Pt,1),size(Pt,2)*size(Pt,3));
-
-        [PK,PV,binMids,nR,meanP,PbyBin] = getPressure1D(Rt,Pt,nBins,optsPhys);
-
-        figure
-
-        for iPlot = 1:nBins
-            hold off
-            [N,Pmid] = hist(PbyBin{iPlot},20);
-            bar(Pmid,N);
-            hold on
-            maxN = max(N);
-            plot(Pmid, maxN*exp(-(Pmid-meanP(iPlot)).^2/2) );
-            title(num2str(binMids(iPlot)));
-            pause
-        end
-
-    end
-
+    testLE(stocStruct,optsPhys);
+    
 end
     
 %--------------------------------------------------------------------------

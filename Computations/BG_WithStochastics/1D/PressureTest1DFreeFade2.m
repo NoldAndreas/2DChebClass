@@ -15,12 +15,11 @@ nParticlesS=10;
 kBT=1;          % temperature
 mS=1;
 
-%gammaS=0.1; % fails
-gammaS=0.2; % fails
+
+%gammaS=0.2; % fails
 %gammaS=0.3; % fails
 %gammaS=0.5; % fails
-%gammaS=1; % fails
-%gammaS=2; % runs but messy
+gammaS=0.4; % fails
 
 D0S=kBT./mS./gammaS;
 
@@ -72,11 +71,8 @@ burnin = 10000;
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=2;
 
 nRuns = 50000;
-
-%nRuns = 50000;
 
 % number of cores to use in parallel processing
 poolsize=12;

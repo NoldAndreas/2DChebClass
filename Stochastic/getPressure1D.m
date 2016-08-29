@@ -87,7 +87,6 @@ for iSpecies=1:nSpecies
     sumP(:,iSpecies)=sumP(:,iSpecies);
     sumP2(:,iSpecies)=sumP2(:,iSpecies);
     
-    % do we actually want to take off the mean in the box??
     PK(:,iSpecies) = sumP2(:,iSpecies) - 2*meanP(:,iSpecies).*sumP(:,iSpecies) ...
                     + nR(:,iSpecies).*meanP(:,iSpecies).^2;
     
@@ -108,11 +107,11 @@ for iSpecies=1:nSpecies
     PV = zeros(nBins,1);
 
     hw = waitbar(0,'Computing PV');
-    
+
     for iSample = 1:nSamples
 
         waitbar(iSample/nSamples,hw);
-        
+
         RSpi = RSp(:,:,iSample);
         RSmi = RSm(:,:,iSample);
         RijSi = RijS(:,:,iSample);
@@ -132,9 +131,9 @@ for iSpecies=1:nSpecies
         end
 
     end
-    
+
     close(hw);
-    
+
     PV = PV/nSamples/binWidth;
     
     
