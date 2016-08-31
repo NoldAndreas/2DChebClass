@@ -69,9 +69,9 @@ initialGuess='makeGrid';
 % number of runs of stochastic dynamics to do, and average over
 %nRuns=2;
 
-%nRuns = 5000;
+nRuns = 5000;
 
-nRuns = 200000;
+%nRuns = 200000;
 
 % number of cores to use in parallel processing
 poolsize=12;

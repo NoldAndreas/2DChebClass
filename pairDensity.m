@@ -1,41 +1,44 @@
-function pairDensity(X)
-    [X1,X2] = meshgrid(X);
-        
-    mask = eye(length(X));
+function [rho2,rhorho,rho] = pairDensity(X,opts)
     
-
+    [X1,X2] = meshgrid(X);
+    
+    % prevent counting the same particle twice
+    mask = eye(length(X));
     X1 = X1(:);
     X2 = X2(:);
-
     X1 = X1(~mask);
     X2 = X2(~mask);
         
     %histogram2(X1,X2);
     
-    nBins = 10;
+    edges = opts.edges;
     
-    edges = linspace(0,1,nBins);
+    nBins = length(edges);
     
-    [N2,Xedges2,Yedges2] = histcounts2(X1,X2,edges,edges)
+    %edges = linspace(0,1,nBins);
     
-    [N,edges] = histcounts(X,edges)
+    %rho2 = histcounts2(X1,X2,edges,edges);
     
-    NN = kron(N,N);
+    edges2 = {edges,edges};
     
-    size(NN)
-    size(X)
+    rho2 = hist3([X1 X2],'Edges',edges2);
     
-    NN = reshape(NN,nBins-1,nBins-1);
+    rho = histc(X,edges);
     
-    figure
+    %rho = histcounts(X,edges);
     
-    subplot(1,2,1)
+    rhorho = kron(rho,rho);
+        
+    rhorho = reshape(rhorho,nBins,nBins);
     
-    bar3(N2)
+    if(isfield(opts,'doPlots') && opts.doPlots)
     
-    subplot(1,2,2)
-    
-    bar3(NN)
+        figure
+        subplot(1,2,1)
+        bar3(rho2)
+        subplot(1,2,2)
+        bar3(rhorho)
 
+    end
 
 end
