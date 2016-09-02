@@ -7,10 +7,10 @@ function testLE(stocStruct,optsPhys)
     P = permute(P,[2,1,3]);
 
     nBins = 25;
-    optsPhys.rMin = -6;
-    optsPhys.rMax = 0;
+    optsPhys.rMin = -5;
+    optsPhys.rMax = 5;
 
-    for tPos = 101:10:101
+    for tPos = 41:5:61
 
         Rt = R(:,:,tPos);
         Pt = P(:,:,tPos);

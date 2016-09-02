@@ -16,10 +16,12 @@ kBT=1;          % temperature
 mS=1;
 
 
-%gammaS=0.2; % fails
+%gammaS=0.2; % fails  % done this
 %gammaS=0.3; % fails
 %gammaS=0.5; % fails
-gammaS=0.4; % fails
+%gammaS=0.4; % fails
+
+gammaS = 2;
 
 D0S=kBT./mS./gammaS;
 
@@ -65,17 +67,21 @@ tMax=5;
 % number of samples to take of the initial and final equilibrium
 % distributions goverened by the second and third arguments of V1DV1 above
 % only relevant if fixedInitial=false or sampleFinal=true
-nSamples = 50000;
-burnin = 10000;
+%nSamples = 50000;
+%burnin = 10000;
+
+nSamples = 20000;
+burnin = 5000;
+
 
 initialGuess='makeGrid';
 
 % number of runs of stochastic dynamics to do, and average over
 
-nRuns = 50000;
+nRuns = 20000;
 
 % number of cores to use in parallel processing
-poolsize=12;
+poolsize=4;
 %poolsize=4;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon

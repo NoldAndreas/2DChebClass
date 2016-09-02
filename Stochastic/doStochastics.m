@@ -106,7 +106,11 @@ else
     opts.optsPhys = optsPhys;
     opts.optsPhys.tMax = [];  % initial sampling independent of final time
     opts.optsStoc = optsStocI;
-
+    opts.optsPhys.D0S = []; % initial sampling independent of friction/diffusion
+    opts.optsPhys.gammaS = [];
+    opts.optsPhys.D0 = []; % initial sampling independent of friction/diffusion
+    opts.optsPhys.gamma = [];    
+    
     ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
     [xInitial,~,Parameters] = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
@@ -125,6 +129,10 @@ if(sampleFinal)
 
     optsPhys.t=optsPhys.tMax;
     optsStocF = optsStocI;
+    opts.optsPhys.D0S = []; % initial sampling independent of friction/diffusion
+    opts.optsPhys.gammaS = [];
+    opts.optsPhys.D0 = []; % initial sampling independent of friction/diffusion
+    opts.optsPhys.gamma = [];    
     
     opts.optsPhys = optsPhys;
     opts.optsStoc = optsStocF;

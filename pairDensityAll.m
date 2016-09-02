@@ -5,7 +5,7 @@ function pairDensityAll(stocStruct)
     nTimes = size(x,3);
     nSamples = size(x,1);
     
-    edges = linspace(-15,0,20)';
+    edges = linspace(-5,5,20)';
     opts.edges = edges;
     
     rho2 = zeros(length(edges),length(edges),nTimes);
