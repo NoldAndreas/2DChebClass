@@ -408,6 +408,9 @@ classdef DDFT_2D < Computation
                 T_n_Max = 1;
             elseif(IsOption(opts,'end'))
                 T_n_Min = T_n_Max;
+            elseif(IsOption(opts,'middle'))
+                T_n_Min = round(T_n_Max/2);
+                T_n_Max = round(T_n_Max/2);
             else
                 T_n_Min = 1;
             end

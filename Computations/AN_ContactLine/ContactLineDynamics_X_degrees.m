@@ -32,6 +32,7 @@ function dynRes = ContactLineDynamics_X_degrees(input,misc) %config,alpha_deg,ep
     CL.ComputeDynamics();    
     CL.PostprocessDynamics(input.fitInterval);
     CL.PlotInterfaceFittingQuality([25,50,75,100]);
+    CL.PlotSlipEstimate();
     %CL.PostprocessDynamics();
 
     %********************************************************************

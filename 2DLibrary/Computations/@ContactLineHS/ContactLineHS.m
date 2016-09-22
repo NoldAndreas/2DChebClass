@@ -383,6 +383,24 @@ classdef ContactLineHS < DDFT_2D
         Compute_DisjoiningPressure_IV(this)
         [errRel,estTheta,error_estTheta,I,err] = SumRule_DisjoiningPressure(this,II_or_IV)      
         [err,eps,pi_II] = SumRuleIIError(this,interval_y1)
+        function d = Compute_LiquidVapourInterfaceThickness(this)
+            
+            %Find y1 where (n - n_vap)/(n_liq-n_vap) = 0.05/0.95
+            nLV = this.rho1D_lg;
+            x1  = this.IDC.Pts.x1;   
+            nV  = this.optsPhys.rhoGas_sat;
+            nL  = this.optsPhys.rhoLiq_sat;
+            
+            pTarget = 0.95; xP = fsolve(@GetN_LV,0);
+            pTarget = 0.05; xM = fsolve(@GetN_LV,0);
+            
+            d = (this.IDC.PhysSpace1(xP) - this.IDC.PhysSpace1(xM))*sin(this.IDC.alpha);
+            
+            function err = GetN_LV(x)
+                IP  = barychebevalMatrix(x1,x);
+                err = (IP*nLV - nV)/(nL-nV)-pTarget;
+            end
+        end
         
         %Compute height profiles
         Compute_hI(this);
@@ -488,8 +506,8 @@ classdef ContactLineHS < DDFT_2D
             
             this.dynamicsResult.pathlines = {};   
             this.dynamicsResult.streaklines = {};   
-            for y1_i = -5:2.5:5
-                for y2_i = 0.5:1:4.5
+            for y1_i = -3:3:3
+                for y2_i = 0.5:2:6.5
                     this.dynamicsResult.pathlines{end+1}   = this.GetPathlines(y1_i,y2_i);
                     this.dynamicsResult.streaklines{end+1} = this.GetStreaklines(y1_i,y2_i);                    
                 end
@@ -557,14 +575,45 @@ classdef ContactLineHS < DDFT_2D
             end 
         end
         [contactlinePos,contactAngle_deg,y2Interface,ak] = ExtrapolateInterface(this,rho,y2,ak,y2Lim,opts,t)
-        function sliplength = GetSliplength(this,y2Bar)
-            pt.y1_kv = this.dynamicsResult.contactlinePos_y1_0(end);
-            pt.y2_kv = y2Bar + 0.5;
-            IP = this.IDC.SubShapePtsCart(pt);
+        function sliplength = GetSliplength(this,delta_y1,y2Bar)
+            pt.y1_kv   = this.dynamicsResult.contactlinePos_y1_0(end) + delta_y1;
+            pt.y2_kv   = y2Bar + 0.5;
             
-            uBar  = IP*CL.dynamicsResult.UV_t(1:end/2,:,end);
-            duBar = IP*CL.IDC.Diff.Dy2*CL.dynamicsResult.UV_t(1:end/2,:,end/2);
+            IP         = this.IDC.SubShapePtsCart(pt);
+            
+            uBar       = IP*this.dynamicsResult.UV_t(1:end/2,:,end);
+            duBar      = IP*this.IDC.Diff.Dy2*this.dynamicsResult.UV_t(1:end/2,:,end);
             sliplength = uBar/duBar - y2Bar;
+        end
+        
+        function PlotSlipEstimate(this)
+            
+            u     = this.dynamicsResult.UV_t(1:end/2,:,end);
+            CLpos = this.dynamicsResult.contactlinePos_y1_0(end);
+            
+            opts  = struct('plain',true,'CART',true,'dist0',true);
+                       
+            PlotSub(-3);%In the vapour phase
+            PlotSub(0); %At the contact line
+            PlotSub(3); %In the liquid phase                        
+            
+            function PlotSub(deltaY1)
+                figure('Position',[0 0 200 200]);
+                this.IDC.plotLine(CLpos*[1 1]+deltaY1,[0.5 5.5],u,opts);
+                slips = [GetSliplength(this,deltaY1,1),...
+                         GetSliplength(this,deltaY1,1.5),...
+                         GetSliplength(this,deltaY1,2),...
+                         GetSliplength(this,deltaY1,2.5)];
+                
+                pbaspect([1 1 1]);
+                xlabel('$y_2$'); ylabel('$u$');    
+                text(2,0,['$\Sliplength = [',num2str(min(slips),3),','...
+                                            num2str(max(slips),3),']$']);
+                                        
+                filename = [this.FilenameDyn,'_','SlipEstimate_DeltaY_',num2str(deltaY1)];
+                SaveCurrentFigure(this,filename);                                        
+            end
+                        
         end
             
         %to delete

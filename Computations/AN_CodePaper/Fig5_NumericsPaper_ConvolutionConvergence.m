@@ -39,9 +39,13 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
     %epw = 0.9;%[0.75,0.8,0.85,0.9,0.95];
     config.optsPhys.V1.epsilon_w = 0.865;%0.9;%    1.0;%1.25;%0.55;% 1.375; %0.7;%1.25;%375;%25; %375;%47;%1.25;
                 
-    N    = 20;%:10:50;    
-    NS_d = 10; %2;  %10;
-    NS   = 10:NS_d:80; %[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
+  %  N    = 20;%20; %:10:50;    
+  %  NS_d = 10; %2;  %10;
+  %  NS   = 10:NS_d:80; %[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
+    
+    N    = 40; 
+    NS_d = 10; 
+    NS   = 10:NS_d:80; 
     
     res = DataStorage(['ConvError'],@ComputeError,v2struct(N,NS,config),[],[],{'config_optsNum_PhysArea_N','config_optsPhys_V1_epsilon_w'});
     

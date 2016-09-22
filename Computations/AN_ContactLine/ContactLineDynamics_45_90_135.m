@@ -1,12 +1,9 @@
-function ContactLineDynamics_45_90_135(kBT)
+function ContactLineDynamics_45_90_135()
     
     AddPaths();
 
-    if(nargin < 1)
-        %kBT = 0.75;
-        kBT = 0.9;
-    end
-
+    kBT = 0.9;
+ 
     PhysArea = struct('N',[40,40],...
                       'L1',4,'L2',2,...                        
                       'alpha_deg',[]);
@@ -64,51 +61,24 @@ function ContactLineDynamics_45_90_135(kBT)
                       'viscosity',optsViscosity);	
 
     config = v2struct(optsNum,optsPhys);      
-
-    %config.optsPhys.kBT = 0.9;            
+        
     if(config.optsPhys.kBT == 0.9)
-        config.optsNum.plotTimes.t_int(2) = 800;
-        config.optsNum.PhysArea.L1 = 6;
-    end
+            config.optsNum.plotTimes.t_int(2) = 400;
+            config.optsNum.PhysArea.L1 = 6;
+	end
 
-    alphas  = [0,30,40,45,50,60,70,80,90,100,110,120,130,135,140,150];    
-    eps     = DataStorage([],@FindEps,struct('alpha_degs',alphas,'config',config),[],[],{});
-    
-    %***************************************************
-    optsDefault = {'snapshots'};
     dynRes = {};
-    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==60),optsDefault);    
-    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==120),optsDefault);
-                                            
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==90),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==0),optsDefault);                                            
-                                            
-    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==90),optsDefault);
-    
-    %****************************************************
-    % further computations
-    optsDefault = {};
-	dynRes{end+1} = MCL_Comp(config,90,eps(alphas==70),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==80),optsDefault);
-	dynRes{end+1} = MCL_Comp(config,90,eps(alphas==100),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,90,eps(alphas==110),optsDefault);
-    
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==40),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==50),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==70),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,60,eps(alphas==80),optsDefault);
-    
-    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==100),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==110),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==130),optsDefault);
-    dynRes{end+1} = MCL_Comp(config,120,eps(alphas==140),optsDefault);
+    dynRes = CollectData(config,dynRes);
+   % dynRes = CollectData(config,0.9,dynRes);
     
     dynRes = PostProcess(dynRes);
     GetDataForThesis(dynRes);
     
+    PlotMKTComparison(dynRes);
 	PlotVelocitiesForThesis(dynRes,'contactlineVel_y1_0','$U_{\text{CL}}$');
     PlotVelocitiesForThesis(dynRes,'contactangle_0','$\theta$'); 
-	PlotMKTComparison(dynRes);
+    PlotVelocitiesForThesis(dynRes,'contactlinePos_y1_0','$y_{1,\text{CL}}$');
+	
     
     %***************************************************
      
@@ -120,6 +90,46 @@ function ContactLineDynamics_45_90_135(kBT)
 %     %MCL_Comp(config,{'90','receding','snapshots'});   
 %     MCL_Comp(config,{'45','receding','snapshots'});        
 %     MCL_Comp(config,{'135','receding','snapshots'});
+    function dynRes = CollectData(config,dynRes)                        
+
+        alphas  = [0,30,40,45,50,60,70,80,90,100,110,120,130,135,140,150];    
+        eps     = DataStorage([],@FindEps,struct('alpha_degs',alphas,'config',config),[],[],...
+                            {'config_optsNum_PlotAreaCart',...
+                             'config_optsNum_plotTimes'});
+
+        %***************************************************
+        optsDefault = {'snapshots'};
+        %dynRes = {};
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==60),optsDefault);    
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==120),optsDefault);        
+
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==90),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==0),optsDefault);                                            
+
+        dynRes{end+1} = MCL_Comp(config,120,eps(alphas==90),optsDefault);
+
+        %****************************************************
+        % further computations
+        optsDefault = {};
+        if(config.optsPhys.kBT == 0.9)
+            config.optsNum.plotTimes.t_int(2) = 800;
+        end
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==70),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==80),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==100),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,90,eps(alphas==110),optsDefault);
+
+
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==40),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==50),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==70),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,60,eps(alphas==80),optsDefault);
+
+        dynRes{end+1} = MCL_Comp(config,120,eps(alphas==100),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,120,eps(alphas==110),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,120,eps(alphas==130),optsDefault);
+        dynRes{end+1} = MCL_Comp(config,120,eps(alphas==140),optsDefault);
+    end
 
     function eps = FindEps(input,misc)        
         input.config.optsNum.PhysArea.alpha_deg = 90;        
@@ -127,21 +137,22 @@ function ContactLineDynamics_45_90_135(kBT)
     end    
     function res = MCL_Comp(config,alpha_deg,epw,opts)
         
-        recomp = true;%[];
+        recomp = [];
          
         config.optsNum.PhysArea.alpha_deg = alpha_deg;
         config.optsPhys.V1.epsilon_w      = epw;
          
-        if(alpha_deg <= 80)
-            y1_Int = [-5,10];
+        if(alpha_deg <= 80)  
+            y10 = 2.5;            
         elseif(alpha_deg >= 100)
-            y1_Int = [-10,5];
+            y10 = -2.5;            
         else
-            y1_Int = [-7.5,7.5];
+            y10 = 0;           
         end
+        dY = config.optsNum.PlotAreaCart.y1Max - config.optsNum.PlotAreaCart.y1Min;
 
-        config.optsNum.PlotAreaCart.y1Min = y1_Int(1);
-        config.optsNum.PlotAreaCart.y1Max = y1_Int(2);
+        config.optsNum.PlotAreaCart.y1Min = y10 - dY/2;
+        config.optsNum.PlotAreaCart.y1Max = y10 + dY/2;
          
         input.config = config;
         input.opts   = opts;
@@ -171,14 +182,31 @@ function ContactLineDynamics_45_90_135(kBT)
         end
    end 
     function PlotMKTComparison(res)
-        gammaLV =  0.2853;
+        
+        if(config.optsPhys.kBT == 0.75)
+            gammaLV =  0.2853;
+            index = 80;            
+            zeta_receding  = 4;%wRecSum/URecSum;
+            zeta_advancing = 10;%wAdvSum/UAdvSum;
+            
+            d_lv           = 4.240;
+        elseif(config.optsPhys.kBT == 0.9)
+            gammaLV = 0.071572;
+            index   = 50;
+            
+            zeta_receding  = 4;%wRecSum/URecSum;
+            zeta_advancing = 10;%wAdvSum/UAdvSum;
+            
+            d_lv           = 7.290;
+        else
+            return;
+        end
         
         figure('color','white','Position',[0 0 300 250]);
-        index = 80;
         leg = {};
         
-        %zeta_advancing = 0; n_advancing = 0;
-        %zeta_receding  = 0; n_receding  = 0;        
+        zeta_advancing = 0; n_advancing = 0;
+        zeta_receding  = 0; n_receding  = 0;        
         wAdvSum = 0; wRecSum = 0;
         UAdvSum = 0; URecSum = 0;
         
@@ -190,7 +218,7 @@ function ContactLineDynamics_45_90_135(kBT)
             %subplot(1,2,1);
             w = gammaLV*res{i}.cosDiff_t(index);
             U = res{i}.contactlineVel_y1_0(index);
-            plot(w,U,res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
+            plot(w,U/d_lv,res{i}.sym,'MarkerFaceColor',res{i}.col,'MarkerEdgeColor',res{i}.col);  hold on;
             %plot(res{i}.cosDiff,res{i}.contactlineVel_y1_0(index),...
             %subplot(1,2,2);
             %plot(res{i}.GDiff,res{i}.contactlineVel_y1_0(index),...
@@ -202,22 +230,21 @@ function ContactLineDynamics_45_90_135(kBT)
                 if(res{i}.thetaEq < res{i}.thetaInitial)
                     wAdvSum = wAdvSum + w;
                     UAdvSum = UAdvSum + U;
-%                     n_advancing    = n_advancing + 1;
-%                     zeta_advancing = zeta_advancing + w/U;
+                     n_advancing    = n_advancing + 1;
+                     zeta_advancing = zeta_advancing + w/U;
 %                     disp(w/U);
                 else
                     wRecSum = wRecSum + w;
                     URecSum = URecSum + U;
-                    %n_receding     = n_receding + 1;
-                    %zeta_receding  = zeta_receding + w/U;
+                    n_receding     = n_receding + 1;
+                    zeta_receding  = zeta_receding + w/U;
                 end
             end
             
         end
-        zeta_receding  = 4;%wRecSum/URecSum;
-        zeta_advancing = 10;%wAdvSum/UAdvSum;
-%         zeta_receding  = zeta_receding  / n_receding;
-%         zeta_advancing = zeta_advancing / n_advancing;
+        
+         zeta_receding  = zeta_receding  / n_receding;
+         zeta_advancing = zeta_advancing / n_advancing;
         
         plot([0;0.07],[0;0.07]/zeta_receding,'k');
         plot([0;-0.13],[0;-0.13]/zeta_advancing,'--k');
@@ -239,7 +266,7 @@ function ContactLineDynamics_45_90_135(kBT)
         figure('color','white','Position',[0 0 200 150]);
         for ii = 1:length(res)
             if(isfield(res{ii},'erratic'))
-                continue;
+                continue;            
             end        
             %mark = (20:100);            
             plot(res{ii}.t, res{ii}.(varName),[res{ii}.col]); hold on; %res{ii}.lin
@@ -255,7 +282,7 @@ function ContactLineDynamics_45_90_135(kBT)
     end          
     function res = PostProcess(res)
         
-        cols = {'r','m','k','b','c','g'};
+        cols = {'r','m','k','b','c','g'};         
         
         for i = 1:length(res)        
             if(isfield(res{i},'erratic'))
@@ -263,8 +290,12 @@ function ContactLineDynamics_45_90_135(kBT)
             end
 
             res{i}.thetaEq   = res{i}.thetaEq*180/pi;
+            
+            thetaFinal       = res{i}.contactangle_0(end);
             res{i}.cosDiff   = cos(res{i}.thetaInitial*pi/180)-cos(res{i}.thetaEq*pi/180);
-            res{i}.cosDiff_t = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq*pi/180);
+            %res{i}.cosDiff_t = cos(res{i}.contactangle_0*pi/180)-cos(res{i}.thetaEq*pi/180);
+            res{i}.cosDiff_t = cos(res{i}.contactangle_0*pi/180)-cos(thetaFinal*pi/180);                        
+            
             %res{i}.cosDiff_t = cos(res{i}.thetaInitial*pi/180)-cos(res{i}.contactangle_0*pi/180);
 
             lambdaEta      = 0.2;
