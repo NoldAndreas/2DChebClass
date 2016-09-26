@@ -92,7 +92,16 @@ function [f1,f1leq,rho,meanP] = oneBodyDistribution(X,P,opts)
     dv = repmat(dv',nBinsP,1);
     
     f1cut = f1(:,2:end-1);
+    f1leqcut = f1leq(:,2:end-1);
     binMidsXCut = binMidsX(2:end-1);
+    
+    f1cutmask = (f1cut > max(max(f1cut))*0.05);
+    
+    %A = f1cut./dv./f1leqcut;
+    A = f1cut./dv;
+    A(~f1cutmask) = 0;
+    dv(~f1cutmask) = 0;
+    
     
     figure('Position',[0,0,1200,800]);
     subplot(1,3,1)
@@ -103,9 +112,13 @@ function [f1,f1leq,rho,meanP] = oneBodyDistribution(X,P,opts)
     pcolor(binMidsXCut,binMidsP,dv)
     colorbar
     
+    % do cutoff for where f1 is significant, otherwise just get noise
     subplot(1,3,3)
-    pcolor(binMidsXCut,binMidsP,f1cut./dv)
+    pcolor(binMidsXCut,binMidsP,A)
     colorbar
+    %surf(binMidsXCut,binMidsP,f1cut./dv./f1leqcut)
+    
+
     
     
 

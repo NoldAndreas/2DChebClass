@@ -97,10 +97,10 @@ AddPaths();
 %inputFile = 'PressureTest1DFree';
 %inputFile = 'PressureTest1DFreeStill';
 %inputFile = 'PressureTest1DFreeFade';
-inputFile = 'PressureTest1DFreeFade2';  % Good example for failure of LE
+%inputFile = 'PressureTest1DFreeFade2';  % Good example for failure of LE
 %inputFile = 'PressureTest1DGaussian';
 %inputFile = 'PressureTest1DFreeHill';
-%inputFile = 'PressureTest1DGaussianHill';
+inputFile = 'PressureTest1DGaussianHill';
 
 %---------------------------------
 

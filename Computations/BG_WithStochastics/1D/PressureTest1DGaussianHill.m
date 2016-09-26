@@ -15,7 +15,10 @@ nParticlesS=10;
 kBT=1;          % temperature
 mS=1;
 
-gammaS=0.3;
+%gammaS=0.3; % DDFT works and obviously not leq
+gammaS = 1;
+%gammaS=2;
+
 D0S=kBT./mS./gammaS;
 
 %--------------------------------------------------------------------------
@@ -69,9 +72,9 @@ initialGuess='makeGrid';
 % number of runs of stochastic dynamics to do, and average over
 %nRuns=2;
 
-nRuns = 5000;
+nRuns = 50000;
 
-%nRuns = 200000;
+%nRuns = 200000; % gamma = 0.3
 
 % number of cores to use in parallel processing
 poolsize=12;

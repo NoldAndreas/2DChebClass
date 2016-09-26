@@ -104,12 +104,14 @@ else
 
     optsPhys.t=0;
     opts.optsPhys = optsPhys;
-    opts.optsPhys.tMax = [];  % initial sampling independent of final time
     opts.optsStoc = optsStocI;
-    opts.optsPhys.D0S = []; % initial sampling independent of friction/diffusion
-    opts.optsPhys.gammaS = [];
-    opts.optsPhys.D0 = []; % initial sampling independent of friction/diffusion
-    opts.optsPhys.gamma = [];    
+
+    removeList = {'tMax','D0S','gammaS','D0','gamma'};
+    for k = 1:length(removeList)
+        if(isfield(opts.optsPhys,[removeList{k}]))
+           opts.optsPhys = rmfield(opts.optsPhys,[removeList{k}]);              
+        end
+    end  
     
     ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
@@ -129,14 +131,16 @@ if(sampleFinal)
 
     optsPhys.t=optsPhys.tMax;
     optsStocF = optsStocI;
-    opts.optsPhys.D0S = []; % initial sampling independent of friction/diffusion
-    opts.optsPhys.gammaS = [];
-    opts.optsPhys.D0 = []; % initial sampling independent of friction/diffusion
-    opts.optsPhys.gamma = [];    
-    
-    opts.optsPhys = optsPhys;
     opts.optsStoc = optsStocF;
-
+    opts.optsPhys = optsPhys;
+    
+    removeList = {'D0S','gammaS','D0','gamma'};
+    for k = 1:length(removeList)
+        if(isfield(opts.optsPhys,[removeList{k}]))
+           opts.optsPhys = rmfield(opts.optsPhys,[removeList{k}]);              
+        end
+    end
+    
     FCDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final'];
     
     [xFinal,~,Parameters] = DataStorage(FCDir,@samplepdf,opts,[],~loadSamples);
