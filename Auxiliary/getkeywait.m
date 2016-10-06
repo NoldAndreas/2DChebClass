@@ -25,7 +25,7 @@ function ch = getkeywait(m)
 %                  still exists (after comment on GETKEY on FEX by Andrew). 
 
 % check input argument
-w = warning ('on','all');
+w = warning ('off','all');
 error(nargchk(1,1,nargin)) ;
 warning(w);
 if numel(m)~=1 || ~isnumeric(m) || ~isfinite(m) || m <= 0,    

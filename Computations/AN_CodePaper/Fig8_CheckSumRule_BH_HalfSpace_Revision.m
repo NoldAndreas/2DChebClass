@@ -1,4 +1,4 @@
-function CheckSumRule_BH_HalfSpace()
+function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     
     AddPaths('CodePaper');  
     close all;
@@ -35,7 +35,10 @@ function CheckSumRule_BH_HalfSpace()
 
     config = v2struct(optsNum,optsPhys);                        
 
-    N    = 20:5:120;        
+    %N    = 20:5:120;        
+    %N    = 20:5:100;        
+    %N    = 40:20:120;
+    N    = 50:50:250;
     y    = (0.5:0.1:20)';
     
     ignoreList = {'config_optsNum_PhysArea_N',...
@@ -167,7 +170,7 @@ function CheckSumRule_BH_HalfSpace()
         end
     end    
     function PlotConvergenceDensityProfiles(res,N,acc,xlims,ints,name,varName)        
-        figure('Position',[0 0 1800 500],'color','white');
+        figure('color','white');%'Position',[0 0 1800 500]
         for i = 1:3            
             subplot(1,3,i); 
             if(~isempty(acc))
@@ -185,8 +188,10 @@ function CheckSumRule_BH_HalfSpace()
         CLT = ContactLineHS(conf);
         CLT.PreprocessIDC();         
 
-        xIP = (-1:0.002:1)';
-        yIP = CLT.IDC.PhysSpace2(xIP);                
+        %xIP = (-1:0.002:1)';
+        %yIP = CLT.IDC.PhysSpace2(xIP);                        
+        yIP = (0.5:0.01:11)';
+        xIP = CLT.IDC.CompSpace2(yIP);
         
         rhoRef = res(1).(rhoName)(end);                
         mark   = ( (N >= NInt(1)) & (N <= NInt(2)));        
@@ -194,7 +199,7 @@ function CheckSumRule_BH_HalfSpace()
         is     = is(mark);        
         cls = GetGreyShades(length(is)); %cols = {'b','m','k','r','g'};
                 
-        f1 = figure('color','white','Position',[0 0 600 600]);
+        f1 = figure('color','white');%,'Position',[0 0 600 600]);
        %plot(res(end).y2-0.5,res(end).(rhoName),'o','color','k','MarkerSize',8,'MarkerFaceColor','k'); hold on;
         IP = barychebevalMatrix(res(end).x2,xIP);
         plot(yIP-0.5,IP*res(end).(rhoName),'-','color','k','linewidth',1.5); hold on;
@@ -203,7 +208,7 @@ function CheckSumRule_BH_HalfSpace()
         xlabel('$y_2$','Interpreter','Latex','fontsize',25); %/\sigma
         ylabel('$n$','Interpreter','Latex','fontsize',25); %\sigma^3
         
-        f2 = figure('color','white','Position',[0 0 600 600]);
+        f2 = figure('color','white');%'Position',[0 0 600 600]);
         for i = 1:sum(mark)
             resI   = res(is(i));
             rhoRefErr = abs(rhoRef-res(i).(rhoName)(end));
@@ -297,6 +302,11 @@ function CheckSumRule_BH_HalfSpace()
             
             conf.optsNum.PhysArea.N       = [1,n(i)];
             conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
+            conf.optsNum.FexNum.N1disc    = 40;%n(i);
+            conf.optsNum.FexNum.N2disc    = 40;%n(i);
+            if(isfield(conf.optsNum,'V2Num'))
+                conf.optsNum.V2Num.N      =  2*round((20+n(i)/2)/2)*[1,1];%[80,80];%2*round((n(i)/2))*[1,1];
+            end
 
             CL = ContactLineHS(conf);
             preErr = CL.Preprocess(); 
@@ -364,7 +374,7 @@ function CheckSumRule_BH_HalfSpace()
     end
        
     function PlotFullErrorGraph(res,var_name,yLab,filename)
-        figure('color','white','Position',[0 0 900 800]); 
+        figure('color','white');%,'Position',[0 0 900 800]); 
         for i0 = 1:length(res)            
             var_name_wg = [var_name(1:end-3),'_wg'];
             if(isfield(res{i0}(1,1),var_name_wg))

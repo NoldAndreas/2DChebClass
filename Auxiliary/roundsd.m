@@ -47,7 +47,9 @@ function y=roundsd(x,n,method)
 %	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 %	POSSIBILITY OF SUCH DAMAGE.
 
+w = warning ('off','all');
 error(nargchk(2,3,nargin))
+warning(w);
 
 if ~isnumeric(x)
 		error('X argument must be numeric.')
