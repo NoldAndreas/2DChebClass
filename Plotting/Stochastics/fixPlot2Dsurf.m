@@ -63,26 +63,25 @@ pbaspect(h,[ (xMax-xMin)   (yMax-yMin)   max( (xMax-xMin) , (yMax-yMin) ) ]);
 xticks=get(h,'XTick');
 yticks=get(h,'YTick');
 
-
 nx=length(xticks);
 ny=length(yticks);
 mx=floor(nx/2)+1;
 my=floor(ny/2)+1;
 
 if(nx>2)
-    xLabelPos=[xticks(mx)+(xticks(mx+1)-xticks(mx))/2, -0.1*(yMax-yMin)+yMin, zMin];
+    xLabelPos=[xticks(mx)+(xticks(mx+1)-xticks(mx))/2, -0.2*(yMax-yMin)+yMin, zMin];
 end
 
 if(ny>2)
     sgny=sign(viewPoint(1));
 
     if (sgny>0)
-        xVal=0.1*(xMax-xMin)+xMax;
+        xVal=0.2*(xMax-xMin)+xMax;
     else
-        xVal=-0.1*(xMax-xMin)+xMin;
+        xVal=-0.2*(xMax-xMin)+xMin;
     end
 
-    yLabelPos=[xVal, yticks(my)+(yticks(my+1)-yticks(my))/2, zMin];
+    yLabelPos=[xVal, yticks(my)+(yticks(my+1)-yticks(my))/2, zMin - 0.1*(zMax-zMin)];
 end
 
 % FIX THIS FOR VIEW FROM OTHER SIDE?
@@ -94,6 +93,10 @@ if(isLatex)
 else
     set(get(h,'XLabel'),'String',xLab,'FontSize',20)
 end
+
+% xLab = get(h,'XLabel');
+% xLabPos = get(xLab,'Position');
+% set(xLab,'Position',[xLabPos(1), xLabPos(2), xLabPos(3)+0.025]);
 
 if(nx>2)
     set(get(h,'XLabel'),'Position',xLabelPos);
@@ -110,6 +113,11 @@ if(ny>2)
     set(get(h,'YLabel'),'Position',yLabelPos);
 end
 
+% yLab = get(h,'YLabel');
+% yLabPos = get(yLab,'Position');
+% set(yLab,'Position',[0.9*yLabPos(1), yLabPos(2), yLabPos(3)+0.02]);
+
+
 isLatex=~isempty(strfind(zLab,'$'));
 if(isLatex)
     set(get(h,'ZLabel'),'String',zLab,'Interpreter','LaTex','FontSize',20)
@@ -124,7 +132,7 @@ end
 if(~isempty(time))
     axes(h);  %#ok % need this as you can't use gca with text
     
-    textX=xMax;
+    textX=xMin + 0.7*(xMax-xMin);
     textY=yMin+0.75*(yMax-yMin);
     textZ=zMin+0.9*(zMax-zMin);
     

@@ -188,7 +188,7 @@ classdef DDFT_2D < Computation
                 
                 disp('*** Test FMT matrices ***');
                 if(isfield(this.optsNum.FexNum,'Fex') && strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
-                    res = CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);                    
+                %    res = CheckAverageDensities_Rosenfeld_3D(this.IDC,this.IntMatrFex);                    
                 end
                 
             elseif(isfield(this.optsPhys,'HSBulk') && ~strcmp(this.optsPhys.HSBulk,'Fex_ZeroMap'))
@@ -664,6 +664,9 @@ classdef DDFT_2D < Computation
             plotData.filename = this.FilenameDyn;
             plotData.data.shape = this.IDC;
 
+            plotData
+            
+            
             figure('Position',[0 0 1000 1000]);
             fig_h = PlotDDFT(plotData,rec);
         end              

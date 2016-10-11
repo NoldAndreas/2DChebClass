@@ -73,6 +73,12 @@ hr=zeros(nSpecies,1);
 % hp1=hr;
 % hp2=hr;
 
+doContours = true;
+
+if(isfield(optsPlot,'contours') && ~optsPlot.contours)
+    doContours = false;
+end
+
 for iSpecies=1:nSpecies
     
     rhoS=rho(:,:,iSpecies);
@@ -82,7 +88,7 @@ for iSpecies=1:nSpecies
     switch optsPlot.plotType
         case 'surf'
             % surface plot
-            %hr(iSpecies)=surf(hRa(iSpecies),xRS(:,:,1),xRS(:,:,2),nRS);
+            
             hr(iSpecies)=surf(hRa(iSpecies),boxesS(:,:,1),boxesS(:,:,2),rhoS);
             set(hr(iSpecies),'FaceColor',faceColour{iSpecies}) %, ...
                 %'EdgeColor','none','LineStyle','none','FaceLighting','phong');
@@ -103,11 +109,14 @@ for iSpecies=1:nSpecies
         lineStyle{iSpecies} = ':';
     end
     
-    [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
-    set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
-    clabel(C,h,'Color',faceColour{iSpecies});
-    hold(hCa,'on');
-
+    
+    if(doContours)
+        [C,h]=contour(hCa,boxesS(:,:,1),boxesS(:,:,2),rhoS);
+        set(h,'color',faceColour{iSpecies},'linewidth',contourWidth,'linestyle',lineStyle{iSpecies});
+        clabel(C,h,'Color',faceColour{iSpecies});
+        hold(hCa,'on');
+    end
+        
     % FLUXES??
     
     

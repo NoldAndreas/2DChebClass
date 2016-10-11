@@ -1,5 +1,7 @@
  function res = CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,opts)           
  
+    this
+ 
        if((nargin > 2) && islogical(opts))
            VisualOutput = opts;
        else

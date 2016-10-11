@@ -11,7 +11,7 @@ stocDim=2;
 DDFTDim=2;
 
 %nParticlesS=20;
-nParticlesS=20;
+nParticlesS=25;
 
 kBT=1;          % temperature
 mS=1;
@@ -66,7 +66,11 @@ HIParamsNames={'sigmaH'};
 %--------------------------------------------------------------------------
 
 % end time of calculation
-tMax=0.25;
+%tMax=0.25;
+tMax = 0.3;
+%tMax = 5;
+%tMax = 8;
+%tMax = 15;
 
 
 %--------------------------------------------------------------------------
@@ -130,12 +134,16 @@ Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
 
 
-Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
+Sub_Area = struct('shape','Box','y1Min',-10,'y1Max',10,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
-Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',100,...
-                       'y2Min',0.5,'y2Max',20,'N2',100);
+% Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',50,...
+%                        'y2Min',0.5,'y2Max',10,'N2',50);
 
+
+Plot_Area = struct('y1Min',-3,'y1Max',3,'N1',30,...
+                       'y2Min',0.5,'y2Max',4,'N2',30);
+                   
 % Fex_Num   = struct('Fex','FMTRosenfeld',...
 %                        'Ncircle',10,'N1disc',10,'N2disc',10);
 
@@ -149,19 +157,23 @@ Fex_Num   = struct('Fex','FMTRoth',...
 %eq_Num    = struct('eqSolver','Newton','NewtonLambda1',0.7,'NewtonLambda2',0.7);
 eq_Num = struct('eqSolver','fsolve');
                    
-PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area};
+PhysArea = {Phys_Area, Phys_Area, Phys_Area, Phys_Area, Phys_Area};
 
-SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area};
+SubArea  = {Sub_Area, Sub_Area, Sub_Area, Sub_Area, Sub_Area};
 
-PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area};
+PlotArea = {Plot_Area, Plot_Area, Plot_Area, Plot_Area, Plot_Area};
 
-FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num};
+FexNum   = {Fex_Num, Fex_Num, Fex_Num, Fex_Num, Fex_Num};
 
-V2Num    = {[],[],[],[]};
+V2Num    = {[],[],[],[],[]};
 
-eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num};
+eqNum    = {eq_Num,eq_Num,eq_Num,eq_Num,eq_Num};
 
 HINum    = {[], ...
+            struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','Oseen_2D_noConv', ...
+                      'HIPreprocess', 'RotnePragerPreprocess2D', ...
+                      'HIWallFull',true,'doConv',false,...
+                      'Wall','SelfWallTermZero'), ...
             struct('N',[20;20],'L',2,'HI11','noHI_2D','HI12','FullWallHI_2D_noConv', ...
                       'HIPreprocess', 'RotnePragerPreprocess2D',...
                       'HIWallFull',true,'doConv',false,...
@@ -176,32 +188,34 @@ HINum    = {[], ...
                       'Wall','SelfWallTermKN'), ...
            };
 
-DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
+DDFTCode = {'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics', 'DDFTDynamics'};
         
 doPlots = false;
 
 DDFTParamsNames = {{'PhysArea','SubArea','PlotArea','FexNum','V2Num','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
+                   {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}, ...
                    {'PhysArea','SubArea','PlotArea','FexNum','V2Num','HINum','eqNum','doPlots'}};
 
 HIParamsNamesDDFT={'sigmaH','sigma'};               
                
-DDFTName={'No HI','Full HI','Just Wall','Oseen + Wall'};
+DDFTName={'No HI','Just Oseen','Full HI','Just Wall','Oseen + Wall'};
 
 
 % type of DDFT calculations, either 'rv' to include momentum, or 'r' for
 % the standard position DDFT
-DDFTType={'r','r','r','r'};
+DDFTType={'r','r','r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true,true};
-%doDDFT={true,false,false,false};
+%doDDFT={true,true,true,true,false};
+doDDFT={true,false,true,false,false};
 
 % do we load and save the DDFT data
-loadDDFT={true,true,true,true};
+loadDDFT={true,true,true,true,true};
 %loadDDFT={false,false};
 
-DDFTColour = {{'r'},{'b'},{'g'},{'m'}};
+DDFTColour = {{'r'},{'b'},{'g'},{'m'},{'c'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup
@@ -214,13 +228,13 @@ viewPoint = [-56;7];
 % x axis for position and velocity plots
 rMin=[-3;0];
 %rMax=[3;20];
-rMax=[3;5];
+rMax=[3;4];
 pMin=rMin;
 pMax=rMax;
 
 % y axis for position and velocity plots
 RMin=0;
-RMax=0.6;
+RMax=0.75;
 
 PMin=[-1;-1];
 PMax=[1;1];
@@ -237,8 +251,9 @@ nBins=[40;40];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = true;
-doInitialFinal = true;
+doMovieAvi     = false;
+doPdfs         = true;
+doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
 

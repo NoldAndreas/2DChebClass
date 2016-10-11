@@ -121,7 +121,7 @@ stocHIType={[],'RP','OseenPlusWall2D'};
 stocName={'noHI','RP','OseenWall'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={true,false,false};
+doStoc={false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
@@ -192,11 +192,11 @@ DDFTName={'Rosenfeld','Roth','Rosenfeld3D'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true};
+doDDFT={true,true,false};   % 3D case doesn't seem to work?
 %doDDFT={false,true,false};
 
 % do we load and save the DDFT data
-loadDDFT={false,true,false};
+loadDDFT={true,true,false};
 
 DDFTColour = {{'r'},{'b'},{'g'}};
 

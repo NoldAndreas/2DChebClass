@@ -90,8 +90,7 @@ tMax=0.5;
 % only relevant if fixedInitial=false or sampleFinal=true
 
 
-nSamples = 1000000;  
-%nSamples = 200000; 
+nSamples = 1000000;  % done
 
 %nSamples = 50000;
 
@@ -192,7 +191,7 @@ DDFTName={'Rosenfeld','Roth','Rosenfeld3D'};
 DDFTType={'r','r','r'};
 
 % whether to do DDFT calculations
-doDDFT={true,true,true};
+doDDFT={true,true,false};
 %doDDFT={false,true,false};
 
 % do we load and save the DDFT data
@@ -234,9 +233,9 @@ nBins=[20;20];
 % determine which movies/plots to make
 % distribution movies/plots
 doMovieGif     = false;          % .gif movie
-doMovieAvi     = false;
+doMovieAvi     = true;
 doInitialFinal = false;
 doMeans        = false;
-doEquilibria   = true;
+doEquilibria   = false;
 
 %sendEmail = true;

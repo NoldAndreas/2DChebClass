@@ -105,6 +105,16 @@ else
 end
 
 %--------------------------------------------------------------------------
+% Determine if there is a set initial condition
+%--------------------------------------------------------------------------
+
+if(isfield(optsStruct,'ICrho'))
+    optsStruct.IC = true;
+else
+    optsStruct.IC = false;
+end
+
+%--------------------------------------------------------------------------
 % Assign defaults to any missing values
 %--------------------------------------------------------------------------
 
@@ -144,6 +154,14 @@ if(optsStruct.flow)
 end
 
 %--------------------------------------------------------------------------
+% Set up IC parameters
+%--------------------------------------------------------------------------
+
+if(optsStruct.IC)
+    optsStruct=setICParams(optsStruct);
+end
+
+%--------------------------------------------------------------------------
 % Set up HI parameters
 %--------------------------------------------------------------------------
 
@@ -159,9 +177,11 @@ optsStruct=setDDFTParams(optsStruct);
 % Determine which plots we're doing
 %--------------------------------------------------------------------------
 
-optsStruct.anyPlots=any([optsStruct.doPdfs,optsStruct.doMovieGif,optsStruct.doMovieSwf,optsStruct.doMovieAvi, ...
-              optsStruct.doInitialFinal,optsStruct.doMeans,optsStruct.doCustom,optsStruct.doEquilibria]);
+optsStruct.anyPlots=any([optsStruct.doPdfs,optsStruct.doFigs,optsStruct.doMovieGif,optsStruct.doMovieSwf,optsStruct.doMovieAvi, ...
+              optsStruct.doInitialFinal,optsStruct.doMeans,optsStruct.doCustom,optsStruct.doEquilibria, ...
+              optsStruct.doSnapshotsError,optsStruct.doSnapshotsDDFT]);
 optsStruct.anyPlotsP=any([optsStruct.doPdfsP,optsStruct.doMovieGifP,optsStruct.doMovieSwfP, ...
                optsStruct.doInitialFinalP,optsStruct.doCustomP]);
+
 
 end

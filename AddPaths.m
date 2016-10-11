@@ -15,11 +15,13 @@
             dirData    = 'D:\2DChebData';                
         case '00:88:65:35:a1:92'
             %dirData    = '/Volumes/BACKUP_IC/2DChebData';
-            dirData    = '/Users/NoldAndreas/Documents/2DChebData';
+            dirData    = '/Users/NoldAndreas/Documents/2DChebData';            
         case '1C:C1:DE:52:03:FF' % Ben office machine
             dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';            
         case '10:40:f3:8a:30:f4' % Ben MacBook Air
-            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';            
+            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
+        case 'f4:5c:89:93:1d:7f' % Ben MacBook Pro
+            dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
         case '80:e6:50:13:7e:a8' % Andreas' MPI Laptop
             dirData    = '/Users/andreas/Documents/2DChebData';                
         case 'C8:1F:66:ED:06:8F' % compute64c

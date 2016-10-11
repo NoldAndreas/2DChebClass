@@ -27,6 +27,9 @@ function plotFiles = doPlots(stocStruct,DDFTStruct,optsStocFull,optsDDFTFull,opt
 
 plotFiles = {};
 
+anyPlots  = ~isempty(optsPlot);
+anyPlotsP = ~isempty(optsPlotParticles);
+
 %--------------------------------------------------------------------------
 % Set text size and line width
 %--------------------------------------------------------------------------
@@ -128,45 +131,49 @@ if(~isempty(stocStruct))
     % get dynamic quantities (rho, v, means, etc)
     %--------------------------------------------------------------------------
     
-    opts.optsPhys = optsPhys;
+    if(anyPlots) % ony if doing any non-particle plots
+    
+        opts.optsPhys = optsPhys;
 
-    opts.optsPlot.geom        = optsPlot.geom;
-    opts.optsPlot.nBins       = optsPlot.nBins;
-    opts.optsPlot.dim         = optsPlot.dim;
-    opts.optsPlot.plotTimes   = optsPlot.plotTimes;
-    opts.optsPlot.nParticlesS = optsPlot.nParticlesS;
-    opts.optsPlot.mS          = optsPlot.mS;
-    if(optsPhys.dim == 2)
-        opts.optsPlot.fixedBins   = optsPlot.fixedBins;
-        opts.optsPlot.rMin        = optsPlot.rMin;
-        opts.optsPlot.rMax        = optsPlot.rMax;
+        opts.optsPlot.geom        = optsPlot.geom;
+        opts.optsPlot.nBins       = optsPlot.nBins;
+        opts.optsPlot.dim         = optsPlot.dim;
+        opts.optsPlot.plotTimes   = optsPlot.plotTimes;
+        opts.optsPlot.nParticlesS = optsPlot.nParticlesS;
+        opts.optsPlot.mS          = optsPlot.mS;
+        if(optsPhys.dim == 2)
+            opts.optsPlot.fixedBins   = optsPlot.fixedBins;
+            opts.optsPlot.rMin        = optsPlot.rMin;
+            opts.optsPlot.rMax        = optsPlot.rMax;
+        end
+
+
+        nStoc = length(optsStocFull);
+
+        fprintf(1,'Calculating dynamics values ... ');
+        for iStoc = 1:nStoc
+            optsStoc = optsStocFull(iStoc);
+
+            redoPlotData = ~optsStoc.loadStoc;
+    %         redoPlotData = true;
+
+            optsStoc = rmfield(optsStoc,'loadSamples');
+            optsStoc = rmfield(optsStoc,'sampleFinal');
+            optsStoc = rmfield(optsStoc,'poolsize');
+            optsStoc = rmfield(optsStoc,'doStoc');
+            optsStoc = rmfield(optsStoc,'loadStoc');
+            optsStoc = rmfield(optsStoc,'saveStoc');
+            optsStoc = rmfield(optsStoc,'stocName');
+
+            opts.optsStoc = optsStoc;
+
+            plotDataDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Dynamics' filesep 'Plotting'];
+            stocPlotStruct(iStoc) = DataStorage(plotDataDir,@getAverages,opts,stocStruct(iStoc),redoPlotData);
+
+        end
+        fprintf(1,'Finished\n');
+    
     end
-
-
-    nStoc = length(optsStocFull);
-
-    fprintf(1,'Calculating dynamics values ... ');
-    for iStoc = 1:nStoc
-        optsStoc = optsStocFull(iStoc);
-
-        redoPlotData = ~optsStoc.loadStoc;
-%         redoPlotData = true;
-
-        optsStoc = rmfield(optsStoc,'loadSamples');
-        optsStoc = rmfield(optsStoc,'sampleFinal');
-        optsStoc = rmfield(optsStoc,'poolsize');
-        optsStoc = rmfield(optsStoc,'doStoc');
-        optsStoc = rmfield(optsStoc,'loadStoc');
-        optsStoc = rmfield(optsStoc,'saveStoc');
-        optsStoc = rmfield(optsStoc,'stocName');
-
-        opts.optsStoc = optsStoc;
-
-        plotDataDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Dynamics' filesep 'Plotting'];
-        stocPlotStruct(iStoc) = DataStorage(plotDataDir,@getAverages,opts,stocStruct(iStoc),redoPlotData);
-
-    end
-    fprintf(1,'Finished\n');
 
 else
     
@@ -205,6 +212,7 @@ if(~isempty(DDFTStruct))
             DDFTAveragesStruct      = getAveragesDDFT([],DDFTStruct(iDDFT));
             DDFTStruct(iDDFT).rMean    = DDFTAveragesStruct.rMean;
             DDFTStruct(iDDFT).fluxMean = DDFTAveragesStruct.fluxMean;
+            DDFTStruct(iDDFT).vMean = DDFTAveragesStruct.vMean;
             
         end
           
@@ -218,56 +226,89 @@ else
     
 end
 
-
-if(~exist(optsPlot.plotDir,'dir'))
-    mkdir(optsPlot.plotDir);
+if(anyPlots)
+    plotDir = optsPlot.plotDir;
+elseif(anyPlotsP)
+    plotDir = optsPlotParticles.plotDir;
+else
+    plotDir = [];
 end
 
-%--------------------------------------------------------------------------
-% make movie
-%--------------------------------------------------------------------------
-
-if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs) 
-    movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
-    plotFiles = cat(2,plotFiles,movieFile);
+if(anyPlots || anyPlotsP)
+    if(~exist(plotDir,'dir'))
+        mkdir(plotDir);
+    end
 end
 
-%--------------------------------------------------------------------------
-% make intial and final plots
-%--------------------------------------------------------------------------
+if(anyPlots)
 
-if(optsPlot.doInitialFinal)
-    IFFile = plotInitialFinal(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
-    plotFiles = cat(2,plotFiles,IFFile);
-end
+    %--------------------------------------------------------------------------
+    % make movie
+    %--------------------------------------------------------------------------
 
-%--------------------------------------------------------------------------
-% make equilibrium plots
-%--------------------------------------------------------------------------
+    if(optsPlot.doMovieGif || optsPlot.doMovieAvi || optsPlot.doMovieSwf || optsPlot.doPdfs || optsPlot.doFigs) 
+        movieFile = makeMovie(stocPlotStruct,DDFTPlotStruct,optsPlot,optsPhys,equilibria(2));
+        plotFiles = cat(2,plotFiles,movieFile);
+    end
 
-if(optsPlot.doEquilibria)
-    eqFile = plotEquilibria(stocStruct,DDFTStruct,optsPlot,optsPhys,equilibria);
-    plotFiles = cat(2,plotFiles,eqFile);
-end
+    %--------------------------------------------------------------------------
+    % make intial and final plots
+    %--------------------------------------------------------------------------
 
-%--------------------------------------------------------------------------
-% make mean plot
-%--------------------------------------------------------------------------
+    if(optsPlot.doInitialFinal)
+        IFFile = plotInitialFinal(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,IFFile);
+    end
 
-if(optsPlot.doMeans)
-    %pdfFile=fileStruct.plotFile{1};
-    meanFile = plotMeans(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
-    plotFiles = cat(2,plotFiles,meanFile);
-end
+    %--------------------------------------------------------------------------
+    % make equilibrium plots
+    %--------------------------------------------------------------------------
 
+    if(optsPlot.doEquilibria)
+        eqFile = plotEquilibria(stocStruct,DDFTStruct,optsPlot,optsPhys,equilibria);
+        plotFiles = cat(2,plotFiles,eqFile);
+    end
+
+    %--------------------------------------------------------------------------
+    % make mean plot
+    %--------------------------------------------------------------------------
+
+    if(optsPlot.doMeans)
+        %pdfFile=fileStruct.plotFile{1};
+        meanFile = plotMeans(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,meanFile);
+    end
+
+    %--------------------------------------------------------------------------
+    % make error snapshot plots
+    %--------------------------------------------------------------------------
+
+    if(optsPlot.doSnapshotsError)
+        errorFile = plotSnapshotsError2D(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,errorFile);
+    end
+    
+    %--------------------------------------------------------------------------
+    % make DDFT snapshot plots
+    %--------------------------------------------------------------------------
+
+    if(optsPlot.doSnapshotsDDFT)
+        DDFTFile = plotSnapshotsDDFT2D(stocPlotStruct,DDFTPlotStruct,optsPlot,equilibria);
+        plotFiles = cat(2,plotFiles,DDFTFile);
+    end
+
+    
+end    
+   
 %--------------------------------------------------------------------------
 % get mean (over runs) position and momentum of each particle at each time.
 % only useful when particles are 'distinguishable'
 %--------------------------------------------------------------------------
 
-% if(optsStruct.anyPlotsP)
-%     meanStruct=getMeansParticles(stocStruct);
-% end
+if(anyPlotsP)
+    meanStruct=getMeansParticles(stocStruct);
+end
+
 % 
 % %--------------------------------------------------------------------------
 % % make intial and final particle plots
@@ -282,10 +323,13 @@ end
 % % make particle movie
 % %--------------------------------------------------------------------------
 % 
-% if(optsStruct.doMovieGifP || optsStruct.doMovieSwfP || optsStruct.doPdfsP)
-%     makeMovieParticles(meanStruct,optsPlotParticles)
-% end
 
+if(anyPlotsP)
+    if(optsPlotParticles.doMovieGifP || optsPlotParticles.doMovieSwfP || optsPlotParticles.doPdfsP)
+        makeMovieParticles(meanStruct,optsPlotParticles)
+    end
+end
+    
 %--------------------------------------------------------------------------
 % make custom plot
 %--------------------------------------------------------------------------

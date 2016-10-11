@@ -1,9 +1,13 @@
 function [VGeom_S] = V1_HardWall(y1S,y2S,t,optsPhys)
 
+% ONLY WORKS FOR SINGLE SPECIES
+
 kBT = 1;
 
 if(isfield(optsPhys,'sigma'))
     sigma = optsPhys.sigma;
+    % sigma is nParticles x nParticles
+    sigma = sigma(1);
 else
     sigma = 0;
 end

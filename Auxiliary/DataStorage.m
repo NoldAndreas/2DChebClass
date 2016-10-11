@@ -102,7 +102,7 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                  fclose(fileID);
             end
         end     
-    
+
         if(~exist('Data','var'))
             no = fprintf('Do you want to load data (press "l"), or wait for 2 seconds.');        
             if(getkeywait(2) == 108)
@@ -137,7 +137,18 @@ function [Data,recompute,Parameters] = DataStorage(nameDir,func,Parameters,Other
                 disp('Folder not found. Creating new path..');            
                 mkdir(DataFolder);
            end
+           
+           
+           lastwarn('');
+           
            save([DataFolder filesep filename],'Data');
+           
+           % deal with case when file is >2GB
+           [~,wid]=lastwarn;
+           if(strcmp(wid,'MATLAB:save:sizeTooBigForMATFile'))
+              save([DataFolder filesep filename],'Data','-v7.3');
+           end
+           
            disp(['Data saved in ',[DataFolder filesep filename],'.']);            
             
            Parameters.Results.comptime_sec = t;

@@ -113,9 +113,11 @@ doGif=optsPlot.doMovieGif;
 doAvi=optsPlot.doMovieAvi;
 doSwf=optsPlot.doMovieSwf;
 doPdfs=optsPlot.doPdfs;
+doFigs=optsPlot.doFigs;
 
 % get movie files and options
 pdfDir=optsPlot.pdfDir;
+figDir=optsPlot.figDir;
 movieFile=[optsPlot.movieFile optsPlot.plotType ...
            '-' num2str(separateSpecies) '-' num2str(separateComp)];
 fps=optsPlot.fps;
@@ -131,6 +133,17 @@ if(doPdfs || doSwf)
     nDigits=ceil(log10(nPlots));
     nd=['%0' num2str(nDigits) 'd'];
 end
+
+% set up fig file names
+if(doFigs)
+    if(~exist(figDir,'dir'))
+        mkdir(figDir);
+    end       
+    figFileNames=[];
+    nDigits=ceil(log10(nPlots));
+    nd=['%0' num2str(nDigits) 'd'];
+end
+
 
 %--------------------------------------------------------------------------
 % Set up figure
@@ -218,14 +231,6 @@ if(doAvi)
     outputFile = aviFile;
 end
 
-%--------------------------------------------------------------------------
-% Set up legend
-%--------------------------------------------------------------------------
-
-if(~strcmp(optsPlot.oneLeg,'off'))
-    % create the legend
-    addOneLeg(optsPlot,hRPf);
-end
 
 
 %--------------------------------------------------------------------------
@@ -302,7 +307,7 @@ for iPlot=1:nPlots
         end
             
         % plot the distributions
-        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iDDFT));
+        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC,optsPlot,handlesRP(iDDFT));
         
 %         for iAxis = 1:nAxes
 %             hold(hRa(iAxis),'on');
@@ -380,6 +385,17 @@ for iPlot=1:nPlots
 
     end
  
+    %--------------------------------------------------------------------------
+    % Set up legend
+    %--------------------------------------------------------------------------
+
+    if(~strcmp(optsPlot.oneLeg,'off'))
+        % create the legend
+        shift = 0.15;
+        addOneLeg(optsPlot,hRPf,shift);
+    end
+    
+    
     %----------------------------------------------------------------------
     % Get gif frames and save write file
     %----------------------------------------------------------------------
@@ -434,10 +450,21 @@ for iPlot=1:nPlots
         
         if(doPdfs)
             % save the pdf file for this time step
-            save2pdf(outputFile,hRPf,dpi);
+            save2pdf(outputFile,hRPf,[]);
         end
     end
-    
+
+    %----------------------------------------------------------------------
+    % Get figure frames
+    %----------------------------------------------------------------------
+
+    if(doFigs)
+        % determine output file, of the form iPlot.pdf, with leading zeros
+        outputFile=[figDir num2str(iPlot,nd) '.fig'];
+        % add to list of pdf files used to make movie
+        figFileNames = cat(2, figFileNames, [' ' outputFile]);
+        savefig(hRPf,outputFile);
+    end    
 end
 
 fprintf(1,'Finished\n');
@@ -467,6 +494,17 @@ end
 
 if(doAvi)
     close(writerObj);
+end
+
+if(doPdfs)
+    fprintf(1,'Combining pdf ... ');
+    fullPdfFile=[movieFile '.pdf'];
+
+    gsCmd= ['gs -dNOPAUSE -sDEVICE=pdfwrite ' ...
+              '-sOUTPUTFILE=' fullPdfFile ' -dBATCH -dQUIET ' pdfFileNames];
+
+    system(gsCmd);
+    fprintf(1,'Finished\n');
 end
 
 close(hRPf);

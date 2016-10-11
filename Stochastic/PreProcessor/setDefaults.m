@@ -49,6 +49,7 @@ if(S.anyStoc)
     D.noise=true;
     D.MBp=true;
     D.initialGuess='makeGrid';
+    D.useNewHS = false;
     D.nSamples=10*S.nRuns;
     D.thin=1;
     D.burnin=0;
@@ -58,6 +59,7 @@ if(S.anyStoc)
     D.loadSamples=true;
     
     D.HIParamsNames={};
+    D.stocUseDivergence = false;
     
     D.doStrip = false;
     
@@ -115,6 +117,7 @@ end
 D.doMovieGif=false;
 D.doMovieAvi=false;
 D.doPdfs=false;
+D.doFigs=false;
 D.doMovieSwf=false;
 D.doInitialFinal=false;
 D.doEquilibria=false;
@@ -125,6 +128,9 @@ D.doInitialFinalP=false;
 D.doMovieGifP=false;
 D.doPdfsP=false;
 D.doMovieSwfP=false;
+D.doInitialFinalP=false;
+D.doSnapshotsError = false;
+D.doSnapshotsDDFT = false;
 
 D.doCustom=false;
 D.doCustomP=false;
@@ -133,6 +139,7 @@ D.custom='';
 D.plotType='contour';
 
 D.separateSpecies = false;
+D.separateError = false;
 D.separateComp = false;
 
 D.legPos='off';

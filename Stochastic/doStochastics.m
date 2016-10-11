@@ -91,15 +91,28 @@ optsStocI.burnin       = optsStoc.burnin;
 fprintf(1,'Starting initial sampling ... ');
 
 if(optsStoc.fixedInitial)
-    xInitial = optsStoc.initialGuess;
+    getInitial = str2func(optsStoc.initialGuess);
+    initialTemp = getInitial(optsPhys);
+    initialTemp = initialTemp';
+    
+    % repeat for number of runs
+    nRuns = optsStoc.nRuns;
+    xInitial = repmat(initialTemp,nRuns,1);
+    
     ICFilename = [];
 else
 
     optsPhys.t=0;
     opts.optsPhys = optsPhys;
-    opts.optsPhys.tMax = [];  % initial sampling independent of final time
     opts.optsStoc = optsStocI;
 
+    removeList = {'tMax','D0S','gammaS','D0','gamma'};
+    for k = 1:length(removeList)
+        if(isfield(opts.optsPhys,[removeList{k}]))
+           opts.optsPhys = rmfield(opts.optsPhys,[removeList{k}]);              
+        end
+    end  
+    
     ICDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Initial'];
 
     [xInitial,~,Parameters] = DataStorage(ICDir,@samplepdf,opts,[],~loadSamples);
@@ -118,10 +131,16 @@ if(sampleFinal)
 
     optsPhys.t=optsPhys.tMax;
     optsStocF = optsStocI;
-    
-    opts.optsPhys = optsPhys;
     opts.optsStoc = optsStocF;
-
+    opts.optsPhys = optsPhys;
+    
+    removeList = {'D0S','gammaS','D0','gamma'};
+    for k = 1:length(removeList)
+        if(isfield(opts.optsPhys,[removeList{k}]))
+           opts.optsPhys = rmfield(opts.optsPhys,[removeList{k}]);              
+        end
+    end
+    
     FCDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Final'];
     
     [xFinal,~,Parameters] = DataStorage(FCDir,@samplepdf,opts,[],~loadSamples);
@@ -214,7 +233,7 @@ for iStoc=1:nStoc
                 ': ' stocName ' ... ']);
 
     dynDir = [optsPhys.potNames filesep 'Stochastic' filesep 'Dynamics'];
-            
+    
     [xpStruct,~,Parameters] = DataStorage(dynDir,@stochasticStatistics,opts,ICStruct,~loadStoc);
     
     % store in output structure

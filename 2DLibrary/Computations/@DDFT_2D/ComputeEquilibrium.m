@@ -53,9 +53,9 @@
     misc.Int        = this.IDC.Int;
     misc.PtsCart    = this.IDC.GetCartPts;    
     
-    if(strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
-        misc.AD.PtsCart = this.IDC.AD.GetCartPts;
-    end    
+%     if(strcmp(this.optsNum.FexNum.Fex,'FMTRosenfeld_3DFluid'))
+%         misc.AD.PtsCart = this.IDC.AD.GetCartPts;
+%     end    
     
     opts.Comments = this.configName;
     

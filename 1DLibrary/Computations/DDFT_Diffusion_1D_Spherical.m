@@ -146,7 +146,7 @@ function [data,optsPhys,optsNum,optsPlot] = DDFT_Diffusion_1D_Spherical(optsPhys
     mu       = repmat(mu,N,1);
     x_ic     = x_ic(2:end,:);
     x_icFull = mirror(x_ic);
-    
+        
     t_eqSol = toc;
     disp(['Equilibrium computation time (sec): ', num2str(t_eqSol)]);
    

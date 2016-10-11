@@ -100,7 +100,7 @@ for iPlot=1:2
 %     if(fullscreen(3)>1500)
 %         fullscreen(3)=fullscreen(3)/2;
 %     end
-    hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+    hRPf=figure('Position',[0 0 0.75*fullscreen(3) 0.75*fullscreen(4)]);
     % set background colour to white
     set(hRPf,'Color','w');
 
@@ -217,8 +217,9 @@ for iPlot=1:2
         optsPlot.lineStyle=lineStyleDDFT{iDDFT};
         
         % plot the distributions
-        %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).shape.Interp,ddft(iDDFT).shape.Pts,optsPlot,handlesRP(iPlot));
-        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
+        %plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iPlot));
+        
+        plotRhoVdistDDFT2D(rhot,vt,ddft(iDDFT).IDC,optsPlot,handlesRP(iPlot));
         
         hold(hRa,'on');
         hold(hPa,'on');

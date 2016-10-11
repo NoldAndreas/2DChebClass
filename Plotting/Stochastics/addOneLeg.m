@@ -1,4 +1,4 @@
-function addOneLeg(optsPlot,hFig)
+function addOneLeg(optsPlot,hFig,shift)
 %addOneLeg(optsPlot,hFig)
 % Adds a single legend at the top of a figure.
 %
@@ -11,6 +11,10 @@ function addOneLeg(optsPlot,hFig)
 %         lineColour    (line colours for each line, same form)
 %         perRow        (integer (max) number of labels per row of legend)
 %  hFig     --  figure handle in which to draw legend
+
+if(nargin<3)
+    shift = 0;
+end
 
 if(isfield(optsPlot,'lineColourStoc'))
     lineStyleStoc=optsPlot.lineStyleStoc;
@@ -90,7 +94,7 @@ for iRow =1:nRows
     % [x y width height] on a scale of [0 1].  If the width/height is too
     % small it's automatically centred about x,y so we deliberately choose
     % it too small.
-    set(hL,'Position',[0.5,1-offset*iRow,0.01,0.01]);
+    set(hL,'Position',[0.5,1-offset*iRow-shift,0.01,0.01]);
     
     % change to a horizontal legend and turn the box off (or we get an
     % odd-sized box for each row legend)

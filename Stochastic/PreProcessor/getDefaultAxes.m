@@ -33,7 +33,16 @@ switch D.geom
         
         D.RMMin={{0,0}};
         D.RMMax={{10,2*pi}};
-                
+
+    case 'full'
+        
+        D.rMin={{-10,-10,-10}};
+        D.rMax={{10,10,10}};
+        
+        D.RMMin=D.rMin;
+        D.RMMax=D.rMax;
+
+        
 end
 
 D.pMin=D.rMin;
@@ -53,7 +62,12 @@ switch D.dim
         
         D.PMin={{-1,-1}};
         D.PMax={{1,1}};
-               
+        
+    case 3
+        
+        D.PMin={{-1,-1,-1}};
+        D.PMax={{1,1,1}};
+        
 end
 
 D.PMMin=D.PMin;

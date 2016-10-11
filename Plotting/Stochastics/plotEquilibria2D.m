@@ -65,12 +65,15 @@ fullscreen = get(0,'ScreenSize');
 % Set up figure
 %----------------------------------------------------------------------
 
-hRPf=figure('Position',[0 -50 fullscreen(3) fullscreen(4)]);
+hRPf=figure('Position',[0 0 0.75*fullscreen(3) 0.75*fullscreen(4)]);
 % set background colour to white
 set(hRPf,'Color','w');
 
 
 separateSpecies = optsPlot.separateSpecies;
+
+separateError = optsPlot.separateError;
+
 
 if(separateSpecies)
     nSpecies = length(optsPhys.nParticlesS);
@@ -85,15 +88,26 @@ switch optsPlot.plotType
             % figure and axes handles to be passed to plotting functions
             handlesRP = struct('hRPf',hRPf,'hRa',hRa,'hPa',hPa);
         else
-            %handles=tightsubplot(nSpecies,2,0.075,0.075,0.075);
-            %hRa = handles(1:2:end);
-            %hPa = handles(2:2:end);
-            handles=tightsubplot(2,nSpecies,0.075,0.075,0.075);
-            hRa = handles(1:nSpecies);
-            hPa = handles(nSpecies+1:end);
-            for iSpecies = 1:nSpecies
-                handlesRP(iSpecies) = struct('hRPf',hRPf,'hRa',hRa(iSpecies),'hPa',hPa(iSpecies));%#ok
+            if(~separateError)
+                handles=tightsubplot(2,nSpecies,0.075,0.075,0.075);
+                hRa = handles(1:nSpecies);
+                hPa = handles(nSpecies+1:end);
+                for iSpecies = 1:nSpecies
+                    handlesRP(iSpecies) = struct('hRPf',hRPf,'hRa',hRa(iSpecies),'hPa',hPa(iSpecies));%#ok
+                end
+            else
+                hETemp = axes('Visible','off','Position',[-1 -1 0.1 0.1],'HitTest','off');
+                
+                handles=tightsubplot(3,nSpecies,0.075,0.075,0.075);
+                hRa = handles(1:nSpecies);
+                hEa = handles(nSpecies+1:2*nSpecies);
+                hPa = handles(2*nSpecies+1:end);
+                for iSpecies = 1:nSpecies
+                    handlesRP(iSpecies) = struct('hRPf',hRPf,'hRa',hRa(iSpecies),'hPa',hPa(iSpecies));%#ok
+                    handlesRPE(iSpecies) = struct('hRPf',hRPf,'hRa',hEa(iSpecies),'hPa',hETemp);%#ok
+                end
             end
+
         end
     case 'contour'
         if(~separateSpecies)
@@ -170,14 +184,15 @@ if(nDDFT>0)
         if(~separateSpecies)
             optsPlot.faceColour = colours;
             % plot the distributions
-            plotRhoVdistDDFT2D(rhot,fluxt,ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP);
+            plotRhoVdistDDFT2D(rhot,fluxt,ddft(iDDFT).IDC,optsPlot,handlesRP);
 
             hold(hRa,'on');
             hold(hPa,'on');
         else
             for iSpecies = 1:nSpecies
                 optsPlot.faceColour = colours(iSpecies);
-                plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(iDDFT).IDC.Interp,ddft(iDDFT).IDC.Pts,optsPlot,handlesRP(iSpecies));
+                optsPlot.doFlux = false;
+                plotRhoVdistDDFT2D(rhot(:,iSpecies),fluxt(:,iSpecies),ddft(iDDFT).IDC,optsPlot,handlesRP(iSpecies));
                 hold(hRa(iSpecies),'on');
                 hold(hPa(iSpecies),'on');
             end
@@ -199,6 +214,37 @@ if(nStoc>0)
         v     = equilibria(iStoc).data.vEq;
         boxes = equilibria(iStoc).data.xEq;
 
+        if(separateError)
+            y1C = boxes(:,:,1,1);
+            y2C = boxes(:,:,2,1);
+            y1C_kv = y1C(:);
+            y2C_kv = y2C(:);
+            IDC = ddft(iDDFT).IDC;
+
+            pts         = IDC.GetInvCartPts(y1C_kv,y2C_kv);
+
+            InterPol = IDC.InterpolationMatrix_Pointwise(pts.y1_kv,pts.y2_kv);
+
+            % only compare first DDFT - to generalise
+            rhoDDFT = ddft(1).dynamicsResult.rho_t;
+            rhoDDFT = rhoDDFT(:,:,1);
+            
+            rhoDDFTBoxes = InterPol*rhoDDFT;
+        
+        
+            nBins = optsPlot.nBins;
+            N1 = nBins(1);
+            N2 = nBins(2);
+
+%             rho3 = rhoIBoxes(:,3);
+%             rho3 = reshape(rho3,N1,N2);
+%         
+%         
+%             surf(hEa(3),y1C,y2C,rho3)
+        
+        end
+       
+        
         optsPlot.type=stocType(iStoc);
         optsPlot.lineStyle = optsPlot.lineStyleStoc{iStoc};
 
@@ -211,13 +257,33 @@ if(nStoc>0)
             hold(hRa,'on');
             hold(hPa,'on');
         else
-            for iSpecies = 1:nSpecies
-                optsPlot.faceColour = colours(iSpecies);
-                optsPlot.nParticlesS = nParticlesS(iSpecies);
-                plotRhoVdistStoc2D(rho(:,:,iSpecies),v,boxes,optsPlot,handlesRP(iSpecies));
-                hold(hRa(iSpecies),'on');
-                hold(hPa(iSpecies),'on');
+            if(~separateError)
+            
+                for iSpecies = 1:nSpecies
+                    optsPlot.faceColour = colours(iSpecies);
+                    optsPlot.nParticlesS = nParticlesS(iSpecies);
+                    plotRhoVdistStoc2D(rho(:,:,iSpecies),v,boxes,optsPlot,handlesRP(iSpecies));
+                    hold(hRa(iSpecies),'on');
+                    hold(hPa(iSpecies),'on');
+                end
+                
+            else
+                
+                maxError = zeros(nSpecies,1);
+                
+                for iSpecies = 1:nSpecies
+                    rhoDDFTBoxesS = reshape( rhoDDFTBoxes(:,iSpecies), N1,N2);
+                    rhoError = abs(rho(:,:,iSpecies) - rhoDDFTBoxesS);
+                    maxError(iSpecies) = max(max(rhoError));
+                    optsPlot.faceColour = colours(iSpecies);
+                    optsPlot.nParticlesS = nParticlesS(iSpecies);
+                    plotRhoVdistStoc2D(rhoError,v,boxes,optsPlot,handlesRPE(iSpecies));
+                    hold(hEa(iSpecies),'on');
+                    hold(hPa(iSpecies),'on');
+                    
+                end
             end
+                
         end
         
     end
@@ -232,8 +298,8 @@ end
 %optsPlot.time=plotTime;
 optsPlot.time=[];
 
-optsPlot.xLab='x';
-optsPlot.yLab='y';
+optsPlot.xLab='$y_1$';
+optsPlot.yLab='$y_2$';
 
 optsPlot.xMin=optsPlot.rMin(1);
 optsPlot.xMax=optsPlot.rMax(1);
@@ -254,6 +320,15 @@ if(strcmp(optsPlot(1).plotType,'surf'))
     else
         for iSpecies = 1:nSpecies
             fixPlot2Dsurf(hRa(iSpecies),optsPlot);
+            
+            if(separateError)
+                optsPlotError = optsPlot;
+                optsPlotError.zLab = 'Error';
+                optsPlotError.zMax = 1.1*max(maxError);
+                fixPlot2Dsurf(hEa(iSpecies),optsPlotError);
+                
+            end
+            
             optsPlot.time=[];
             fixPlot2Dcontour(hPa(iSpecies),optsPlot);
         end

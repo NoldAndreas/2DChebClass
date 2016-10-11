@@ -131,7 +131,7 @@ stocName={'r0','rv0','r1','rv1'};
 
 % whether to do Langevin and Brownian dynamics
 %doStoc={true,true,true,true};
-doStoc={true,false,false,false};
+doStoc={false,false,false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true,true};
@@ -157,7 +157,9 @@ Phys_Area = struct('shape','Box','L1',L1S,'L2',L2S);
 Plot_Area = struct('y1Min',0,'y1Max',L1S,'N1',50,...
                        'y2Min',0,'y2Max',L2S,'N2',50);
 
-V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
+%V2_Num   = struct('Fex','Meanfield','N',[20;20],'L',1);
+
+V2_Num   = struct('Fex','Meanfield','N',[20;20]);
 
 paramNames = {'PhysArea','PlotArea','V2Num','doPlots'};
 
@@ -173,8 +175,8 @@ DDFTName = {};
 doDDFT = {};
 loadDDFT = {};
 
-%for N = 10:2:50
-for N = 50:50
+%for N = 10:10:50
+for N = 10:10:30
     Phys_Area.N = [N,N];
     PhysArea = cat(2,PhysArea,Phys_Area);
     PlotArea = cat(2,PlotArea,Plot_Area);
@@ -193,12 +195,12 @@ end
 doPlots = false;
 
 % for stochastic comparison
-DDFTColour = {{'k','c','m'}};
-DDFTStyle = {{'-','-','-'}};
+%DDFTColour = {{'k','c','m'}};
+%DDFTStyle = {{'-','-','-'}};
 
 % for N computations
-%DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
-%DDFTStyle = {{':',':',':'},{'-.','-.','-.'},{'-','-','-'},{'--','--','--'}};
+DDFTColour = {{'r','r','r'},{'g','g','g'},{'b','b','b'},{'m','m','m'}};
+DDFTStyle = {{':',':',':'},{'-.','-.','-.'},{'-','-','-'},{'--','--','--'}};
 
 %--------------------------------------------------------------------------
 % Plotting setup

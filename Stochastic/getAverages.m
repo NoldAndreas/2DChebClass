@@ -34,16 +34,16 @@ function averagesStruct=getAverages(opts,stocStruct)
 
     if(dim==2)
         [rMean,vMean] = getRVmeansStoc2D(x,p,geom,nParticlesS,mS);
-        [~,fluxMean]  = getRFluxMeansStoc2D(x,p,geom,nParticlesS,mS);
+        %[~,fluxMean]  = getRFluxMeansStoc2D(x,p,geom,nParticlesS,mS); % broken - need to think about it
     else
         [rMean,vMean] = getRVmeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
-        [~,fluxMean]  = getRFluxMeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
+        %[~,fluxMean]  = getRFluxMeansStoc1D(x,p,geom,dim,nParticlesS,mS);    
     end
 
     %----------------------------------------------------------------------
     % Distributions for each time and species
     %----------------------------------------------------------------------
-
+    
     for iPlot = 1: nPlots
         xt=x(:,:,iPlot)'; 
         pt=p(:,:,iPlot)';
@@ -78,12 +78,10 @@ function averagesStruct=getAverages(opts,stocStruct)
 
     averagesStruct.rMean     = rMean;
     averagesStruct.vMean     = vMean;
-    averagesStruct.fluxMean  = fluxMean;
+    %averagesStruct.fluxMean  = fluxMean;
     averagesStruct.rho       = rho;
     averagesStruct.v         = v;
     averagesStruct.flux      = flux;
     averagesStruct.boxes     = boxes;
     averagesStruct.plotTimes = plotTimes;
-
-
 end

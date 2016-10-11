@@ -1,6 +1,7 @@
-function Rij=getRij(x,y,dim)
-%  Rij=getRij(x,dim)
-%   calculates particle separation matrix of size nParticle x nParticles
+function [Rij,nij,Z]=getRij(x,y,dim)
+%  Rij=getRij(x,y,dim)
+%   calculates particle separation matrix of size nParticlesx x nParticlessy
+%   and unit separation vectors
 %
 % INPUTS:
 %   x           -- (dim*nParticlesx,1) vector of positions 
@@ -41,6 +42,16 @@ Z=reshape(X-Y,dim,nParticlesx*nParticlesy);
 
 % calculate the norm of each column and reshape to the correct size
 Rij=reshape(sqrt(sum(Z.^2,1)),nParticlesx,nParticlesy);
+
+% nij(:,i,j) gives unit separation vector x(i) - y(j)
+%nij = reshape(Z,dim,nParticlesx,nParticlesy);
+nij = reshape(Z',nParticlesx,nParticlesy,dim);
+
+for iDim = 1:dim
+    nij(:,:,iDim) = nij(:,:,iDim) ./ Rij;
+end
+ 
+nij(isnan(nij)) = 0;
 
 end
 

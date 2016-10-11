@@ -34,8 +34,8 @@ function FMTMatricesFull = FexMatrices_FMTRosenfeld(Parameters,IDC)
         FMTMatrices.AAD.n1_v_1 = AAD(:,:,2);
         FMTMatrices.AAD.n1_v_2 = AAD(:,:,3);
 
-        FMTMatrices.AD.n0      = FMTMatrices.AD.n1/(2*pi*R);
-        FMTMatrices.AAD.n0     = FMTMatrices.AAD.n1/(2*pi*R);                   
+        %FMTMatrices.AD.n0      = FMTMatrices.AD.n1/(2*pi*R);
+        %FMTMatrices.AAD.n0     = FMTMatrices.AAD.n1/(2*pi*R);                   
         
         FMTMatricesFull(iSpecies) = FMTMatrices;
     end

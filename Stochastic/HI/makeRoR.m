@@ -1,4 +1,4 @@
-function [RoR,RijInv]=makeRoR(x,dim)
+function [RoR,RijInv,nij]=makeRoR(x,dim)
 % [RoR,RijInv]=makeRoR(x,dim)
 %   returns the tensor (r_ij)\otimes(r_ij) / |r_ij|^2 and |r_ij|^(-1)
 %
@@ -29,7 +29,7 @@ dmask=dvec(:,ones(nParticles,1));     % nParticle columns each 1:dim
 % -------------------------------------------------------------------------
 
 % get separations 
-Rij=getRij(x,x,dim);     % nParticles x nParticles
+[Rij,nij]=getRij(x,x,dim);     % nParticles x nParticles
 Rij=Rij(nmask,nmask);  % dim*nParticles x dim*nParticles by expanding each
                        % element into a dim x dim block
 % and inverse separations for non-zero elements
