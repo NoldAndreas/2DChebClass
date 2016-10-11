@@ -22,20 +22,13 @@ function ContactLineBinaryFluid
                        'nParticles',0);
 
     parameters.config = v2struct(optsPhys,optsNum);
-    parameters.Cak   = [0.005;0.01];%(0.005:0.0025:0.01)';
-    parameters.y2Max = 18:2:24;%(18:2:24);            
-    parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
+    parameters.Cak   = 0.005;%;0.01%(0.005:0.0025:0.01)';
+    parameters.y2Max = 22;%(20:2:24);%18:2:24;%(18:2:24);            
+    parameters.l_d   = 1./(1.0:0.5:5.0);%[1.5:0.5:3.0];%[1.25:0.25:3.0]; %0.25:0.25:2.5;
     
-  %  parameters.l_d   = 1:0.25:3.0;%0.25:0.25:2.5;                    
-	
-  %  parameters.y2Max = 30:5:50;%(16:2:24);          
-  %  parameters.l_d   = [0.2:0.1:1.0];%,1.25:0.25:3.0];%0.25:0.25:2.5;
     
-    %parameters.l_d   = 0.2:0.1:1.0;%0.25:0.25:2.5;                    
-    %parameters.l_d  = [1.25:0.25:3.0]; %0.25:0.25:2.5;
-    
-
-    [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],[]);
+    comp = [];
+    [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],comp);
     %dataM{l_d}[Cak,y2Max]
     dataN = Rescale(dataM);clear('dataM');    
         
@@ -51,8 +44,6 @@ function ContactLineBinaryFluid
     
     fileExampleVelocoties = 'D:\2DChebData\DIBinaryPaper\StagnationPoint_Velocity.fig';
     
-        
-    
     %PlotFigure1_Thesis();
     %PlotFigure2_Thesis();    
     %PlotFigure3_Thesis();	
@@ -60,7 +51,7 @@ function ContactLineBinaryFluid
     %PlotFigure5_Thesis();
     %PlotFigure6_Thesis();    
     %PlotFigure7_Thesis();   
-    PlotFigure7_APSDFD_2015(); 
+    %PlotFigure7_APSDFD_2015(); 
     %PlotFigure8_Thesis();
     %***************************************
     %***************************************
