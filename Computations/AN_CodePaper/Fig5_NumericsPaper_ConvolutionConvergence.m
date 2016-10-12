@@ -43,7 +43,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
   %  NS_d = 10; %2;  %10;
   %  NS   = 10:NS_d:80; %[20,30,40,50,60,70,80,82];%10:NS_d:50;%10:10:40;[20,22,30,32];
     
-    N    = 40; 
+    N    = 20; 
     NS_d = 10; 
     NS   = 10:NS_d:80; 
     
@@ -301,6 +301,8 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
         end     
         plot(line_N,line,...
                         ['-',sym],'color',col,'MarkerSize',10,'MarkerFaceColor',col); hold on;
+                    
+        
         %plot(line_N,line,col);        
         
         legendstring(end+1) = {name};
@@ -316,9 +318,7 @@ function Fig5_NumericsPaper_ConvolutionConvergence()
                 line_N(n) = (res(k1,k2).NS);%+res(k1,k2+1).NS)/2;
                 %plot(line_N(n),line(n),...
                  %       [sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
-                n = n+1;
-                
-                                
+                n = n+1;                                
             end
         end
         plot(line_N,line,...

@@ -23,7 +23,8 @@
         case 'f4:5c:89:93:1d:7f' % Ben MacBook Pro
             dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
         case '80:e6:50:13:7e:a8' % Andreas' MPI Laptop
-            dirData    = '/Users/andreas/Documents/2DChebData';                
+            dirData    = '/Users/andreas/Documents/2DChebData'; 
+            %dirData    = '/Volumes/BACKUP_IC/2DChebData';
         case 'C8:1F:66:ED:06:8F' % compute64c
             switch getenv('USER')
                 case 'bgoddard'
