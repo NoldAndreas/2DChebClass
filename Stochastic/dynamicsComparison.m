@@ -45,11 +45,6 @@ AddPaths();
 
 %inputFile = 'HalfSpaceTestHIDiv';
 
-%inputFile = 'InfSpaceMoveN_HI_6';  % WORKS!!
-%inputFile = 'HalfSpaceMoveN_HI';  % WORKS
-%inputFile = 'HalfSpaceMoveAwayN_HI';
-%inputFile = 'HalfSpaceMoveParallelN_HI';
-
 %inputFile = 'InfSpaceMoveN_HI_6_TestTiming';
 %inputFile = 'HalfSpaceMoveN_HI_Short';
 
@@ -100,13 +95,25 @@ AddPaths();
 %inputFile = 'PressureTest1DFreeFade2';  % Good example for failure of LE
 %inputFile = 'PressureTest1DGaussian';
 %inputFile = 'PressureTest1DFreeHill';
-inputFile = 'PressureTest1DGaussianHill';
+%inputFile = 'PressureTest1DGaussianHill';
 
 %---------------------------------
 
 %inputFile = 'Karolis';
 %inputFile = 'Box3DSampling';
 
+%---------------------------------
+
+% CONFINED HI PAPER
+
+%inputFile = 'InfSpaceMoveN_HI_6';  % For confined HI paper
+%inputFile = 'HalfSpaceMoveN_HI';  % For confined HI paper
+%inputFile = 'HalfSpaceMoveAwayN_HI'; % For confined HI paper
+%inputFile = 'HalfSpaceMoveParallelN_HI';
+
+%inputFile = 'ConfinedHIPaperInfSpace';  % For confined HI paper
+%inputFile = 'ConfinedHIPaperHalfSpaceTowards';  % For confined HI paper
+inputFile = 'ConfinedHIPaperHalfSpaceAway'; % For confined HI paper
 
 %--------------------------------------------------------------------------
 % Get parameters from input file
