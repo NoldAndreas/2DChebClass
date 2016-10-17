@@ -735,6 +735,11 @@ classdef DDFT_2D < Computation
         
         function pts = GetPathlines(this,y1_0,y2_0)
             
+            if(~isfield(this.dynamicsResult,'UV_t'))
+                pts = {};
+                return;
+            end
+            
             %Intgrate velocity
             pts.y1 = zeros(length(this.dynamicsResult.t),1,1);
             pts.y2 = zeros(length(this.dynamicsResult.t),1,1);
@@ -754,6 +759,11 @@ classdef DDFT_2D < Computation
         end
                 
         function pts = GetStreaklines(this,y1_0,y2_0)
+            
+            if(~isfield(this.dynamicsResult,'UV_t'))
+                pts = {};
+                return;
+            end
             
             %Intgrate velocity
             pts.y1 = zeros(length(this.dynamicsResult.t),1,1);

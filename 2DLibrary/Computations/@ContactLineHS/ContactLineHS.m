@@ -504,6 +504,10 @@ classdef ContactLineHS < DDFT_2D
             
             PostprocessDynamics@DDFT_2D(this);
             
+            if(~isfield(this.optsNum,'PlotAreaCart'))
+                return;
+            end
+            
             this.dynamicsResult.pathlines = {};   
             this.dynamicsResult.streaklines = {};   
             for y1_i = -3:3:3
