@@ -139,7 +139,11 @@ function DynamicContactLine()
         n      = opts.N;
         
         for i = 1:length(n)
-            conf.optsNum.PhysArea.N       = n(i)*[1,1];            
+            conf.optsNum.PhysArea.N       = n(i)*[1,1];
+            
+            conf.optsNum.FexNum.N1disc    =  2*round((20+n(i)/4)/2)*[1,1];
+            conf.optsNum.FexNum.N2disc    =  2*round((20+n(i)/4)/2)*[1,1];
+            conf.optsNum.V2Num.N          =  2*round((20+n(i)/2)/2)*[1,1];            
 
             CL = ContactLineHS(conf);
             CL.Preprocess(); 

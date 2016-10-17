@@ -58,7 +58,7 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     resC{1}.config = config;
     resC{1}.name = 'HSeta0.3';
     resC{1}.eta    = eta;
-        	    
+        	       
     %eta            = 0.15;    
     eta            = 0.0147;    
     res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],comp,ignoreList);      
@@ -71,7 +71,7 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     %config.optsPhys.V2   = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5.0);
     config.optsPhys.V2   = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);%2.5
     config.optsPhys.V1.epsilon_w = 0.865; %0.928;%94;% 0.94;    	
-    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],[],ignoreList); 
+    res{3}        = DataStorage('SumRuleError',@ComputeError,v2struct(N,config),[],comp,ignoreList); 
     resC{3}.name = 'BH';
     resC{3}.config = config;           
     
@@ -302,8 +302,8 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
             
             conf.optsNum.PhysArea.N       = [1,n(i)];
             conf.optsNum.PhysArea.N2bound = max(10,2*round(n(i)/6));
-            conf.optsNum.FexNum.N1disc    = 40;%n(i);
-            conf.optsNum.FexNum.N2disc    = 40;%n(i);
+            conf.optsNum.FexNum.N1disc    =  2*round((20+n(i)/4)/2)*[1,1];%40;%n(i);
+            conf.optsNum.FexNum.N2disc    =  2*round((20+n(i)/4)/2)*[1,1];%n(i);
             if(isfield(conf.optsNum,'V2Num'))
                 conf.optsNum.V2Num.N      =  2*round((20+n(i)/2)/2)*[1,1];%[80,80];%2*round((n(i)/2))*[1,1];
             end
