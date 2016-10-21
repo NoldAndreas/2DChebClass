@@ -6,7 +6,7 @@ function DynamicContactLine()
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,...                      
                       'alpha_deg',90);%'y2wall',0.,'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
-                  
+
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
                           'N',[40,40]);
@@ -37,7 +37,7 @@ function DynamicContactLine()
 
     config = v2struct(optsNum,optsPhys);                                
     
-    N = 20:10:60;
+    N = 20:10:70;
     ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
     comp       = [];    
     res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);    
@@ -143,7 +143,9 @@ function DynamicContactLine()
             
             conf.optsNum.FexNum.N1disc    =  2*round((20+n(i)/4)/2)*[1,1];
             conf.optsNum.FexNum.N2disc    =  2*round((20+n(i)/4)/2)*[1,1];
-            conf.optsNum.V2Num.N          =  2*round((20+n(i)/2)/2)*[1,1];            
+            conf.optsNum.V2Num.N          =  2*round((20+n(i)/2)/2)*[1,1];
+            
+            conf.optsNum.SubArea.N        =  n(i)*[1,1];
 
             CL = ContactLineHS(conf);
             CL.Preprocess(); 
