@@ -1,10 +1,11 @@
-function DynamicContactLine()
+function DynamicContactLine_recoverOldResult()
 
     AddPaths('CodePaper');            
     close all;
     
     PhysArea = struct('N',[20,20],...
-                      'L1',4,'L2',2,...                      
+                      'L1',4,'L2',2,'L2_AD',2,...                      
+                      'y2wall',0.,'N2bound',10,'h',1,...
                       'alpha_deg',90);%'y2wall',0.,'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
 
 	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
@@ -27,17 +28,17 @@ function DynamicContactLine()
                      'y1Shift',0,...
                      'plotTimes',plotTimes);%0:0.05:5);
 
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856,...%0.928,...%0.94,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.865,...%0.928,...%0.94,...
                 'tau',5,'epsilon_w_max',1);
 
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
-                      'Dmu',0.0,'nSpecies',1,...
+                      'Dmu',0,'nSpecies',1,...
                       'sigmaS',1);
 
-    config = v2struct(optsNum,optsPhys);                                
+    config = v2struct(optsNum,optsPhys);
     
-    N = 20:10:70;    
+    N = 20:10:60; 
     ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
     comp       = [];    
     res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);    
@@ -64,7 +65,7 @@ function DynamicContactLine()
     lines = {'-','--',':','-.'}; nolines = length(lines);   
     
     
-    saveC   = res{2}.config;
+    saveC   = res{1}.config;
 	saveC.N = N;         
         
     %PlotResultsOverTime(res{1},'massError_dt');

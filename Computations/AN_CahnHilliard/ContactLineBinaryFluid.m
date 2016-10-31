@@ -24,8 +24,10 @@ function ContactLineBinaryFluid
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = 0.005;%;0.01%(0.005:0.0025:0.01)';
     parameters.y2Max = 22;%(20:2:24);%18:2:24;%(18:2:24);            
-    parameters.l_d   = 1./(1.0:0.5:5.0);%[1.5:0.5:3.0];%[1.25:0.25:3.0]; %0.25:0.25:2.5;
+    parameters.l_d   = [(3.0:-0.5:1.5),1./(1.0:0.5:5.0)];%[1.5:0.5:3.0];%[1.25:0.25:3.0]; %0.25:0.25:2.5;    
     
+    parameters.y2Max = 10;%22; 
+    parameters.l_d   = 1./(10:5:20);
     
     comp = [];
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],comp);
@@ -41,7 +43,7 @@ function ContactLineBinaryFluid
     %cols = {'g','b','c','k','r'};  nocols = length(cols);
 	syms = {'<','d','s','o','>'};  nosyms = length(syms);            
     lines = {'-','--',':','.','-.'}; nolines = length(lines);                
-    
+        
     fileExampleVelocoties = 'D:\2DChebData\DIBinaryPaper\StagnationPoint_Velocity.fig';
     
     %PlotFigure1_Thesis();
@@ -765,7 +767,11 @@ function ContactLineBinaryFluid
                 col  = cols_{mod(j2-1,nocols_)+1};
                                 
                 %plot(Cn,par,[lin,sym,'k'],'linewidth',1.,'MarkerSize',2,'MarkerFaceColor','k'); hold on;                
-                plot(Cn,par,[lin,'k'],'linewidth',1.,'MarkerSize',2,'MarkerFaceColor',col,'color',col); hold on;                
+                if(IsOption(opts,'CompareKusumaatmaja'))
+                    plot((1./Cn).^2,par./Cn,[lin,'ko'],'linewidth',1.,'MarkerSize',5,'MarkerFaceColor',col,'color',col); hold on;                
+                else 
+                    plot(Cn,par,[lin,'k'],'linewidth',1.,'MarkerSize',2,'MarkerFaceColor',col,'color',col); hold on;                
+                end
                 
                 legendstr(end+1) = {['Ca = ',num2str(Ca),' y_{2,Max} = ',num2str(dataM{1}(i_Cak,j2).y2Max)]};
              end  
@@ -775,8 +781,26 @@ function ContactLineBinaryFluid
         if(~IsOption(opts,'noLegend'))            
             legend(legendstr);
         end
-        xlabel('Cn','Interpreter','Latex','fontsize',25);        
-        ylabel(ylabelStr,'Interpreter','Latex','fontsize',25);                
+        if(IsOption(opts,'CompareKusumaatmaja'))
+            xlabel('$1/\textnormal{Cn}^2$','Interpreter','Latex','fontsize',25);        
+            ylabel([ylabelStr,'/Cn'],'Interpreter','Latex','fontsize',25);  
+            
+            set(gca,'XScale','log');
+            set(gca,'YScale','log');    
+            if(strcmp(parameter,'hatL'))
+                fac = 1;
+            elseif(strcmp(parameter,'stagnationPointY2'))
+                fac = 5;
+            else
+                fac = 1;
+            end
+            plot((1./Cn).^2,fac*0.3./Cn,'r','linewidth',1.5);
+            xDIRegime = (0.01:0.01:0.1);
+            plot(xDIRegime,fac*0.1*xDIRegime.^0.25,'m','linewidth',1.5);            
+        else
+            xlabel('Cn','Interpreter','Latex','fontsize',25);        
+            ylabel(ylabelStr,'Interpreter','Latex','fontsize',25);                
+        end
         
         %ylim([90,100]);        
         %SaveFigure([parameter,'_vs_l_diff']);
