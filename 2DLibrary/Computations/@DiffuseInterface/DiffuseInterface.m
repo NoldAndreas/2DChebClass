@@ -403,6 +403,7 @@ classdef DiffuseInterface < Computation
            
             thetaEq = this.optsPhys.thetaEq;
             Ca      = 3/4*this.optsPhys.Cak;
+            Cn      = this.optsPhys.Cn;
                         
             L       = this.optsNum.PhysArea.y2Max;            
             
@@ -411,7 +412,7 @@ classdef DiffuseInterface < Computation
             else
                 l_diff = 1;
             end
-            fitPos  = min(12*l_diff,L*4/5);%L - min(L/2,2*l_diff);
+            fitPos  = min(max(10*Cn,12*l_diff),L*4/5);%L - min(L/2,2*l_diff);            
             x2M2    = this.IDC.CompSpace2(fitPos);
             IP05    = barychebevalMatrix(this.IDC.Pts.x2,x2M2);
             %Diff    = barychebdiff(this.IDC.Pts.y2,1);

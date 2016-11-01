@@ -24,17 +24,17 @@ function ContactLineBinaryFluid
     parameters.config = v2struct(optsPhys,optsNum);
     parameters.Cak   = 0.005;%;0.01%(0.005:0.0025:0.01)';
     parameters.y2Max = 22;%(20:2:24);%18:2:24;%(18:2:24);            
-    parameters.l_d   = [(3.0:-0.5:1.5),1./(1.0:0.5:5.0)];%[1.5:0.5:3.0];%[1.25:0.25:3.0]; %0.25:0.25:2.5;    
+    parameters.l_d   = [(3.0:-0.5:1.5),1./(1.0:0.5:5.0),1./(7.5:2.5:30)];%[1.5:0.5:3.0];%[1.25:0.25:3.0]; %0.25:0.25:2.5;    
     
-    parameters.y2Max = 10;%22; 
-    parameters.l_d   = 1./(10:5:20);
+    parameters.y2Max = 22;%10;%22; 
+    parameters.l_d   = 1/20;%1./(10:5:20);
     
     comp = [];
     [dataM,~,res] = DataStorage('NumericalExperiment',@RunNumericalExperiment,parameters,[],comp);
     %dataM{l_d}[Cak,y2Max]
     dataN = Rescale(dataM);clear('dataM');    
         
-    AddPaths(['DIBinaryPaper' filesep 'NumericalExperiment']);   
+    AddPaths(['DIBinaryPaper' filesep 'NumericalExperiment_Results']);   
     shades = {}; %{'g','b','c','k','r'};  
     noshades = 9;%length(cols);
     for iC = 1:noshades
@@ -60,9 +60,11 @@ function ContactLineBinaryFluid
     %***************************************
     %***************************************
     
-    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});       
-    PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend'}); xlim([0 1]); ylim([0.42 0.48]); SaveFigure('hatL_Asymptotics');
+    PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend','CompareKusumaatmaja'});
+    PlotAsymptoticResults(dataN,'stagnationPointY2',{'noLegend','CompareKusumaatmaja'});
     
+    PlotAsymptoticInterfaceResults(dataN,1,[],struct('i',1,'val','flux1Slip'),{'mu_y2'});       
+    PlotAsymptoticResults(dataN,'hatL',{'IsoInterface','noLegend'}); xlim([0 1]); ylim([0.42 0.48]); SaveFigure('hatL_Asymptotics');    
     
     f2 = open(fileExampleVelocoties); set(gca,'Xtick',[]);  set(gca,'Ytick',[]);
     PlotAsymptoticResults(dataN,'stagnationPointY2',{'noLegend'}); xlim([0 1]); ylim([2.4 2.55]);     
@@ -523,7 +525,8 @@ function ContactLineBinaryFluid
     end    
     function PlotAllInterfaceData(dataN,i_Cak,parameters)
                        
-        i_y2Max = 1:4;   
+        %i_y2Max = 1:4;
+        i_y2Max = 1:length(parameters.y2Max);
         xL      = [0 dataN{1}(1,i_y2Max(end)).y2Max];
         defaultOpts = {'IsoInterface','noLegend','noNewFigure'};
         figure('Position',[0 0 1000 1400],'color','white');
@@ -788,15 +791,16 @@ function ContactLineBinaryFluid
             set(gca,'XScale','log');
             set(gca,'YScale','log');    
             if(strcmp(parameter,'hatL'))
-                fac = 1;
+                fac = 1;                
             elseif(strcmp(parameter,'stagnationPointY2'))
                 fac = 5;
             else
                 fac = 1;
             end
             plot((1./Cn).^2,fac*0.3./Cn,'r','linewidth',1.5);
-            xDIRegime = (0.01:0.01:0.1);
-            plot(xDIRegime,fac*0.1*xDIRegime.^0.25,'m','linewidth',1.5);            
+            xDIRegime = (0.001:0.01:0.1);
+            plot(xDIRegime,fac*0.1*xDIRegime.^0.25,'m','linewidth',1.5);   
+            SaveFigure(['CompareKusumaatmaja_',parameter]);
         else
             xlabel('Cn','Interpreter','Latex','fontsize',25);        
             ylabel(ylabelStr,'Interpreter','Latex','fontsize',25);                
