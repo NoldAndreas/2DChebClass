@@ -312,6 +312,14 @@ classdef (Abstract) Shape < handle
 %                 end                
                 
                 fl_y1 = fl_y1(mask,:);  fl_y2 = fl_y2(mask,:);
+                
+                %exclude close to zero fluxes                
+                abs_fl    = sqrt(fl_y1.^2 + fl_y2.^2);
+                mark_zero = (abs_fl > 0.2*max(0.1,max(abs_fl)));
+                fl_y1 = fl_y1(mark_zero,:);  
+                fl_y2 = fl_y2(mark_zero,:);
+                y1_s  = y1_s([true;mark_zero]);
+                y2_s  = y2_s([true;mark_zero]);
 
                 if(exist('fl_norm','var') && ~isempty(fl_norm))
                     O = ones(1,size(fl_y1,2));
@@ -421,10 +429,12 @@ classdef (Abstract) Shape < handle
                 if((nargin >= 3) && IsOption(options,'contour'))
                     if(nargin >= 4)         
                         VIM   = reshape(VI,Interp.Nplot2,Interp.Nplot1);
-                        if(isfield(optDetails,'nContours'))                            
-                            [C,h] = contour(y1M,y2M,VIM,...
-                                  optDetails.nContours,...
-                                  'linewidth',lw);  
+                        if(isfield(optDetails,'nContours')) 
+                            ns = optDetails.nContours;
+                            if(length(optDetails.nContours)==1)
+                                ns = ns*[1,1];                            
+                            end
+                            [C,h] = contour(y1M,y2M,VIM,ns,'linewidth',lw);  
                         else                            
                             [C,h] = contour(y1M,y2M,VIM,...
                                   'linewidth',lw);  

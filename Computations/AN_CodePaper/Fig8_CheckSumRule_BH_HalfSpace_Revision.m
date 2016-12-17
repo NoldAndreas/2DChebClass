@@ -39,6 +39,8 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     %N    = 20:5:100;        
     %N    = 40:20:120;
     N    = 50:50:250;
+    N    = 50:25:150; %for Fig. 7
+    
     y    = (0.5:0.1:20)';
     
     ignoreList = {'config_optsNum_PhysArea_N',...
@@ -92,10 +94,10 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     %**********************
     %**********************        
     %PlotConvergenceDensityProfilesInt(res{3},N,0.17,[1 7],[60,100],'rho_1D_WL'); title([]);
-    PlotConvergenceDensityProfilesInt(res{3},N,0.05*[-1 1],[3 7],[60,100],'rho_1D_WL'); title([]);
+    PlotConvergenceDensityProfilesInt(res{3},N,0.05*[-1 1],[3 7],[50,150],'rho_1D_WL'); title([]);
     SaveFigure('BH_ConvergingDensityProfiles');
         
-    PlotConvergenceDensityProfilesInt(res{1},N,[-0.0075 0.015],[3 7],[60,100],'rho_1D'); title([]);
+    PlotConvergenceDensityProfilesInt(res{1},N,[-0.0075 0.015],[3 7],[50,150],'rho_1D'); title([]);
     %PlotConvergenceDensityProfilesInt(res{1},N,0.17,[1 7],[60,100],'rho_1D');
     SaveFigure('HS_ConvergingDensityProfiles');
     
@@ -216,7 +218,7 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
                 error('reference density not unique');
             end
             %disp(resI.config.optsNum.PhysArea.N(2))
-            plot(resI.y2-0.5,resI.(rhoName)-rhoRef,'o','color',cls{i},'MarkerSize',8,'MarkerFaceColor',cls{i}); hold on;
+            %plot(resI.y2-0.5,resI.(rhoName)-rhoRef,'o','color',cls{i},'MarkerSize',8,'MarkerFaceColor',cls{i}); hold on;
             IP = barychebevalMatrix(resI.x2,xIP);
             plot(yIP-0.5,IP*resI.(rhoName)-rhoRef,'-','color',cls{i},'linewidth',1.5); hold on;
         end        
