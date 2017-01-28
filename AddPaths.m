@@ -11,6 +11,8 @@
     global loadAll         
     
     switch GetMacAddress()
+        case '18-66-DA-34-E5-42'  %Andreas' Windows Work PC Max-Planck D-01508
+            dirData    = 'D:\2DChebData';                
         case '24-BE-05-10-A1-52'  %Andreas' Windows Work PC
             dirData    = 'D:\2DChebData';                
         case '00:88:65:35:a1:92'
@@ -44,7 +46,7 @@
         otherwise
             disp('Unknown computer; using current directory to save data');
             dirData     = pwd;
-    end
+    end       
     dirDDFT    = pwd;
     
     if(strcmp(dirData,dirDDFT))
