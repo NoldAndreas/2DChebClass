@@ -315,7 +315,7 @@ classdef (Abstract) Shape < handle
                 
                 %exclude close to zero fluxes                
                 abs_fl    = sqrt(fl_y1.^2 + fl_y2.^2);
-                mark_zero = (abs_fl > 0.2*max(0.1,max(abs_fl)));
+                mark_zero = (abs_fl > max(0.01,0.2*max(abs_fl)));
                 fl_y1 = fl_y1(mark_zero,:);  
                 fl_y2 = fl_y2(mark_zero,:);
                 y1_s  = y1_s([true;mark_zero]);
@@ -328,7 +328,7 @@ classdef (Abstract) Shape < handle
                 end            
             
                 %fl_y1 = this.Interp.InterPol*flux(1:this.N1*this.N2,:);
-                %fl_y2 = this.Interp.InterPol*flux(this.N1*this.N2+1:end,:);                                                
+                %fl_y2 = this.Interp.InterPol*flux(this.N1*this.N2+1:end,:);                 Sa                               
                 
                 %if(nSpecies > 1)                    
                 %    subplot(nRows,nCol,iSpecies);

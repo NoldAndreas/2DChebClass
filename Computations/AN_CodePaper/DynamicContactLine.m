@@ -93,7 +93,7 @@ function DynamicContactLine()
 
         CL = ContactLineHS(conf);
         CL.Preprocess(); 
-        CL.ComputeEquilibrium();              
+       % CL.ComputeEquilibrium();              
         CL.ComputeDynamics();            
         CL.PostprocessDynamics();
             
