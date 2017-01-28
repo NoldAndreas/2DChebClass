@@ -318,13 +318,17 @@ classdef (Abstract) Shape < handle
                 mark_zero = (abs_fl > max(0.01,0.2*max(abs_fl)));
                 fl_y1 = fl_y1(mark_zero,:);  
                 fl_y2 = fl_y2(mark_zero,:);
-                y1_s  = y1_s([true;mark_zero]);
-                y2_s  = y2_s([true;mark_zero]);
-
+                                
                 if(exist('fl_norm','var') && ~isempty(fl_norm))
                     O = ones(1,size(fl_y1,2));
                     fl_y1 = [fl_norm*O;fl_y1];
-                    fl_y2 = [0*O;fl_y2];
+                    fl_y2 = [0*O;fl_y2];                    
+                    
+                    y1_ss  = y1_s([true;mark_zero]);            
+                    y2_ss  = y2_s([true;mark_zero]);
+                else
+                    y1_ss  = y1_s([mark_zero]);            
+                    y2_ss  = y2_s([mark_zero]);
                 end            
             
                 %fl_y1 = this.Interp.InterPol*flux(1:this.N1*this.N2,:);
@@ -336,12 +340,12 @@ classdef (Abstract) Shape < handle
 
                 if(exist('lw','var') && exist('c','var') && ~isempty(lw)) 
                     if(nSpecies == 1)
-                        quiver(y1_s,y2_s,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
+                        quiver(y1_ss,y2_ss,fl_y1,fl_y2,'LineWidth',lw,'Color',c);
                     else
-                        quiver(y1_s,y2_s,fl_y1,fl_y2,'LineWidth',lw,'Color',c{iSpecies});
+                        quiver(y1_ss,y2_ss,fl_y1,fl_y2,'LineWidth',lw,'Color',c{iSpecies});
                     end
                 else
-                    quiver(y1_s,y2_s,fl_y1,fl_y2);
+                    quiver(y1_ss,y2_ss,fl_y1,fl_y2);
                 end
 
                 hold on;
