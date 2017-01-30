@@ -152,14 +152,11 @@ parfor (iRun=1:nRuns, poolsize)
     end
  
     % do dynamics
-    if(isfield(optsStoc,'useNewHS') && optsStoc.useNewHS)
-        %disp('new')
-        [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamicsHS(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
-    elseif(isfield(optsStoc,'useDivergence') && optsStoc.useDivergence)
+    if(isfield(optsStoc,'useDivergence') && optsStoc.useDivergence)
         %disp('with divergence')
         [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamicsDiv(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
     else 
-        %disp('old')
+        %disp('zero divergence')
         [x(iRun,:,:),p(iRun,:,:)]=stochasticDynamics(f,x0(:,iRun),p0(:,iRun),optsPhys,optsStoc,plotPosMask);
     end
 

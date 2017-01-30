@@ -46,7 +46,7 @@ function HIStruct = HIMatricesSpherical(opts,IDC)
     for iS = 1:nSpecies
         for jS = iS:nSpecies
             paramsIJ = getIJParams(iS,jS);
-            HITemp11 = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);  edit 
+            HITemp11 = IDC.ComputeConvolutionMatrix(@F11,paramsIJ);
             HITemp12 = IDC.ComputeConvolutionMatrix(@F12,paramsIJ);  
             
             HIStruct(iS,jS).HIInt11 = HITemp11;

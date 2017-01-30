@@ -213,7 +213,7 @@ end
 %--------------------------------------------------------------------------
 
 D.sendEmail = false;
-D.emailAddress = 'b.goddard@ed.ac.uk';
+D.emailAddress = 'yourEmailGoesHere';
 
 %--------------------------------------------------------------------------
 % Assign values to those which don't exist in S

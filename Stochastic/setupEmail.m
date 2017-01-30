@@ -1,8 +1,9 @@
 function setupEmail()
 
-    myaddress = 'mymatlabmail@gmail.com';
-    mypassword = 'tp2fca8560_6988_422d_8745_3ec499db6668';
+    myaddress = 'yourAddressGoesHere';
+    mypassword = 'yourPasswordGoesHere';
     
+    % this may vary if you're not using gmail
     setpref('Internet','E_mail',myaddress);
     setpref('Internet','SMTP_Server','smtp.gmail.com');
     setpref('Internet','SMTP_Username',myaddress);
@@ -16,4 +17,5 @@ function setupEmail()
 
 end
 
+% test sending email
 %sendmail(myaddress, 'Gmail Test', 'This is a test message.', 'emailTest.m');
