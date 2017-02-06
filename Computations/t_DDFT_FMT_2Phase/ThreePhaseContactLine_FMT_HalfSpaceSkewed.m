@@ -16,7 +16,7 @@ function ThreePhaseContactLine_FMT_HalfSpaceSkewed(CompCase,Case90)
     
     disp('** ThreePhaseContactLine FMT HalfSpaceSkewed **');    
     AddPaths();
-    global PersonalUserOutput dirData
+    global dirData
     %************************************************
     %***************  Initialization ****************
     %************************************************        
@@ -185,7 +185,7 @@ function ThreePhaseContactLine_FMT_HalfSpaceSkewed(CompCase,Case90)
     
      %(a) Test Interpolation for Convolution with current function
     % yPtsCheck          = [0 2 ; 0 PhysArea.y2wall ; -10 0 ; 20 10;0 Inf];
-	% if(recomputed && (PersonalUserOutput))        
+	% if(recomputed)        
     %    HS.TestConvolutionMatrix(yPtsCheck,@Phi);
     % else
     %     HS.TestConvolutionMatrix(yPtsCheck,@Phi,false);
@@ -343,44 +343,43 @@ function ThreePhaseContactLine_FMT_HalfSpaceSkewed(CompCase,Case90)
     fprintf(['Measured Contact Angle: ',num2str(alphaM*180/pi),' [deg]\n']);
     %***************************************************************
     
-    if(PersonalUserOutput)
-        dirData     = [dirData filesep 'Case_' num2str(CompCase)];
-        
-        figure('Color','white','Position',[0 0 1200 800]);
-        %optDetails.nContours = 10;       
-        optDetails.clabel = true;        
-        optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
-        %HS.PlotGridLines(); hold on;
-        HS.plot(rho,'contour',optDetails);
-    
-        hold on;  
-        plot([pt1.y1_kv;pt2.y1_kv],[pt1.y2_kv;pt2.y2_kv],'o','MarkerSize',8,'MarkerEdgeColor','k','MarkerFaceColor','g');        
-        plot((y2I-b)/slope,y2I,'--m','linewidth',1.5);
-        
-        if(saveFigs)       
-            print2eps([dirData filesep 'DensityPlotCL'],gcf);
-            saveas(gcf,[dirData filesep 'DensityPlotCL.fig']);
-        end
-        
-        %***************************************************************
-        figure('Color','white','Position',[0 0 1200 800]);
-        y2MaxCompPlot = 2;
-        PlotArea2 = struct('y1Min',min(-plotX0,-plotX0+y2MaxCompPlot/tan(theta_CS)),...
-                           'y1Max',max(plotX0,plotX0+y2MaxCompPlot/tan(theta_CS)),...
-                           'N1',60,'N2',60,...                           
-                           'y2Min',0.5,'y2Max',y2MaxCompPlot+2);
-        HS.InterpolationPlotCart(PlotArea2,true);        
-        HS.plot(rho,'SC');
-        zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
-        colormap(hsv);
-        set(gca, 'CLim', [0, 1.0]);
-        view([-10 5 3]);                       
-        
-        if(saveFigs)       
-            print2eps([dirData filesep 'ContourPlot'],gcf);
-            saveas(gcf,[dirData filesep 'Density_Wall_AverageDensities.fig']);
-        end        
+    dirData     = [dirData filesep 'Case_' num2str(CompCase)];
+
+    figure('Color','white','Position',[0 0 1200 800]);
+    %optDetails.nContours = 10;       
+    optDetails.clabel = true;        
+    optDetails.nContours = [0.1,0.2,0.3,0.4,0.5,0.6,0.7];        
+    %HS.PlotGridLines(); hold on;
+    HS.plot(rho,'contour',optDetails);
+
+    hold on;  
+    plot([pt1.y1_kv;pt2.y1_kv],[pt1.y2_kv;pt2.y2_kv],'o','MarkerSize',8,'MarkerEdgeColor','k','MarkerFaceColor','g');        
+    plot((y2I-b)/slope,y2I,'--m','linewidth',1.5);
+
+    if(saveFigs)       
+        print2eps([dirData filesep 'DensityPlotCL'],gcf);
+        saveas(gcf,[dirData filesep 'DensityPlotCL.fig']);
     end
+
+    %***************************************************************
+    figure('Color','white','Position',[0 0 1200 800]);
+    y2MaxCompPlot = 2;
+    PlotArea2 = struct('y1Min',min(-plotX0,-plotX0+y2MaxCompPlot/tan(theta_CS)),...
+                       'y1Max',max(plotX0,plotX0+y2MaxCompPlot/tan(theta_CS)),...
+                       'N1',60,'N2',60,...                           
+                       'y2Min',0.5,'y2Max',y2MaxCompPlot+2);
+    HS.InterpolationPlotCart(PlotArea2,true);        
+    HS.plot(rho,'SC');
+    zlabel('$\varrho$','Interpreter','Latex','fontsize',26);
+    colormap(hsv);
+    set(gca, 'CLim', [0, 1.0]);
+    view([-10 5 3]);                       
+
+    if(saveFigs)       
+        print2eps([dirData filesep 'ContourPlot'],gcf);
+        saveas(gcf,[dirData filesep 'Density_Wall_AverageDensities.fig']);
+    end        
+
     
     display(['Preprocessor, Computation time (sec): ', num2str(t_preprocess),'\n']);
     display(['Equilibrium, Computation time (sec): ', num2str(t_eqSol),'\n']);
