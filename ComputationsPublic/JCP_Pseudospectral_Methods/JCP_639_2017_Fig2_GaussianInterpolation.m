@@ -1,12 +1,26 @@
-function ConvolutionTest_1D_Convergence
+function JCP_639_2017_Fig2_NumericsPaper_GaussianInterpolation    
+
+    AddPaths('CodePaper');
+    set(0,'defaultaxesfontsize',20);
+    set(0,'defaultlinelinewidth',2);
+
+    defaultPos = [0 0 1000 800];
+
+    saveDir = [pwd filesep 'Computations' filesep 'CodePaper' filesep 'Images' filesep];
 
     close all;
 
-    geom.N = 30;
+    geom.N = 50;
     geom.L = 2;  % optimize by looking at a derivative, or do parameter testing
-	PlotArea = struct('N',1000,'yMin',-20,'yMax',20);
     
     infLine = InfSpectralLine(geom);
+    
+    % for Gaussian plots
+    PlotArea = struct('N',1500,'yMin',-25,'yMax',25);
+    
+    % for kernel plots
+    %PlotArea = struct('N',1000,'yMin',-10,'yMax',10);
+    
     [Pts,Diff,Int,Ind,Interp] = infLine.ComputeAll(PlotArea);
 
     % this case breaks the basic convolution
@@ -17,6 +31,13 @@ function ConvolutionTest_1D_Convergence
 
     mu3 = 1;
     sigma3 = 1;
+    
+    % this case is pretty good for both (still better for ptwise
+%     mu1 = 0;
+%     mu2 = 1;    
+%     sigma1 = 0.25;
+%     sigma2 = 1;
+
 
     muConv12 = mu1+mu2;
     sigmaConv12 = sqrt(sigma1^2 + sigma2^2);
@@ -24,59 +45,59 @@ function ConvolutionTest_1D_Convergence
     muConv13 = mu1+mu3;
     sigmaConv13 = sqrt(sigma1^2 + sigma3^2);
 
+    y = Pts.y;
+    sigma1 = 1;
     
-    y              = Pts.y;           
+    figure('Position',[0 0 450 200],'color','white');  
+    
+    subplot(1,3,1);
+    k = geom.N-20;
+    yTest = y(k);
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k'); hold on;
+    plot(y,shiftedKernel,'ok');
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    title(['$g(y-y_{',num2str(k),'})$'],'Interpreter','latex');
+    pbaspect([1 1 1]);
+    
+    subplot(1,3,2);
+    k = geom.N-6;
+    yTest = y(k);    
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k');hold on;
+    plot(y,shiftedKernel,'ok');
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    title(['$g(y-y_{',num2str(k),'})$'],'interpreter','latex');
+    pbaspect([1 1 1]);
+    
+    subplot(1,3,3);
+    k = geom.N-3;
+    yTest = y(k);   
+    shiftedKernel = Gaussian1(y-yTest);
+    plot(Interp.pts,Interp.InterPol*shiftedKernel,'k'); hold on;
+    plot(y,shiftedKernel,'ok');
+    pbaspect([1 1 1]);
+    
+    xlim([-25,25]);  ylim([-0.1,0.5]);
+    xlabel('$y$','interpreter','latex');
+    title(['$g(y-y_{',num2str(k),'})$'],'interpreter','latex');
+    SaveFigure('kernel_all');
+    
+    sigma1 = 0.25;
+    g1 = Gaussian1(y);
+    g2 = Gaussian2(y);
+    g3 = Gaussian3(y);
+    
+    gConv12 = GaussianConv12(y);
+    gConv13 = GaussianConv13(y);
+    
+    shapeParams.N  = 50;
     shapeParams.L  = 2;
-    %shapeParamsHalfLim.L    = 2;
-    shapeParamsHalfLim.yMin = 1;
-    shapeParamsHalfLim.yMax = 10;
-    shapeParamsLim.yMin = -1;
-    shapeParamsLim.yMax = 1;
     
     % false gives pointwise convolution
-    NS_d = 5;
-    NS = 20:NS_d:80;%20:NS_d:40;
-    for i = 1:length(NS)
-        shapeParams.N     = NS(i);
-        shapeParamsHalfLim.N  = NS(i);
-        shapeParamsLim.N  = NS(i);
-        res{i}.ConvBH1_HalfLim  = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsHalfLim,false);
-        res{i}.ConvGauss1       = infLine.ComputeConvolutionMatrix(@Gaussian1,shapeParams,false);
-        %res{i}.ConvBH1     = infLine.ComputeConvolutionMatrix(@BH1,shapeParams,false);        
-        res{i}.ConvBH1_Lim      = infLine.ComputeConvolutionMatrix(@BH1,shapeParamsLim,false);
-        res{i}.NS         = NS(i);
-    end        
-    
-    cols = {'b','m','k','r','g'}; nosyms = 5;
-    syms = {'d','s','o','>','<'}; nocols = 5;
-    legendstring = {};
-    
-	figure('color','white','Position',[0 0 800 800]);         
-    PlotMatrixErrorOverY('ConvGauss1','o','k','Gaussian');
-    %PlotMatrixErrorOverY('ConvBH1','o','m','BH1');
-    PlotMatrixErrorOverY('ConvBH1_HalfLim','o','g','BH1_{HalfLim}');
-    PlotMatrixErrorOverY('ConvBH1_Lim','o','b','BH1_{Lim}');
-
-    xlabel('$N$','Interpreter','Latex','fontsize',15);        
-    set(gca,'YScale','log');
-    set(gca,'linewidth',1.5);
-    set(gca,'fontsize',15);
-    legend(legendstring,'Location','southoutside','Orientation','horizontal');        
-    
-     function PlotMatrixErrorOverY(A_name,sym,col,name)     
-        leg_string = {};        
-        
-        y = Pts.y;
-        n = 1;
-        for j = 1:(length(res)-1)            
-            line(n)   = max(max(abs(res{j}.(A_name)-res{j+1}.(A_name))));
-            line_N(n) = (res{j}.NS);%+res(k1,k2+1).NS)/2;                
-            n = n+1;                
-        end       
-        plot(line_N,line,['-',sym,col],'MarkerSize',10,'MarkerFaceColor',col); hold on;
-        legendstring(end+1) = {name};
-    end
-    
+    convMatrixPtwise = infLine.ComputeConvolutionMatrix(@Gaussian1,shapeParams,false);
     
     % true uses naive convolution
     convMatrixBasic = infLine.ComputeConvolutionMatrix(@Gaussian1,shapeParams,true);
@@ -127,14 +148,6 @@ function ConvolutionTest_1D_Convergence
     ptwiseErr3 = L2norm(gPtwise3-gConv13)/L2norm(gConv13)
     basicErr3  = L2norm(gBasic3-gConv13)/L2norm(gConv13)
 
-    function g = BH1(x)
-        x = abs(x);
-        %g = x.*BarkerHenderson_2D(x); g(x==inf) = 0; g(x==-inf) = 0;
-        %g(x <= 1) = BarkerHenderson_2D(1);
-        g = 1./(x.^4);
-        %g(x <= 1) = BarkerHenderson_2D(1);
-        g(x <= 1) = 1;
-    end
     
     function g = Gaussian1(x)
         g = 1/sqrt(2*pi)/sigma1 * exp( -(x-mu1).^2/(2*sigma1^2) );
