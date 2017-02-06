@@ -19,7 +19,7 @@ function TestAll(dirTest,recomputeAll,rerun)
     end
         
     QuickOutput  = true;
-    comments = 'values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.';
+    comments     = 'TEST_ALL -- computation time in secs (>0); ignore file (=0); recompute (< 0); error in last run (-2)';
         
     
     dirResOld  = dirData;
@@ -195,10 +195,11 @@ function TestAll(dirTest,recomputeAll,rerun)
                tc = tc + str2num(Parameters.(strfT));
             end
         end
-
-        Struct2File([dirDDFT_2D,'/TestAll_report.txt'],Parameters,...
-                        ['Computed at: ',datestr(now),...
-                        ' Cumulative computation time: ',sec2hms(tc), ' (hrs:min:sec) ',comments]);
+        
+        if(~isfield(Parameters,'DateTime'))
+            Parameters.DateTime =  datestr(now);
+        end
+        Struct2File([dirDDFT_2D,'/TestAll_report.txt'],Parameters,comments);
 
     end
     function outStr = replaceBackslash(tStr)
