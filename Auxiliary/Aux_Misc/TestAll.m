@@ -29,7 +29,7 @@ function TestAll(dirTest,recomputeAll,rerun)
         mkdir(dirData);
     end           
 
-    dirDDFT_2D  = [pwd,'/Computations/',dirTest];
+    dirDDFT_2D  = [pwd,filesep,dirTest];
     MFiles      = dir(fullfile(dirDDFT_2D,'*.m'));
     
     

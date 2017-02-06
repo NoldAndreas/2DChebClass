@@ -1,10 +1,10 @@
 # ************************************************************ 
-# Computed at: 04-Nov-2015 18:05:31 Cumulative computation time: 00:01:28.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# Computed at: 03-Feb-2017 11:42:51 Cumulative computation time: 00:00:59.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
 # ************************************************************ 
 SecondLine : Computed at: 02-Nov-2015 16:11:55 Cumulative computation time: 00:00:46.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run.
-DiffusionAdvectionPolarInfinity : 32
-DiffusionCapillary : 4
-DiffusionClosedBox : 12
+DiffusionAdvectionPolarInfinity : 10
+DiffusionCapillary : 2
+DiffusionClosedBox : 7
 DiffusionClosedBox_VariableMobility : 14
 DiffusionDisk : 5
 DiffusionPeriodicSlit : 3

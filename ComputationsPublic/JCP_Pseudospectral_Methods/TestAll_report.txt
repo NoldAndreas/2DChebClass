@@ -1,0 +1,22 @@
+# ************************************************************ 
+# Computed at: 05-Feb-2017 20:19:02 Cumulative computation time: 01:57:57.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# ************************************************************ 
+CheckSumRule_HalfSpace_L : 5019
+CodePaper_ComputeSurfaceTensions : 1878
+ConvolutionTest_1D_Convergence : -2
+DynamicContactLine : -2
+DynamicContactLine_recoverOldResult : -2
+Fig4_NumericsPaper_HalfSpaceRepresentation : -2
+Fig5_NumericsPaper_ConvolutionConvergence : -2
+Fig8_CheckSumRule_BH_HalfSpace : -2
+Fig8_CheckSumRule_BH_HalfSpace_Revision : -2
+Fig9_NumericsPaper_2DSumRuleConvergence : -2
+Fig_IntersectionFigures : 5
+HalfSpaceRepresentation : -2
+IntegrationNL : 0
+IntegrationNLPlots : -2
+PlanarDensityProfiles : 142
+SphericalHeatEquation : 0
+SphericalHeatEquationParameterTestPlots : -2
+TestBH_Cutoff : -2
+TestBarkerHenderson1DConvolution : 0
