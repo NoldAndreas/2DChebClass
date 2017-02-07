@@ -561,15 +561,17 @@ classdef ContactLineHS < DDFT_2D
             this.dynamicsResult.contactangle_0.str = '\theta';
             this.dynamicsResult.contactlineVel_y1_0 = vel_0_Cart;
             
-            this.dynamicsResult.pathlines_MovingFrameOfReference   = this.dynamicsResult.pathlines;
-            this.dynamicsResult.streaklines_MovingFrameOfReference = this.dynamicsResult.streaklines;
-            
-            for jj = 1:length(this.dynamicsResult.pathlines)                
-                this.dynamicsResult.pathlines_MovingFrameOfReference{jj}.y1 = ...
-                    this.dynamicsResult.pathlines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
-                
-                this.dynamicsResult.streaklines_MovingFrameOfReference{jj}.y1 = ...
-                    this.dynamicsResult.streaklines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
+            if(~isempty(this.dynamicsResult.pathlines{1}))
+                this.dynamicsResult.pathlines_MovingFrameOfReference   = this.dynamicsResult.pathlines;
+                this.dynamicsResult.streaklines_MovingFrameOfReference = this.dynamicsResult.streaklines;
+
+                for jj = 1:length(this.dynamicsResult.pathlines)                
+                    this.dynamicsResult.pathlines_MovingFrameOfReference{jj}.y1 = ...
+                        this.dynamicsResult.pathlines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
+
+                    this.dynamicsResult.streaklines_MovingFrameOfReference{jj}.y1 = ...
+                        this.dynamicsResult.streaklines{jj}.y1 - this.dynamicsResult.contactlinePos_y1_0;
+                end
             end
             
             function z = rhoX1(y1)

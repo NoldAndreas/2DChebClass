@@ -1,5 +1,5 @@
 %Half Space
-
+function JCP_639_2017_Fig3_HalfSpaceRepresentation()
 
 %Initialization
 
@@ -55,3 +55,5 @@
     ylim([-0.5 10]); xlim([-0.5 0.5]*10);        	
     xlabel('$y_1$','Interpreter','Latex','fontsize',25);
     ylabel('$y_2$','Interpreter','Latex','fontsize',25);
+    
+end

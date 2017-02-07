@@ -1,4 +1,4 @@
-function DynamicContactLine()
+function JCP_639_2017_Fig13_DynamicContactLine()
 
     AddPaths('CodePaper');            
     close all;

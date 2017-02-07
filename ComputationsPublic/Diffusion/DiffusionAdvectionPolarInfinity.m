@@ -19,7 +19,7 @@ function DiffusionAdvectionPolarInfinity()
     ux  = 0; uy = -1;  %External velocity field:    
     
     IDC                = InfDisc(v2struct(L,N));     
-    [Pts,Diff,Int,Ind] = IDC.ComputeAll();    
+    [Pts,Diff,~,Ind]   = IDC.ComputeAll();    
     
     x1plotMax          = IDC.CompSpace1(10);                      
     IDC.ComputeInterpolationMatrix((0:100)'*x1plotMax/100,(0:0.02:1)',true,true);

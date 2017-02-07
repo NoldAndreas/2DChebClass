@@ -1,22 +1,13 @@
 # ************************************************************ 
-# Computed at: 05-Feb-2017 20:19:02 Cumulative computation time: 01:57:57.00 (hrs:min:sec) values > 0:  computation time in seconds; = 0: ignore; < 0: recompute; -2 : error in last run. 
+# TEST_ALL -- computation time in secs (>0); ignore file (=0); recompute (< 0); error in last run (-2) 
 # ************************************************************ 
-CheckSumRule_HalfSpace_L : 5019
-CodePaper_ComputeSurfaceTensions : 1878
-ConvolutionTest_1D_Convergence : -2
-DynamicContactLine : -2
-DynamicContactLine_recoverOldResult : -2
-Fig4_NumericsPaper_HalfSpaceRepresentation : -2
-Fig5_NumericsPaper_ConvolutionConvergence : -2
-Fig8_CheckSumRule_BH_HalfSpace : -2
-Fig8_CheckSumRule_BH_HalfSpace_Revision : -2
-Fig9_NumericsPaper_2DSumRuleConvergence : -2
-Fig_IntersectionFigures : 5
-HalfSpaceRepresentation : -2
-IntegrationNL : 0
-IntegrationNLPlots : -2
-PlanarDensityProfiles : 142
-SphericalHeatEquation : 0
-SphericalHeatEquationParameterTestPlots : -2
-TestBH_Cutoff : -2
-TestBarkerHenderson1DConvolution : 0
+JCP_639_2017_Fig13_DynamicContactLine : -2
+JCP_639_2017_Fig1_IntegrationNLPlots : 2
+JCP_639_2017_Fig2_GaussianInterpolation : 2
+JCP_639_2017_Fig3_HalfSpaceRepresentation : -2
+JCP_639_2017_Fig4_IntersectionFigures : 6
+JCP_639_2017_Fig5_ConvolutionConvergence : 4460
+JCP_639_2017_Fig6_DFT_vs_MD : 7
+JCP_639_2017_Fig8_CheckSumRule : -2
+JCP_639_2017_Fig9_2DSumRuleConvergence : -2
+DateTime : 06-Feb-2017 16:06:25

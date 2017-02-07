@@ -1,4 +1,4 @@
-function Fig5_NumericsPaper_ConvolutionConvergence()
+function JCP_639_2017_Fig5_ConvolutionConvergence()
     
     AddPaths('CodePaper');
 

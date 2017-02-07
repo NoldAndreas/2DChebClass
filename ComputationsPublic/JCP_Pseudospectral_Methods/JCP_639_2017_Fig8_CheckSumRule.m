@@ -1,4 +1,4 @@
-function Fig8_CheckSumRule_BH_HalfSpace_Revision()
+function JCP_639_2017_Fig8_CheckSumRule()
     
     AddPaths('CodePaper');  
     close all;
@@ -176,7 +176,7 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
         for i = 1:3            
             subplot(1,3,i); 
             if(~isempty(acc))
-                PlotConvergenceDensityProfilesInt(res,N,acc(i),xlims,ints{i},varName);
+                PlotConvergenceDensityProfilesInt(res,N,[0 acc(i)],xlims,ints{i},varName);
             else
                 PlotConvergenceDensityProfilesInt(res,N,[],xlims,ints{i},varName);
             end
@@ -354,8 +354,6 @@ function Fig8_CheckSumRule_BH_HalfSpace_Revision()
     end
     function PlotErrorVsY(res,var_name,sym,title_name)        
         ns   = 1:length(res);
-        mark = 5:9;%length(res);
-        ns   = ns(mark);
         cls  = GetGreyShades(length(ns));
         for j1 = 1:length(ns)                                    
             col = cls{j1};

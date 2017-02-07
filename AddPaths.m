@@ -4,21 +4,20 @@
     % Set current data folder
     %*****************************
     global dirData      
-    %dirData    = 'D:\2DChebData';                
+    dirData    = 'D:\2DChebData';                
     %dirData    = '/Users/NoldAndreas/Documents/2DChebData';            
     %dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';            
     %dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
-	dirData    = '/Users/andreas/Documents/2DChebData'; 
+	%dirData    = '/Users/andreas/Documents/2DChebData'; 
     
     %***********************************
     % Initialization of main data folder
     %***********************************
     
-    global dirDataOrg    %Main data folder   
+    global dirDataOrg    %Main data folder 
+    dirDataOrg  = dirData; 
     if(nargin >= 1)
         ChangeDirData([dirDataOrg filesep dirOrg],'ORG');
-    else
-        dirDataOrg         = dirData;        
     end
     
     %******************************
