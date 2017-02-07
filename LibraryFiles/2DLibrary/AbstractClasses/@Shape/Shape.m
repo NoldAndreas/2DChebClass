@@ -234,12 +234,6 @@ classdef (Abstract) Shape < handle
             end
             
             h = streamline(y1M,y2M,fl_y1,fl_y2,startMask1,startMask2);                                                   
-%                hold on;
-%                streamline(y1M,y2M,-fl_y1,-fl_y2,...
-%                       PtsYCart.y1_kv(mask&startMask),PtsYCart.y2_kv(mask&startMask));
-%            else
-%               
-%            end
             if((nargin >= 5) && isfield(opts,'color'))
                 set(h,'color',opts.color);
             end
@@ -257,10 +251,9 @@ classdef (Abstract) Shape < handle
             else
                 nCol = 2;
             end
-            %ma3 = (~Ind.bound  & (Pts.y1_kv >=  min(y1Plot)) & (Pts.y1_kv <=  max(y1Plot)) & (Pts.y2_kv <=  max(y2Plot)) & (Pts.y2_kv >=  min(y2Plot)));  
             
             nRows  = ceil(nSpecies/nCol);
-            %yCart  = GetCartPts(this,this.Interp.pts1,this.Interp.pts2);
+            
             if(isempty(this.InterpFlux))
                 pts = this.Pts;         
                 IP  = diag(length(this.Pts.y1_kv));
@@ -301,11 +294,7 @@ classdef (Abstract) Shape < handle
             for iSpecies=1:nSpecies
                 
                 fl_y1     = IP*flux(1:this.N1*this.N2,iSpecies);
-                fl_y2     = IP*flux(this.N1*this.N2+1:end,iSpecies);
-                
-%                 if(strcmp(this.polar,'polar'))
-%                    [fl_y1,fl_y2] = GetCartesianFromPolar(fl_y1,fl_y2,this.Pts.y2_kv);
-%                 end                
+                fl_y2     = IP*flux(this.N1*this.N2+1:end,iSpecies);                     
                 
                 fl_y1 = fl_y1(mask,:);  fl_y2 = fl_y2(mask,:);
                 
@@ -325,14 +314,7 @@ classdef (Abstract) Shape < handle
                 else
                     y1_ss  = y1_s([mark_zero]);            
                     y2_ss  = y2_s([mark_zero]);
-                end            
-            
-                %fl_y1 = this.Interp.InterPol*flux(1:this.N1*this.N2,:);
-                %fl_y2 = this.Interp.InterPol*flux(this.N1*this.N2+1:end,:);                 Sa                               
-                
-                %if(nSpecies > 1)                    
-                %    subplot(nRows,nCol,iSpecies);
-                %end
+                end                        
 
                 if(exist('lw','var') && exist('c','var') && ~isempty(lw)) 
                     if(nSpecies == 1)
