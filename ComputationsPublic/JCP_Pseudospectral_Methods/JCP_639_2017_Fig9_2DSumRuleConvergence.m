@@ -1,7 +1,7 @@
 function JCP_639_2017_Fig9_2DSumRuleConvergence()
     
     AddPaths('CodePaper');
-    global recomputeAll
+
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,...
                       'alpha_deg',90);
@@ -78,14 +78,14 @@ function JCP_639_2017_Fig9_2DSumRuleConvergence()
     xlabel('$N$','Interpreter','Latex','fontsize',20);%/{\sigma}
 	ylabel('t (sec.)','Interpreter','Latex','fontsize',20); %/{\sigma}    
     SaveFigure('CompTime');
-    
-    %fullname = PlotDensityProfile(res{1}(3));
-    %open([fullname,'.fig']);    
-    open('D:\2DChebData\CodePaper\deg90\2015_5_9_17_1_53_EquilibriumContour.fig');
-    set(gca,'fontsize',15); set(gca,'linewidth',1.5);
-    xlabel('${y_1}$','Interpreter','Latex','fontsize',20);%/{\sigma}
-	ylabel('${y_2}$','Interpreter','Latex','fontsize',20); %/{\sigma}
-    f1 = gcf;
+  
+    %******************
+    % TODO: PRODUCE CONTOUR PLOT
+    %open('D:\2DChebData\CodePaper\deg90\2015_5_9_17_1_53_EquilibriumContour.fig');
+    %set(gca,'fontsize',15); set(gca,'linewidth',1.5);
+    %xlabel('${y_1}$','Interpreter','Latex','fontsize',20);%/{\sigma}
+	%ylabel('${y_2}$','Interpreter','Latex','fontsize',20); %/{\sigma}
+    %f1 = gcf;    
     %**********************
     %**********************
     %PlotDensityProfile(res{1}(3));
@@ -107,7 +107,7 @@ function JCP_639_2017_Fig9_2DSumRuleConvergence()
     %                        'Interpreter','Latex','fontsize',20);
     xlim([(N(1)-2),(N(end)+2)]);    
 	
-    inset2(f2,f1,0.35,[0.6,0.6]);   close(f1);
+    %inset2(f2,f1,0.35,[0.6,0.6]);   close(f1);
     inset2(f2,f0,0.3,[0.25,0.2]); close(f0);
     SaveFigure('SumRuleError2D',v2struct(N,config));
     

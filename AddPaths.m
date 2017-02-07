@@ -14,11 +14,10 @@
     % Initialization of main data folder
     %***********************************
     
-    global dirDataOrg    %Main data folder   
+    global dirDataOrg    %Main data folder 
+    dirDataOrg  = dirData; 
     if(nargin >= 1)
         ChangeDirData([dirDataOrg filesep dirOrg],'ORG');
-    else
-        dirDataOrg         = dirData;        
     end
     
     %******************************
