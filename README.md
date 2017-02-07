@@ -1,6 +1,6 @@
 # README #
 
-2DChebClass is a code Andreas Nold and Ben Goddard developed as a project for some simple DFT computations in 2012 by at Imperial College London. Since then, it evolved into a library of classes and functions to solve 1D and 2D DFT and DDFT problems. 
+2DChebClass is a code Andreas Nold and Ben Goddard developed as a project for DFT and DDFT computations in 2012 at Imperial College London. Since then, it evolved into a library of classes and functions to solve 1D and 2D DFT and DDFT problems.
 
 ## How to get started
 
