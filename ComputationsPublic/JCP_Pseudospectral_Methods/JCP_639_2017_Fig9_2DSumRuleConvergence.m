@@ -1,4 +1,4 @@
-function Fig9_NumericsPaper_2DSumRuleConvergence()
+function JCP_639_2017_Fig9_2DSumRuleConvergence()
     
     AddPaths('CodePaper');
     global recomputeAll

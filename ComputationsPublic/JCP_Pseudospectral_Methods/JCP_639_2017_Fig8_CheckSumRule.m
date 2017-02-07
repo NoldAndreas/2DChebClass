@@ -1,4 +1,4 @@
-function Fig8_CheckSumRule_BH_HalfSpace_Revision()
+function JCP_639_2017_Fig8_CheckSumRule()
     
     AddPaths('CodePaper');  
     close all;
