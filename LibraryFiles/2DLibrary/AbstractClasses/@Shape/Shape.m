@@ -561,14 +561,14 @@ classdef (Abstract) Shape < handle
             for i1=1:nthGridLines:this.N1
                 [y1_kv,y2_kv] = PhysSpace(this,this.Pts.x1(i1)*O2,x2I);                
                 GL_CartPts = GetCartPts(this,y1_kv,y2_kv);
-                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift); hold on;
+                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift,'b'); hold on;
             end
             
             %(2) Plot x2-isolines
             for i2=1:nthGridLines:this.N2
                 [y1_kv,y2_kv] = PhysSpace(this,x1I,this.Pts.x2(i2)*O1);
                 GL_CartPts    = GetCartPts(this,y1_kv,y2_kv);
-                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift,'linewidth',1.); hold on;                
+                plot(GL_CartPts.y1_kv,GL_CartPts.y2_kv+y2CartShift,'b'); hold on;                %'linewidth',1.
             end            
             
         end     

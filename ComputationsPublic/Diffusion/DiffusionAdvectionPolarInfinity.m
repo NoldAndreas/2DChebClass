@@ -1,12 +1,10 @@
 function DiffusionAdvectionPolarInfinity()
 %************************************************
-%data = DiffusionAdvectionPolarInfinity(N1,N2,doplotsBool)
-%
 % Diffusion Equation: 
 %  drhodt = Lap(rho) - u'*grad(rho);
 % Analytical Solution
-% xt = x - ux*t;   y = y - (3 + uy*t);  t0 = -1;
-%  y  = exp(-(x^2 + y^2)/(4*(t-t0)))./(t-t0);
+%  xt = x - ux*t;   y = y - (3 + uy*t);  t0 = -1;
+%  f  = exp(-(x^2 + y^2)/(4*(t-t0)))./(t-t0);
 %************************************************
 
     disp('** DiffusionAdvectionPolarInfinity **');
@@ -43,10 +41,8 @@ function DiffusionAdvectionPolarInfinity()
     %***********************  Plot Solution *************************
     %****************************************************************
     Rho_t = Rho_t';                
-    
-    giffile = 'DiffusionAdvectionInf.gif';    
-    figure('color','white','Position',[100 100 1100 1100]);
-    
+        
+    figure('color','white','Position',[100 100 1100 1100]);    
     for i=1:length(outTimes)        
         rho      = Rho_t(:,i);
         error    = max(abs( rho -  AnalyticalSolution(Pts.y1_kv,Pts.y2_kv,outTimes(i))));
@@ -54,9 +50,7 @@ function DiffusionAdvectionPolarInfinity()
         IDC.plot(rho,'SC');                
         title(['t = ', num2str(outTimes(i)),' Error: ',num2str(error,'%1.2e')]);
         zlim([0 max(rho_ic)]);
-        hold off;
-                
-        Record(i,giffile,0.1);       
+        hold off;                        
     end        
     
     
@@ -82,17 +76,5 @@ function DiffusionAdvectionPolarInfinity()
         t0 = -1;
         y  = exp(-r.^2./(4*(t-t0)))./(t-t0);
     end
-
-
-    %*****************************************************
-	%*****************************************************
-% 	function y = f(rho)
-%         y = DdoubleWellFE(rho) - Vext7(Pts.y1_kv,Pts.y2_kv);
-%         y = y(Ind.outR == 0);
-%     end
-% 
-%     function dy = DdoubleWellFE(x)
-%         dy = 2*x;
-%     end
 
 end

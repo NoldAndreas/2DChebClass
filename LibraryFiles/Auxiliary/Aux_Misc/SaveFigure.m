@@ -25,8 +25,9 @@ function fullName = SaveFigure(filename,opts)
     print2eps(fullName,gcf);
 	saveas(gcf,[fullName '.fig']);        
     matlab2tikz([fullName '.tex'],'showInfo',false);
+    save2pdf([fullName '.pdf'],gcf);
     
-    disp(['Figures saved in ',fullName '.fig/eps']);
+    disp(['Figures saved in ',fullName '.fig/eps/tex/pdf']);
         
     if((nargin >= 2) && ~isempty(opts)) 
         opts_filename = [fullName, '_figData.txt'];
