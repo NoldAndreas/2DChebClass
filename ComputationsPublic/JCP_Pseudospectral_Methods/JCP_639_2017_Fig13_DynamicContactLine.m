@@ -1,89 +1,65 @@
 function JCP_639_2017_Fig13_DynamicContactLine()
 
-    AddPaths('CodePaper');            
+    AddPaths('JCP_639_2017');            
     close all;
     
-    PhysArea = struct('N',[20,20],...
-                      'L1',4,'L2',2,...                      
-                      'alpha_deg',90);%'y2wall',0.,'N2bound',10,'h',1,... %max(10,2*round(n(i)/6));
-
-	SubArea      = struct('shape','Box','y1Min',-2,'y1Max',2,...
+	%**************************
+    % **** Initialization *****
+    %**************************
+    
+    PhysArea  = struct('N',[20,20],...
+                       'L1',4,'L2',2,...                                            
+                       'alpha_deg',90);
+	SubArea   = struct('shape','Box','y1Min',-2,'y1Max',2,...
                           'y2Min',0.5,'y2Max',2.5,...
-                          'N',[40,40]);
-                      
-    V2Num    = struct('Fex','SplitAnnulus','N',[80,80]);
-    %V2       = struct('V2DV2','BarkerHendersonCutoff_2D','epsilon',1,'LJsigma',1,'r_cutoff',5);     
-    V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
-
-    FexNum   = struct('Fex','FMTRosenfeld_3DFluid',...
-                       'Ncircle',1,'N1disc',50,'N2disc',50);
-                   
+                          'N',[40,40]);                      
+    V2Num     = struct('Fex','SplitAnnulus','N',[80,80]);
+    FexNum    = struct('Fex','FMTRosenfeld_3DFluid',...
+                       'Ncircle',1,'N1disc',50,'N2disc',50);                   
 	plotTimes = struct('t_int',[0,20],'t_n',100);
+    optsNum   = struct('PhysArea',PhysArea,...
+                       'FexNum',FexNum,'V2Num',V2Num,...
+                       'SubArea',SubArea,...
+                       'maxComp_y2',20,...
+                       'y1Shift',0,...
+                       'plotTimes',plotTimes);
 
-    optsNum = struct('PhysArea',PhysArea,...
-                     'FexNum',FexNum,'V2Num',V2Num,...
-                     'SubArea',SubArea,...%'PlotAreaCart',PlotAreaCart,
-                     'maxComp_y2',20,...
-                     'y1Shift',0,...
-                     'plotTimes',plotTimes);%0:0.05:5);
-
-    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856,...%0.928,...%0.94,...
+    V1 = struct('V1DV1','Vext_BarkerHenderson_HardWall','epsilon_w',0.856,...
                 'tau',5,'epsilon_w_max',1);
-
+	V2       = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);     
     optsPhys = struct('V1',V1,'V2',V2,...
                       'kBT',0.75,...                                               
                       'Dmu',0.0,'nSpecies',1,...
                       'sigmaS',1);
 
-    config = v2struct(optsNum,optsPhys);                                
+    config = v2struct(optsNum,optsPhys);                                    
+    N       = 20:10:70;    
     
-    N = 20:10:70;    
-    ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};    
-    comp       = [];    
-    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);    
+    %************************
+    % **** Computations *****
+    %************************
+    
+    
+    ignoreList = {'config_optsNum_PhysArea_N','config_optsNum_PlotAreaCart'};        
+    res{1} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],[],ignoreList);    
                 
     config.optsPhys.Inertial = true;    
     config.optsPhys.gammaS   = 2;        
-    res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
-    
-    %config.optsPhys.gammaS   = 5;
-    %res{3} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
-    
-    %config.optsPhys.gammaS   = 10;
-    %res{4} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],comp,ignoreList);
+    res{2} = DataStorage('DynamicError',@ComputeDynamicError,v2struct(config,N),[],[],ignoreList);    
     
     res = PostProcess(res);    
    
-    cols = {}; %{'g','b','c','k','r'};  
-    nocols = length(res{1});%length(cols);
-    for iC = 1:nocols
-        cols{end+1} = (nocols-iC)/nocols*[1 1 1];
-	end
-    %cols = {'g','b','c','k','r'};  nocols = length(cols);
-	syms = {'o','^','*','<','d','s','>'};  nosyms = length(syms);
-    lines = {'-','--',':','-.'}; nolines = length(lines);   
-    
-    
-    saveC   = res{2}.config;
-	saveC.N = N;         
-        
-    %PlotResultsOverTime(res{1},'massError_dt');
-    %PlotResults(res{1},'massError_dtMax');        
-    
-   
-    %PlotResultsOverTime(res,'massErrorRel_dt');  %SaveFigure('Dynamics_MassErrorTime',saveC);
-    PlotResultsOverTime(res,'mass',{'maxN'}); ylim([2.2 3]); f1 = gcf; %SaveFigure(['Dynamics_Mass'],saveC);        
+	%********************
+    % **** Plotting *****
+    %********************   	                
+    PlotResultsOverTime(res,'mass',{'maxN'}); ylim([1.9 2.6]); f1 = gcf; 
     PlotResults(res,'massErrorRel_dtMax');    f2 = gcf;  
-    inset2(f2,f1,0.3,[0.27,0.2]);   %close(f1);    
+    inset2(f2,f1,0.3,[0.27,0.2]);  close(f1);
     
-    
-    SaveFigure(['DynamicMaxMassError'],saveC);   
+    SaveFigure('JCP_639_2017_Fig13_a');   
     
     PlotExampleSnaptshots(res);
-    
-    %PlotResults(res{1},'MaxmassErrorRel');    
-    %PlotResultsOverTime(res{1},'massErrorRel');        
-    
+        
     function PlotExampleSnaptshots(res)
         conf = res{1}(3).config;
         conf.optsNum.PlotAreaCart = struct('y1Min',-5,'y1Max',5,...
@@ -93,7 +69,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
 
         CL = ContactLineHS(conf);
         CL.Preprocess(); 
-       % CL.ComputeEquilibrium();              
+        CL.ComputeEquilibrium();              
         CL.ComputeDynamics();            
         CL.PostprocessDynamics();
             
@@ -112,9 +88,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
     
     function res = PostProcess(res)
                 
-        
-        for i0 = 1:length(res)
-            
+        for i0 = 1:length(res)            
             NT = length(res{i0}(1).t);
             T  = res{i0}(1).t(end);
             [xt,w,D] = FDxw(NT);
@@ -154,8 +128,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
             CL.ComputeEquilibrium(struct('solver','Picard'));              
             CL.ComputeDynamics();            
             CL.PostprocessDynamics();
-
-           % CL.PlotDynamics();            
+       
             res(i).config          = conf;
             res(i).t               = CL.dynamicsResult.t;
             res(i).mass            = CL.dynamicsResult.Subspace.mass;
@@ -168,11 +141,18 @@ function JCP_639_2017_Fig13_DynamicContactLine()
             clear('CL');            
         end        
     end
-
     function PlotResultsOverTime(res,var,opts)
         if(nargin < 3)
             opts = {};
         end
+        lines = {'-','--',':','-.'};     
+        cols = {}; 
+        nocols = length(res{1});
+        for iC = 1:nocols
+            cols{end+1} = (nocols-iC)/nocols*[1 1 1];
+        end 
+        
+        
         figure('color','white','Position',[0 0 800 800]); 
         
         for i0 = 1:length(res)
@@ -195,6 +175,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
                                        
     end
     function PlotResults(res,var)
+        lines = {'-','--',':','-.'};     
         figure('color','white','Position',[0 0 800 800]);                 
         
         for i0 = 1:length(res)
@@ -215,8 +196,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
         set(gca,'fontsize',20);            
         xlabel('$N$','Interpreter','Latex','fontsize',20);
         ylabel(GetYLabel(var),...
-                                'Interpreter','Latex','fontsize',20);
-        %xlim([(n(1)-2),(n(end)+2)]);                           
+                                'Interpreter','Latex','fontsize',20);       
     end
     function str = GetYLabel(var)        
 

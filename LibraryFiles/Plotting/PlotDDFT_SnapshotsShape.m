@@ -24,7 +24,7 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
         UV_t = flux_t;
     end
     
-    plotTimes  = t;%optsNum.plotTimes;    
+    plotTimes  = t;
     n          = length(plotTimes);
     fl_norm    = 0.1*max(max(max(abs(UV_t))));
     disp(['Flux normalized with ',num2str(fl_norm)]);
@@ -64,8 +64,7 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
     end
     %**************************************
     %Initialization of figure and screen, and movie    
-    if(~IsOption(opts,'noNewFigure'))
-        %close all;
+    if(~IsOption(opts,'noNewFigure'))       
         figure('Color','white','Position', [0 0 (200+300*cols) (200+300*rows)]);            
     end
     %*****************************    

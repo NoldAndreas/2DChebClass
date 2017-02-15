@@ -63,7 +63,7 @@ function JCP_639_2017_Fig5_ConvolutionConvergence()
                             'Interpreter','Latex','fontsize',20);
     xlim([(NS(1)-2),(NS(end-1)+2)]);
     ylim([1e-16 1]);
-    SaveFigure('JCP_639_2017_Fig5_ConvolutionConvergence',v2struct(N,NS,config));
+    SaveFigure('JCP_639_2017_Fig5',v2struct(N,NS,config));
 
     
     function res = ComputeError(in,h)

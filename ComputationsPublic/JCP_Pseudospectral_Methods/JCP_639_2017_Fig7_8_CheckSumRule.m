@@ -57,12 +57,19 @@ function JCP_639_2017_Fig7_8_CheckSumRule()
                   'config_optsNum_FexNum_N2disc',...
                   'NS'};              
         
+        %************************************
+        % **** Hard sphere computations *****
+        %************************************
         eta            = 0.3257;
         res{1}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],[],ignoreList);    
 
         eta            = 0.0147;    
         res{2}         = DataStorage('SumRuleError',@ComputeError,v2struct(N,config,eta),[],[],ignoreList);      
 
+        %*****************************************************************
+        % **** Computations for a fluid with long range interactions *****
+        %*****************************************************************
+        
         config.optsNum.V2Num = struct('Fex','SplitAnnulus','N',[80,80]);
         config.optsPhys.V2   = struct('V2DV2','BarkerHenderson_2D','epsilon',1,'LJsigma',1,'r_cutoff',2.5);
         config.optsPhys.V1.epsilon_w = 0.865;

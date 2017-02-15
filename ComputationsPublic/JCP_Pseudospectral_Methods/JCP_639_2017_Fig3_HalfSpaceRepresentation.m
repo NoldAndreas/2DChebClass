@@ -24,7 +24,7 @@ function JCP_639_2017_Fig3_HalfSpaceRepresentation()
     xlabel('$y_1$','Interpreter','Latex','fontsize',25);
     ylabel('$y_2$','Interpreter','Latex','fontsize',25);
     
-    SaveFigure('JCP_639_2017_Fig3_HalfSpaceRepresentation_a');
+    SaveFigure('JCP_639_2017_Fig3_a');
 
 
     %********************************************

@@ -3,11 +3,11 @@ function JCP_639_2017_Fig4_IntersectionFigures
     AddPaths('JCP_639_2017');
     close all;
 
-    FigPlot(0,0.5,'InfAnnulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_IntersectionFigures_a');
-    FigPlot(0,1.1,'InfAnnulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_IntersectionFigures_b');
+    FigPlot(0,0.5,'InfAnnulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_a');
+    FigPlot(0,1.1,'InfAnnulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_b');
 
-    FigPlot(0,0.5,'Annulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_IntersectionFigures_c');
-    FigPlot(0,1.1,'Annulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_IntersectionFigures_d');
+    FigPlot(0,0.5,'Annulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_c');
+    FigPlot(0,1.1,'Annulus'); xlim([-2.5 2.5]); ylim([0 4]); SaveFigure('JCP_639_2017_Fig4_d');
 
     function FigPlot(y10,y20,shapeType)
        

@@ -13,7 +13,7 @@ function JCP_639_2017_Fig2_GaussianInterpolation
     subplot(1,3,1); Plot(geom.N-20,infLine);    
     subplot(1,3,2); Plot(geom.N-6,infLine);    
     subplot(1,3,3); Plot(geom.N-3,infLine);
-    SaveFigure('JCP_639_2017_Fig2_GaussianInterpolation');
+    SaveFigure('JCP_639_2017_Fig2');
         
     function g = Gaussian(x)
         mu    = 0;

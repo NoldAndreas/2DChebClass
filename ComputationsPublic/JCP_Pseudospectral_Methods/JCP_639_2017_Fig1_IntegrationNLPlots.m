@@ -24,7 +24,7 @@ function JCP_639_2017_Fig1_IntegrationNLPlots
     set(gca,'XTickLabel',Lvals);
     xlabel('$L$','interpreter','latex');
     ylabel('$N$','interpreter','latex');
-    SaveFigure('JCP_639_2017_Fig1_IntegrationNLPlots');
+    SaveFigure('JCP_639_2017_Fig1');
 
     function IntError = IntegrationNL(N,L)
 
