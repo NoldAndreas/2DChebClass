@@ -92,8 +92,7 @@ classdef DDFT_2D < Computation
                 end
                 return;
           end
-            
-          %if(~isfield(optsPhys,'HSBulk') && ~isfield(optsNum,'HSBulk'))
+                     
           if(~isfield(optsPhys,'Dmu') && ~isfield(optsPhys,'mu'))
               
             % initial guess for mu doesn't really matter

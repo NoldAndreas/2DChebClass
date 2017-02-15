@@ -1,7 +1,5 @@
  function res = CheckAverageDensities_Rosenfeld_3D(this,IntMatrFex_2D,opts)           
- 
-    this
- 
+  
        if((nargin > 2) && islogical(opts))
            VisualOutput = opts;
        else
@@ -14,7 +12,7 @@
            topB = false;
        end
        
-       if(isa(this,'InfCapillary_FMT')) %(nargin > 2) &&  strcmp(opts,'checkTop')
+       if(isa(this,'InfCapillary_FMT'))
            y2Min    = this.y2Min;
            checkTop = true;
        else
@@ -179,21 +177,10 @@
             FMT_Bulk  = FexBulk_FMTRosenfeld_3DFluid(1,1);
             PrintErrorPos(FMT(end)-FMT_Bulk,'Bulk FMT Value');
         end
-%         if(abs(FMT(end)-FMT_Bulk) > 1e-3)            
-%             cprintf('red','Error for computation of bulk FMT value > 10^(-3) \n');
-%             figure('name','FMT');
-%             do1Dplot_D(FMT);
-%         else
-%             cprintf('green','Error for computation of bulk FMT value < 10^(-3) \n');
-%         end
 
-%        cprintf('blue','Please check for errors in computation of average densities. \n');        
-%        pause(2);       
-%         close(f1);
 
     function y = f3_h2Diff(x)
         y          = (f3_h2(x,x+R) - f3_h2(x,max(R,x-R)));
-        %y         = f3_h2(x,x+R) - f3_h2(max(R,x-R));
         y(x > 20)  = 4/3*pi*R^3;
     end
     function y = f3_h2(x,xt)
@@ -292,12 +279,10 @@
         
     end
     function y  = check1n2z(x)
-        y        = zeros(size(x));
-        
+        y        = zeros(size(x));        
         markB    = (x < (y2Min+R));
         xR       = x(markB) - (y2Min - R);
         y(markB) = pi*xR.*(xR-2*R);                    
-        %y(x < 1) = pi*(x(x<1)).*(x(x<1)-2*R);        
         
         if(topB)
             markT    = ((this.y2Max+R -x) < 1);
@@ -395,8 +380,6 @@
             plot(Interp1D_AD.ptsCart.y2_kv,Interp1D_AD.InterPol*val,'linewidth',1.5);
             xlim([min(Interp1D_AD.ptsCart.y2_kv) max(Interp1D_AD.ptsCart.y2_kv)]);    
             h = xlabel('$y$');     set(h,'Interpreter','Latex'); set(h,'fontsize',25);
-        	%h = ylabel('$\rho$');  set(h,'Interpreter','Latex'); set(h,'fontsize',25);                        
-            %title(sel(i));    
             set(gca,'fontsize',20);                        
             set(gca,'linewidth',1.5);                        
     end

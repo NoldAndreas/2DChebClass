@@ -69,8 +69,7 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         [h1,h2,Int_1D_AD]  = HS.AD.ComputeIntegrationVector();
         
         IntMatrFex_1D     = Get1DMatrices(IntMatrFex_2D,HS);    
-        IntMatrFex        = IntMatrFex_1D;
-   %     IntMatrFex.DiffAD = HS.AD.ComputeDifferentiationMatrix;                 
+        IntMatrFex        = IntMatrFex_1D;   
     end
     
     if(isempty(Conv))
@@ -79,7 +78,7 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         Conv = Conv(markComp,markComp);
     end                   
     
-    y2MaxInt = inf;%inf;%inf;%inf;%40;
+    y2MaxInt = inf;
 	Int_1D(ptsCart.y2_kv>y2MaxInt) = 0;
     mark      = (HS.AD.Pts.y1_kv == inf);
     PtsADCart = HS.AD.GetCartPts();
@@ -102,10 +101,9 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
             y0        = kBT*log(optsPhys.rho_iguess)*ones(length(Pts.y1_kv),nSpecies);                          
         end
     else
-        y0        = zeros(length(Pts.y1_kv),nSpecies);%getInitialGuess(VAdd0);                
+        y0        = zeros(length(Pts.y1_kv),nSpecies);
     end       
-    y0 = y0(markComp);    
-    %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                           
+    y0 = y0(markComp);        
     
     if(IsOption(opts,'Newton'))
         [x_ic_1D,errorHistory1] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
@@ -113,8 +111,8 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         errorHistory            = [errorHistory1,errorHistory2];
         semilogy(errorHistory);
     elseif(IsOption(opts,'Picard'))
-        xmin = -10;%kBT*log(0.1*rhoGas_eq);
-        xmax = 20;%kBT*log(10*rhoLiq_eq);
+        xmin = -10;
+        xmax = 20;
         x_ic = y0;
         err  = 1; it = 1;
         while((err > 1e-10) && (it < 4000))
@@ -135,13 +133,10 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
             [dx,err]   = GetdX_nP1(x_ic);
             l_max  = (xmax - x_ic)./dx; l_max(l_max < 0) = 100;
             l_min  = (xmin - x_ic)./dx; l_min(l_min < 0) = 100;
-            %lambda = min(1,0.8*min(min(l_max),0.8*min(l_min)));
-            %x_ic       = x_ic + lambda*dx;
-            %disp(['Iteration ',num2str(it),': ',num2str(err),' lambda = ',num2str(lambda)]);
+
             lambda = min(1,0.1*min(l_max,l_min));
             x_ic       = x_ic + lambda.*dx;            
             x_ic(HS.Pts.y2 > 5) = kBT*log(rhoGas_eq);
-            %x_ic       = max(min(x_ic,xmax),xmin);
             disp(['Iteration ',num2str(it),': ',num2str(err),' min(lambda) = ',num2str(min(lambda)),' max(lambda) = ',num2str(max(lambda))]);
             it = it+1;
         end
@@ -156,12 +151,8 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
             drho(HS.Pts.y2 > 10) = 0;
             l_max  = (rho_max - rho_ic)./drho; l_max(l_max < 0) = 100;
             l_min  = (rho_min - rho_ic)./drho; l_min(l_min < 0) = 100;
-            %lambda = min(0.05,0.1*min(min(l_max),0.8*min(l_min)));
-            %x_ic       = x_ic + lambda*dx;
-            %disp(['Iteration ',num2str(it),': ',num2str(err),' lambda = ',num2str(lambda)]);            
             lambda_maxAbs = 0.05;
             lambda = min(lambda_maxAbs,0.8*min(l_max,l_min));            
-            %lambda = 0.1;
             rho_ic       = rho_ic + lambda.*drho;            
             rho_ic(HS.Pts.y2 > 10) = rhoGas_eq;
             [err,i_err] = max(abs(drho));
@@ -190,8 +181,7 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
     %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
     
     if(~isempty(dVAdd.dy2))
-        checkContactDensity = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
-        %checkContactDensity = (p)/kBT;
+        checkContactDensity               = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
         postParms.contactDensity_relError = ((rho_ic1D(1)-checkContactDensity)/checkContactDensity);
         PrintErrorPos(rho_ic1D(1)-checkContactDensity,'First Sum Rule - for Contact Density');
         PrintErrorPos(postParms.contactDensity_relError*100,'First Sum Rule - for contact density (in per cent)');
@@ -206,7 +196,7 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
         if(IsOption(opts,'NoCollPts'))
             bool_collPts = [];
         else
-            bool_collPts = 'o';%[]; %'o'
+            bool_collPts = 'o';
         end
         f1 = figure;        
         
@@ -223,27 +213,22 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
             
         deltaY = 0.5;
         if(strcmp(optsPhys.V2.V2DV2,'zeroPotential') && strcmp(optsPhys.HSBulk,'FexBulk_FMTRosenfeld_3DFluid'))                
-            Interp1D                  = HS.ComputeInterpolationMatrix(1,(-1:0.01:0.7)',true,true);        
-            Interp1D.InterPol         = Interp1D.InterPol(:,markComp);
-            Interp1D.ptsCart          = HS.GetCartPts(Interp1D.pts1,Interp1D.pts2);
-            dataMC = LoadGrootData(eta*6/pi);                        
-            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on; %'markersize',8
+            Interp1D              = HS.ComputeInterpolationMatrix(1,(-1:0.01:0.7)',true,true);        
+            Interp1D.InterPol     = Interp1D.InterPol(:,markComp);
+            Interp1D.ptsCart      = HS.GetCartPts(Interp1D.pts1,Interp1D.pts2);
+            dataMC                = LoadGrootData(eta*6/pi);                        
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on;
             
             f2 = figure('Color','white');
-            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on; %'markersize',8
+            plot(dataMC.y-deltaY,dataMC.rho,'ks','markerFace','k'); hold on;
             if(eta == 0.4783)
-                %shift = struct('xmin',0.5,'xmax',.6,'ymin',0.,'ymax',11.,'yref',0,'xref',0.5);
-                %PlotBackgroundImage(['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'Inset_PackingFraction0_4783_RothFMTReview.gif'],shift);
                 xlim([0.5 .6]-0.5);   ylim([0 12]);
-            elseif(eta == 0.3744)
+            elseif(abs(eta - 0.3744) < 0.0001)
                 xlim([0.8 1.4]);   ylim([0.5 1.2]);
             elseif(eta == 0.4257)
-                %shift = struct('xmin',1.3,'xmax',1.8,'ymin',0.65,'ymax',1.55,'yref',0.65,'xref',1.3);
-                %PlotBackgroundImage(['Fex' filesep 'FMT' filesep 'SpecialPlotting' filesep 'Inset_PackingFraction0_4257_RothFMTReview.gif'],shift);
                 xlim([1.3 1.8]-0.5);   ylim([0.65 1.55]);
             end
-            %plot(PtsCart.y2_kv(markComp),rho_ic1D,'o','markersize',8,'markerFace','green'); hold on
-            plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k'); %'linewidth',1.5 %Interp1D.pts2
+            plot(Interp1D.ptsCart.y2_kv-deltaY,Interp1D.InterPol*rho_ic1D,'k');
             h = xlabel(xLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
             h = ylabel(yLabelTxt);  set(h,'Interpreter','Latex'); set(h,'fontsize',25);
             pbaspect([1 1 1]);                            
