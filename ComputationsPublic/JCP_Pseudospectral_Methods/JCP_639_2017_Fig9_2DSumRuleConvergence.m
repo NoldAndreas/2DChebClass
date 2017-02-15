@@ -1,6 +1,6 @@
 function JCP_639_2017_Fig9_2DSumRuleConvergence()
     
-    AddPaths('CodePaper');
+    AddPaths('JCP_639_2017');
 
     PhysArea = struct('N',[20,20],...
                       'L1',4,'L2',2,...
