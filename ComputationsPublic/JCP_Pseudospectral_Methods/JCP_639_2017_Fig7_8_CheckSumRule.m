@@ -232,8 +232,7 @@ function JCP_639_2017_Fig7_8_CheckSumRule()
         set(gca,'linewidth',1.5);
         set(gca,'fontsize',20);
         xlabel('$N$','Interpreter','Latex','fontsize',20);
-        ylabel(yLab,'Interpreter','Latex','fontsize',20);
-        xlim([(N(1)-2),(N(end)+2)]);            
+        ylabel(yLab,'Interpreter','Latex','fontsize',20);        
     end
     function PlotErrorGraph(res,var_name,sym,col)        
         n = 1;                
