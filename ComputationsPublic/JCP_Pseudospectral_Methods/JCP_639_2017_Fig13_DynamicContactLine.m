@@ -54,11 +54,11 @@ function JCP_639_2017_Fig13_DynamicContactLine()
     %********************   	                
     PlotResultsOverTime(res,'mass',{'maxN'}); ylim([1.9 2.6]); f1 = gcf; 
     PlotResults(res,'massErrorRel_dtMax');    f2 = gcf;  
-    inset2(f2,f1,0.3,[0.27,0.2]);  close(f1);
-    
+    inset2(f2,f1,0.3,[0.27,0.2]);  close(f1);    
     SaveFigure('JCP_639_2017_Fig13_a');   
     
     PlotExampleSnaptshots(res);
+    SaveFigure('JCP_639_2017_Fig13_b');
         
     function PlotExampleSnaptshots(res)
         conf = res{1}(3).config;
@@ -82,8 +82,7 @@ function JCP_639_2017_Fig13_DynamicContactLine()
         plotData.data.t = plotData.data.t(plotData.data.t < 3.1);
         
         figure('color','white','Position',[0 0 800 800]);
-        PlotDDFT_SnapshotsShape(plotData,[CL.FilenameDyn,'_4Snapshots'],{'4Snapshots','noNewFigure','NumericsManuscript'});                
-        
+        PlotDDFT_SnapshotsShape(plotData,[],{'4Snapshots','noNewFigure','NumericsManuscript'});                        
     end
     
     function res = PostProcess(res)

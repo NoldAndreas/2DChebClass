@@ -128,10 +128,7 @@ function PlotDDFT_SnapshotsShape(input,file_name,opts)
         %    'fontsize',15);
         pl_j = pl_j +1;                
     end        
-    if(nargin > 1)
+    if((nargin > 1) && ~isempty(file_name))
         SaveFigure(file_name,v2struct(optsPhys,optsNum));
-            %print2eps(file_name,gcf);
-            %saveas(gcf,[file_name,'.fig']);
-            %disp(['Snapshots saved in ',file_name,'.eps/.fig.']);
 	end
 end
