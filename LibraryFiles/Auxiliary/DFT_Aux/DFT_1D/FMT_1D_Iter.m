@@ -84,7 +84,9 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
     PtsADCart = HS.AD.GetCartPts();
     Int_1D_AD(PtsADCart.y2_kv(mark)>y2MaxInt) = 0;
     
-	cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);    
+    if(y2MaxInt < Inf)
+        cprintf('-k',['For integration, values of rho for y2Cart > ',num2str(y2MaxInt),' are ignored.\n']);    
+    end
         
     %****************************************************************
     %**************** Solve for equilibrium 1D condition   **********
@@ -106,10 +108,8 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
     y0 = y0(markComp);        
     
     if(IsOption(opts,'Newton'))
-        [x_ic_1D,errorHistory1] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
-        [x_ic_1D,errorHistory2] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);   
-        errorHistory            = [errorHistory1,errorHistory2];
-        semilogy(errorHistory);
+        [x_ic_1D] = NewtonMethod(zeros(N+4*N_AD,1),@f,1,3,0.3,{'returnLastIteration'});
+        [x_ic_1D] = NewtonMethod(x_ic_1D,@f,1e-10,200,1);   
     elseif(IsOption(opts,'Picard'))
         xmin = -10;
         xmax = 20;
@@ -176,10 +176,7 @@ function [rho_ic1D,postParms] = FMT_1D_Iter(HS,IntMatrFex_2D,optsPhys,FexNum,Con
 	%*****************************************
     %**************** PostProcess   **********
     %*****************************************
-    %postParms.Fex = GetExcessGrandPotential(rho_ic1D);   
-    
-    %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]
-    
+    %Check Contact Density: see also Eq. (13a) of [Swol,Henderson,PRA,Vol 40,2567]    
     if(~isempty(dVAdd.dy2))
         checkContactDensity               = (pBulk + Int_1D*(rho_ic1D.*dVAdd.dy2) )/kBT;
         postParms.contactDensity_relError = ((rho_ic1D(1)-checkContactDensity)/checkContactDensity);

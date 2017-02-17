@@ -84,7 +84,6 @@ function JCP_639_2017_Fig13_DynamicContactLine()
         figure('color','white','Position',[0 0 800 800]);
         PlotDDFT_SnapshotsShape(plotData,[],{'4Snapshots','noNewFigure','NumericsManuscript'});                        
     end
-    
     function res = PostProcess(res)
                 
         for i0 = 1:length(res)            

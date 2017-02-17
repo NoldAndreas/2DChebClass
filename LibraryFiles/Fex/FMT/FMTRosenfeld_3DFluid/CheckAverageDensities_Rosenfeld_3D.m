@@ -3,7 +3,7 @@
        if((nargin > 2) && islogical(opts))
            VisualOutput = opts;
        else
-           VisualOutput = true;
+           VisualOutput = false;
        end
        
        if(isa(this,'InfCapillary'))

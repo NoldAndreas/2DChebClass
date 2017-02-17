@@ -137,7 +137,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
         else
             bool_collPts = 'o';%[]; %'o'
         end
-        f1 = figure;
+        f1 = figure('name','Wall-fluid interface');
         
         subplot(3,3,[1,2,4,5,7,8]);
         HS.do1DPlotNormal(rho_ic1D,bool_collPts); hold on;
@@ -236,7 +236,7 @@ function [rho_ic1D,postParms] = FMT_1D(HS,IntMatrFex_2D,optsPhys,FexNum,Conv,opt
             colormap(gray);    
             set(gcf,'Color','white');            
         end
-        SaveFigure(['Density_Wall_rho=0_',num2str(ceil(100*rho_ic1D(end)))]);                        
+        %SaveFigure(['Density_Wall_rho=0_',num2str(ceil(100*rho_ic1D(end)))]);                        
         %***************************************************************
         %figure('name','Variation of FMT Excess Free Energy for initial condition');
         %do1Dplot_D(Fex_FMTRosenfeld_3DFluid(rho_ic1D,IntMatrFex,kBT));

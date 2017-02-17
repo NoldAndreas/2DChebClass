@@ -86,13 +86,8 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
     IP0 = barychebevalMatrix(Pts.x1,0);
    
     %PlotRosenfeldFMT_AverageDensities(HS,IntMatrFex(1),ones(size(y0)));                       
-    fsolveOpts       = optimset('MaxFunEvals',2000000,'MaxIter',200000,'Algorithm','Levenberg-Marquardt','Display','off','TolFun',1e-10,'TolX',1e-10);
-    [x_ic_1D,h1,flag] = fsolve(@f,y0,fsolveOpts);
-    if(flag ~= 1)
-        cprintf('red','Error in fsolve, FMT_1D_Interface.\n');
-        fsolveOpts       = optimset('MaxFunEvals',2000000,'MaxIter',200000,'Algorithm','Levenberg-Marquardt');
-        x_ic_1D = fsolve(@f,y0,fsolveOpts);
-    end
+    fsolveOpts    = optimset('MaxFunEvals',2000000,'MaxIter',200000,'Algorithm','Levenberg-Marquardt','Display','off');%'TolFun',1e-10,'TolX',1e-10);
+    x_ic_1D       = fsolve(@f,y0,fsolveOpts);
     rho_ic1D      = exp(x_ic_1D/kBT);     
     postParms.Fex = GetExcessGrandPotential(rho_ic1D);    
 
@@ -101,7 +96,8 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
     %*****************************************
     if(BoolPlot)
         
-        f1 = figure('Color','white','Position', [0 0 1000 1000]);        
+        f1 = figure('Color','white','Position', [0 0 1000 1000],...
+                    'name','Liquid-vapour interface');        
         HS.do1DPlotParallel(rho_ic1D); hold on;
         plot([-5 5],[optsPhys.rhoLiq_sat,optsPhys.rhoLiq_sat],'--','linewidth',2);
         plot([-5 5],[optsPhys.rhoGas_sat,optsPhys.rhoGas_sat],'--','linewidth',2);
@@ -143,12 +139,12 @@ function [rho_ic1D,postParms] = FMT_1D_Interface(HS,IntMatrFex_2D,optsPhys,FexNu
             
             colormap(gray);    
             set(gcf,'Color','white');            
+            set(gcf, 'Position', [0 0 1400 1000]);
             
             if(~exist(dirData,'dir'))                        
                 mkdir(dirData);
             end
-            
-            SaveFigure('Density_Interface');                        
+            %SaveFigure('Density_Interface');                        
          end
     end
     
