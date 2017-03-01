@@ -11,9 +11,13 @@ AddPaths();
 %--------------------------------------------------------------------------
 
 % CONFINED HI PAPER
-inputFile = 'ConfinedHIPaperInfSpace';  % For confined HI paper
-%inputFile = 'ConfinedHIPaperHalfSpaceTowards';  % For confined HI paper
-%inputFile = 'ConfinedHIPaperHalfSpaceAway'; % For confined HI paper
+inputFile = 'ConfinedHIPaperInfSpace';  
+%inputFile = 'ConfinedHIPaperHalfSpaceTowards';  
+%inputFile = 'ConfinedHIPaperHalfSpaceAway'; 
+
+% COMPUTATIONAL PAPER
+%inputFile = 'JCP_639_2017_Fig10_14_Gaussians';
+%inputFile = 'JCP_639_2017_Fig11_15_HardDiscs';
 
 %--------------------------------------------------------------------------
 % Get parameters from input file
