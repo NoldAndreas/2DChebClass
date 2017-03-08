@@ -4,11 +4,7 @@
     % Set current data folder
     %*****************************
     global dirData      
-    %dirData    = 'D:\2DChebData';                
-    %dirData    = '/Users/NoldAndreas/Documents/2DChebData';            
-    %dirData    = '/home/bgoddard/work/MATLAB/Fluids/2DChebData';            
-    %dirData    = '/Users/Ben/work/MATLAB/Fluids/2DChebData';
-	dirData    = '/Users/andreas/Documents/2DChebData'; 
+    dirData = [pwd filesep 'Results']; 
     
     %***********************************
     % Initialization of main data folder
