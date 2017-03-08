@@ -148,7 +148,7 @@ function JCP_639_2017_Fig9_2DSumRuleConvergence()
     function res = ComputeError(in,h)
         conf = in.config;
                 
-        for i = 1:length(n)
+        for i = 1:length(in.N)
             
             conf.optsNum.PhysArea.N  = in.N(i)*[1,1];                
             CL            = ContactLineHS(conf);
