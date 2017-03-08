@@ -65,6 +65,7 @@ tMax=0.25;
 
 % number of samples to take of the initial equilibrium
 nSamples=5000000;  
+%nSamples=5000;  
  
 % intial condition for sampling
 initialGuess='makeGrid';
@@ -74,8 +75,8 @@ initialGuess='makeGrid';
 nRuns = 1;
 
 % number of cores to use in parallel processing
-poolsize=12;
-% poolsize = 1
+%poolsize=12;
+poolsize = 1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r'};
@@ -89,7 +90,7 @@ stocHIType={[]};
 stocName={'r0'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={false};
+doStoc={true};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true};
@@ -148,7 +149,7 @@ for iN = 1:length(Nlist);
     PlotArea = cat(2,PlotArea,Plot_Area);
     FexNum = cat(2,FexNum,Fex_Num);
     V2Num = cat(2,V2Num,{[]});
-    eqNum = cat(2,eqNum,eqNum);
+    eqNum = cat(2,eqNum,eq_Num);
     DDFTCode = cat(2,DDFTCode,'DDFTDynamics');
     DDFTParamsNames = cat(2,DDFTParamsNames,{paramNames});
     DDFTType = cat(2,DDFTType,'r');
@@ -156,7 +157,7 @@ for iN = 1:length(Nlist);
     loadDDFT = cat(2,loadDDFT,true);
     DDFTName = cat(2,DDFTName, num2str(N));
 end
-                  
+
 % whether to do the built-in DDFT plotting
 doPlots = false;
 

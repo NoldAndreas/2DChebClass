@@ -81,18 +81,18 @@ tMax = 5;
 
 % number of samples to take of the initial equilibrium
 
-nSamples=5000000;  
+%nSamples=5000000;  
+nSamples=5000;  
 sampleFinal = false;  % dont sample at final time
 
 initialGuess='makeGridPosScale'; % intial guess for sampling
 
 % number of runs of stochastic dynamics to do, and average over
-%nRuns=50000;
-nRuns=100;
+nRuns=1;
 
 % number of cores to use in parallel processing
-poolsize=12;
-%poolsize=4;
+%poolsize=12;
+poolsize=1;
 
 % type of calculation, either 'rv'=Langevin or 'r'=Ermak-MCammon
 stocType={'r'};
@@ -136,7 +136,7 @@ V2_Num   = struct('Fex','Meanfield','N',[20;20]);
 
 eq_Num = struct('eqSolver','fsolve');
 
-paramNames = {'PhysArea','PlotArea','V2Num','eqNum''doPlots'};
+paramNames = {'PhysArea','PlotArea','V2Num','eqNum','doPlots'};
 
 PhysArea = {};
 PlotArea = {};
