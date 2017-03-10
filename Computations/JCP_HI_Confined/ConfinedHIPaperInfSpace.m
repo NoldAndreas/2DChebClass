@@ -93,8 +93,8 @@ stocHIType={[],'RP2D'};
 stocName={'noHI','RP'};
 
 % whether to do Langevin and Brownian dynamics
-%doStoc={true,true};
-doStoc={false,false};
+doStoc={true,true};
+%doStoc={false,false};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true};
@@ -118,7 +118,7 @@ y2Plot=10;
 
 Phys_Area = struct('shape','InfSpace_FMT','y1Min',-inf,'y1Max',inf,'N',[40,40],'L1',4,...
                     'y2Min',-inf,'y2Max',inf,'L2',4);
-                
+
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
@@ -209,11 +209,11 @@ nBins=[20;20];
 
 % determine which movies/plots to make
 % distribution movies/plots
-doMovieGif     = true;
+doMovieGif     = false;
 doMovieAvi     = false;
 doInitialFinal = false;
 doMeans        = false;
 doEquilibria   = false;
-doSnapshotsError = false;
+doSnapshotsError = true;
 
 sendEmail = false;

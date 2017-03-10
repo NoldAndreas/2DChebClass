@@ -76,6 +76,7 @@ sampleFinal = false;
 % number of runs of stochastic dynamics to do, and average over
 nRuns = 10000;
 
+
 % number of cores to use in parallel processing
 poolsize=12;
 
@@ -93,7 +94,8 @@ stocHIType={[],'fullWall2D','RP2D'};
 stocName={'No HI','Full HI','RP'};
 
 % whether to do Langevin and Brownian dynamics
-doStoc={false,false,false};
+%doStoc={false,false,false};
+doStoc={true,true,true};
 
 % whether to load saved data for Langevin and Brownian dynamics
 loadStoc={true,true,true};
@@ -114,9 +116,10 @@ stocColour = {{'r'},{'m'},{'b'}};
 y1Plot=10;
 y2Plot=10;
 
-Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
-                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90); 
 
+Phys_Area = struct('shape','HalfSpace_FMT','N',[40;40],'L1',3,'L2',3, ...
+                        'y2wall',0,'N2bound',10,'h',1,'L2_AD',1,'alpha_deg',90);                    
+                    
 Sub_Area = struct('shape','Box','y1Min',-3,'y1Max',3,'N',[20,20],...
                       'y2Min',0.5,'y2Max',1);
                    
