@@ -200,7 +200,7 @@ function JCP_639_2017_Fig7_8_CheckSumRule()
                 [~,res(i).rho_1D,params] = CL.Compute1D(in.eta);
                 res(i).error_wl = params.contactDensity_relError;                                                                                
             else
-                res(i).error_conv1 = preErr.error_conv1;
+               % res(i).error_conv1 = preErr.error_conv1;
                 res(i).Conv        = CL.IntMatrV2.Conv;
 
                 [~,res(i).rho_1D_WL,params] = CL.Compute1D('WL');

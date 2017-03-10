@@ -61,7 +61,8 @@ function JCP_639_2017_Fig13_DynamicContactLine()
     SaveFigure('JCP_639_2017_Fig13_b');
         
     function PlotExampleSnaptshots(res)
-        conf = res{1}(3).config;
+        id_plot = min(3,length(res{1}));
+        conf = res{1}(id_plot).config;
         conf.optsNum.PlotAreaCart = struct('y1Min',-5,'y1Max',5,...
                                            'y2Min',0.5,'y2Max',10.5,...
                                            'N1',100,'N2',100,...

@@ -51,14 +51,14 @@ function JCP_639_2017_Fig9_2DSumRuleConvergence()
     close all;
         
     % **** Plot computation times ****
-    f0 = figure('color','white','Position',[0 0 800 800]); 
-    PlotErrorGraph(res,'compTimeEq','k','k');
-    set(gca,'yscale','log'); 
-    ylim([50 10^4]);
-    set(gca,'fontsize',15); set(gca,'linewidth',1.5);
-    xlabel('$N$','Interpreter','Latex','fontsize',20);%/{\sigma}
-	ylabel('t (sec.)','Interpreter','Latex','fontsize',20); %/{\sigma}    
-    SaveFigure('CompTime');      
+%     f0 = figure('color','white','Position',[0 0 800 800]); 
+%     PlotErrorGraph(res,'compTimeEq','k','k');
+%     set(gca,'yscale','log'); 
+%     ylim([50 10^4]);
+%     set(gca,'fontsize',15); set(gca,'linewidth',1.5);
+%     xlabel('$N$','Interpreter','Latex','fontsize',20);%/{\sigma}
+% 	ylabel('t (sec.)','Interpreter','Latex','fontsize',20); %/{\sigma}    
+%     SaveFigure('CompTime');      
     
     % **** Plot error convergence ****
     f2 = figure('color','white','Position',[0 0 800 800]); 
@@ -71,7 +71,7 @@ function JCP_639_2017_Fig9_2DSumRuleConvergence()
     xlim([(N(1)-2),(N(end)+2)]);    
 	
     % **** Produce full figure ****
-    inset2(f2,f0,0.3,[0.25,0.2]); close(f0);
+%    inset2(f2,f0,0.3,[0.25,0.2]); close(f0);
     SaveFigure('JCP_639_2017_Fig9_b',v2struct(N,config));
     
     function PlotDisjoiningPressureProfiles(res)

@@ -113,13 +113,13 @@ function JCP_639_2017_Fig5_ConvolutionConvergence()
                 CL.optsNum.V2Num.Fex            = 'SplitAnnulus';
                 CL.optsPhys.V2.V2DV2            = 'BarkerHenderson_2D'; 
                 preErr                          = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_conv_BHcutoff    = preErr.error_conv1;
+                %res(i,j).error_conv_BHcutoff    = preErr.error_conv1;
                 res(i,j).ConvBHCutoff           = CL.IntMatrV2.Conv;
 
                 CL.optsNum.V2Num.Fex            = 'SplitDisk';
                 CL.optsPhys.V2.V2DV2            = 'BarkerHenderson_2D'; 
                 preErr                          = CL.Preprocess_MeanfieldContribution();                
-                res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
+%                res(i,j).error_conv_SplitDisk   = preErr.error_conv1;
                 res(i,j).ConvSplitDisk          = CL.IntMatrV2.Conv;
         
                 close all;                       
