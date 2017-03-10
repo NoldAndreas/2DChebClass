@@ -21,6 +21,7 @@ The code currently runs using Matlab2014a and Matlab2016a.
 Andreas Nold 
 andreasnold05@gmail.com
 andreas.nold09@imperial.ac.uk
+andreas.nold@brain.mpg.de
 
 Ben Goddard
 b.goddard@ed.ac.uk
